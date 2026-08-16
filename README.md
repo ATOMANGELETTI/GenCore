@@ -37,6 +37,7 @@ Plugin **folder** names are `gencore-plugin-pty` / `gencore-plugin-fs`. The Carg
 - Rust stable with `rustfmt` and `clippy` (`rust-toolchain.toml`)
 - Tauri 2 system dependencies for Windows ([Tauri prerequisites](https://v2.tauri.app/start/prerequisites/))
 - WebView2 Runtime (ships with Windows 10/11; portable ZIPs do not include a bootstrapper)
+- Git LFS (bundled with Git for Windows); run `git lfs install` once. GitHub does not copy LFS objects into “Use this template” repos — forks and clones are fine.
 
 ## Commands
 

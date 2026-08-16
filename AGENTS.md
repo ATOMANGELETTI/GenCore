@@ -61,4 +61,4 @@ Scoped: `pnpm --filter @gencore/<pkg> test` or `cargo test -p <crate>`. Release 
 
 ## Git
 
-Do not create commits or push unless the user explicitly asks. Conventional commits when they do. Add a changeset for `@gencore/*` package behavior changes (`pnpm changeset`).
+Do not create commits or push unless the user explicitly asks. Conventional commits when they do. Add a changeset for `@gencore/*` package behavior changes (`pnpm changeset`). Binary assets listed in `.gitattributes` (icons, fonts, media, archives) are Git LFS-tracked; run `git lfs install` once.

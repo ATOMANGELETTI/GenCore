@@ -12,6 +12,9 @@ Rust plugin crates.
   automatically)
 - Rust `stable` with the `rustfmt` and `clippy` components (see
   `rust-toolchain.toml`)
+- Git LFS (bundled with Git for Windows); run `git lfs install` once.
+  GitHub does not copy LFS objects into “Use this template” repos —
+  forks and clones are fine.
 
 ## Getting started
 
