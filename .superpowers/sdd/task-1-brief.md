@@ -1,77 +1,140 @@
-# Task 1 / Wave 1 — Workspace root
+### Task 1: Hover morph and glyph removal
 
-Work from: `c:\Storage\Development\Workspace\Cursor\GenCore`
+**Files:**
+- Modify: `packages/ui-kit/tests/composites/titlebar.test.tsx`
+- Modify: `packages/ui-kit/src/composites/titlebar/titlebar.component.tsx`
+- Modify: `packages/ui-kit/src/composites/titlebar/titlebar.variants.ts`
 
-## Goal
+**Interfaces:**
+- Consumes: existing `Titlebar` / `TrafficLights` / `trafficLightVariants({ light, active })`. `TrafficLightKind` stays `"close" | "minimize" | "maximize"`.
+- Produces: same public exports. Buttons have no text children. Enabled lights include classes `rounded-full`, `enabled:hover:rounded-[2px]`, and `enabled:focus-visible:rounded-[2px]`.
 
-Create the pnpm + Turborepo + Cargo workspace skeleton and shared config packages. Do not build apps, ui-kit, crates, .github, .husky, or .vscode yet.
+- [ ] **Step 1: Write the failing tests**
 
-## Clean slate
+Append these two cases inside the existing `describe("Titlebar", …)` in `packages/ui-kit/tests/composites/titlebar.test.tsx`. Do not change the six existing tests.
 
-- Replace the empty root `package.json` (it is invalid JSON today).
-- Delete placeholder folders if they exist: `crates/core-bindings`, `crates/tauri-plugin-fs`, `crates/tauri-plugin-pty`, empty `apps/*/src-tauri` stubs.
-- Keep `.cursor/hooks/state/continual-learning.json` and `.git`.
-- Keep `.superpowers/sdd/**` (controller files).
+```tsx
+  it("renders traffic lights without glyphs", () => {
+    render(<Titlebar onClose={vi.fn()} onMinimize={vi.fn()} onToggleMaximize={vi.fn()} />);
 
-## Create these files
+    expect(screen.getByRole("button", { name: "Close window" })).toHaveTextContent("");
+    expect(screen.getByRole("button", { name: "Minimize window" })).toHaveTextContent("");
+    expect(screen.getByRole("button", { name: "Toggle maximize window" })).toHaveTextContent("");
+    expect(screen.queryByText("\u00D7")).not.toBeInTheDocument();
+    expect(screen.queryByText("\u2212")).not.toBeInTheDocument();
+    expect(screen.queryByText("\u002B")).not.toBeInTheDocument();
+  });
 
-### Root
+  it("morphs enabled lights to a 2px rounded square on hover via class", () => {
+    render(<Titlebar onClose={vi.fn()} onMinimize={vi.fn()} onToggleMaximize={vi.fn()} />);
 
-- `package.json`
-  - `name`: `gencore`, `private`: true, `packageManager`: `pnpm@11.22.0`
-  - `engines.node`: `>=22.13.0`
-  - scripts: `dev`, `build`, `lint`, `test`, `typecheck`, `format` via turbo; `changeset` placeholder ok
-  - devDependencies (exact latest stables): `turbo@2.10.10`, `@biomejs/biome@2.5.8`, `typescript@7.0.2`
-- `pnpm-workspace.yaml`: `apps/*`, `packages/*`
-- `turbo.json` (`$schema` https://turborepo.dev/schema.json)
-  - tasks: `build` (`dependsOn: ["^build"]`, outputs `dist/**`), `dev` (persistent, cache false), `lint`, `test`, `typecheck`, `format`
-- `Cargo.toml` workspace only:
-  - `resolver = "2"`
-  - `members = []` (Wave 2 adds crates; do not list missing members)
-  - `[workspace.package]` edition `2024`
-  - `[workspace.dependencies]`: `tauri = "2.11.5"`, `tauri-build` matching 2.11.x latest, `serde` with derive, `serde_json`, `thiserror` latest stable
-- `rust-toolchain.toml`: `channel = "stable"`, components `rustfmt`, `clippy`
-- `biome.json`: recommended + organize imports; ignore `node_modules`, `dist`, `target`, `.turbo`
-- `.gitignore`: `node_modules`, `dist`, `target`, `.turbo`, `.netlify`, `*.log`, `.DS_Store`
-- `.editorconfig`: utf-8, lf, 2-space JS/TS/JSON, 4-space Rust
-- `.npmrc`: `strict-peer-dependencies=true`, `auto-install-peers=true`
+    for (const name of [
+      "Close window",
+      "Minimize window",
+      "Toggle maximize window",
+    ] as const) {
+      const light = screen.getByRole("button", { name });
+      expect(light).toHaveClass("rounded-full");
+      expect(light).toHaveClass("enabled:hover:rounded-[2px]");
+      expect(light).toHaveClass("enabled:focus-visible:rounded-[2px]");
+    }
+  });
+```
 
-### `packages/config-typescript` (`@gencore/config-typescript`)
+- [ ] **Step 2: Run tests to verify they fail**
 
-Modular files:
+Run: `pnpm --filter @gencore/ui-kit test -- tests/composites/titlebar.test.tsx`
 
-- `package.json` name `@gencore/config-typescript`, private, exports for each tsconfig
-- `tsconfig.base.json` — strict, `moduleResolution: bundler`, `skipLibCheck`, `noEmit` optional
-- `tsconfig.react-library.json` extends base, JSX react-jsx, DOM
-- `tsconfig.vite-app.json` extends base, Vite app (`bundler`, `noEmit`, include src)
+Expected: FAIL. `renders traffic lights without glyphs` fails because × / − / + are in the document. `morphs enabled lights…` fails because `enabled:hover:rounded-[2px]` is not on the buttons. The six existing tests still pass.
 
-### `packages/config-vite` (`@gencore/config-vite`)
+- [ ] **Step 3: Write minimal implementation**
 
-Modular files:
+In `packages/ui-kit/src/composites/titlebar/titlebar.component.tsx`, delete `trafficLightGlyph` and the inner `<span>`. Drop `group/traffic` from the wrapper (it exists only for cluster glyph reveal). Keep `trafficLightLabel` and the three `aria-label`s. `TrafficLights` becomes:
 
-- `package.json` with deps: `vite@8.2.1`, `@vitejs/plugin-react@6.0.5`, `@tailwindcss/vite@4.3.3`, `babel-plugin-react-compiler@1.0.0`, `@rolldown/plugin-babel` latest stable compatible with plugin-react 6, `@babel/core` latest stable
-- `src/vite.tauri-factory.ts` — factory `createTauriViteConfig({ port })`:
-  - `clearScreen: false`
-  - `server.port`, `strictPort: true`, host from `TAURI_DEV_HOST`, HMR as Tauri Vite guide
-  - watch ignore `**/src-tauri/**`
-  - `envPrefix`: `VITE_`, `TAURI_ENV_*`
-  - build target `chrome105` on Windows else `safari13` (or newer if current Tauri Vite docs raised them)
-  - minify unless `TAURI_ENV_DEBUG`, sourcemap if debug
-  - plugins: react(), tailwindcss(), babel with `reactCompilerPreset({ compilationMode: 'infer' })` from `@vitejs/plugin-react` if that export exists; otherwise babel-plugin-react-compiler equivalent
-- `src/vite.tauri-factory.types.ts`
-- `src/index.ts` re-export
-- `tsconfig.json` extending `@gencore/config-typescript` react-library or base
+```tsx
+export function TrafficLights({
+  className,
+  onClose,
+  onMinimize,
+  onToggleMaximize,
+  ...props
+}: TrafficLightsProps) {
+  const lights: { kind: TrafficLightKind; onClick: (() => void) | undefined }[] = [
+    { kind: "close", onClick: onClose },
+    { kind: "minimize", onClick: onMinimize },
+    { kind: "maximize", onClick: onToggleMaximize },
+  ];
 
-## Constraints
+  return (
+    <div
+      data-slot="traffic-lights"
+      className={cn("flex items-center gap-2", className)}
+      {...props}
+    >
+      {lights.map(({ kind, onClick }) => (
+        <button
+          key={kind}
+          type="button"
+          data-slot={`traffic-light-${kind}`}
+          aria-label={trafficLightLabel[kind]}
+          disabled={!onClick}
+          onClick={onClick}
+          className={trafficLightVariants({ light: kind, active: Boolean(onClick) })}
+        />
+      ))}
+    </div>
+  );
+}
+```
 
-- Latest stables only. Versions above are locked; do not downgrade.
-- Modular folder/file naming. Tests for these config packages only if there is real logic to test (`packages/config-vite/tests/` for factory shape). No dummy tests.
-- Do NOT create apps, ui-kit, crates, .github, .husky, .vscode, AGENTS.md, README (later waves).
-- Do NOT git commit.
-- Do NOT install shadow MCP servers.
-- After files exist, run `pnpm install` from repo root (corepack enable pnpm 11 if needed).
-- Verify: `pnpm exec tsc -p packages/config-vite --noEmit` if applicable; `pnpm exec biome check .` should pass on the files you created.
+Leave `Titlebar` unchanged.
 
-## Report
+In `packages/ui-kit/src/composites/titlebar/titlebar.variants.ts`, replace `trafficLightVariants` with:
 
-Write full report to `.superpowers/sdd/task-1-report.md`. No commit.
+```ts
+export const trafficLightVariants = cva(
+  [
+    "size-3 rounded-full",
+    "transition-[border-radius,colors] duration-150 outline-none",
+    "enabled:hover:rounded-[2px] enabled:focus-visible:rounded-[2px]",
+    "motion-reduce:transition-none",
+    "focus-visible:ring-2 focus-visible:ring-ring/60",
+  ],
+  {
+    variants: {
+      light: {
+        close: "bg-traffic-close",
+        minimize: "bg-traffic-minimize",
+        maximize: "bg-traffic-maximize",
+      },
+      active: {
+        true: "",
+        false: "bg-traffic-inactive",
+      },
+    },
+    defaultVariants: { active: true },
+  },
+);
+```
+
+Do not add scale, hover color, or glyph classes. Do not change `titlebarVariants` or `titlebarTitleVariants`.
+
+- [ ] **Step 4: Run tests to verify they pass**
+
+Run: `pnpm --filter @gencore/ui-kit test -- tests/composites/titlebar.test.tsx`
+
+Expected: PASS (8 tests). Then run: `pnpm --filter @gencore/ui-kit test`
+
+Expected: all ui-kit tests pass.
+
+- [ ] **Step 5: Commit**
+
+Stage only these three files:
+
+```bash
+git add packages/ui-kit/tests/composites/titlebar.test.tsx packages/ui-kit/src/composites/titlebar/titlebar.component.tsx packages/ui-kit/src/composites/titlebar/titlebar.variants.ts
+git commit -m "feat(ui-kit): morph traffic lights to rounded squares on hover"
+```
+
+---
+

@@ -75,4 +75,53 @@ describe("SidePanel", () => {
     expect(root.tagName).toBe("ASIDE");
     expect(root).toHaveAttribute("data-slot", "side-panel");
   });
+
+  it("defaults the complementary root to 240px wide", () => {
+    render(<SidePanel />);
+
+    expect(screen.getByRole("complementary")).toHaveStyle({ width: "240px" });
+  });
+
+  it("exposes a vertical resize separator on the panel seam", () => {
+    render(<SidePanel />);
+
+    const handle = screen.getByRole("separator", { name: "Resize side panel" });
+    expect(handle).toHaveAttribute("data-slot", "side-panel-resize");
+    expect(handle).toHaveAttribute("aria-orientation", "vertical");
+    expect(handle).toHaveAttribute("aria-valuenow", "240");
+    expect(handle).toHaveAttribute("aria-valuemin", "160");
+  });
+
+  it("grows the panel 10px on ArrowRight and shrinks 10px on ArrowLeft", async () => {
+    const user = userEvent.setup();
+    render(<SidePanel />);
+
+    const handle = screen.getByRole("separator", { name: "Resize side panel" });
+    handle.focus();
+    await user.keyboard("{ArrowRight}");
+
+    expect(handle).toHaveAttribute("aria-valuenow", "250");
+    expect(screen.getByRole("complementary")).toHaveStyle({ width: "250px" });
+
+    await user.keyboard("{ArrowLeft}");
+    expect(handle).toHaveAttribute("aria-valuenow", "240");
+    expect(screen.getByRole("complementary")).toHaveStyle({ width: "240px" });
+  });
+
+  it("jumps to min on Home and max on End", async () => {
+    const user = userEvent.setup();
+    render(<SidePanel />);
+
+    const handle = screen.getByRole("separator", { name: "Resize side panel" });
+    handle.focus();
+    await user.keyboard("{Home}");
+
+    expect(handle).toHaveAttribute("aria-valuenow", "160");
+    expect(screen.getByRole("complementary")).toHaveStyle({ width: "160px" });
+
+    await user.keyboard("{End}");
+    const max = handle.getAttribute("aria-valuemax");
+    expect(handle).toHaveAttribute("aria-valuenow", max);
+    expect(screen.getByRole("complementary")).toHaveStyle({ width: `${max}px` });
+  });
 });

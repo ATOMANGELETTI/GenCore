@@ -8,6 +8,13 @@ import {
 } from "@gencore/ui-kit";
 import { Bot, Folder, type LucideIcon, Settings } from "lucide-react";
 import * as React from "react";
+import {
+  clampSidePanelWidth,
+  DEFAULT_SIDE_PANEL_WIDTH,
+  MIN_SIDE_PANEL_WIDTH,
+  maxSidePanelWidth,
+  SIDE_PANEL_WIDTH_STEP,
+} from "./side-panel.resize";
 import type { SidePanelTabId } from "./side-panel.types";
 
 const TABS: readonly {
@@ -27,7 +34,39 @@ function panelId(id: SidePanelTabId): string {
 
 export function SidePanel() {
   const [selected, setSelected] = React.useState<SidePanelTabId>("files");
+  const [width, setWidth] = React.useState(DEFAULT_SIDE_PANEL_WIDTH);
+  const [containerWidth, setContainerWidth] = React.useState(0);
+  const rootRef = React.useRef<HTMLElement | null>(null);
+  const dragRef = React.useRef<{ startX: number; startWidth: number } | null>(null);
   const tabRefs = React.useRef<Partial<Record<SidePanelTabId, HTMLButtonElement | null>>>({});
+
+  React.useEffect(() => {
+    const parent = rootRef.current?.parentElement;
+
+    function syncFromParent() {
+      const next = rootRef.current?.parentElement?.clientWidth ?? 0;
+      setContainerWidth(next);
+      setWidth((current) => clampSidePanelWidth(current, next));
+    }
+
+    syncFromParent();
+    window.addEventListener("resize", syncFromParent);
+
+    let observer: ResizeObserver | undefined;
+    if (parent && typeof ResizeObserver !== "undefined") {
+      observer = new ResizeObserver(() => {
+        const next = parent.clientWidth;
+        setContainerWidth(next);
+        setWidth((current) => clampSidePanelWidth(current, next));
+      });
+      observer.observe(parent);
+    }
+
+    return () => {
+      window.removeEventListener("resize", syncFromParent);
+      observer?.disconnect();
+    };
+  }, []);
 
   function selectTab(id: SidePanelTabId) {
     setSelected(id);
@@ -62,10 +101,50 @@ export function SidePanel() {
     }
   }
 
+  function endDrag() {
+    dragRef.current = null;
+  }
+
+  function onHandlePointerDown(event: React.PointerEvent<HTMLHRElement>) {
+    event.currentTarget.setPointerCapture(event.pointerId);
+    dragRef.current = { startX: event.clientX, startWidth: width };
+  }
+
+  function onHandlePointerMove(event: React.PointerEvent<HTMLHRElement>) {
+    const drag = dragRef.current;
+    if (!drag || !event.currentTarget.hasPointerCapture(event.pointerId)) {
+      return;
+    }
+
+    setWidth(clampSidePanelWidth(drag.startWidth + (event.clientX - drag.startX), containerWidth));
+  }
+
+  function onHandleKeyDown(event: React.KeyboardEvent<HTMLHRElement>) {
+    let nextWidth: number | undefined;
+    if (event.key === "ArrowRight") {
+      nextWidth = width + SIDE_PANEL_WIDTH_STEP;
+    } else if (event.key === "ArrowLeft") {
+      nextWidth = width - SIDE_PANEL_WIDTH_STEP;
+    } else if (event.key === "Home") {
+      nextWidth = MIN_SIDE_PANEL_WIDTH;
+    } else if (event.key === "End") {
+      nextWidth = maxSidePanelWidth(containerWidth);
+    }
+
+    if (nextWidth === undefined) {
+      return;
+    }
+
+    event.preventDefault();
+    setWidth(clampSidePanelWidth(nextWidth, containerWidth));
+  }
+
   return (
     <aside
+      ref={rootRef}
       data-slot="side-panel"
-      className="flex h-full w-60 shrink-0 flex-col border-r border-border bg-card"
+      className="relative flex h-full shrink-0 flex-col border-r border-border bg-card"
+      style={{ width }}
     >
       <div className="min-h-0 flex-1 overflow-auto">
         {TABS.map((tab) => (
@@ -130,6 +209,24 @@ export function SidePanel() {
           })}
         </div>
       </TooltipProvider>
+      <hr
+        data-slot="side-panel-resize"
+        aria-orientation="vertical"
+        aria-label="Resize side panel"
+        tabIndex={0}
+        aria-valuemin={MIN_SIDE_PANEL_WIDTH}
+        aria-valuemax={maxSidePanelWidth(containerWidth)}
+        aria-valuenow={width}
+        className="absolute top-0 right-0 z-10 m-0 h-full w-2 translate-x-1/2 cursor-col-resize touch-none border-0 bg-transparent p-0"
+        onPointerDown={onHandlePointerDown}
+        onPointerMove={onHandlePointerMove}
+        onPointerUp={endDrag}
+        onLostPointerCapture={endDrag}
+        onKeyDown={onHandleKeyDown}
+        onDoubleClick={() => {
+          setWidth(DEFAULT_SIDE_PANEL_WIDTH);
+        }}
+      />
     </aside>
   );
 }
