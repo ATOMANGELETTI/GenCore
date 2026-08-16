@@ -1,0 +1,64 @@
+.cursor/rules/react-ui-kit.mdc
+  s_22428f2960d9ee::t_bbf9c7da6267be 20-21
+AGENTS.md
+  s_22428f2960d9ee::t_ef1925aa54cbe6 35
+packages/ui-kit/README.md
+  s_22428f2960d9ee::t_a138e9706cba5e 69
+packages/ui-kit/src/styles/globals.css
+  s_4f2d24fcfb910e::t_052f305c5c7b3e 12
+  s_4f2d24fcfb910e::t_1094ae998f5caa 76-77
+packages/ui-kit/tests/tokens/tokens.typography.test.ts
+  s_230a7efadb7e08::t_93e4196c44432e 1-13
+packages/ui-kit/tests/styles/fonts.test.ts
+  s_4f2d24fcfb910e::t_a6da76d632446b 1-34
+packages/ui-kit/AGENTS.md
+  s_22428f2960d9ee::t_b318903d5b4382 7
+.cursor/skills/add-ui-primitive/SKILL.md
+  s_22428f2960d9ee::t_c84e184a517ee0 33
+packages/ui-kit/src/styles/fonts.css
+  s_4f2d24fcfb910e::t_14dee36c0cf972 1-31
+packages/ui-kit/src/tokens/tokens.typography.ts
+  s_230a7efadb7e08::t_440fac0b0a75df 2-3,6-7
+.changeset/terminess-appshell-font.md
+  s_3b35cf39ef7f27::t_7b32cb198c08ff 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "72a153afc00d4795e0600872c28364f35ee94f67",
+  "prompts": {},
+  "sessions": {
+    "s_22428f2960d9ee": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "1da93a22-5a61-49b4-972d-76dba56b54c8",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_230a7efadb7e08": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "bd00626a-432f-4dd5-bfbb-f87cece7f8a8",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_3b35cf39ef7f27": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e16fae28-8d9d-498b-8f27-e575cd58f092",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_4f2d24fcfb910e": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "6dac5baf-d8bc-4996-90b9-47e311270c3a",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
