@@ -1,0 +1,24 @@
+packages/ui-kit/src/primitives/dropdown-menu/dropdown-menu.variants.ts
+  s_1c26277c963a6b::t_927e2dfd69c4fa 2-9,12,16-20
+packages/ui-kit/tests/primitives/menu/menu.variants.test.ts
+  s_1c26277c963a6b::t_a577edd35ecc2d 1-47,50
+  s_1c26277c963a6b::t_a1cd7cd4a6ca14 48-49,51
+packages/ui-kit/src/primitives/menu/menu.variants.ts
+  s_1c26277c963a6b::t_6496b68cdee033 1-58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "d72a5830cf840bb957ba9a54fb16a8f5f647d23a",
+  "prompts": {},
+  "sessions": {
+    "s_1c26277c963a6b": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "c2e3108e-3875-4400-907a-fb0d122eb32e",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
