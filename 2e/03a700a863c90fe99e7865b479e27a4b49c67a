@@ -1,0 +1,45 @@
+.github/workflows/codeql.yml
+  s_247da30355c9f5::t_42c046cdff0b2c 36
+.github/workflows/reusable-rust.yml
+  s_247da30355c9f5::t_57c1c9e35f13f0 23
+.github/workflows/reusable-js.yml
+  s_247da30355c9f5::t_c08535251f050b 31
+README.md
+  s_247da30355c9f5::t_4dc136951ac4b7 40
+.cursor/skills/add-app/SKILL.md
+  s_247da30355c9f5::t_eed824e33e325b 28
+.github/workflows/release.yml
+  s_247da30355c9f5::t_628673cbdca499 25
+.github/CONTRIBUTING.md
+  s_247da30355c9f5::t_24cec5b41da55a 15-17
+.gitattributes
+  s_247da30355c9f5::t_9f832494414484 1-60
+AGENTS.md
+  s_247da30355c9f5::t_78f017e3235d75 64
+.husky/pre-push
+  s_59aa5c24068ac2::t_9f66235c7faa98 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "2e03a700a863c90fe99e7865b479e27a4b49c67a",
+  "prompts": {},
+  "sessions": {
+    "s_247da30355c9f5": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "a12170d5-e160-4fa7-b3f2-2920ce4692d9",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_59aa5c24068ac2": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "f1726de0-d926-4a5c-8925-990b1f74fb01",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
