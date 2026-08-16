@@ -1,0 +1,90 @@
+.cursor/hooks/state/edited-files.json
+  s_8d93d9620853d4::t_0085b7c28eace3 1-6
+AGENTS.md
+  s_8d93d9620853d4::t_45209e000bacef 46-49,57,60
+.github/ISSUE_TEMPLATE/config.yml
+  s_955281970d422b::t_2c388531cd20c7 4
+scripts/package-win64.ps1
+  s_8d93d9620853d4::t_4cff8a6cd4aab1 57-59
+  s_8d93d9620853d4::t_282a233cedd2e0 2-56,60-78
+  s_8d93d9620853d4::t_62b17c11240517 1
+.github/workflows/labeler.yml
+  s_955281970d422b::t_914a5b48630806 9,21-40,46
+apps/terminal/package.json
+  s_8d93d9620853d4::t_226e26e1d042ad 11
+.github/actions/setup-node-pnpm/action.yml
+  s_955281970d422b::t_00b531f51133d8 3-5,16-19,21,23-25,27
+pnpm-workspace.yaml
+  s_8d93d9620853d4::t_8a6a836547ad53 5
+.cursor/rules/architecture.mdc
+  s_8d93d9620853d4::t_445981d2103a39 29-30
+.cursor/hooks/state/continual-learning.json
+  s_8d93d9620853d4::t_c6ed1cf75fcd35 4,6
+  s_b7fcf1873e6c41::t_079da156912a05 3,5
+apps/explorer/src-tauri/tauri.conf.json
+  s_8d93d9620853d4::t_20a38f285f69c2 54
+.vscode/settings.json
+  s_c5b320da949965::t_67478fb0e37c72 46-48
+.cursor/skills/add-app/SKILL.md
+  s_8d93d9620853d4::t_f239cb00837164 26-27
+.github/workflows/reusable-rust.yml
+  s_955281970d422b::t_d1e84632740258 24-37
+apps/terminal/src-tauri/tauri.conf.json
+  s_8d93d9620853d4::t_98c78ca5ace31c 52
+.github/CODEOWNERS
+  s_955281970d422b::t_9622692cc1d651 6,9,12-13,16,19
+package.json
+  s_8d93d9620853d4::t_d35863c9b93907 16
+apps/terminal/AGENTS.md
+  s_8d93d9620853d4::t_1b1557ce25a3fe 12
+.gitignore
+  s_8d93d9620853d4::t_7bbe4bc70d057a 11-12
+README.md
+  s_8d93d9620853d4::t_31756b2329e2d2 57-59,63
+  s_8d93d9620853d4::t_988781b7058df2 38-39
+  s_8d93d9620853d4::t_ff8e28aecb134c 3
+apps/explorer/package.json
+  s_8d93d9620853d4::t_c1227f3f8c506b 11
+apps/explorer/AGENTS.md
+  s_8d93d9620853d4::t_f9392e656067b0 12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "9a2e1d3ad84347f18b28e5390c3de718572d0680",
+  "prompts": {},
+  "sessions": {
+    "s_8d93d9620853d4": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "b9d73ea2-fde3-470c-aad7-649129426343",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_955281970d422b": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e1d5b4df-1afb-4234-a155-e81d4b146ce7",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_b7fcf1873e6c41": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "f835313c-d36b-4265-8fab-142e72fd4ec0",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_c5b320da949965": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "5f0da9f4-da3a-417e-9eda-13994aa34270",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
