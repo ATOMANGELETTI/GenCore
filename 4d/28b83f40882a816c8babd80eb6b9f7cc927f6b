@@ -1,0 +1,188 @@
+AGENTS.md
+  s_fe78c9d32b459e::t_ee9ae92e6681ee 65-76
+apps/terminal/src/modules/side-panel/side-panel.types.ts
+  s_82390553f164d8::t_43ce710772e55b 1
+.superpowers/sdd/side-panel/task-4-report.md
+  s_f05b851e3e1a12::t_42f9825e816976 1-31
+.superpowers/sdd/side-panel/task-3-review.diff
+  s_f05b851e3e1a12::t_83238548c8b9ae 1-104
+apps/terminal/package.json
+  s_82390553f164d8::t_bb71bef4a0dce5 19
+packages/ui-kit/src/composites/app-shell/app-shell.types.ts
+  s_dd0bca68bbd69c::t_b3627ded1b4ecd 17
+packages/ui-kit/src/composites/statusbar/statusbar.types.ts
+  s_998fdbeedf28c1::t_21bb03f25cc85b 6
+apps/terminal/src/modules/app/app.component.tsx
+  s_c1e81025b5d61e::t_753cf6a62b1bfb 6
+  s_c1e81025b5d61e::t_3fbd98490d864b 43
+  s_998fdbeedf28c1::t_891841dc6d9a33 9
+.superpowers/sdd/side-panel/task-2-report.md
+  s_a78fdec0203deb::t_c626ae6c6cb137 120-178
+  s_82390553f164d8::t_e9a8d5b4b3daf6 1-119
+apps/terminal/src/modules/side-panel/side-panel.component.tsx
+  s_82390553f164d8::t_89fb2c551732d8 1-8,10-77,79,83-135
+  s_82390553f164d8::t_6869174e46722d 9
+  s_a78fdec0203deb::t_8337d5ef780363 78,80-82
+.superpowers/sdd/side-panel/task-1-report.md
+  s_dd0bca68bbd69c::t_5a7d147f643ccc 1-93
+apps/explorer/tests/unit/app.component.test.tsx
+  s_998fdbeedf28c1::t_0e3fef4fb3806c 32,45
+.superpowers/sdd/side-panel/task-1-brief.md
+  s_f05b851e3e1a12::t_f5692eb57c90bb 1-82
+.superpowers/sdd/side-panel/task-3-report.md
+  s_c1e81025b5d61e::t_b19896d748f734 1-106
+.changeset/app-shell-sidebar-slot.md
+  s_dd0bca68bbd69c::t_f13a2d80e21db9 1-5
+apps/terminal/tests/unit/app.component.test.tsx
+  s_998fdbeedf28c1::t_6c648e4e449a23 35,39,41
+  s_c1e81025b5d61e::t_74355cd8c160c3 50-58
+packages/ui-kit/src/composites/statusbar/index.ts
+  s_998fdbeedf28c1::t_a7cba885611858 3
+.superpowers/sdd/side-panel/task-3-brief.md
+  s_f05b851e3e1a12::t_b10b5db3bdc0fd 1-60
+.superpowers/sdd/side-panel/final-review.md
+  s_ba555b2c61315f::t_1d682b95628593 1-62
+.cursor/hooks/state/continual-learning-index.json
+  s_fe78c9d32b459e::t_7fdc20f1b096e6 53-64,68-70,80-133,135,137-139,141,147,150,154-160,162
+.superpowers/sdd/side-panel/task-1-review.md
+  s_2a4c1a56238228::t_0d50610c0de270 1-46
+.superpowers/sdd/side-panel/task-2-review.diff
+  s_f05b851e3e1a12::t_d7397d32eb7e73 273-466
+  s_f05b851e3e1a12::t_b06b9549edfbbf 1-272
+packages/ui-kit/src/composites/statusbar/statusbar.component.tsx
+  s_998fdbeedf28c1::t_a69aea75d6704c 3
+.superpowers/sdd/side-panel/task-2-brief.md
+  s_f05b851e3e1a12::t_b722d513fffb58 1-99
+packages/ui-kit/src/composites/app-shell/app-shell.component.tsx
+  s_dd0bca68bbd69c::t_4357ff6b0c49aa 44-51
+  s_998fdbeedf28c1::t_de1be034b94c95 53
+  s_dd0bca68bbd69c::t_c9480428f86b5e 22
+packages/ui-kit/tests/composites/app-shell.test.tsx
+  s_dd0bca68bbd69c::t_a1d0ade327b3ab 68-100
+  s_998fdbeedf28c1::t_2f1b62a9be0f4a 47,50
+.superpowers/sdd/side-panel/task-2-review.md
+  s_a636b526afa6dd::t_14229afa22480f 1-53
+.superpowers/sdd/progress.md
+  s_f05b851e3e1a12::t_d1a454cbfbc64c 46
+  s_f05b851e3e1a12::t_3d2f0d576ce766 44
+  s_f05b851e3e1a12::t_1e1fbb48302bab 47-49
+  s_f05b851e3e1a12::t_ed981841ce162f 40-43,50
+  s_f05b851e3e1a12::t_5bbed42dbf9b9c 45
+.superpowers/sdd/side-panel/task-fix-brief.md
+  s_f05b851e3e1a12::t_d408c3cb9cd3fe 1-36
+apps/terminal/tests/unit/side-panel.test.tsx
+  s_a78fdec0203deb::t_cc1adcb4357401 57-59
+  s_a78fdec0203deb::t_b2d000f00e4c7f 6-9,12-13
+  s_82390553f164d8::t_f1faaf6e90b734 1-5,22-26,32-40,46-54,60-78
+  s_a78fdec0203deb::t_b8b97bec4c991f 10-11,14-21,55-56
+  s_a78fdec0203deb::t_532656632acbf4 43-45
+  s_82390553f164d8::t_d64cafbbdb1e61 41-42
+  s_82390553f164d8::t_bf2cda5d117cb7 27-28
+  s_a78fdec0203deb::t_2de3d55ba44038 29-31
+.changeset/hide-statusbar-version.md
+  s_998fdbeedf28c1::t_64ee382435d704 1-5
+.superpowers/sdd/side-panel/task-3-review.md
+  s_1b7f2e9f011a4a::t_f25df1fa98f508 1-41
+.superpowers/sdd/side-panel/final-review.diff
+  s_f05b851e3e1a12::t_6d0c913335336d 1-481
+.superpowers/sdd/side-panel/task-1-review.diff
+  s_f05b851e3e1a12::t_11f4b11e7509fd 1-166
+pnpm-lock.yaml
+  s_82390553f164d8::t_2cbc8c2cae8c30 99-101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "4d28b83f40882a816c8babd80eb6b9f7cc927f6b",
+  "prompts": {},
+  "sessions": {
+    "s_1b7f2e9f011a4a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "2bc98437-1573-45de-925e-e4da38830864",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_2a4c1a56238228": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "5df73b53-a129-4422-8fbf-9d098635bc2b",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_82390553f164d8": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "1f58c299-f53e-45dc-aaa0-ac9598752993",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_998fdbeedf28c1": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "a02e3e65-ac82-4749-9b6b-ed90ba063eb2",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_a636b526afa6dd": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "b00b6c10-fbfe-400c-bd85-679a465eddd5",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_a78fdec0203deb": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4cccffc8-0d52-46f7-850b-3c9d9df7f5ad",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_ba555b2c61315f": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "88e3436d-2932-4c38-aa57-54bc1037cca6",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_c1e81025b5d61e": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "6b5c864a-ddc6-437a-ac56-82e94f11d86b",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_dd0bca68bbd69c": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "1b4b3819-b6bd-4e20-b752-b69ddb3eef99",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_f05b851e3e1a12": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "c37ea2fe-c115-4caf-bad9-37b0849b80a5",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_fe78c9d32b459e": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "3fd4fcf0-fc10-4d56-9b06-27b7961a4dcc",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
