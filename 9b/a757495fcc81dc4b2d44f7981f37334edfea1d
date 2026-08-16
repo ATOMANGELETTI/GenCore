@@ -1,0 +1,32 @@
+packages/ui-kit/src/primitives/context-menu/context-menu.variants.ts
+  s_034ffaef75aed0::t_d61382977292d7 1-20
+packages/ui-kit/tests/primitives/context-menu/context-menu.test.tsx
+  s_034ffaef75aed0::t_cc8fed8d88a680 1-11,16-74
+  s_034ffaef75aed0::t_d28dfafb154289 12-15
+packages/ui-kit/src/primitives/context-menu/index.ts
+  s_034ffaef75aed0::t_f5f58aadd04775 1-34
+packages/ui-kit/src/primitives/context-menu/context-menu.component.tsx
+  s_034ffaef75aed0::t_c8d9978bba46c0 42
+  s_034ffaef75aed0::t_3bd3a47e779484 88
+  s_034ffaef75aed0::t_b2ea19cc0d628f 1-41,43-87,89-133
+packages/ui-kit/src/index.ts
+  s_034ffaef75aed0::t_edc6daac59f406 8
+packages/ui-kit/src/primitives/context-menu/context-menu.types.ts
+  s_034ffaef75aed0::t_3b5bcc55f778cd 1-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "9ba757495fcc81dc4b2d44f7981f37334edfea1d",
+  "prompts": {},
+  "sessions": {
+    "s_034ffaef75aed0": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "d355358d-45f4-4cd6-a6bf-c576e5e4c57b",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
