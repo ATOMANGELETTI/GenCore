@@ -15,6 +15,8 @@ export interface AppShellProps
   statusbarStart?: React.ReactNode;
   statusbarEnd?: React.ReactNode;
   sidebar?: React.ReactNode;
+  titlebarContextMenu?: React.ReactNode;
+  contentContextMenu?: React.ReactNode;
   showTrafficLights?: boolean;
   /** Forwarded to the inner `ContentArea` (centering, padding, className). */
   contentProps?: Omit<ContentAreaProps, "children">;

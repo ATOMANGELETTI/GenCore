@@ -1,6 +1,8 @@
 import { render, screen } from "@testing-library/react";
+import { userEvent } from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { AppShell } from "../../src/composites/app-shell";
+import { ContextMenuContent, ContextMenuItem } from "../../src/primitives/context-menu";
 
 describe("AppShell", () => {
   it("exposes titlebar, content, and statusbar landmarks", () => {
@@ -97,5 +99,60 @@ describe("AppShell", () => {
     expect(screen.getByRole("main")).toHaveAttribute("data-slot", "content-area");
     expect(screen.getByRole("contentinfo")).toHaveAttribute("data-slot", "statusbar");
     expect(document.querySelector('[data-slot="app-shell-body"]')).toBeNull();
+  });
+
+  it("suppresses the native context menu on the shell root", () => {
+    render(<AppShell title="GenCore">Workbench</AppShell>);
+    const shell = document.querySelector("[data-slot='app-shell']") as HTMLElement;
+    const event = new MouseEvent("contextmenu", { bubbles: true, cancelable: true });
+    shell.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+  });
+
+  it("opens a titlebar context menu only when the titlebar slot is set", async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(<AppShell title="GenCore">Workbench</AppShell>);
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByRole("banner") });
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+
+    rerender(
+      <AppShell
+        title="GenCore"
+        titlebarContextMenu={
+          <ContextMenuContent>
+            <ContextMenuItem>Minimize</ContextMenuItem>
+          </ContextMenuContent>
+        }
+      >
+        Workbench
+      </AppShell>,
+    );
+
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByRole("banner") });
+    expect(await screen.findByRole("menuitem", { name: "Minimize" })).toBeInTheDocument();
+    expect(screen.getByRole("banner", { hidden: true })).toHaveAttribute("data-tauri-drag-region");
+  });
+
+  it("opens a content context menu only when the content slot is set", async () => {
+    const user = userEvent.setup();
+    render(
+      <AppShell
+        title="GenCore"
+        sidebar={<aside>Rail</aside>}
+        contentContextMenu={
+          <ContextMenuContent>
+            <ContextMenuItem>Copy</ContextMenuItem>
+          </ContextMenuContent>
+        }
+      >
+        Workbench
+      </AppShell>,
+    );
+
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByRole("complementary") });
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByRole("main") });
+    expect(await screen.findByRole("menuitem", { name: "Copy" })).toBeInTheDocument();
   });
 });

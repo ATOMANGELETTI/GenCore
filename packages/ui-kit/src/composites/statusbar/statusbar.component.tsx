@@ -8,10 +8,20 @@ export function Statusbar({
   statusbarEnd,
   idleLabel = "Ready",
   children,
+  onContextMenu,
   ...props
 }: StatusbarProps) {
   return (
-    <footer data-slot="statusbar" className={cn(statusbarVariants(), className)} {...props}>
+    // biome-ignore lint/a11y/noStaticElementInteractions: suppress the native context menu on the statusbar
+    <footer
+      data-slot="statusbar"
+      className={cn(statusbarVariants(), className)}
+      {...props}
+      onContextMenu={(event) => {
+        event.preventDefault();
+        onContextMenu?.(event);
+      }}
+    >
       <div data-slot="statusbar-start" className="flex min-w-0 items-center gap-2 truncate">
         {statusbarStart ?? idleLabel}
       </div>
