@@ -1,0 +1,12 @@
+﻿# Secrets - never let the Agent read these.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+**/secrets/**
+
+# Local credential dumps (keep the committed root .npmrc readable).
+**/*.credentials.json

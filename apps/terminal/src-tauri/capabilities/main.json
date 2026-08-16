@@ -1,0 +1,13 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main",
+  "description": "Least-privilege capabilities for the GenCore Terminal main window: core window chrome controls plus app-info. No gencore-pty commands are granted yet.",
+  "windows": ["main"],
+  "permissions": [
+    "core:window:allow-close",
+    "core:window:allow-minimize",
+    "core:window:allow-toggle-maximize",
+    "core:window:allow-start-dragging",
+    "gencore-core:allow-get-app-info"
+  ]
+}

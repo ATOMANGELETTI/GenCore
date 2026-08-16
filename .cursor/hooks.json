@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      { "command": "node .cursor/hooks/session-start.mjs" }
+    ],
+    "beforeShellExecution": [
+      { "command": "node .cursor/hooks/before-shell-execution.mjs" }
+    ],
+    "afterFileEdit": [
+      { "command": "node .cursor/hooks/after-file-edit.mjs" }
+    ],
+    "beforeSubmitPrompt": [
+      { "command": "node .cursor/hooks/before-submit-prompt.mjs" }
+    ],
+    "stop": [
+      { "command": "node .cursor/hooks/stop.mjs" }
+    ]
+  }
+}

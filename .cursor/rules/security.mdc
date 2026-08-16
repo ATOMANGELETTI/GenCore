@@ -1,0 +1,26 @@
+---
+description: Tauri security baseline — CSP, Isolation, capabilities, secrets
+alwaysApply: true
+---
+
+# Security
+
+Applies to every Tauri app in `apps/**`:
+
+- `tauri.conf.json` `app.security.csp` must be the **object form**, not a raw string.
+- Isolation pattern must be enabled (`app.security.pattern` = `isolation`) with an
+  allowlist hook that only lets through the exact IPC commands the UI actually calls.
+- `app.withGlobalTauri: false` always. Never reference `window.__TAURI__` from app code.
+- `app.security.freezePrototype: true`.
+- `app.security.assetProtocol.enable: false` unless a task explicitly requires serving
+  local assets through it.
+- Capabilities (`src-tauri/capabilities/*.json`): least privilege, scoped to
+  `"windows": ["main"]` only. Grant only the identifiers the UI invokes
+  (`core:window:allow-close`, `gencore-core:allow-get-app-info`, …) — never `core:default`.
+- Do not grant `gencore-pty` / `gencore-fs` command permissions in any capability until
+  the UI actually invokes them. Stub plugin commands stay ungranted until wired up.
+- Never set any `dangerous*` Tauri config flag.
+- No secrets, tokens, or credentials committed to the repo. Use environment variables /
+  local `.env` files (git-ignored) instead.
+- No shadow MCP servers: do not add `.cursor/mcp.json`, `.mcp.json`, or any ad-hoc
+  `npx -y @modelcontextprotocol/server-*` config. Team MCP is dashboard-managed only.

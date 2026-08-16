@@ -1,0 +1,30 @@
+# actions/labeler v5+ config schema (nested changed-files / any-glob-to-any-file).
+# See: https://github.com/actions/labeler#matching-object
+
+app-terminal:
+  - changed-files:
+      - any-glob-to-any-file: "apps/terminal/**"
+
+app-explorer:
+  - changed-files:
+      - any-glob-to-any-file: "apps/explorer/**"
+
+pkg-ui-kit:
+  - changed-files:
+      - any-glob-to-any-file: "packages/ui-kit/**"
+
+crate-core:
+  - changed-files:
+      - any-glob-to-any-file: "crates/gencore-core/**"
+
+crate-pty:
+  - changed-files:
+      - any-glob-to-any-file: "crates/gencore-plugin-pty/**"
+
+crate-fs:
+  - changed-files:
+      - any-glob-to-any-file: "crates/gencore-plugin-fs/**"
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file: ".github/**"

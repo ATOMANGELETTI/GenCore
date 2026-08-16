@@ -1,0 +1,48 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Tauri: Debug GenCore Terminal (LLDB)",
+      "type": "lldb",
+      "request": "launch",
+      "preLaunchTask": "debug: prepare (terminal)",
+      "cwd": "${workspaceFolder}/apps/terminal/src-tauri",
+      "windows": {
+        "program": "${workspaceFolder}/target/debug/gencore-terminal.exe"
+      },
+      "osx": {
+        "program": "${workspaceFolder}/target/debug/gencore-terminal"
+      },
+      "linux": {
+        "program": "${workspaceFolder}/target/debug/gencore-terminal"
+      }
+    },
+    {
+      "name": "Tauri: Debug GenCore Explorer (LLDB)",
+      "type": "lldb",
+      "request": "launch",
+      "preLaunchTask": "debug: prepare (explorer)",
+      "cwd": "${workspaceFolder}/apps/explorer/src-tauri",
+      "windows": {
+        "program": "${workspaceFolder}/target/debug/gencore-explorer.exe"
+      },
+      "osx": {
+        "program": "${workspaceFolder}/target/debug/gencore-explorer"
+      },
+      "linux": {
+        "program": "${workspaceFolder}/target/debug/gencore-explorer"
+      }
+    },
+    {
+      "name": "Cargo: Debug tests (workspace)",
+      "type": "lldb",
+      "request": "launch",
+      "cargo": {
+        "args": ["test", "--no-run", "--workspace"],
+        "cwd": "${workspaceFolder}"
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

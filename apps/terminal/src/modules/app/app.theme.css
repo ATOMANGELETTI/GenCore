@@ -1,0 +1,9 @@
+/*
+ * Terminal app chrome density. No new palette or semantic tokens here —
+ * everything colour-related comes from `@gencore/ui-kit`'s Nord themes.
+ */
+
+[data-slot="app-shell"] {
+  --gencore-titlebar-height: 28px;
+  --gencore-statusbar-height: 24px;
+}

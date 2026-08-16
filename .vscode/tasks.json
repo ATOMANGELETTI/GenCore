@@ -1,0 +1,115 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "turbo: dev",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["turbo", "run", "dev"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "tauri:dev (terminal)",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["--filter", "@gencore/terminal", "run", "tauri:dev"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "tauri:dev (explorer)",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["--filter", "@gencore/explorer", "run", "tauri:dev"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "cargo: test (workspace)",
+      "type": "shell",
+      "command": "cargo",
+      "args": ["test"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": ["$rustc"],
+      "group": "test"
+    },
+    {
+      "label": "turbo: test",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["turbo", "run", "test"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "cargo: build debug (terminal)",
+      "type": "shell",
+      "command": "cargo",
+      "args": ["build", "--package", "gencore-terminal"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": ["$rustc"],
+      "group": "build"
+    },
+    {
+      "label": "cargo: build debug (explorer)",
+      "type": "shell",
+      "command": "cargo",
+      "args": ["build", "--package", "gencore-explorer"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": ["$rustc"],
+      "group": "build"
+    },
+    {
+      "label": "vite: dev (terminal)",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["--filter", "@gencore/terminal", "run", "dev"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": { "regexp": "." },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "VITE",
+          "endsPattern": "ready in"
+        }
+      },
+      "presentation": { "reveal": "silent" }
+    },
+    {
+      "label": "vite: dev (explorer)",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["--filter", "@gencore/explorer", "run", "dev"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": { "regexp": "." },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "VITE",
+          "endsPattern": "ready in"
+        }
+      },
+      "presentation": { "reveal": "silent" }
+    },
+    {
+      "label": "debug: prepare (terminal)",
+      "dependsOrder": "sequence",
+      "dependsOn": ["vite: dev (terminal)", "cargo: build debug (terminal)"]
+    },
+    {
+      "label": "debug: prepare (explorer)",
+      "dependsOrder": "sequence",
+      "dependsOn": ["vite: dev (explorer)", "cargo: build debug (explorer)"]
+    }
+  ]
+}

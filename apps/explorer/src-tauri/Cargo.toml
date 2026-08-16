@@ -1,0 +1,24 @@
+[package]
+name = "gencore-explorer"
+version = "0.1.0"
+edition.workspace = true
+description = "GenCore Explorer — standalone Tauri 2 + Vite + React template app."
+publish = false
+
+[lib]
+name = "gencore_explorer_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[[bin]]
+name = "gencore-explorer"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { workspace = true, features = ["codegen", "isolation"] }
+
+[dependencies]
+tauri = { workspace = true, features = ["isolation"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+gencore-core = { path = "../../../crates/gencore-core" }
+gencore-fs = { path = "../../../crates/gencore-plugin-fs" }

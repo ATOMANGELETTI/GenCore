@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@gencore/config-typescript/vite-app",
+  "compilerOptions": {
+    "types": ["vite/client"]
+  },
+  "include": ["src", "tests", "vite.config.ts", "vitest.config.ts"]
+}

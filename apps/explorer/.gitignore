@@ -1,0 +1,2 @@
+# Tauri CLI build-time artifacts (JSON schemas, generated ACL manifests).
+src-tauri/gen

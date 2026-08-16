@@ -1,0 +1,48 @@
+name: Feature request
+description: Suggest an enhancement for GenCore.
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion! Please search existing issues and
+        discussions first to avoid duplicates.
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Affected surface
+      options:
+        - "@gencore/terminal (apps/terminal)"
+        - "@gencore/explorer (apps/explorer)"
+        - "@gencore/ui-kit (packages/ui-kit)"
+        - "gencore-core (crates/gencore-core)"
+        - "gencore-pty (crates/gencore-plugin-pty)"
+        - "gencore-fs (crates/gencore-plugin-fs)"
+        - New / cross-cutting
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the use case or pain point this feature addresses.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false

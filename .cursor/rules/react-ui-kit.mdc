@@ -1,0 +1,23 @@
+---
+description: Nord-themed React UI kit conventions
+globs: packages/ui-kit/**,apps/**/*.tsx
+alwaysApply: false
+---
+
+# React UI kit
+
+- Colors come only from the official Nord palette hex values (`nord0`–`nord15`). No
+  ad-hoc hex, no Tailwind default palette colors.
+- Chrome is flat macOS-style: no drop shadows/gradients on window chrome, thin 1px
+  borders, no skeuomorphism.
+- Variants are authored with `class-variance-authority` (CVA); do not hand-roll
+  conditional className strings for variant logic.
+- Import primitives from the unified package: `import { Dialog, Tooltip } from
+  "radix-ui"` — not the old scattered `@radix-ui/react-*` packages.
+- Never use a raw HTML control (`<button>`, `<input>`, `<select>`, `<dialog>`) when
+  `@gencore/ui-kit` already exports a primitive for it. Extend the kit instead of
+  bypassing it.
+- Fonts are system fonts only (`-apple-system`, `Segoe UI`, etc.) — no `@font-face` or
+  remote font loading, since it would require relaxing CSP `font-src`.
+- New primitives get tests under `packages/ui-kit/tests/`, not colocated with source
+  (see `modular-naming`).

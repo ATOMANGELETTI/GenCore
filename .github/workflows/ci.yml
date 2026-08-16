@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  js:
+    name: JS
+    uses: ./.github/workflows/reusable-js.yml
+
+  rust:
+    name: Rust
+    uses: ./.github/workflows/reusable-rust.yml
+    with:
+      os: ubuntu-latest
+
+# `tauri build` intentionally does not run in CI: it needs a WebView runtime
+# and `pnpm approve-builds` for esbuild's postinstall script, which is out of
+# scope for this pipeline. Use reusable-js/reusable-rust checks instead.

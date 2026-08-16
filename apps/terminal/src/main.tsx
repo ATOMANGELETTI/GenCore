@@ -1,0 +1,16 @@
+import "@gencore/ui-kit/styles/globals.css";
+import "@gencore/ui-kit/styles/theme.polar-night.css";
+import * as React from "react";
+import * as ReactDOM from "react-dom/client";
+import { App } from "./modules/app/app.component";
+
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  throw new Error("Root element #root not found");
+}
+
+ReactDOM.createRoot(rootElement).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+);

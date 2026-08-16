@@ -1,0 +1,17 @@
+[package]
+name = "gencore-core"
+version = "0.1.0"
+edition.workspace = true
+description = "Shared core types, typed errors, and the app-info command for GenCore Tauri plugins."
+links = "gencore-core"
+
+[dependencies]
+tauri = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+
+[build-dependencies]
+tauri-plugin = { workspace = true, features = ["build"] }

@@ -1,0 +1,10 @@
+node_modules
+dist
+target
+.turbo
+.netlify
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example

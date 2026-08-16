@@ -1,0 +1,14 @@
+/*
+ * App-level density defaults for the Explorer template.
+ *
+ * `AppShell`'s `density` prop already sets `--gencore-titlebar-height` and
+ * `--gencore-statusbar-height` per-instance; this file only pins the
+ * standalone `:root` fallbacks (used before the shell mounts) to the same
+ * "comfortable" values so there is no flash of a different chrome height.
+ * No new colour tokens are introduced here — palette lives in ui-kit only.
+ */
+
+:root {
+  --gencore-titlebar-height: 32px;
+  --gencore-statusbar-height: 28px;
+}

@@ -1,0 +1,82 @@
+/*
+ * GenCore — Nord Snow Storm (light).
+ *
+ * Self-contained, same shape as theme.polar-night.css. Scoped to
+ * `.theme-snow-storm` / `.light` so importing it never hijacks the default
+ * Polar Night root theme.
+ */
+
+.theme-snow-storm,
+.light {
+  /* Polar Night */
+  --nord-polar-0: #2e3440;
+  --nord-polar-1: #3b4252;
+  --nord-polar-2: #434c5e;
+  --nord-polar-3: #4c566a;
+
+  /* Snow Storm */
+  --nord-snow-4: #d8dee9;
+  --nord-snow-5: #e5e9f0;
+  --nord-snow-6: #eceff4;
+
+  /* Frost */
+  --nord-frost-7: #8fbcbb;
+  --nord-frost-8: #88c0d0;
+  --nord-frost-9: #81a1c1;
+  --nord-frost-10: #5e81ac;
+
+  /* Aurora */
+  --nord-aurora-11: #bf616a;
+  --nord-aurora-12: #d08770;
+  --nord-aurora-13: #ebcb8b;
+  --nord-aurora-14: #a3be8c;
+  --nord-aurora-15: #b48ead;
+
+  /* Surfaces */
+  --background: var(--nord-snow-6);
+  --foreground: var(--nord-polar-0);
+  --card: var(--nord-snow-5);
+  --card-foreground: var(--nord-polar-0);
+  --popover: var(--nord-snow-5);
+  --popover-foreground: var(--nord-polar-0);
+
+  /* Interactive */
+  --primary: var(--nord-frost-8);
+  --primary-foreground: var(--nord-polar-0);
+  --secondary: var(--nord-snow-4);
+  --secondary-foreground: var(--nord-polar-0);
+  --muted: var(--nord-snow-5);
+  --muted-foreground: var(--nord-polar-3);
+  --accent: var(--nord-snow-4);
+  --accent-foreground: var(--nord-polar-0);
+
+  /* State */
+  --destructive: var(--nord-aurora-11);
+  --destructive-foreground: var(--nord-snow-6);
+  --warning: var(--nord-aurora-12);
+  --warning-foreground: var(--nord-polar-0);
+  --success: var(--nord-aurora-14);
+  --success-foreground: var(--nord-polar-0);
+  --info: var(--nord-aurora-15);
+  --info-foreground: var(--nord-polar-0);
+
+  /* Lines */
+  --border: var(--nord-snow-4);
+  --input: var(--nord-snow-4);
+  --ring: var(--nord-frost-8);
+
+  /* Chrome — nord5 chrome over nord6 content */
+  --titlebar: var(--nord-snow-5);
+  --titlebar-foreground: var(--nord-polar-0);
+  --statusbar: var(--nord-snow-5);
+  --statusbar-foreground: var(--nord-polar-3);
+
+  /* Traffic lights */
+  --traffic-close: var(--nord-aurora-11);
+  --traffic-minimize: var(--nord-aurora-13);
+  --traffic-maximize: var(--nord-aurora-14);
+  --traffic-inactive: var(--nord-snow-4);
+  --traffic-glyph: var(--nord-polar-0);
+
+  color-scheme: light;
+}

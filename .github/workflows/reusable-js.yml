@@ -1,0 +1,45 @@
+name: Reusable JS Checks
+
+on:
+  workflow_call:
+    inputs:
+      lint:
+        description: Run pnpm turbo run lint
+        type: boolean
+        default: true
+      typecheck:
+        description: Run pnpm turbo run typecheck
+        type: boolean
+        default: true
+      test:
+        description: Run pnpm turbo run test
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: JS checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Node & pnpm
+        uses: ./.github/actions/setup-node-pnpm
+
+      - name: Lint
+        if: inputs.lint
+        run: pnpm turbo run lint
+
+      - name: Typecheck
+        if: inputs.typecheck
+        run: pnpm turbo run typecheck
+
+      - name: Test
+        if: inputs.test
+        run: pnpm turbo run test

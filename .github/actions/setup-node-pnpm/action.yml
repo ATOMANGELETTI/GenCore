@@ -1,0 +1,32 @@
+name: Setup Node & pnpm
+description: >-
+  Enables Corepack, activates the pnpm version pinned in package.json,
+  installs Node.js with pnpm store caching, and installs workspace
+  dependencies with a frozen lockfile.
+
+inputs:
+  node-version:
+    description: Node.js version to install (repo requires >=22.13.0).
+    required: false
+    default: "22"
+
+runs:
+  using: composite
+  steps:
+    - name: Enable Corepack
+      shell: bash
+      run: corepack enable
+
+    - name: Activate pinned pnpm version
+      shell: bash
+      run: corepack prepare --activate
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v7
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: pnpm
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile

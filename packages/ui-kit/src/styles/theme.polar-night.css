@@ -1,0 +1,86 @@
+/*
+ * GenCore — Nord Polar Night (default, dark).
+ *
+ * Self-contained: declares the full official Nord palette plus the semantic
+ * roles that resolve from it, so this file can be imported on its own.
+ * Applied at `:root` and re-applied under `.theme-polar-night` / `.dark` so a
+ * nested subtree can opt back into dark inside a light shell.
+ */
+
+:root,
+.theme-polar-night,
+.dark {
+  /* Polar Night */
+  --nord-polar-0: #2e3440;
+  --nord-polar-1: #3b4252;
+  --nord-polar-2: #434c5e;
+  --nord-polar-3: #4c566a;
+
+  /* Snow Storm */
+  --nord-snow-4: #d8dee9;
+  --nord-snow-5: #e5e9f0;
+  --nord-snow-6: #eceff4;
+
+  /* Frost */
+  --nord-frost-7: #8fbcbb;
+  --nord-frost-8: #88c0d0;
+  --nord-frost-9: #81a1c1;
+  --nord-frost-10: #5e81ac;
+
+  /* Aurora */
+  --nord-aurora-11: #bf616a;
+  --nord-aurora-12: #d08770;
+  --nord-aurora-13: #ebcb8b;
+  --nord-aurora-14: #a3be8c;
+  --nord-aurora-15: #b48ead;
+
+  /* Surfaces */
+  --background: var(--nord-polar-0);
+  --foreground: var(--nord-snow-4);
+  --card: var(--nord-polar-1);
+  --card-foreground: var(--nord-snow-4);
+  --popover: var(--nord-polar-1);
+  --popover-foreground: var(--nord-snow-4);
+
+  /* Interactive */
+  --primary: var(--nord-frost-8);
+  --primary-foreground: var(--nord-polar-0);
+  --secondary: var(--nord-polar-2);
+  --secondary-foreground: var(--nord-snow-4);
+  --muted: var(--nord-polar-1);
+  --muted-foreground: var(--nord-polar-3);
+  --accent: var(--nord-polar-2);
+  --accent-foreground: var(--nord-snow-6);
+
+  /* State */
+  --destructive: var(--nord-aurora-11);
+  --destructive-foreground: var(--nord-snow-6);
+  --warning: var(--nord-aurora-12);
+  --warning-foreground: var(--nord-polar-0);
+  --success: var(--nord-aurora-14);
+  --success-foreground: var(--nord-polar-0);
+  --info: var(--nord-aurora-15);
+  --info-foreground: var(--nord-polar-0);
+
+  /* Lines */
+  --border: var(--nord-polar-2);
+  --input: var(--nord-polar-3);
+  --ring: var(--nord-frost-8);
+
+  /* Chrome — nord1 chrome over nord0 content */
+  --titlebar: var(--nord-polar-1);
+  --titlebar-foreground: var(--nord-snow-4);
+  --statusbar: var(--nord-polar-1);
+  /* nord3 is Nord's inactive tone and only reaches 1.4:1 on nord1, so status
+     text uses nord4 and is muted by size and weight instead. */
+  --statusbar-foreground: var(--nord-snow-4);
+
+  /* Traffic lights */
+  --traffic-close: var(--nord-aurora-11);
+  --traffic-minimize: var(--nord-aurora-13);
+  --traffic-maximize: var(--nord-aurora-14);
+  --traffic-inactive: var(--nord-polar-3);
+  --traffic-glyph: var(--nord-polar-0);
+
+  color-scheme: dark;
+}

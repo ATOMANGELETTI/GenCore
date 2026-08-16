@@ -1,0 +1,38 @@
+title: "q&a: "
+labels:
+  - question
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for usage questions about GenCore. For bugs or
+        feature requests, please open an Issue instead.
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: What are you asking about?
+      options:
+        - "@gencore/terminal (apps/terminal)"
+        - "@gencore/explorer (apps/explorer)"
+        - "@gencore/ui-kit (packages/ui-kit)"
+        - "gencore-core (crates/gencore-core)"
+        - "gencore-pty (crates/gencore-plugin-pty)"
+        - "gencore-fs (crates/gencore-plugin-fs)"
+        - General / other
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: What have you already tried?
+    validations:
+      required: false

@@ -1,0 +1,46 @@
+{
+  "name": "@gencore/ui-kit",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles/globals.css": "./src/styles/globals.css",
+    "./styles/theme.polar-night.css": "./src/styles/theme.polar-night.css",
+    "./styles/theme.snow-storm.css": "./src/styles/theme.snow-storm.css",
+    "./primitives/*": "./src/primitives/*/index.ts",
+    "./composites/*": "./src/composites/*/index.ts",
+    "./tokens": "./src/tokens/tokens.index.ts"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "lucide-react": "1.31.0",
+    "radix-ui": "1.6.7",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "tailwind-merge": "3.6.0",
+    "tailwindcss": "4.3.3"
+  },
+  "devDependencies": {
+    "@gencore/config-typescript": "workspace:*",
+    "@testing-library/jest-dom": "7.0.1",
+    "@testing-library/react": "16.3.2",
+    "@testing-library/user-event": "14.6.4",
+    "@types/node": "26.2.0",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "jsdom": "30.0.1",
+    "typescript": "7.0.2",
+    "vitest": "4.1.10"
+  }
+}

@@ -1,0 +1,20 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/gencore-core",
+    "crates/gencore-plugin-pty",
+    "crates/gencore-plugin-fs",
+    "apps/terminal/src-tauri",
+    "apps/explorer/src-tauri",
+]
+
+[workspace.package]
+edition = "2024"
+
+[workspace.dependencies]
+tauri = "2.11.5"
+tauri-build = "2.6.3"
+tauri-plugin = "2.6.3"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+thiserror = "2.0.20"

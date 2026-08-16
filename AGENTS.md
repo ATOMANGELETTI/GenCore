@@ -1,0 +1,59 @@
+# GenCore agent instructions
+
+This file is the repo-wide brief. Nested `AGENTS.md` files add path-specific rules and win on conflict. Project Cursor rules in `.cursor/rules/` apply as well (`security.mdc` is always on).
+
+## What this is
+
+A pnpm + Turborepo + Cargo monorepo with two **template** Tauri 2 apps. Do not implement a real PTY emulator or file manager unless the user asks.
+
+## Layout
+
+- `apps/terminal` — `@gencore/terminal`, port 5173, identifier `com.gencore.terminal`
+- `apps/explorer` — `@gencore/explorer`, port 5174, identifier `com.gencore.explorer`
+- `packages/ui-kit` — Nord design system; **no** `@tauri-apps/*` imports
+- `packages/config-typescript`, `packages/config-vite` — shared tooling
+- `crates/gencore-core` — package/plugin id `gencore-core`
+- `crates/gencore-plugin-pty` — package **and** plugin id `gencore-pty`
+- `crates/gencore-plugin-fs` — package **and** plugin id `gencore-fs`
+
+Never name a crate `tauri-plugin-fs` or `tauri-plugin-pty`. Plugin id must equal `CARGO_PKG_NAME` or ACL grants never match.
+
+## Naming
+
+Folder-per-module. Files are `{module}.{role}.{ext}` (JS) or `{module}_api.rs` / `{module}_error.rs` (Rust). Tests only under that unit’s `tests/`.
+
+## Security (non-negotiable)
+
+- Object-form CSP; Isolation IPC; `withGlobalTauri: false`; never `window.__TAURI__`
+- `freezePrototype: true`; `assetProtocol.enable: false`; no `dangerous*` flags
+- Capabilities: `windows: ["main"]` only. Do not grant `gencore-pty` / `gencore-fs` stub commands until the UI invokes them
+- UI talks to Rust only through `src/modules/ipc/` wrappers
+- No secrets in the repo. No in-repo MCP configs (`.cursor/mcp.json`, `.mcp.json`, ad-hoc `npx` MCP servers). Team MCP is dashboard-only.
+
+## UI
+
+Official Nord hex only. Flat macOS chrome. Import from `radix-ui` (unified). System fonts only. Apps override density in `app.theme.css`, not colors.
+
+Exact template copy:
+
+- Terminal: `Tauri Terminal Template` + version from `get_app_info`
+- Explorer: `Tauri Explorer Template` + version from `get_app_info`
+
+## Versions
+
+Latest **stable** only. No beta/rc/canary. Do not downgrade the locked stack (React 19.2, Vite 8, Tauri 2, Tailwind 4, pnpm 11, Node >=22.13).
+
+## Commands
+
+```sh
+pnpm install
+pnpm turbo run lint typecheck test
+cargo test --workspace
+cargo clippy --workspace --all-targets -- -D warnings
+```
+
+Scoped: `pnpm --filter @gencore/<pkg> test` or `cargo test -p <crate>`.
+
+## Git
+
+Do not create commits or push unless the user explicitly asks. Conventional commits when they do. Add a changeset for `@gencore/*` package behavior changes (`pnpm changeset`).

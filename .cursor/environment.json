@@ -1,0 +1,12 @@
+{
+  "name": "gencore",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "install": "corepack enable && corepack prepare pnpm@11.22.0 --activate && pnpm install && rustup component add rustfmt clippy",
+  "ports": [
+    { "name": "terminal", "port": 5173 },
+    { "name": "explorer", "port": 5174 }
+  ]
+}

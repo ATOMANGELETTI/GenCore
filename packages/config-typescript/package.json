@@ -1,0 +1,16 @@
+{
+  "name": "@gencore/config-typescript",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    "./base": "./tsconfig.base.json",
+    "./react-library": "./tsconfig.react-library.json",
+    "./vite-app": "./tsconfig.vite-app.json"
+  },
+  "files": [
+    "tsconfig.base.json",
+    "tsconfig.react-library.json",
+    "tsconfig.vite-app.json"
+  ]
+}

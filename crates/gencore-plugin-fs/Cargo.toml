@@ -1,0 +1,17 @@
+[package]
+name = "gencore-fs"
+version = "0.1.0"
+edition.workspace = true
+description = "Stub filesystem plugin for GenCore. No real filesystem access is implemented yet."
+links = "gencore-fs"
+
+[dependencies]
+tauri = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+
+[build-dependencies]
+tauri-plugin = { workspace = true, features = ["build"] }
