@@ -17,8 +17,8 @@ export const titlebarTitleVariants = cva(
 
 export const trafficLightVariants = cva(
   [
-    "size-3 rounded-full",
-    "transition-[border-radius,colors] duration-150 outline-none",
+    "size-3 rounded-[6px]",
+    "transition-[border-radius] duration-150 outline-none",
     "enabled:hover:rounded-[2px] enabled:focus-visible:rounded-[2px]",
     "motion-reduce:transition-none",
     "focus-visible:ring-2 focus-visible:ring-ring/60",

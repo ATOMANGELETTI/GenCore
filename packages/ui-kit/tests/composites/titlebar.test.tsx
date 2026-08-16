@@ -84,7 +84,7 @@ describe("Titlebar", () => {
 
     for (const name of ["Close window", "Minimize window", "Toggle maximize window"] as const) {
       const light = screen.getByRole("button", { name });
-      expect(light).toHaveClass("rounded-full");
+      expect(light).toHaveClass("rounded-[6px]");
       expect(light).toHaveClass("enabled:hover:rounded-[2px]");
       expect(light).toHaveClass("enabled:focus-visible:rounded-[2px]");
     }
