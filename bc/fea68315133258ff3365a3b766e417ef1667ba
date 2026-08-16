@@ -1,0 +1,21 @@
+packages/ui-kit/src/composites/titlebar/titlebar.variants.ts
+  s_42614d1de28ef9::t_48f8a36d11c518 20-21
+packages/ui-kit/tests/composites/titlebar.test.tsx
+  s_42614d1de28ef9::t_f9ed8fffcf309f 87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "bcfea68315133258ff3365a3b766e417ef1667ba",
+  "prompts": {},
+  "sessions": {
+    "s_42614d1de28ef9": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "711c9c0c-6db2-43ce-8f65-0a0ce1a02925",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
