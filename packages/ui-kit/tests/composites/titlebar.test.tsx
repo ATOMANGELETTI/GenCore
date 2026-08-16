@@ -67,4 +67,26 @@ describe("Titlebar", () => {
 
     expect(screen.queryByRole("button", { name: "Close window" })).not.toBeInTheDocument();
   });
+
+  it("renders traffic lights without glyphs", () => {
+    render(<Titlebar onClose={vi.fn()} onMinimize={vi.fn()} onToggleMaximize={vi.fn()} />);
+
+    expect(screen.getByRole("button", { name: "Close window" })).toHaveTextContent("");
+    expect(screen.getByRole("button", { name: "Minimize window" })).toHaveTextContent("");
+    expect(screen.getByRole("button", { name: "Toggle maximize window" })).toHaveTextContent("");
+    expect(screen.queryByText("\u00D7")).not.toBeInTheDocument();
+    expect(screen.queryByText("\u2212")).not.toBeInTheDocument();
+    expect(screen.queryByText("\u002B")).not.toBeInTheDocument();
+  });
+
+  it("morphs enabled lights to a 2px rounded square on hover via class", () => {
+    render(<Titlebar onClose={vi.fn()} onMinimize={vi.fn()} onToggleMaximize={vi.fn()} />);
+
+    for (const name of ["Close window", "Minimize window", "Toggle maximize window"] as const) {
+      const light = screen.getByRole("button", { name });
+      expect(light).toHaveClass("rounded-full");
+      expect(light).toHaveClass("enabled:hover:rounded-[2px]");
+      expect(light).toHaveClass("enabled:focus-visible:rounded-[2px]");
+    }
+  });
 });

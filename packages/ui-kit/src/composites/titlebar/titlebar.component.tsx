@@ -3,12 +3,6 @@ import { Badge } from "../../primitives/badge";
 import type { TitlebarProps, TrafficLightKind, TrafficLightsProps } from "./titlebar.types";
 import { titlebarTitleVariants, titlebarVariants, trafficLightVariants } from "./titlebar.variants";
 
-const trafficLightGlyph: Record<TrafficLightKind, string> = {
-  close: "\u00D7",
-  minimize: "\u2212",
-  maximize: "\u002B",
-};
-
 const trafficLightLabel: Record<TrafficLightKind, string> = {
   close: "Close window",
   minimize: "Minimize window",
@@ -29,11 +23,7 @@ export function TrafficLights({
   ];
 
   return (
-    <div
-      data-slot="traffic-lights"
-      className={cn("group/traffic flex items-center gap-2", className)}
-      {...props}
-    >
+    <div data-slot="traffic-lights" className={cn("flex items-center gap-2", className)} {...props}>
       {lights.map(({ kind, onClick }) => (
         <button
           key={kind}
@@ -43,14 +33,7 @@ export function TrafficLights({
           disabled={!onClick}
           onClick={onClick}
           className={trafficLightVariants({ light: kind, active: Boolean(onClick) })}
-        >
-          <span
-            aria-hidden="true"
-            className="opacity-0 transition-opacity duration-100 group-hover/traffic:opacity-100"
-          >
-            {trafficLightGlyph[kind]}
-          </span>
-        </button>
+        />
       ))}
     </div>
   );
