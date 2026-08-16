@@ -1,24 +1,19 @@
 # Code owners for GenCore.
 #
-# This file is intentionally left as commented-out examples. No GitHub
-# handles or teams exist for this repository yet — invented @usernames
-# would silently fail to request review. Uncomment and fill in real
-# handles/teams once the repository has collaborators.
-#
 # Syntax reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
 # Default owner for everything not matched below.
-# * @MAINTAINER
+* @ATOMANGELETTI
 
 # UI kit / design system.
-# /packages/ui-kit/ @MAINTAINER
+# /packages/ui-kit/ @ATOMANGELETTI
 
 # Tauri apps.
-# /apps/terminal/ @MAINTAINER
-# /apps/explorer/ @MAINTAINER
+# /apps/terminal/ @ATOMANGELETTI
+# /apps/explorer/ @ATOMANGELETTI
 
 # Rust crates (core + plugins).
-# /crates/ @MAINTAINER
+# /crates/ @ATOMANGELETTI
 
 # CI/CD and repository automation.
-# /.github/ @MAINTAINER
+# /.github/ @ATOMANGELETTI

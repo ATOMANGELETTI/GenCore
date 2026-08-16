@@ -9,3 +9,4 @@ Template Tauri 2 shell — not a working terminal emulator.
 - `gencore-pty` is registered in Rust. **Do not** grant its stub commands in capabilities until a real UI calls them
 - Override density only in `src/modules/app/app.theme.css`. Keep Nord tokens
 - Tests: `apps/terminal/tests/` (JS) and `apps/terminal/src-tauri/tests/` (Rust)
+- Release packaging is root `pnpm package:win64` (Windows x64 portable ZIP only)

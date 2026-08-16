@@ -21,6 +21,20 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install Linux Tauri dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libgtk-3-dev \
+            pkg-config
+
       - name: Setup Rust toolchain
         uses: ./.github/actions/setup-rust
 

@@ -13,6 +13,7 @@
     "typecheck": "turbo run typecheck",
     "format": "turbo run format",
     "changeset": "changeset",
+    "package:win64": "pwsh -NoProfile -File scripts/package-win64.ps1",
     "prepare": "husky"
   },
   "devDependencies": {

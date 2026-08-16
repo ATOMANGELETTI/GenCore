@@ -8,3 +8,5 @@ target
 .env
 .env.*
 !.env.example
+**/src-tauri/gen/
+artifacts/

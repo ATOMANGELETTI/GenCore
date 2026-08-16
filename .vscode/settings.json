@@ -43,5 +43,7 @@
     "**/node_modules": true,
     "**/dist": true,
     "**/.turbo": true
-  }
+  },
+  "workbench.editor.pinnedTabSizing": "compact",
+  "workbench.editor.pinnedTabsOnSeparateRow": true
 }

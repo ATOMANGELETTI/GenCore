@@ -1,6 +1,6 @@
 # GenCore
 
-Turborepo + Cargo monorepo for two Tauri 2 desktop templates that share one design system and one set of Rust plugins.
+Turborepo + Cargo monorepo for two Tauri 2 desktop templates that share one design system and one set of Rust plugins. Product distribution is **Windows x64 portable ZIP** only.
 
 The apps are **shells**, not a finished terminal or file manager. They exist so later features drop into an already modular, security-locked layout.
 
@@ -35,7 +35,8 @@ Plugin **folder** names are `gencore-plugin-pty` / `gencore-plugin-fs`. The Carg
 - Node.js `>=22.13`
 - pnpm `11.22.0` (from the root `packageManager` field — `corepack enable`)
 - Rust stable with `rustfmt` and `clippy` (`rust-toolchain.toml`)
-- Tauri 2 system dependencies for your OS ([Tauri prerequisites](https://v2.tauri.app/start/prerequisites/))
+- Tauri 2 system dependencies for Windows ([Tauri prerequisites](https://v2.tauri.app/start/prerequisites/))
+- WebView2 Runtime (ships with Windows 10/11; portable ZIPs do not include a bootstrapper)
 
 ## Commands
 
@@ -53,10 +54,13 @@ pnpm install
 | Rust tests | `cargo test --workspace` |
 | Rust lint | `cargo clippy --workspace --all-targets -- -D warnings` |
 | Version a change | `pnpm changeset` |
+| Windows x64 portable ZIP | `pnpm package:win64` |
+
+`tauri:build` compiles the exe with `--no-bundle` and does not emit NSIS/MSI or other installers. ZIP packaging runs only through `pnpm package:win64` (64-bit Windows). Output lands in `artifacts/`.
 
 VS Code tasks and LLDB launch configs live in `.vscode/`.
 
-On first production `vite` / `tauri` build this machine may need `pnpm approve-builds` for esbuild (pnpm’s ignored-builds policy). That is a local supply-chain prompt, not a missing script.
+The workspace allows esbuild’s install script (`allowBuilds.esbuild` in `pnpm-workspace.yaml`) so production Vite can transpile. If a new dependency needs a lifecycle script, decide explicitly in that file rather than running an ad-hoc approve prompt.
 
 ## Security baseline
 

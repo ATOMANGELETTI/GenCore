@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
   - name: Ask a question / start a discussion
-    url: https://github.com/OWNER/GenCore/discussions/new?category=q-a
+    url: https://github.com/ATOMANGELETTI/GenCore/discussions/new?category=q-a
     about: Usage questions and general discussion belong in Discussions, not Issues.
