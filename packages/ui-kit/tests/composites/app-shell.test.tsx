@@ -155,4 +155,27 @@ describe("AppShell", () => {
     await user.pointer({ keys: "[MouseRight]", target: screen.getByRole("main") });
     expect(await screen.findByRole("menuitem", { name: "Copy" })).toBeInTheDocument();
   });
+
+  it("keeps region data-slots when context menus are attached", () => {
+    render(
+      <AppShell
+        title="GenCore"
+        titlebarContextMenu={
+          <ContextMenuContent>
+            <ContextMenuItem>Minimize</ContextMenuItem>
+          </ContextMenuContent>
+        }
+        contentContextMenu={
+          <ContextMenuContent>
+            <ContextMenuItem>Copy</ContextMenuItem>
+          </ContextMenuContent>
+        }
+      >
+        Workbench
+      </AppShell>,
+    );
+
+    expect(screen.getByRole("banner")).toHaveAttribute("data-slot", "titlebar");
+    expect(screen.getByRole("main")).toHaveAttribute("data-slot", "content-area");
+  });
 });

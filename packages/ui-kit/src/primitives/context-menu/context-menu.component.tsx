@@ -27,7 +27,11 @@ export function ContextMenu(props: ContextMenuProps) {
   return <ContextMenuPrimitive.Root data-slot="context-menu" {...props} />;
 }
 
-export function ContextMenuTrigger(props: ContextMenuTriggerProps) {
+export function ContextMenuTrigger({ asChild, ...props }: ContextMenuTriggerProps) {
+  if (asChild) {
+    return <ContextMenuPrimitive.Trigger asChild {...props} />;
+  }
+
   return <ContextMenuPrimitive.Trigger data-slot="context-menu-trigger" {...props} />;
 }
 
