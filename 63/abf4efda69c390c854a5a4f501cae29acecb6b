@@ -1,0 +1,21 @@
+.node-version
+  s_8e34310062f50d::t_91fbb73788bd13 1
+.github/actions/setup-node-pnpm/action.yml
+  s_8e34310062f50d::t_a1b28e9daf069a 9,11,20,32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "63abf4efda69c390c854a5a4f501cae29acecb6b",
+  "prompts": {},
+  "sessions": {
+    "s_8e34310062f50d": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "a808a6ec-0937-4694-8a1e-b958b7c03812",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
