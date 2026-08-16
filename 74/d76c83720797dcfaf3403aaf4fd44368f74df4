@@ -1,0 +1,21 @@
+packages/ui-kit/tests/composites/app-shell.test.tsx
+  s_6ace1747dedcfb::t_2ccaffd51016ae 158-180
+packages/ui-kit/src/primitives/context-menu/context-menu.component.tsx
+  s_6ace1747dedcfb::t_75c7a816abdf18 30-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "74d76c83720797dcfaf3403aaf4fd44368f74df4",
+  "prompts": {},
+  "sessions": {
+    "s_6ace1747dedcfb": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4e6054be-dc41-4055-b4e3-f069dc12b048",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
