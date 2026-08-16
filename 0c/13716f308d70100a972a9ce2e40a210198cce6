@@ -1,0 +1,31 @@
+apps/terminal/src-tauri/tauri.conf.json
+  s_bcff7685cfaa49::t_0c15fd019c17f1 53
+.cursor/hooks/state/edited-files.json
+  s_247da30355c9f5::t_1263b558d990a2 5-8
+apps/explorer/src-tauri/tauri.conf.json
+  s_bcff7685cfaa49::t_c039c7df4b06f0 55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "0c13716f308d70100a972a9ce2e40a210198cce6",
+  "prompts": {},
+  "sessions": {
+    "s_247da30355c9f5": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "a12170d5-e160-4fa7-b3f2-2920ce4692d9",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_bcff7685cfaa49": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "23641c73-5395-40f6-b5f9-204b935c1eb3",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
