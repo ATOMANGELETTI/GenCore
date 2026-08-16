@@ -66,4 +66,4 @@ app can retint the kit without forking CSS:
 - Flat: no panel gradients, no shadow stacks, no glassmorphism. Separators are
   1px hairlines. The only blur is a 10px backdrop on the titlebar and statusbar.
 - Spacing on a 4/8/12/16 grid; radii 6–8px.
-- System font stack only, never a remote font. Version strings use tabular figures.
+- Bundled Terminess Nerd Font; no remote fonts. Version strings use tabular figures.

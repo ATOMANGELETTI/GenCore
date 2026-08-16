@@ -30,5 +30,5 @@ Use this when adding a new primitive component to `@gencore/ui-kit`.
 ## Constraints
 
 - No raw HTML controls when a Radix/ui-kit primitive already covers the use case.
-- System fonts only; no new `@font-face` rules (CSP `font-src` stays `'self'`).
+- Bundled Terminess Nerd Font only; do not add remote fonts or extra `@font-face` families (CSP `font-src` stays `'self'`).
 - Follow `modular-naming` and `react-ui-kit` rules for file layout and styling.

@@ -32,7 +32,7 @@ Folder-per-module. Files are `{module}.{role}.{ext}` (JS) or `{module}_api.rs` /
 
 ## UI
 
-Official Nord hex only. Flat macOS chrome. Import from `radix-ui` (unified). System fonts only. Apps override density in `app.theme.css`, not colors.
+Official Nord hex only. Flat macOS chrome. Import from `radix-ui` (unified). Bundled Terminess Nerd Font; no remote fonts; CSP `font-src` stays `'self'`. Apps override density in `app.theme.css`, not colors.
 
 Exact template copy:
 

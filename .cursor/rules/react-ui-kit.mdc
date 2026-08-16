@@ -17,7 +17,7 @@ alwaysApply: false
 - Never use a raw HTML control (`<button>`, `<input>`, `<select>`, `<dialog>`) when
   `@gencore/ui-kit` already exports a primitive for it. Extend the kit instead of
   bypassing it.
-- Fonts are system fonts only (`-apple-system`, `Segoe UI`, etc.) — no `@font-face` or
-  remote font loading, since it would require relaxing CSP `font-src`.
+- Fonts are the bundled Terminess Nerd Font via local `@font-face` — no remote font
+  loading. CSP `font-src` stays `'self'`.
 - New primitives get tests under `packages/ui-kit/tests/`, not colocated with source
   (see `modular-naming`).

@@ -1,10 +1,10 @@
 /**
- * System font stacks only — the kit never loads a remote font, so Tauri
- * windows paint their first frame without a webfont round trip.
+ * Bundled local Terminess Nerd Font — the kit never loads a remote font.
+ * System stacks remain as fallbacks if the TTF files are missing.
  */
 export const fontFamily = {
-  sans: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
-  mono: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+  sans: '"Terminess Nerd Font", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
+  mono: '"Terminess Nerd Font", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
 } as const;
 
 export const fontSize = {
