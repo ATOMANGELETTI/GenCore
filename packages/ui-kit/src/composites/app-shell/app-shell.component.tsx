@@ -19,6 +19,7 @@ export function AppShell({
   titlebarEnd,
   statusbarStart,
   statusbarEnd,
+  sidebar,
   showTrafficLights,
   contentProps,
   onClose,
@@ -40,9 +41,16 @@ export function AppShell({
         onToggleMaximize={onToggleMaximize}
       />
 
-      <ContentArea {...contentProps}>{children}</ContentArea>
+      {sidebar ? (
+        <div data-slot="app-shell-body" className="flex min-h-0 flex-1">
+          {sidebar}
+          <ContentArea {...contentProps}>{children}</ContentArea>
+        </div>
+      ) : (
+        <ContentArea {...contentProps}>{children}</ContentArea>
+      )}
 
-      <Statusbar statusbarStart={statusbarStart} statusbarEnd={statusbarEnd} version={version} />
+      <Statusbar statusbarStart={statusbarStart} statusbarEnd={statusbarEnd} />
     </div>
   );
 }

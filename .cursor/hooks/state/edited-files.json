@@ -6,5 +6,17 @@
   "23641c73-5395-40f6-b5f9-204b935c1eb3": [
     "apps/terminal",
     "apps/explorer"
+  ],
+  "1b4b3819-b6bd-4e20-b752-b69ddb3eef99": [
+    "packages/ui-kit"
+  ],
+  "1f58c299-f53e-45dc-aaa0-ac9598752993": [
+    "apps/terminal"
+  ],
+  "6b5c864a-ddc6-437a-ac56-82e94f11d86b": [
+    "apps/terminal"
+  ],
+  "4cccffc8-0d52-46f7-850b-3c9d9df7f5ad": [
+    "apps/terminal"
   ]
 }

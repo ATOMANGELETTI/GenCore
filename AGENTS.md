@@ -62,3 +62,15 @@ Scoped: `pnpm --filter @gencore/<pkg> test` or `cargo test -p <crate>`. Release 
 ## Git
 
 Do not create commits or push unless the user explicitly asks. Conventional commits when they do. Add a changeset for `@gencore/*` package behavior changes (`pnpm changeset`). Binary assets listed in `.gitattributes` (icons, fonts, media, archives) are Git LFS-tracked; run `git lfs install` once.
+
+## Learned User Preferences
+
+- For multi-agent orchestration, use Grok 4.6 unless a stronger model is clearly required.
+- Do not show the app version in the statusbar; it already appears in the titlebar.
+- Reviewer skills (code-reviewer, security-reviewer, performance-reviewer) are read-only: propose a plan, ask which changes to apply, and do not edit unless asked.
+- Shared fonts belong in `@gencore/ui-kit` (`packages/ui-kit/src/assets/fonts/`) and may be used in the app shell (Terminus Nerd Font); do not copy font files into apps.
+
+## Learned Workspace Facts
+
+- CI and local version managers read `.node-version` (currently `22`); keep that file and keep it aligned with `engines.node` (`>=22.13.0`).
+

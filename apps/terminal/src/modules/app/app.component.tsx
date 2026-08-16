@@ -3,9 +3,10 @@ import * as React from "react";
 import { getAppInfo } from "../ipc/ipc.app-info";
 import type { AppInfo } from "../ipc/ipc.types";
 import { closeWindow, minimizeWindow, toggleMaximizeWindow } from "../ipc/ipc.window";
+import { SidePanel } from "../side-panel/side-panel.component";
 import "./app.theme.css";
 
-/** Exact product copy for this template app; also fed into the titlebar/statusbar via `version`. */
+/** Exact product copy for this template app; also fed into the titlebar via `version`. */
 export const APP_TITLE = "Tauri Terminal Template";
 
 export function App() {
@@ -39,6 +40,7 @@ export function App() {
         onMinimize={minimizeWindow}
         onToggleMaximize={toggleMaximizeWindow}
         contentProps={{ centered: true }}
+        sidebar={<SidePanel />}
       >
         <div className="flex flex-col items-center gap-2">
           <h1 className="font-semibold text-lg">{APP_TITLE}</h1>

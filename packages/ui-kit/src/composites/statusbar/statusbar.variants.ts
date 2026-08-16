@@ -5,5 +5,3 @@ export const statusbarVariants = cva([
   "gap-2 border-t border-border bg-statusbar/95 px-2",
   "text-xs text-statusbar-foreground/80 backdrop-blur-[10px]",
 ]);
-
-export const statusbarVersionVariants = cva("tabular-nums");

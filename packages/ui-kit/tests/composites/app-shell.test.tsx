@@ -44,9 +44,10 @@ describe("AppShell", () => {
 
     expect(titlebar).toHaveTextContent("start");
     expect(titlebar).toHaveTextContent("end");
+    expect(titlebar).toHaveTextContent("0.1.0");
     expect(statusbar).toHaveTextContent("Indexing");
     expect(statusbar).toHaveTextContent("3 tasks");
-    expect(statusbar).toHaveTextContent("0.1.0");
+    expect(statusbar).not.toHaveTextContent("0.1.0");
   });
 
   it("falls back to the idle status label", () => {
@@ -63,5 +64,38 @@ describe("AppShell", () => {
 
     rerender(<AppShell density="comfortable">content</AppShell>);
     expect(shell().className).toContain("[--gencore-titlebar-height:32px]");
+  });
+
+  it("places sidebar and main as siblings under the body slot", () => {
+    render(
+      <AppShell title="GenCore" sidebar={<aside>Rail</aside>}>
+        <p>Workbench</p>
+      </AppShell>,
+    );
+
+    const body = document.querySelector('[data-slot="app-shell-body"]');
+    const sidebar = screen.getByRole("complementary");
+    const main = screen.getByRole("main");
+
+    expect(body).not.toBeNull();
+    expect(sidebar.parentElement).toBe(body);
+    expect(main.parentElement).toBe(body);
+    expect(sidebar).toHaveTextContent("Rail");
+    expect(main).toHaveTextContent("Workbench");
+    expect(screen.getByRole("banner")).toHaveAttribute("data-slot", "titlebar");
+    expect(screen.getByRole("contentinfo")).toHaveAttribute("data-slot", "statusbar");
+  });
+
+  it("omits the body slot when sidebar is not passed", () => {
+    render(
+      <AppShell title="GenCore">
+        <p>Workbench</p>
+      </AppShell>,
+    );
+
+    expect(screen.getByRole("banner")).toHaveAttribute("data-slot", "titlebar");
+    expect(screen.getByRole("main")).toHaveAttribute("data-slot", "content-area");
+    expect(screen.getByRole("contentinfo")).toHaveAttribute("data-slot", "statusbar");
+    expect(document.querySelector('[data-slot="app-shell-body"]')).toBeNull();
   });
 });

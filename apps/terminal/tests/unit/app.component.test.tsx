@@ -32,13 +32,13 @@ describe("App", () => {
     expect(screen.getByRole("heading", { name: APP_TITLE })).toBeInTheDocument();
   });
 
-  it("renders the version from get_app_info in the titlebar and statusbar", async () => {
+  it("renders the version from get_app_info in the titlebar, not the statusbar", async () => {
     render(<App />);
 
     await waitFor(() => {
-      const versionNodes = screen.getAllByText(mockAppInfo.version, { exact: false });
-      expect(versionNodes.length).toBeGreaterThanOrEqual(2);
+      expect(screen.getByRole("banner")).toHaveTextContent(mockAppInfo.version);
     });
+    expect(screen.getByRole("contentinfo")).not.toHaveTextContent(mockAppInfo.version);
   });
 
   it("never touches window.__TAURI__", async () => {
@@ -46,5 +46,14 @@ describe("App", () => {
     await screen.findAllByText(APP_TITLE);
 
     expect((window as unknown as Record<string, unknown>).__TAURI__).toBeUndefined();
+  });
+
+  it("renders SidePanel in the sidebar without replacing the workbench heading", async () => {
+    render(<App />);
+
+    expect(screen.getByRole("heading", { name: APP_TITLE })).toBeInTheDocument();
+    expect(screen.getByRole("complementary")).toHaveAttribute("data-slot", "side-panel");
+    expect(screen.getByText("Tab 1")).toBeVisible();
+    expect(screen.getByRole("tablist", { name: "Side panel" })).toBeInTheDocument();
   });
 });

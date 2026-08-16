@@ -1,0 +1,481 @@
+﻿# Review package: Terminal side panel (working tree, no commits)
+# Feature files only — exclude unrelated statusbar WIP
+
+## Commits
+none
+
+## Files changed
+
+ M apps/terminal/package.json
+ M apps/terminal/src/modules/app/app.component.tsx
+ M apps/terminal/tests/unit/app.component.test.tsx
+ M packages/ui-kit/src/composites/app-shell/app-shell.component.tsx
+ M packages/ui-kit/src/composites/app-shell/app-shell.types.ts
+ M packages/ui-kit/tests/composites/app-shell.test.tsx
+?? .changeset/app-shell-sidebar-slot.md
+?? apps/terminal/src/modules/side-panel/
+?? apps/terminal/tests/unit/side-panel.test.tsx
+
+## Diff
+
+diff --git a/apps/terminal/package.json b/apps/terminal/package.json
+index f755017..a9df911 100644
+--- a/apps/terminal/package.json
++++ b/apps/terminal/package.json
+@@ -9,20 +9,21 @@
+     "tauri": "tauri",
+     "tauri:dev": "tauri dev",
+     "tauri:build": "tauri build --no-bundle",
+     "test": "vitest run",
+     "typecheck": "tsc -p tsconfig.json --noEmit",
+     "lint": "biome check ."
+   },
+   "dependencies": {
+     "@gencore/ui-kit": "workspace:*",
+     "@tauri-apps/api": "2.11.1",
++    "lucide-react": "1.31.0",
+     "react": "19.2.8",
+     "react-dom": "19.2.8"
+   },
+   "devDependencies": {
+     "@gencore/config-typescript": "workspace:*",
+     "@gencore/config-vite": "workspace:*",
+     "@tauri-apps/cli": "2.11.4",
+     "@testing-library/jest-dom": "7.0.1",
+     "@testing-library/react": "16.3.2",
+     "@testing-library/user-event": "14.6.4",
+diff --git a/apps/terminal/src/modules/app/app.component.tsx b/apps/terminal/src/modules/app/app.component.tsx
+index ab17f9d..e9f86b2 100644
+--- a/apps/terminal/src/modules/app/app.component.tsx
++++ b/apps/terminal/src/modules/app/app.component.tsx
+@@ -1,18 +1,19 @@
+ import { AppShell, ThemeProvider } from "@gencore/ui-kit";
+ import * as React from "react";
+ import { getAppInfo } from "../ipc/ipc.app-info";
+ import type { AppInfo } from "../ipc/ipc.types";
+ import { closeWindow, minimizeWindow, toggleMaximizeWindow } from "../ipc/ipc.window";
++import { SidePanel } from "../side-panel/side-panel.component";
+ import "./app.theme.css";
+ 
+-/** Exact product copy for this template app; also fed into the titlebar/statusbar via `version`. */
++/** Exact product copy for this template app; also fed into the titlebar via `version`. */
+ export const APP_TITLE = "Tauri Terminal Template";
+ 
+ export function App() {
+   const [appInfo, setAppInfo] = React.useState<AppInfo | null>(null);
+ 
+   React.useEffect(() => {
+     let cancelled = false;
+ 
+     getAppInfo()
+       .then((info) => {
+@@ -32,20 +33,21 @@ export function App() {
+   return (
+     <ThemeProvider defaultTheme="polar-night">
+       <AppShell
+         title={APP_TITLE}
+         version={appInfo?.version}
+         density="compact"
+         onClose={closeWindow}
+         onMinimize={minimizeWindow}
+         onToggleMaximize={toggleMaximizeWindow}
+         contentProps={{ centered: true }}
++        sidebar={<SidePanel />}
+       >
+         <div className="flex flex-col items-center gap-2">
+           <h1 className="font-semibold text-lg">{APP_TITLE}</h1>
+           {appInfo ? (
+             <p className="text-muted-foreground text-sm tabular-nums">v{appInfo.version}</p>
+           ) : null}
+         </div>
+       </AppShell>
+     </ThemeProvider>
+   );
+diff --git a/apps/terminal/tests/unit/app.component.test.tsx b/apps/terminal/tests/unit/app.component.test.tsx
+index 4b72d0c..48e7e84 100644
+--- a/apps/terminal/tests/unit/app.component.test.tsx
++++ b/apps/terminal/tests/unit/app.component.test.tsx
+@@ -25,26 +25,35 @@ describe("App", () => {
+   });
+ 
+   it("renders the exact template title in the heading and titlebar", async () => {
+     render(<App />);
+ 
+     const matches = await screen.findAllByText(APP_TITLE);
+     expect(matches.length).toBeGreaterThanOrEqual(2);
+     expect(screen.getByRole("heading", { name: APP_TITLE })).toBeInTheDocument();
+   });
+ 
+-  it("renders the version from get_app_info in the titlebar and statusbar", async () => {
++  it("renders the version from get_app_info in the titlebar, not the statusbar", async () => {
+     render(<App />);
+ 
+     await waitFor(() => {
+-      const versionNodes = screen.getAllByText(mockAppInfo.version, { exact: false });
+-      expect(versionNodes.length).toBeGreaterThanOrEqual(2);
++      expect(screen.getByRole("banner")).toHaveTextContent(mockAppInfo.version);
+     });
++    expect(screen.getByRole("contentinfo")).not.toHaveTextContent(mockAppInfo.version);
+   });
+ 
+   it("never touches window.__TAURI__", async () => {
+     render(<App />);
+     await screen.findAllByText(APP_TITLE);
+ 
+     expect((window as unknown as Record<string, unknown>).__TAURI__).toBeUndefined();
+   });
++
++  it("renders SidePanel in the sidebar without replacing the workbench heading", async () => {
++    render(<App />);
++
++    expect(screen.getByRole("heading", { name: APP_TITLE })).toBeInTheDocument();
++    expect(screen.getByRole("complementary")).toHaveAttribute("data-slot", "side-panel");
++    expect(screen.getByText("Tab 1")).toBeVisible();
++    expect(screen.getByRole("tablist", { name: "Side panel" })).toBeInTheDocument();
++  });
+ });
+diff --git a/packages/ui-kit/src/composites/app-shell/app-shell.component.tsx b/packages/ui-kit/src/composites/app-shell/app-shell.component.tsx
+index 79bfa3c..e1170a5 100644
+--- a/packages/ui-kit/src/composites/app-shell/app-shell.component.tsx
++++ b/packages/ui-kit/src/composites/app-shell/app-shell.component.tsx
+@@ -12,20 +12,21 @@ import { appShellVariants } from "./app-shell.variants";
+  */
+ export function AppShell({
+   className,
+   density,
+   title,
+   version,
+   titlebarStart,
+   titlebarEnd,
+   statusbarStart,
+   statusbarEnd,
++  sidebar,
+   showTrafficLights,
+   contentProps,
+   onClose,
+   onMinimize,
+   onToggleMaximize,
+   children,
+   ...props
+ }: AppShellProps) {
+   return (
+     <div data-slot="app-shell" className={cn(appShellVariants({ density }), className)} {...props}>
+@@ -33,16 +34,23 @@ export function AppShell({
+         title={title}
+         version={version}
+         titlebarStart={titlebarStart}
+         titlebarEnd={titlebarEnd}
+         showTrafficLights={showTrafficLights}
+         onClose={onClose}
+         onMinimize={onMinimize}
+         onToggleMaximize={onToggleMaximize}
+       />
+ 
+-      <ContentArea {...contentProps}>{children}</ContentArea>
++      {sidebar ? (
++        <div data-slot="app-shell-body" className="flex min-h-0 flex-1">
++          {sidebar}
++          <ContentArea {...contentProps}>{children}</ContentArea>
++        </div>
++      ) : (
++        <ContentArea {...contentProps}>{children}</ContentArea>
++      )}
+ 
+-      <Statusbar statusbarStart={statusbarStart} statusbarEnd={statusbarEnd} version={version} />
++      <Statusbar statusbarStart={statusbarStart} statusbarEnd={statusbarEnd} />
+     </div>
+   );
+ }
+diff --git a/packages/ui-kit/src/composites/app-shell/app-shell.types.ts b/packages/ui-kit/src/composites/app-shell/app-shell.types.ts
+index 10cba39..fd28e1a 100644
+--- a/packages/ui-kit/src/composites/app-shell/app-shell.types.ts
++++ b/packages/ui-kit/src/composites/app-shell/app-shell.types.ts
+@@ -7,14 +7,15 @@ import type { appShellVariants } from "./app-shell.variants";
+ export interface AppShellProps
+   extends Omit<React.ComponentPropsWithRef<"div">, "title">,
+     VariantProps<typeof appShellVariants>,
+     WindowControlHandlers {
+   title?: React.ReactNode;
+   version?: React.ReactNode;
+   titlebarStart?: React.ReactNode;
+   titlebarEnd?: React.ReactNode;
+   statusbarStart?: React.ReactNode;
+   statusbarEnd?: React.ReactNode;
++  sidebar?: React.ReactNode;
+   showTrafficLights?: boolean;
+   /** Forwarded to the inner `ContentArea` (centering, padding, className). */
+   contentProps?: Omit<ContentAreaProps, "children">;
+ }
+diff --git a/packages/ui-kit/tests/composites/app-shell.test.tsx b/packages/ui-kit/tests/composites/app-shell.test.tsx
+index 667f2d6..be17104 100644
+--- a/packages/ui-kit/tests/composites/app-shell.test.tsx
++++ b/packages/ui-kit/tests/composites/app-shell.test.tsx
+@@ -37,31 +37,65 @@ describe("AppShell", () => {
+       >
+         <p>Workbench</p>
+       </AppShell>,
+     );
+ 
+     const titlebar = screen.getByRole("banner");
+     const statusbar = screen.getByRole("contentinfo");
+ 
+     expect(titlebar).toHaveTextContent("start");
+     expect(titlebar).toHaveTextContent("end");
++    expect(titlebar).toHaveTextContent("0.1.0");
+     expect(statusbar).toHaveTextContent("Indexing");
+     expect(statusbar).toHaveTextContent("3 tasks");
+-    expect(statusbar).toHaveTextContent("0.1.0");
++    expect(statusbar).not.toHaveTextContent("0.1.0");
+   });
+ 
+   it("falls back to the idle status label", () => {
+     render(<AppShell title="GenCore">content</AppShell>);
+ 
+     expect(screen.getByRole("contentinfo")).toHaveTextContent("Ready");
+   });
+ 
+   it("switches chrome heights with the density variant", () => {
+     const { rerender } = render(<AppShell density="compact">content</AppShell>);
+     const shell = () => screen.getByRole("main").parentElement as HTMLElement;
+ 
+     expect(shell().className).toContain("[--gencore-titlebar-height:28px]");
+ 
+     rerender(<AppShell density="comfortable">content</AppShell>);
+     expect(shell().className).toContain("[--gencore-titlebar-height:32px]");
+   });
++
++  it("places sidebar and main as siblings under the body slot", () => {
++    render(
++      <AppShell title="GenCore" sidebar={<aside>Rail</aside>}>
++        <p>Workbench</p>
++      </AppShell>,
++    );
++
++    const body = document.querySelector('[data-slot="app-shell-body"]');
++    const sidebar = screen.getByRole("complementary");
++    const main = screen.getByRole("main");
++
++    expect(body).not.toBeNull();
++    expect(sidebar.parentElement).toBe(body);
++    expect(main.parentElement).toBe(body);
++    expect(sidebar).toHaveTextContent("Rail");
++    expect(main).toHaveTextContent("Workbench");
++    expect(screen.getByRole("banner")).toHaveAttribute("data-slot", "titlebar");
++    expect(screen.getByRole("contentinfo")).toHaveAttribute("data-slot", "statusbar");
++  });
++
++  it("omits the body slot when sidebar is not passed", () => {
++    render(
++      <AppShell title="GenCore">
++        <p>Workbench</p>
++      </AppShell>,
++    );
++
++    expect(screen.getByRole("banner")).toHaveAttribute("data-slot", "titlebar");
++    expect(screen.getByRole("main")).toHaveAttribute("data-slot", "content-area");
++    expect(screen.getByRole("contentinfo")).toHaveAttribute("data-slot", "statusbar");
++    expect(document.querySelector('[data-slot="app-shell-body"]')).toBeNull();
++  });
+ });
+
+## New file: .changeset/app-shell-sidebar-slot.md
+
+---
+"@gencore/ui-kit": minor
+---
+
+feat: optional AppShell sidebar slot
+
+## New file: apps/terminal/src/modules/side-panel/side-panel.types.ts
+
+export type SidePanelTabId = "files" | "assistant" | "settings";
+
+## New file: apps/terminal/src/modules/side-panel/side-panel.component.tsx
+
+import {
+  Button,
+  cn,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@gencore/ui-kit";
+import { Bot, Folder, type LucideIcon, Settings } from "lucide-react";
+import * as React from "react";
+import type { SidePanelTabId } from "./side-panel.types";
+
+const TABS: readonly {
+  id: SidePanelTabId;
+  label: string;
+  Icon: LucideIcon;
+  placeholder: string;
+}[] = [
+  { id: "files", label: "Files", Icon: Folder, placeholder: "Tab 1" },
+  { id: "assistant", label: "Assistant", Icon: Bot, placeholder: "Tab 2" },
+  { id: "settings", label: "Settings", Icon: Settings, placeholder: "Tab 3" },
+];
+
+function panelId(id: SidePanelTabId): string {
+  return `side-panel-${id}`;
+}
+
+export function SidePanel() {
+  const [selected, setSelected] = React.useState<SidePanelTabId>("files");
+  const tabRefs = React.useRef<Partial<Record<SidePanelTabId, HTMLButtonElement | null>>>({});
+
+  function selectTab(id: SidePanelTabId) {
+    setSelected(id);
+    tabRefs.current[id]?.focus();
+  }
+
+  function onTabKeyDown(event: React.KeyboardEvent<HTMLButtonElement>, id: SidePanelTabId) {
+    const currentIndex = TABS.findIndex((tab) => tab.id === id);
+    if (currentIndex < 0) {
+      return;
+    }
+
+    let nextIndex: number | undefined;
+    if (event.key === "ArrowRight") {
+      nextIndex = (currentIndex + 1) % TABS.length;
+    } else if (event.key === "ArrowLeft") {
+      nextIndex = (currentIndex - 1 + TABS.length) % TABS.length;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = TABS.length - 1;
+    }
+
+    if (nextIndex === undefined) {
+      return;
+    }
+
+    event.preventDefault();
+    const next = TABS[nextIndex];
+    if (next) {
+      selectTab(next.id);
+    }
+  }
+
+  return (
+    <aside
+      data-slot="side-panel"
+      className="flex h-full w-60 shrink-0 flex-col border-r border-border bg-card"
+    >
+      <div className="min-h-0 flex-1 overflow-auto">
+        {TABS.map((tab) => (
+          <div
+            key={tab.id}
+            id={panelId(tab.id)}
+            role="tabpanel"
+            hidden={selected !== tab.id}
+            aria-labelledby={`side-panel-tab-${tab.id}`}
+            className="flex h-full items-center justify-center"
+          >
+            <p className="text-sm text-muted-foreground">{tab.placeholder}</p>
+          </div>
+        ))}
+      </div>
+      <TooltipProvider>
+        <div
+          role="tablist"
+          aria-label="Side panel"
+          className="flex h-8 shrink-0 border-t border-border"
+        >
+          {TABS.map((tab) => {
+            const isSelected = selected === tab.id;
+            const { Icon } = tab;
+
+            return (
+              <Tooltip key={tab.id}>
+                <TooltipTrigger asChild>
+                  <Button
+                    ref={(node) => {
+                      tabRefs.current[tab.id] = node;
+                    }}
+                    id={`side-panel-tab-${tab.id}`}
+                    role="tab"
+                    variant="ghost"
+                    size="icon"
+                    aria-label={tab.label}
+                    aria-selected={isSelected}
+                    aria-controls={panelId(tab.id)}
+                    tabIndex={isSelected ? 0 : -1}
+                    className={cn(
+                      "relative h-full w-auto flex-1 rounded-none",
+                      isSelected
+                        ? "bg-accent text-primary hover:bg-accent hover:text-primary before:absolute before:inset-x-0 before:top-0 before:h-0.5 before:bg-primary"
+                        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                    )}
+                    onClick={() => {
+                      selectTab(tab.id);
+                    }}
+                    onKeyDown={(event) => {
+                      onTabKeyDown(event, tab.id);
+                    }}
+                  >
+                    <Icon aria-hidden="true" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{tab.label}</TooltipContent>
+              </Tooltip>
+            );
+          })}
+        </div>
+      </TooltipProvider>
+    </aside>
+  );
+}
+
+## New file: apps/terminal/tests/unit/side-panel.test.tsx
+
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it } from "vitest";
+import { SidePanel } from "../../src/modules/side-panel/side-panel.component";
+
+describe("SidePanel", () => {
+  it("shows Tab 1 by default and hides the other panels", () => {
+    render(<SidePanel />);
+
+    expect(screen.getByText("Tab 1")).toBeVisible();
+    expect(screen.getByText("Tab 2")).not.toBeVisible();
+    expect(screen.getByText("Tab 3")).not.toBeVisible();
+  });
+
+  it("shows Tab 2 when the Assistant tab is clicked", async () => {
+    const user = userEvent.setup();
+    render(<SidePanel />);
+
+    await user.click(screen.getByRole("tab", { name: "Assistant" }));
+
+    expect(screen.getByText("Tab 2")).toBeVisible();
+    expect(screen.getByText("Tab 1")).not.toBeVisible();
+    expect(screen.getByText("Tab 3")).not.toBeVisible();
+  });
+
+  it("shows Tab 3 when the Settings tab is clicked", async () => {
+    const user = userEvent.setup();
+    render(<SidePanel />);
+
+    await user.click(screen.getByRole("tab", { name: "Settings" }));
+
+    expect(screen.getByText("Tab 3")).toBeVisible();
+  });
+
+  it("exposes a Side panel tablist with Files, Assistant, and Settings tabs", () => {
+    render(<SidePanel />);
+
+    expect(screen.getByRole("tablist", { name: "Side panel" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Files" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Assistant" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Settings" })).toBeInTheDocument();
+  });
+
+  it("renders an aside complementary root with the side-panel slot", () => {
+    render(<SidePanel />);
+
+    const root = screen.getByRole("complementary");
+    expect(root.tagName).toBe("ASIDE");
+    expect(root).toHaveAttribute("data-slot", "side-panel");
+  });
+});

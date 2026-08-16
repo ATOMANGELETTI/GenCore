@@ -1,12 +1,11 @@
 import { cn } from "../../lib/cn";
 import type { StatusbarProps } from "./statusbar.types";
-import { statusbarVariants, statusbarVersionVariants } from "./statusbar.variants";
+import { statusbarVariants } from "./statusbar.variants";
 
 export function Statusbar({
   className,
   statusbarStart,
   statusbarEnd,
-  version,
   idleLabel = "Ready",
   children,
   ...props
@@ -19,11 +18,6 @@ export function Statusbar({
 
       <div data-slot="statusbar-end" className="ml-auto flex items-center gap-2">
         {statusbarEnd}
-        {version ? (
-          <span data-slot="statusbar-version" className={statusbarVersionVariants()}>
-            {version}
-          </span>
-        ) : null}
       </div>
 
       {children}

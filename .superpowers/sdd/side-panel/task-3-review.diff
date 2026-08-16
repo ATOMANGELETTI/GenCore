@@ -1,0 +1,104 @@
+﻿# Review package: working tree (no commits)
+# Task 3 files only
+
+## Commits
+none
+
+## Files changed
+
+ apps/terminal/src/modules/app/app.component.tsx |  4 +++-
+ apps/terminal/tests/unit/app.component.test.tsx | 15 ++++++++++++---
+ 2 files changed, 15 insertions(+), 4 deletions(-)
+
+## Diff
+
+diff --git a/apps/terminal/src/modules/app/app.component.tsx b/apps/terminal/src/modules/app/app.component.tsx
+index ab17f9d..e9f86b2 100644
+--- a/apps/terminal/src/modules/app/app.component.tsx
++++ b/apps/terminal/src/modules/app/app.component.tsx
+@@ -1,18 +1,19 @@
+ import { AppShell, ThemeProvider } from "@gencore/ui-kit";
+ import * as React from "react";
+ import { getAppInfo } from "../ipc/ipc.app-info";
+ import type { AppInfo } from "../ipc/ipc.types";
+ import { closeWindow, minimizeWindow, toggleMaximizeWindow } from "../ipc/ipc.window";
++import { SidePanel } from "../side-panel/side-panel.component";
+ import "./app.theme.css";
+ 
+-/** Exact product copy for this template app; also fed into the titlebar/statusbar via `version`. */
++/** Exact product copy for this template app; also fed into the titlebar via `version`. */
+ export const APP_TITLE = "Tauri Terminal Template";
+ 
+ export function App() {
+   const [appInfo, setAppInfo] = React.useState<AppInfo | null>(null);
+ 
+   React.useEffect(() => {
+     let cancelled = false;
+ 
+     getAppInfo()
+       .then((info) => {
+@@ -32,20 +33,21 @@ export function App() {
+   return (
+     <ThemeProvider defaultTheme="polar-night">
+       <AppShell
+         title={APP_TITLE}
+         version={appInfo?.version}
+         density="compact"
+         onClose={closeWindow}
+         onMinimize={minimizeWindow}
+         onToggleMaximize={toggleMaximizeWindow}
+         contentProps={{ centered: true }}
++        sidebar={<SidePanel />}
+       >
+         <div className="flex flex-col items-center gap-2">
+           <h1 className="font-semibold text-lg">{APP_TITLE}</h1>
+           {appInfo ? (
+             <p className="text-muted-foreground text-sm tabular-nums">v{appInfo.version}</p>
+           ) : null}
+         </div>
+       </AppShell>
+     </ThemeProvider>
+   );
+diff --git a/apps/terminal/tests/unit/app.component.test.tsx b/apps/terminal/tests/unit/app.component.test.tsx
+index 4b72d0c..48e7e84 100644
+--- a/apps/terminal/tests/unit/app.component.test.tsx
++++ b/apps/terminal/tests/unit/app.component.test.tsx
+@@ -25,26 +25,35 @@ describe("App", () => {
+   });
+ 
+   it("renders the exact template title in the heading and titlebar", async () => {
+     render(<App />);
+ 
+     const matches = await screen.findAllByText(APP_TITLE);
+     expect(matches.length).toBeGreaterThanOrEqual(2);
+     expect(screen.getByRole("heading", { name: APP_TITLE })).toBeInTheDocument();
+   });
+ 
+-  it("renders the version from get_app_info in the titlebar and statusbar", async () => {
++  it("renders the version from get_app_info in the titlebar, not the statusbar", async () => {
+     render(<App />);
+ 
+     await waitFor(() => {
+-      const versionNodes = screen.getAllByText(mockAppInfo.version, { exact: false });
+-      expect(versionNodes.length).toBeGreaterThanOrEqual(2);
++      expect(screen.getByRole("banner")).toHaveTextContent(mockAppInfo.version);
+     });
++    expect(screen.getByRole("contentinfo")).not.toHaveTextContent(mockAppInfo.version);
+   });
+ 
+   it("never touches window.__TAURI__", async () => {
+     render(<App />);
+     await screen.findAllByText(APP_TITLE);
+ 
+     expect((window as unknown as Record<string, unknown>).__TAURI__).toBeUndefined();
+   });
++
++  it("renders SidePanel in the sidebar without replacing the workbench heading", async () => {
++    render(<App />);
++
++    expect(screen.getByRole("heading", { name: APP_TITLE })).toBeInTheDocument();
++    expect(screen.getByRole("complementary")).toHaveAttribute("data-slot", "side-panel");
++    expect(screen.getByText("Tab 1")).toBeVisible();
++    expect(screen.getByRole("tablist", { name: "Side panel" })).toBeInTheDocument();
++  });
+ });

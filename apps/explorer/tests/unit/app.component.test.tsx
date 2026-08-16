@@ -29,7 +29,7 @@ describe("App", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows the version from get_app_info in the titlebar and statusbar", async () => {
+  it("shows the version from get_app_info in the titlebar, not the statusbar", async () => {
     getAppInfo.mockResolvedValue({
       name: "GenCore Explorer",
       version: "0.1.0",
@@ -41,8 +41,8 @@ describe("App", () => {
 
     await waitFor(() => {
       expect(screen.getByRole("banner")).toHaveTextContent("0.1.0");
-      expect(screen.getByRole("contentinfo")).toHaveTextContent("0.1.0");
     });
+    expect(screen.getByRole("contentinfo")).not.toHaveTextContent("0.1.0");
   });
 
   it("wires the traffic lights to the typed window IPC module, not window.__TAURI__", async () => {

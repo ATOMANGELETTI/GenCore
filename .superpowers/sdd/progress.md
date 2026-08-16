@@ -37,6 +37,17 @@ Controller session. No git commits unless the user asks.
 - Wave 6b `.github/**`: complete (review approved; `changesets/action@v1` is latest stable)
 - Controller docs: `README.md`, `LICENSE` (MIT), root + nested `AGENTS.md`
 
+## Feature: Terminal side panel (2026-08-16)
+
+Controller session. No git commits unless the user asks. Work in place on `main` (running `tauri:dev`).
+
+- Task 1 AppShell sidebar slot: complete (working tree, review approved). Minors: truthy `sidebar ?` vs `!= null`; tests do not assert flex classes or document order.
+- Task 2 Terminal side-panel module: complete (working tree, review approved). Minors: no keyboard-nav test; Settings click test does not assert other panels hidden.
+- Task 3 Wire SidePanel into App: complete (working tree, review approved)
+- Task 4 Verify ui-kit + terminal test/typecheck/lint: complete (ui-kit 31/31, terminal 11/11, typecheck+lint clean)
+- Final review: Critical hidden+flex fixed (inner wrapper; tests assert hidden + no flex on tabpanel). Important version→Statusbar is pre-existing companion WIP — left in place.
+- Fix re-verify: terminal 11/11, typecheck, lint clean
+
 ## Follow-ups (not blocking)
 
 - `pnpm approve-builds` may be required before production `vite` / `tauri` build (esbuild)
