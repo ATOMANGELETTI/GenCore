@@ -1,0 +1,29 @@
+packages/ui-kit/src/composites/titlebar/titlebar.variants.ts
+  s_13673b7e4dd1d4::t_0277988484ce61 20-23
+packages/ui-kit/src/composites/titlebar/titlebar.component.tsx
+  s_13673b7e4dd1d4::t_220b796952a7d1 36
+  s_13673b7e4dd1d4::t_a540cb5961da5a 26
+packages/ui-kit/tests/composites/titlebar.test.tsx
+  s_13673b7e4dd1d4::t_f2e71af76829e3 70-91
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "2e5b7c551de28b35001424f0f3655af1f96e7fa6",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_13673b7e4dd1d4": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "7b114bf8-89cf-44f0-b921-6d7bba800e63",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
