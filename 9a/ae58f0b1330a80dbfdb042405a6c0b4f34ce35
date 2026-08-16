@@ -1,0 +1,21 @@
+packages/ui-kit/tests/styles/traffic-tokens.test.ts
+  s_dff49a8a13c3dd::t_c617d4a8b82b44 1-16
+.changeset/traffic-light-hover.md
+  s_dff49a8a13c3dd::t_1494fafb1e21ae 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "9aae58f0b1330a80dbfdb042405a6c0b4f34ce35",
+  "prompts": {},
+  "sessions": {
+    "s_dff49a8a13c3dd": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4755e3b6-c433-4c8c-a4f2-7ac4d196bf56",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
