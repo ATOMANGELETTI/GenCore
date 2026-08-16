@@ -80,7 +80,6 @@
   --traffic-minimize: var(--nord-aurora-13);
   --traffic-maximize: var(--nord-aurora-14);
   --traffic-inactive: var(--nord-polar-3);
-  --traffic-glyph: var(--nord-polar-0);
 
   color-scheme: dark;
 }
