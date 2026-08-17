@@ -1,6 +1,6 @@
 ## Default Permission
 
-No commands are enabled by default for the gencore-fs plugin. Consumers must explicitly allow the list, stat, and watch commands they need.
+No commands are enabled by default for the gencore-fs plugin. Consumers must explicitly allow the list, list_drives, stat, and watch commands they need.
 
 ## Permission Table
 
@@ -33,6 +33,32 @@ Enables the list command without any pre-configured scope.
 <td>
 
 Denies the list command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`gencore-fs:allow-list-drives`
+
+</td>
+<td>
+
+Enables the list_drives command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`gencore-fs:deny-list-drives`
+
+</td>
+<td>
+
+Denies the list_drives command without any pre-configured scope.
 
 </td>
 </tr>

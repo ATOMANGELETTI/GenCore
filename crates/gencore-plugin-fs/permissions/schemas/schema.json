@@ -307,6 +307,18 @@
           "markdownDescription": "Denies the list command without any pre-configured scope."
         },
         {
+          "description": "Enables the list_drives command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-list-drives",
+          "markdownDescription": "Enables the list_drives command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the list_drives command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-list-drives",
+          "markdownDescription": "Denies the list_drives command without any pre-configured scope."
+        },
+        {
           "description": "Enables the stat command without any pre-configured scope.",
           "type": "string",
           "const": "allow-stat",
@@ -331,10 +343,10 @@
           "markdownDescription": "Denies the watch command without any pre-configured scope."
         },
         {
-          "description": "No commands are enabled by default for the gencore-fs plugin. Consumers must explicitly allow the list, stat, and watch commands they need.",
+          "description": "No commands are enabled by default for the gencore-fs plugin. Consumers must explicitly allow the list, list_drives, stat, and watch commands they need.",
           "type": "string",
           "const": "default",
-          "markdownDescription": "No commands are enabled by default for the gencore-fs plugin. Consumers must explicitly allow the list, stat, and watch commands they need."
+          "markdownDescription": "No commands are enabled by default for the gencore-fs plugin. Consumers must explicitly allow the list, list_drives, stat, and watch commands they need."
         }
       ]
     }

@@ -2,9 +2,7 @@ use std::future::Future;
 use std::pin::pin;
 use std::task::{Context, Poll, Waker};
 
-use gencore_fs::{
-    ListArgs, ListError, StatArgs, StatError, WatchArgs, WatchError, list, stat, watch,
-};
+use gencore_fs::{ListArgs, StatArgs, StatError, WatchArgs, WatchError, stat, watch};
 
 /// Minimal, dependency-free executor for driving the stub commands' futures
 /// to completion in tests. All stub commands resolve on first poll, so a
@@ -18,14 +16,6 @@ fn block_on<F: Future>(future: F) -> F::Output {
             return value;
         }
     }
-}
-
-#[test]
-fn list_returns_not_implemented() {
-    let result = block_on(list(ListArgs {
-        path: "/tmp".into(),
-    }));
-    assert!(matches!(result, Err(ListError::NotImplemented)));
 }
 
 #[test]

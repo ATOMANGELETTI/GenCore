@@ -5,16 +5,19 @@ edition.workspace = true
 license.workspace = true
 authors.workspace = true
 repository.workspace = true
-description = "Stub filesystem plugin for GenCore. No real filesystem access is implemented yet."
+description = "Filesystem plugin for GenCore. Lists directories and system drives."
 links = "gencore-fs"
 
 [dependencies]
 tauri = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
+sysinfo = { version = "0.39", default-features = false, features = ["disk"] }
+dunce = "1"
 
 [dev-dependencies]
 serde_json = { workspace = true }
+tempfile = "3"
 
 [build-dependencies]
 tauri-plugin = { workspace = true, features = ["build"] }
