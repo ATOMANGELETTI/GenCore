@@ -1,0 +1,25 @@
+.superpowers/brainstorm/ps-1786944047/content/layout.html
+  s_cefe76b7b9b6c1::t_09a8f5a33b363f 1-195
+.superpowers/brainstorm/ps-1786944047/state/server-instance-id
+  s_cefe76b7b9b6c1::t_49383badaeba68 1
+.superpowers/brainstorm/ps-1786944047/content/layout-v2.html
+  s_cefe76b7b9b6c1::t_7a598ae6735c2d 1-195
+.superpowers/brainstorm/ps-1786944047/state/last-fetch.html
+  s_cefe76b7b9b6c1::t_2483ac5117fda5 1-184
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "5da30d99cc790deef0cf84844c04db6333b21a99",
+  "prompts": {},
+  "sessions": {
+    "s_cefe76b7b9b6c1": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "494a46d0-b1ac-4b9e-affa-250951e6e6db",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
