@@ -1,0 +1,28 @@
+apps/terminal/AGENTS.md
+  s_6a3ae6e7072de5::t_e864ea5afb494f 14
+apps/terminal/src-tauri/Cargo.toml
+  s_6a3ae6e7072de5::t_ae59a61f774582 23
+apps/terminal/src-tauri/src/lib.rs
+  s_6a3ae6e7072de5::t_9677073ca59d23 3-5,16
+apps/terminal/tests/unit/isolation.hook.test.ts
+  s_6a3ae6e7072de5::t_ef6dbae86ae644 233-239
+  s_6a3ae6e7072de5::t_b51bc16ea7f8db 52-53
+Cargo.lock
+  s_6a3ae6e7072de5::t_ae8beeed760500 1362
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "6229b7364be54ff4e9c656b2055a879dd802bae9",
+  "prompts": {},
+  "sessions": {
+    "s_6a3ae6e7072de5": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4e2d6a63-e918-4d45-aade-27564b40ccc2",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
