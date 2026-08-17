@@ -8,6 +8,7 @@ import {
 } from "@gencore/ui-kit";
 import { Bot, Folder, type LucideIcon, Settings } from "lucide-react";
 import * as React from "react";
+import { FileTree } from "../file-tree/file-tree.component";
 import {
   clampSidePanelWidth,
   DEFAULT_SIDE_PANEL_WIDTH,
@@ -21,9 +22,9 @@ const TABS: readonly {
   id: SidePanelTabId;
   label: string;
   Icon: LucideIcon;
-  placeholder: string;
+  placeholder?: string;
 }[] = [
-  { id: "files", label: "Files", Icon: Folder, placeholder: "Tab 1" },
+  { id: "files", label: "Files", Icon: Folder },
   { id: "assistant", label: "Assistant", Icon: Bot, placeholder: "Tab 2" },
   { id: "settings", label: "Settings", Icon: Settings, placeholder: "Tab 3" },
 ];
@@ -144,7 +145,7 @@ export function SidePanel() {
       className="relative flex h-full shrink-0 flex-col border-r border-border bg-card"
       style={{ width }}
     >
-      <div className="min-h-0 flex-1 overflow-auto">
+      <div className="min-h-0 flex-1 overflow-hidden">
         {TABS.map((tab) => (
           <div
             key={tab.id}
@@ -154,9 +155,15 @@ export function SidePanel() {
             aria-labelledby={`side-panel-tab-${tab.id}`}
             className="h-full"
           >
-            <div className="flex h-full items-center justify-center">
-              <p className="text-sm text-muted-foreground">{tab.placeholder}</p>
-            </div>
+            {tab.id === "files" ? (
+              <div className="flex flex-col min-h-0 h-full">
+                <FileTree />
+              </div>
+            ) : (
+              <div className="flex h-full items-center justify-center">
+                <p className="text-sm text-muted-foreground">{tab.placeholder}</p>
+              </div>
+            )}
           </div>
         ))}
       </div>
