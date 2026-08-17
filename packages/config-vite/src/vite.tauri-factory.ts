@@ -12,6 +12,7 @@ import type { TauriViteFactoryOptions } from "./vite.tauri-factory.types.ts";
 export function createTauriViteConfig({ port }: TauriViteFactoryOptions): UserConfig {
   const host = process.env.TAURI_DEV_HOST;
   const isDebugBuild = Boolean(process.env.TAURI_ENV_DEBUG);
+  const usePolling = process.env.GENCORE_VITE_POLL === "1";
 
   return {
     clearScreen: false,
@@ -25,10 +26,18 @@ export function createTauriViteConfig({ port }: TauriViteFactoryOptions): UserCo
             host,
             port: port + 1,
           }
-        : undefined,
+        : {
+            protocol: "ws",
+            host: "localhost",
+            clientPort: port,
+          },
       watch: {
-        ignored: ["**/src-tauri/**"],
+        ignored: ["**/src-tauri/**", "**/node_modules/**", "!**/node_modules/@gencore/**"],
+        usePolling,
       },
+    },
+    optimizeDeps: {
+      exclude: ["@gencore/ui-kit"],
     },
     envPrefix: ["VITE_", "TAURI_ENV_*"],
     build: {

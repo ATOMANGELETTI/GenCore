@@ -11,14 +11,19 @@ import {
 
 export function ContentContextMenu() {
   const [canPaste, setCanPaste] = React.useState(false);
-  const hasSelection = hasTextSelection();
+  const [hasSelection, setHasSelection] = React.useState(false);
 
   React.useEffect(() => {
     void canReadClipboard().then(setCanPaste);
   }, []);
 
   return (
-    <ContextMenuContent>
+    <ContextMenuContent
+      onOpenAutoFocus={() => {
+        setHasSelection(hasTextSelection());
+        void canReadClipboard().then(setCanPaste);
+      }}
+    >
       <ContextMenuItem disabled={!hasSelection} onSelect={cutSelection}>
         Cut
         <ContextMenuShortcut>Ctrl+X</ContextMenuShortcut>

@@ -45,6 +45,21 @@
         "object-src": "'none'",
         "base-uri": "'none'"
       },
+      "devCsp": {
+        "default-src": "'self'",
+        "connect-src": [
+          "ipc:",
+          "http://ipc.localhost",
+          "'self'",
+          "ws://localhost:5174",
+          "ws://127.0.0.1:5174"
+        ],
+        "img-src": ["'self'", "data:"],
+        "style-src": ["'self'", "'unsafe-inline'"],
+        "font-src": ["'self'"],
+        "object-src": "'none'",
+        "base-uri": "'none'"
+      },
       "headers": {
         "Cross-Origin-Opener-Policy": "same-origin"
       }

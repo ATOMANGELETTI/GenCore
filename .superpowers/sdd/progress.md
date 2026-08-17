@@ -98,6 +98,16 @@ Controller session. SDD + writing-plans. Work in place on `main` (running `tauri
 - Task 4 Terminal titlebar and content menus: pending
 - Task 5 Changeset and verify: pending
 
+## Feature: Dev live reload (2026-08-16)
+
+Controller session. SDD + writing-plans. Work in place on `main` (running `tauri:dev`). No git commits unless the user asks.
+
+- Plan: `.cursor/plans/dev_live_reload_60090d11.plan.md` (Cursor-owned; do not copy into `docs/superpowers/`)
+- Briefs: `.superpowers/sdd/dev-live-reload/`
+- Task 1 Explicit Vite HMR and workspace watch: complete (working tree, review approved). Minors: file comment still mentions only src-tauri ignore; polling-off test does not stub GENCORE_VITE_POLL. ⚠️ TDD runs are report-only — controller accepts RED 5 fail / GREEN 9/9 from task-1-report.md.
+- Task 2 Dev-only CSP lock tests and `devCsp`: pending
+- Task 3 Docs, agent rules, and changeset: pending
+
 ## Follow-ups (not blocking)
 
 - `pnpm approve-builds` may be required before production `vite` / `tauri` build (esbuild)

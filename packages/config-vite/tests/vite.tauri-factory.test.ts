@@ -1,5 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createTauriViteConfig } from "../src/vite.tauri-factory";
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 
 describe("createTauriViteConfig", () => {
   it("pins the dev server to the requested port", () => {
@@ -10,10 +14,14 @@ describe("createTauriViteConfig", () => {
     expect(config.clearScreen).toBe(false);
   });
 
-  it("ignores src-tauri in the file watcher", () => {
+  it("ignores src-tauri and node_modules except @gencore workspace packages", () => {
     const config = createTauriViteConfig({ port: 1420 });
 
-    expect(config.server?.watch?.ignored).toContain("**/src-tauri/**");
+    expect(config.server?.watch?.ignored).toEqual([
+      "**/src-tauri/**",
+      "**/node_modules/**",
+      "!**/node_modules/@gencore/**",
+    ]);
   });
 
   it("exposes VITE_ and TAURI_ENV_ prefixed env vars", () => {
@@ -28,9 +36,45 @@ describe("createTauriViteConfig", () => {
     expect(config.plugins).toHaveLength(3);
   });
 
-  it("disables HMR when TAURI_DEV_HOST is unset", () => {
+  it("enables localhost HMR on the app port when TAURI_DEV_HOST is unset", () => {
+    vi.stubEnv("TAURI_DEV_HOST", "");
     const config = createTauriViteConfig({ port: 1420 });
 
-    expect(config.server?.hmr).toBeUndefined();
+    expect(config.server?.hmr).toEqual({
+      protocol: "ws",
+      host: "localhost",
+      clientPort: 1420,
+    });
+  });
+
+  it("uses a dedicated HMR port when TAURI_DEV_HOST is set", () => {
+    vi.stubEnv("TAURI_DEV_HOST", "0.0.0.0");
+    const config = createTauriViteConfig({ port: 1420 });
+
+    expect(config.server?.host).toBe("0.0.0.0");
+    expect(config.server?.hmr).toEqual({
+      protocol: "ws",
+      host: "0.0.0.0",
+      port: 1421,
+    });
+  });
+
+  it("disables watcher polling unless GENCORE_VITE_POLL is 1", () => {
+    const config = createTauriViteConfig({ port: 1420 });
+
+    expect(config.server?.watch?.usePolling).toBe(false);
+  });
+
+  it("enables watcher polling when GENCORE_VITE_POLL is 1", () => {
+    vi.stubEnv("GENCORE_VITE_POLL", "1");
+    const config = createTauriViteConfig({ port: 1420 });
+
+    expect(config.server?.watch?.usePolling).toBe(true);
+  });
+
+  it("excludes @gencore/ui-kit from dependency prebundling", () => {
+    const config = createTauriViteConfig({ port: 1420 });
+
+    expect(config.optimizeDeps?.exclude).toEqual(["@gencore/ui-kit"]);
   });
 });

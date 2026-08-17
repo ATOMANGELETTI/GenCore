@@ -89,4 +89,34 @@ describe("Titlebar", () => {
       expect(light).toHaveClass("enabled:focus-visible:rounded-[2px]");
     }
   });
+
+  it("keeps a static version chip when onVersionClick is omitted", () => {
+    render(<Titlebar title="GenCore" version="0.1.0" />);
+
+    expect(screen.getByText("0.1.0")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Open the GenCore GitHub repository" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("calls onVersionClick from the version chip", async () => {
+    const user = userEvent.setup();
+    const onVersionClick = vi.fn();
+
+    render(<Titlebar title="GenCore" version="0.1.0" onVersionClick={onVersionClick} />);
+
+    await user.click(screen.getByRole("button", { name: "Open the GenCore GitHub repository" }));
+    expect(onVersionClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("paints the interactive version chip with Nord gilded hover classes", () => {
+    render(<Titlebar title="GenCore" version="0.1.0" onVersionClick={vi.fn()} />);
+
+    const chip = screen.getByRole("button", { name: "Open the GenCore GitHub repository" });
+    expect(chip).toHaveClass("cursor-pointer");
+    expect(chip).toHaveClass("hover:animate-gild-sheen");
+    expect(chip).toHaveClass("hover:border-nord-aurora-13");
+    expect(chip).toHaveClass("hover:text-nord-polar-0");
+    expect(chip).toHaveClass("motion-reduce:hover:animate-none");
+  });
 });

@@ -178,4 +178,18 @@ describe("AppShell", () => {
     expect(screen.getByRole("banner")).toHaveAttribute("data-slot", "titlebar");
     expect(screen.getByRole("main")).toHaveAttribute("data-slot", "content-area");
   });
+
+  it("forwards onVersionClick to the titlebar version chip", async () => {
+    const user = userEvent.setup();
+    const onVersionClick = vi.fn();
+
+    render(
+      <AppShell title="GenCore" version="0.1.0" onVersionClick={onVersionClick}>
+        <p>Workbench</p>
+      </AppShell>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Open the GenCore GitHub repository" }));
+    expect(onVersionClick).toHaveBeenCalledTimes(1);
+  });
 });
