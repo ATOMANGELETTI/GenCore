@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   canReadClipboard,
   copySelection,
+  copyText,
   cutSelection,
   hasTextSelection,
   pasteText,
@@ -167,5 +168,28 @@ describe("context-menu.clipboard", () => {
     });
     expect(await pasteText()).toBe(false);
     exec.mockRestore();
+  });
+
+  it("copyText writes the string and returns true", async () => {
+    const writeText = vi.fn(() => Promise.resolve());
+    vi.stubGlobal("navigator", {
+      clipboard: { writeText },
+    });
+
+    expect(await copyText("C:\\Windows")).toBe(true);
+    expect(writeText).toHaveBeenCalledTimes(1);
+    expect(writeText).toHaveBeenCalledWith("C:\\Windows");
+  });
+
+  it("copyText returns false when writeText is missing", async () => {
+    vi.stubGlobal("navigator", { clipboard: {} });
+    expect(await copyText("C:\\Windows")).toBe(false);
+  });
+
+  it("copyText returns false when writeText throws", async () => {
+    vi.stubGlobal("navigator", {
+      clipboard: { writeText: vi.fn(() => Promise.reject(new Error("denied"))) },
+    });
+    expect(await copyText("C:\\Windows")).toBe(false);
   });
 });
