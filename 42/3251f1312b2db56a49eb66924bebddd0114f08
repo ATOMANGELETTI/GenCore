@@ -1,0 +1,19 @@
+apps/explorer/tsconfig.json
+  s_ce5ffb28095129::t_9b3013b135a43b 5-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "423251f1312b2db56a49eb66924bebddd0114f08",
+  "prompts": {},
+  "sessions": {
+    "s_ce5ffb28095129": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "7fc06754-7d02-475b-b800-00ce5fb74232",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
