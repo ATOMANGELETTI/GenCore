@@ -200,6 +200,7 @@ describe("terminal isolation hook", () => {
 
   it("loads the isolation script from head", () => {
     const head = isolationHtml.match(/<head>([\s\S]*?)<\/head>/);
+    expect(head?.[1]).toContain('name="viewport"');
     expect(head?.[1]).toContain('<script src="./isolation.hook.js"></script>');
     const body = isolationHtml.match(/<body>([\s\S]*?)<\/body>/);
     expect(body?.[1]).not.toContain("isolation.hook.js");
