@@ -1,0 +1,35 @@
+crates/gencore-plugin-fs/src/modules/watch/mod.rs
+  s_532bbb192caa36::t_2c55d3fd04c72a 7
+crates/gencore-plugin-fs/src/lib.rs
+  s_532bbb192caa36::t_416f0eb4e959b6 50
+  s_532bbb192caa36::t_d2be2dd467d699 22,25
+crates/gencore-plugin-fs/src/modules/unwatch/unwatch_api.rs
+  s_532bbb192caa36::t_63c0065e8b09c5 1,19,21,28,31
+crates/gencore-plugin-fs/tests/watch_commands.rs
+  s_532bbb192caa36::t_9b5b351d7c545d 113-166
+  s_532bbb192caa36::t_998cfd04a21153 94,96
+  s_532bbb192caa36::t_0020f7f81ad9b1 71,73-74,76,81-86
+  s_532bbb192caa36::t_68653454de57f2 1
+  s_532bbb192caa36::t_4d77e50bbdb6af 6-7
+  s_532bbb192caa36::t_c9a7af1940a684 55-56,62
+crates/gencore-plugin-fs/src/modules/watch/watch_api.rs
+  s_532bbb192caa36::t_b2dd6522b3d73d 3
+  s_532bbb192caa36::t_68653454de57f2 95
+  s_532bbb192caa36::t_31566a8bbd0ffb 88-94,96-101,107,120-121,126,130-136,145,153,156
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "ab2bb894c68d74dcccc8a23ac0115be9e0587fe1",
+  "prompts": {},
+  "sessions": {
+    "s_532bbb192caa36": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "48cbceb0-3969-4c77-91a6-ee28c6c2288d",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
