@@ -1,0 +1,61 @@
+docs/superpowers/plans/2026-08-16-terminal-file-tree.md
+  s_cefe76b7b9b6c1::t_1b98040e279a64 1-476
+.cursor/hooks/state/continual-learning-index.json
+  s_44ed8094dc73c9::t_202388faf38dd1 57,132,176-190,194-196,293-295
+docs/superpowers/specs/2026-08-16-terminal-file-tree-design.md
+  s_cefe76b7b9b6c1::t_4af4c065b13538 1-96
+.cursor/hooks/state/edited-files.json
+  s_6640fff814919a::t_36cd000fdea631 113-143
+  s_6640fff814919a::t_fc383a9cb93f42 144-146
+.superpowers/sdd/progress.md
+  s_cefe76b7b9b6c1::t_2b7737cc27654a 142-143
+  s_cefe76b7b9b6c1::t_df562a51459ef3 134
+  s_cefe76b7b9b6c1::t_1ee414edfc570f 144
+  s_cefe76b7b9b6c1::t_412f7ee29670ad 137
+  s_cefe76b7b9b6c1::t_da0d5ed4684a56 127-133,145
+  s_cefe76b7b9b6c1::t_2a48bd219018aa 138
+  s_cefe76b7b9b6c1::t_d9011b18178f08 139
+  s_cefe76b7b9b6c1::t_6f3af9e6222e46 136
+  s_cefe76b7b9b6c1::t_f10817e9c7fab3 140
+  s_cefe76b7b9b6c1::t_a4017e62f0b653 135
+  s_cefe76b7b9b6c1::t_bbb44c226e3fb2 141
+.cursor/hooks/state/continual-learning.json
+  s_cefe76b7b9b6c1::t_938b1a9ada63c1 3-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "f8b79511c6bc9e3222cca271b77e609feeee49d4",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_44ed8094dc73c9": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "d848f48c-9e53-431c-8c3b-df169ac8ab35",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_6640fff814919a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4ed1d396-cc45-4008-9ab0-5f49d4498faa",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_cefe76b7b9b6c1": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "494a46d0-b1ac-4b9e-affa-250951e6e6db",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
