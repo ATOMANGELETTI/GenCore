@@ -1,0 +1,27 @@
+crates/gencore-plugin-fs/src/lib.rs
+  s_77b31aa73870bf::t_ab60ed049611cd 12-14
+crates/gencore-plugin-fs/tests/list_commands.rs
+  s_77b31aa73870bf::t_e7c76cb3612a50 138-149
+  s_77b31aa73870bf::t_7b21dfed427908 5
+crates/gencore-plugin-fs/src/modules/list_drives/list_drives_api.rs
+  s_77b31aa73870bf::t_4404209cbfa54b 52-54
+  s_77b31aa73870bf::t_33e3fb47221f56 38-44
+crates/gencore-plugin-fs/src/modules/list_drives/mod.rs
+  s_77b31aa73870bf::t_6e741ba2892702 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "a2045f2a20562537ec454b621cd3767b2aa8d3f2",
+  "prompts": {},
+  "sessions": {
+    "s_77b31aa73870bf": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "9faba538-47c5-49a8-a91e-a7e16f93d316",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
