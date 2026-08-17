@@ -1,5 +1,7 @@
 import {
   Button,
+  ContextMenu,
+  ContextMenuTrigger,
   cn,
   FileIcon,
   Input,
@@ -12,6 +14,8 @@ import {
 } from "@gencore/ui-kit";
 import { FilePlus, FolderPlus, FoldVertical, RefreshCw } from "lucide-react";
 import * as React from "react";
+import { copyText } from "../context-menu/context-menu.clipboard";
+import { FileTreeContextMenu } from "../context-menu/context-menu.file-tree";
 import { useFileTree } from "./file-tree.hook";
 import {
   FILE_TREE_CREATE_ID,
@@ -29,6 +33,31 @@ function nodeKindOf(node: FileTreeNode): "drive" | "folder" | "file" {
   return "file";
 }
 
+function resolveMenuTarget(
+  event: React.MouseEvent,
+  createParentPath: string | null,
+): string | null {
+  const row = (event.target as HTMLElement | null)?.closest?.("[data-slot='tree-row']");
+  const id = row?.getAttribute("data-id");
+  if (id === FILE_TREE_CREATE_ID) {
+    return createParentPath;
+  }
+  return id ?? null;
+}
+
+function menuKindOf(node: FileTreeNode | undefined): "drive" | "dir" | "file" | "blank" {
+  if (!node) {
+    return "blank";
+  }
+  if (node.kind === "drive") {
+    return "drive";
+  }
+  if (node.kind === "dir") {
+    return "dir";
+  }
+  return "file";
+}
+
 function CreateNameInput({
   draft,
   onCommit,
@@ -42,11 +71,22 @@ function CreateNameInput({
   const doneRef = React.useRef(false);
   const errorId = React.useId();
 
+  const ignoreBlurRef = React.useRef(true);
+
   React.useEffect(() => {
     if (draft.error) {
       doneRef.current = false;
     }
   }, [draft.error]);
+
+  React.useEffect(() => {
+    const timer = window.setTimeout(() => {
+      ignoreBlurRef.current = false;
+    }, 0);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, []);
 
   function finish(next: string | null) {
     if (doneRef.current) {
@@ -91,6 +131,10 @@ function CreateNameInput({
           }
         }}
         onBlur={(event) => {
+          if (ignoreBlurRef.current) {
+            event.currentTarget.focus();
+            return;
+          }
           finish(event.currentTarget.value.trim() ? event.currentTarget.value : null);
         }}
       />
@@ -106,6 +150,7 @@ function CreateNameInput({
 export function FileTree() {
   const tree = useFileTree();
   const createDisabled = tree.selectedId == null;
+  const [menuTargetId, setMenuTargetId] = React.useState<string | null>(null);
 
   function renderLeading(row: TreeRow) {
     if (row.id === FILE_TREE_CREATE_ID && tree.create) {
@@ -230,17 +275,65 @@ export function FileTree() {
           </div>
         </div>
       </TooltipProvider>
-      <div className="min-h-0 flex-1 overflow-hidden">
-        <Tree
-          rows={tree.rows}
-          onSelect={tree.onSelect}
-          onToggle={tree.onToggle}
-          renderLeading={renderLeading}
-          renderName={renderName}
-          className="min-h-0 h-full flex-1"
-          style={{ height: "100%" }}
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: ContextMenuTrigger asChild; Tree does not forward a ref */}
+          <div
+            className="min-h-0 flex-1 overflow-hidden"
+            onContextMenu={(event) => {
+              const id = resolveMenuTarget(event, tree.create?.parentPath ?? null);
+              setMenuTargetId(id);
+              if (id) {
+                tree.onSelect(id);
+              }
+            }}
+          >
+            <Tree
+              rows={tree.rows}
+              onSelect={tree.onSelect}
+              onToggle={tree.onToggle}
+              renderLeading={renderLeading}
+              renderName={renderName}
+              className="min-h-0 h-full flex-1"
+              style={{ height: "100%" }}
+            />
+          </div>
+        </ContextMenuTrigger>
+        <FileTreeContextMenu
+          kind={menuKindOf(menuTargetId ? tree.nodes[menuTargetId] : undefined)}
+          expanded={Boolean(menuTargetId && tree.nodes[menuTargetId]?.expanded)}
+          onExpand={() => {
+            if (menuTargetId) {
+              tree.onToggle(menuTargetId);
+            }
+          }}
+          onCollapse={() => {
+            if (menuTargetId) {
+              tree.onToggle(menuTargetId);
+            }
+          }}
+          onNewFile={() => {
+            void tree.startCreate("file", menuTargetId ?? undefined);
+          }}
+          onNewFolder={() => {
+            void tree.startCreate("dir", menuTargetId ?? undefined);
+          }}
+          onRefresh={() => {
+            if (menuTargetId) {
+              void tree.refreshPath(menuTargetId);
+              return;
+            }
+            void tree.refresh();
+          }}
+          onCopyPath={() => {
+            const path = menuTargetId ? tree.nodes[menuTargetId]?.path : undefined;
+            if (path) {
+              void copyText(path);
+            }
+          }}
+          onCollapseAll={tree.collapseAll}
         />
-      </div>
+      </ContextMenu>
     </div>
   );
 }

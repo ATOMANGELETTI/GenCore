@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { DriveEntry, FsEntry } from "../../src/modules/ipc/ipc.types";
 
 const { listDrives, listDir, createFile, createDir, watchDir, unwatchDir, subscribeFsChanges } =
@@ -62,7 +62,12 @@ const C_CHILDREN: { entries: FsEntry[] } = {
 
 function mockFs() {
   listDrives.mockResolvedValue(DRIVES);
-  listDir.mockResolvedValue(C_CHILDREN);
+  listDir.mockImplementation(async (path: string) => {
+    if (path === "C:\\") {
+      return C_CHILDREN;
+    }
+    return { entries: [] };
+  });
   createFile.mockResolvedValue(undefined);
   createDir.mockResolvedValue(undefined);
   watchDir.mockResolvedValue(undefined);
@@ -86,6 +91,10 @@ describe("FileTree", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockFs();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it("renders FILES and four labeled buttons", async () => {
@@ -287,5 +296,54 @@ describe("FileTree", () => {
       expect(icon).not.toHaveClass("animate-spin");
     });
     expect(listDrives).toHaveBeenCalledTimes(2);
+  });
+
+  it("opens a folder menu on right-click and creates a file in that folder", async () => {
+    const { user } = await renderTree();
+    await screen.findByText("Windows");
+
+    await user.click(screen.getByRole("treeitem", { name: "readme.txt" }));
+    await user.pointer({
+      keys: "[MouseRight]",
+      target: screen.getByRole("treeitem", { name: "Windows" }),
+    });
+
+    await user.click(await screen.findByRole("menuitem", { name: "New File" }));
+    const input = screen.getByRole("textbox");
+    await user.type(input, "from-menu.txt");
+    await user.keyboard("{Enter}");
+
+    await waitFor(() => {
+      expect(createFile).toHaveBeenCalledWith("C:\\Windows\\from-menu.txt");
+    });
+  });
+
+  it("shows Refresh and Collapse All when right-clicking the tree blank area", async () => {
+    const { user } = await renderTree();
+    await screen.findByText("Windows");
+
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByRole("tree") });
+
+    expect(await screen.findByRole("menuitem", { name: "Refresh" })).toBeInTheDocument();
+    expect(screen.getByRole("menuitem", { name: "Collapse All" })).toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: "New File" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: "Copy Path" })).not.toBeInTheDocument();
+  });
+
+  it("copies the Windows path from a file row menu", async () => {
+    const writeText = vi.fn(() => Promise.resolve());
+    vi.stubGlobal("navigator", { clipboard: { writeText } });
+    const { user } = await renderTree();
+    vi.spyOn(navigator.clipboard, "writeText").mockImplementation(writeText);
+
+    await user.pointer({
+      keys: "[MouseRight]",
+      target: await screen.findByRole("treeitem", { name: "readme.txt" }),
+    });
+    await user.click(await screen.findByRole("menuitem", { name: "Copy Path" }));
+
+    await waitFor(() => {
+      expect(writeText).toHaveBeenCalledWith("C:\\readme.txt");
+    });
   });
 });
