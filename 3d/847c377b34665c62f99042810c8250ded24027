@@ -1,0 +1,69 @@
+packages/ui-kit/package.json
+  s_8af400f318a275::t_73094256d3927f 5-6
+packages/config-vite/package.json
+  s_8af400f318a275::t_2d60fb094a6622 5-6
+apps/explorer/src-tauri/Cargo.toml
+  s_8af400f318a275::t_cb38828d06ea73 5-7
+apps/explorer/package.json
+  s_8af400f318a275::t_f8b6e80569d5d5 5-6
+.cursor/hooks/state/edited-files.json
+  s_2aa3f5aa8da46e::t_c3cdbce91a8dcd 81-90
+crates/gencore-core/Cargo.toml
+  s_8af400f318a275::t_67e339a4b9cca5 5-7
+README.md
+  s_8af400f318a275::t_6bcf8c5685a592 97-100
+apps/terminal/src-tauri/Cargo.toml
+  s_8af400f318a275::t_6b6f177c0a1324 6-8
+package.json
+  s_8af400f318a275::t_d02a28f9674c26 4-5
+crates/gencore-plugin-fs/Cargo.toml
+  s_8af400f318a275::t_168f8161efa3d0 5-7
+Cargo.toml
+  s_8af400f318a275::t_a4221dc716d051 13-15
+crates/gencore-plugin-pty/Cargo.toml
+  s_8af400f318a275::t_247d5f5f9d5f49 5-7
+.github/CONTRIBUTING.md
+  s_8af400f318a275::t_714ff0870ea0a4 65-68
+.changeset/gpl-relicense.md
+  s_8af400f318a275::t_8f7615816d6fde 1-7
+LICENSE
+  s_2aa3f5aa8da46e::t_acc281ea1067f3 1-693
+packages/config-typescript/package.json
+  s_8af400f318a275::t_97e0db53ac8102 5-6
+apps/terminal/package.json
+  s_8af400f318a275::t_3d67aabad1ae43 5-6
+.superpowers/sdd/progress.md
+  s_3889d1f3669e96::t_5dcfafa7995e60 99
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "3d847c377b34665c62f99042810c8250ded24027",
+  "prompts": {},
+  "sessions": {
+    "s_2aa3f5aa8da46e": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "207e4f14-6ca3-4127-99ff-ea73a5db8762",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_3889d1f3669e96": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "659e80ad-1685-4ec1-9133-064923f7d103",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_8af400f318a275": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4f76c9f9-b2d3-4af9-bcc4-2b392847e98e",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
