@@ -1,0 +1,41 @@
+packages/ui-kit/src/index.ts
+  s_44ad0a338f1b74::t_a109260541c6a1 14
+packages/ui-kit/package.json
+  s_44ad0a338f1b74::t_ee784f82103c8b 26
+packages/ui-kit/src/primitives/tree/tree.component.tsx
+  s_44ad0a338f1b74::t_02f51b30d8b02e 136-138,145-148,153-156
+  s_44ad0a338f1b74::t_1aafed4da79cf3 91
+  s_44ad0a338f1b74::t_4ee467ee2934d4 1-3,5-7,9-15,17-62,65-90,92-135,139-144,149-152,157-178,180-186,190-244
+  s_44ad0a338f1b74::t_825cfd2e4b1a5d 187-189
+  s_44ad0a338f1b74::t_57896273d29812 63-64
+  s_44ad0a338f1b74::t_e945afa7e39b52 4,8,16,179
+packages/ui-kit/tests/primitives/tree/tree.test.tsx
+  s_44ad0a338f1b74::t_4385134dc31af6 30-31,36-37
+  s_44ad0a338f1b74::t_1b40cd6a085554 1-3,5-29,32-35,38-221,223-269
+  s_44ad0a338f1b74::t_e945afa7e39b52 4,222
+packages/ui-kit/src/primitives/tree/tree.types.ts
+  s_44ad0a338f1b74::t_832ecf53eb57ce 1-21
+packages/ui-kit/src/primitives/tree/index.ts
+  s_44ad0a338f1b74::t_bd592842d698fc 1-3
+packages/ui-kit/src/primitives/tree/tree.variants.ts
+  s_44ad0a338f1b74::t_e945afa7e39b52 8
+  s_44ad0a338f1b74::t_6e006719e956ae 1-7,9-44
+pnpm-lock.yaml
+  s_44ad0a338f1b74::t_eee54edc27a3b8 193-195,1713-1721,4406-4413
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "56d1a72b13c99e22a18a77502f064aa15fee9a11",
+  "prompts": {},
+  "sessions": {
+    "s_44ad0a338f1b74": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "47acb52a-84b2-462f-b5bf-2f398d732c1a",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
