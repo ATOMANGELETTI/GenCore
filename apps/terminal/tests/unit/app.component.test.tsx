@@ -29,6 +29,16 @@ vi.mock("../../src/modules/ipc/ipc.opener", () => ({
   openRepoInBrowser,
 }));
 
+vi.mock("../../src/modules/ipc/ipc.fs", () => ({
+  listDrives: vi.fn(() => Promise.resolve([])),
+  listDir: vi.fn(),
+  createFile: vi.fn(),
+  createDir: vi.fn(),
+  watchDir: vi.fn(),
+  unwatchDir: vi.fn(),
+  subscribeFsChanges: vi.fn(async () => () => {}),
+}));
+
 describe("App", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -75,7 +85,8 @@ describe("App", () => {
 
     expect(screen.getByRole("heading", { name: APP_TITLE })).toBeInTheDocument();
     expect(screen.getByRole("complementary")).toHaveAttribute("data-slot", "side-panel");
-    expect(screen.getByText("Tab 1")).toBeVisible();
+    expect(await screen.findByText("FILES")).toBeVisible();
+    expect(screen.queryByText("Tab 1")).toBeNull();
     expect(screen.getByRole("tablist", { name: "Side panel" })).toBeInTheDocument();
   });
 
