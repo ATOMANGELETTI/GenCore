@@ -32,6 +32,6 @@ jobs:
       # "Version Packages" PR — it never calls `changeset publish`, so no
       # NPM_TOKEN is required or configured.
       - name: Create Release Pull Request
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
