@@ -7,6 +7,7 @@ export * from "./primitives/badge";
 export * from "./primitives/button";
 export * from "./primitives/context-menu";
 export * from "./primitives/dropdown-menu";
+export * from "./primitives/file-icon";
 export * from "./primitives/input";
 export * from "./primitives/separator";
 export * from "./primitives/tooltip";
