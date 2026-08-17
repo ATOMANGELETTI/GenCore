@@ -29,6 +29,12 @@ describe("Button", () => {
     expect(button).not.toHaveClass("bg-primary");
   });
 
+  it("applies the icon-sm size classes", () => {
+    render(<Button size="icon-sm">Go</Button>);
+
+    expect(screen.getByRole("button")).toHaveClass("size-7");
+  });
+
   it("renders the child element when asChild is set", () => {
     render(
       <Button asChild>
