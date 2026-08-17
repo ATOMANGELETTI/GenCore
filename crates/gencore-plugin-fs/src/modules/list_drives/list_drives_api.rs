@@ -45,6 +45,12 @@ pub fn is_usable_mount(total_space: u64) -> bool {
 /// Lists ready Windows drive roots (`C:\`, `D:\`, …).
 #[tauri::command]
 pub async fn list_drives() -> Result<Vec<DriveEntry>, ListDrivesError> {
+    tauri::async_runtime::spawn_blocking(list_drives_blocking)
+        .await
+        .map_err(|err| ListDrivesError::Io(err.to_string()))?
+}
+
+fn list_drives_blocking() -> Result<Vec<DriveEntry>, ListDrivesError> {
     let disks = Disks::new_with_refreshed_list();
     let mut drives = Vec::new();
 

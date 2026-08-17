@@ -70,7 +70,7 @@ function CreateNameInput({
         aria-invalid={draft.error ? true : undefined}
         aria-describedby={draft.error ? errorId : undefined}
         value={value}
-        className="h-5 min-w-0 w-full px-1"
+        className={cn("h-5 min-w-0 w-full px-1", draft.error && "border-destructive")}
         onChange={(event) => {
           setValue(event.target.value);
         }}

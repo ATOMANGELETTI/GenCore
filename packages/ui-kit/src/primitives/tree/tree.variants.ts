@@ -5,7 +5,7 @@ export const treeVariants = cva(
 );
 
 export const treeRowVariants = cva(
-  ["flex h-[22px] items-center gap-1 overflow-hidden pr-1 text-xs text-foreground", "select-none"],
+  ["flex h-[22px] items-center gap-1 pr-1 text-xs text-foreground", "select-none"],
   {
     variants: {
       selected: {
@@ -16,10 +16,15 @@ export const treeRowVariants = cva(
         true: "opacity-45",
         false: "",
       },
+      overflow: {
+        hidden: "overflow-hidden",
+        visible: "z-20 overflow-visible",
+      },
     },
     defaultVariants: {
       selected: false,
       muted: false,
+      overflow: "hidden",
     },
   },
 );

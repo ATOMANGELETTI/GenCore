@@ -28,5 +28,8 @@ pub async fn unwatch(
     state: State<'_, Arc<Mutex<WatchMap>>>,
     path: String,
 ) -> Result<(), UnwatchError> {
-    stop_watch(&state, &path)
+    let registry = Arc::clone(state.inner());
+    tauri::async_runtime::spawn_blocking(move || stop_watch(&registry, &path))
+        .await
+        .map_err(|err| UnwatchError::Io(err.to_string()))?
 }

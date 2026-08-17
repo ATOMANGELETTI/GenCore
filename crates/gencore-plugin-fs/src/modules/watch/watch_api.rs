@@ -154,7 +154,12 @@ pub async fn watch<R: Runtime>(
     path: String,
     recursive: bool,
 ) -> Result<(), WatchError> {
-    start_watch(&state, &path, recursive, move |payload| {
-        let _ = app.emit(ENTRY_CHANGED_EVENT, payload);
+    let registry = Arc::clone(state.inner());
+    tauri::async_runtime::spawn_blocking(move || {
+        start_watch(&registry, &path, recursive, move |payload| {
+            let _ = app.emit(ENTRY_CHANGED_EVENT, payload);
+        })
     })
+    .await
+    .map_err(|err| WatchError::Io(err.to_string()))?
 }

@@ -8,6 +8,8 @@ export interface TreeRow {
   expanded: boolean;
   selected: boolean;
   muted?: boolean;
+  /** When set, the row does not clip descendants (inline create errors). */
+  overflowVisible?: boolean;
 }
 
 export interface TreeProps {

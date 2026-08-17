@@ -143,6 +143,7 @@ function flattenRows(state: FileTreeState): TreeRow[] {
         expandable: false,
         expanded: false,
         selected: false,
+        overflowVisible: true,
       });
     }
 

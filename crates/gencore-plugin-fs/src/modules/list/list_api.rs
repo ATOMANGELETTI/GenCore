@@ -54,6 +54,12 @@ pub struct ListResult {
 /// Lists the contents of a directory.
 #[tauri::command]
 pub async fn list(path: String) -> Result<ListResult, ListError> {
+    tauri::async_runtime::spawn_blocking(move || list_blocking(path))
+        .await
+        .map_err(|err| ListError::Io(err.to_string()))?
+}
+
+fn list_blocking(path: String) -> Result<ListResult, ListError> {
     let path = normalize_path(&path);
     let metadata = std::fs::metadata(&path).map_err(map_io)?;
     if !metadata.is_dir() {

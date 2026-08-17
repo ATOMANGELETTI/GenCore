@@ -1,19 +1,9 @@
 use std::future::Future;
-use std::pin::pin;
-use std::task::{Context, Poll, Waker};
 
 use gencore_fs::{FsKind, ListError, is_usable_mount, list};
 
-/// Minimal executor matching `stub_commands.rs` for driving async commands.
 fn block_on<F: Future>(future: F) -> F::Output {
-    let mut future = pin!(future);
-    let waker = Waker::noop();
-    let mut cx = Context::from_waker(waker);
-    loop {
-        if let Poll::Ready(value) = future.as_mut().poll(&mut cx) {
-            return value;
-        }
-    }
+    tauri::async_runtime::block_on(future)
 }
 
 #[cfg(windows)]

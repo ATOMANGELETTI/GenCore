@@ -225,8 +225,8 @@ describe("Tree", () => {
     const drive = rowNamed("C:");
     const file = rowNamed("readme.txt");
 
-    expect(drive).toHaveClass("h-[22px]", "select-none", "bg-accent");
-    expect(file).toHaveClass("h-[22px]", "select-none", "opacity-45");
+    expect(drive).toHaveClass("h-[22px]", "select-none", "bg-accent", "overflow-hidden");
+    expect(file).toHaveClass("h-[22px]", "select-none", "opacity-45", "overflow-hidden");
     expect(file).not.toHaveClass("bg-accent");
     expect(drive).toHaveStyle({ paddingLeft: "0px" });
     expect(file).toHaveStyle({ paddingLeft: "16px" });
@@ -253,6 +253,17 @@ describe("Tree", () => {
 
     const collapsed = within(rowNamed("C:")).getByRole("button", { hidden: true });
     expect(collapsed).not.toHaveClass("rotate-90");
+  });
+
+  it("does not clip overflowVisible rows", () => {
+    renderTree({
+      rows: [{ ...FILE, overflowVisible: true }],
+    });
+
+    const row = rowNamed("readme.txt");
+    expect(row).toHaveClass("overflow-visible", "z-20");
+    expect(row).not.toHaveClass("overflow-hidden");
+    expect(row.querySelector("[data-slot='tree-name']")).not.toHaveClass("truncate");
   });
 
   it("renders leading and name slots without defaulting the name", () => {

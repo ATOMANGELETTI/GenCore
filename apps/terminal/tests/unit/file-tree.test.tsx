@@ -242,6 +242,27 @@ describe("FileTree", () => {
     expect(unwatchDir).toHaveBeenCalledWith("C:\\");
   });
 
+  it("shows a failed createFile error on the draft input", async () => {
+    createFile.mockRejectedValue("path already exists");
+    const { user } = await renderTree();
+
+    await user.click(screen.getByRole("treeitem", { name: /^C:/ }));
+    await screen.findByText("Windows");
+    await user.click(screen.getByRole("button", { name: "New File" }));
+    await user.type(screen.getByRole("textbox"), "a.txt");
+    await user.keyboard("{Enter}");
+
+    const message = await screen.findByText("path already exists");
+    expect(message).toHaveClass("text-destructive", "text-[10px]");
+
+    const input = screen.getByRole("textbox");
+    expect(input).toHaveAttribute("aria-invalid", "true");
+    expect(input).toHaveClass("border-destructive");
+
+    const draftRow = input.closest("[data-slot='tree-row']");
+    expect(draftRow).toHaveClass("overflow-visible");
+  });
+
   it("spins the refresh icon while a refresh is in flight", async () => {
     const { user } = await renderTree();
     let resolveRefresh: (value: DriveEntry[]) => void = () => {};

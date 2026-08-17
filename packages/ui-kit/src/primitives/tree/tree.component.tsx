@@ -194,7 +194,13 @@ export function Tree({
               aria-level={row.depth + 1}
               aria-selected={row.selected}
               aria-expanded={row.expandable ? row.expanded : undefined}
-              className={cn(treeRowVariants({ selected: row.selected, muted: row.muted }))}
+              className={cn(
+                treeRowVariants({
+                  selected: row.selected,
+                  muted: row.muted,
+                  overflow: row.overflowVisible ? "visible" : "hidden",
+                }),
+              )}
               style={{
                 position: "absolute",
                 top: 0,
@@ -232,7 +238,10 @@ export function Tree({
                 <span className="size-2 shrink-0" aria-hidden="true" />
               )}
               {renderLeading?.(row)}
-              <span data-slot="tree-name" className="min-w-0 truncate">
+              <span
+                data-slot="tree-name"
+                className={cn("min-w-0", row.overflowVisible ? "overflow-visible" : "truncate")}
+              >
                 {renderName ? renderName(row) : row.name}
               </span>
             </div>
