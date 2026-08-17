@@ -1,0 +1,20 @@
+apps/terminal/tests/unit/app.component.test.tsx
+  s_9911ee9f5ad1a0::t_5fb81337db8111 32-41
+  s_9911ee9f5ad1a0::t_0ba1b36278d5cf 88-89
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "2dee3599bc424f3017d4d3fe2caf217a7f55fabf",
+  "prompts": {},
+  "sessions": {
+    "s_9911ee9f5ad1a0": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "37714214-a71d-40ee-86f0-f457811ae7b8",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
