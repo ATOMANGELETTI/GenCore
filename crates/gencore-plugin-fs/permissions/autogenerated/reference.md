@@ -1,6 +1,6 @@
 ## Default Permission
 
-No commands are enabled by default for the gencore-fs plugin. Consumers must explicitly allow the list, list_drives, stat, and watch commands they need.
+No commands are enabled by default for the gencore-fs plugin. Consumers must explicitly allow the list, list_drives, create_file, create_dir, stat, and watch commands they need.
 
 ## Permission Table
 
@@ -10,6 +10,58 @@ No commands are enabled by default for the gencore-fs plugin. Consumers must exp
 <th>Description</th>
 </tr>
 
+
+<tr>
+<td>
+
+`gencore-fs:allow-create-dir`
+
+</td>
+<td>
+
+Enables the create_dir command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`gencore-fs:deny-create-dir`
+
+</td>
+<td>
+
+Denies the create_dir command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`gencore-fs:allow-create-file`
+
+</td>
+<td>
+
+Enables the create_file command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`gencore-fs:deny-create-file`
+
+</td>
+<td>
+
+Denies the create_file command without any pre-configured scope.
+
+</td>
+</tr>
 
 <tr>
 <td>

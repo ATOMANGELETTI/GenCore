@@ -295,6 +295,30 @@
       "type": "string",
       "oneOf": [
         {
+          "description": "Enables the create_dir command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-create-dir",
+          "markdownDescription": "Enables the create_dir command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the create_dir command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-create-dir",
+          "markdownDescription": "Denies the create_dir command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the create_file command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-create-file",
+          "markdownDescription": "Enables the create_file command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the create_file command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-create-file",
+          "markdownDescription": "Denies the create_file command without any pre-configured scope."
+        },
+        {
           "description": "Enables the list command without any pre-configured scope.",
           "type": "string",
           "const": "allow-list",
@@ -343,10 +367,10 @@
           "markdownDescription": "Denies the watch command without any pre-configured scope."
         },
         {
-          "description": "No commands are enabled by default for the gencore-fs plugin. Consumers must explicitly allow the list, list_drives, stat, and watch commands they need.",
+          "description": "No commands are enabled by default for the gencore-fs plugin. Consumers must explicitly allow the list, list_drives, create_file, create_dir, stat, and watch commands they need.",
           "type": "string",
           "const": "default",
-          "markdownDescription": "No commands are enabled by default for the gencore-fs plugin. Consumers must explicitly allow the list, list_drives, stat, and watch commands they need."
+          "markdownDescription": "No commands are enabled by default for the gencore-fs plugin. Consumers must explicitly allow the list, list_drives, create_file, create_dir, stat, and watch commands they need."
         }
       ]
     }
