@@ -15,8 +15,8 @@ pub struct CreateFileArgs {
 
 /// Creates a new empty file. Fails if the path already exists.
 #[tauri::command]
-pub async fn create_file(args: CreateFileArgs) -> Result<(), CreateFileError> {
-    let path = normalize_path(&args.path);
+pub async fn create_file(path: String) -> Result<(), CreateFileError> {
+    let path = normalize_path(&path);
     let name = final_path_component(&path);
     if !validate_windows_file_name(name) {
         return Err(CreateFileError::InvalidName);

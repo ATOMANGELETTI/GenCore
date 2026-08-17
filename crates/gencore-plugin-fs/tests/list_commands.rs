@@ -2,7 +2,7 @@ use std::future::Future;
 use std::pin::pin;
 use std::task::{Context, Poll, Waker};
 
-use gencore_fs::{FsKind, ListArgs, ListError, is_usable_mount, list};
+use gencore_fs::{FsKind, ListError, is_usable_mount, list};
 
 /// Minimal executor matching `stub_commands.rs` for driving async commands.
 fn block_on<F: Future>(future: F) -> F::Output {
@@ -61,10 +61,8 @@ fn list_returns_folders_first_and_marks_hidden() {
         set_hidden_attribute(&win_hidden);
     }
 
-    let result = block_on(list(ListArgs {
-        path: dir.path().to_string_lossy().into_owned(),
-    }))
-    .expect("list should succeed");
+    let result =
+        block_on(list(dir.path().to_string_lossy().into_owned())).expect("list should succeed");
 
     let names: Vec<&str> = result
         .entries
@@ -118,9 +116,7 @@ fn list_returns_folders_first_and_marks_hidden() {
 fn list_missing_path_returns_not_found() {
     let dir = tempfile::tempdir().expect("temp dir");
     let missing = dir.path().join("missing-dir");
-    let result = block_on(list(ListArgs {
-        path: missing.to_string_lossy().into_owned(),
-    }));
+    let result = block_on(list(missing.to_string_lossy().into_owned()));
     assert!(matches!(result, Err(ListError::NotFound)));
 }
 
@@ -129,9 +125,7 @@ fn list_file_path_returns_not_a_directory() {
     let dir = tempfile::tempdir().expect("temp dir");
     let file = dir.path().join("visible.txt");
     std::fs::write(&file, b"hi").expect("write file");
-    let result = block_on(list(ListArgs {
-        path: file.to_string_lossy().into_owned(),
-    }));
+    let result = block_on(list(file.to_string_lossy().into_owned()));
     assert!(matches!(result, Err(ListError::NotADirectory)));
 }
 

@@ -26,7 +26,7 @@ pub fn stop_watch(registry: &Arc<Mutex<WatchMap>>, path: &str) -> Result<(), Unw
 #[tauri::command]
 pub async fn unwatch(
     state: State<'_, Arc<Mutex<WatchMap>>>,
-    args: UnwatchArgs,
+    path: String,
 ) -> Result<(), UnwatchError> {
-    stop_watch(&state, &args.path)
+    stop_watch(&state, &path)
 }

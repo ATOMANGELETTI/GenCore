@@ -4,7 +4,7 @@ use std::pin::pin;
 use std::task::{Context, Poll, Waker};
 
 use gencore_fs::{
-    CreateDirArgs, CreateDirError, CreateFileArgs, CreateFileError, FsKind, ListArgs, create_dir,
+    CreateDirArgs, CreateDirError, CreateFileArgs, CreateFileError, FsKind, create_dir,
     create_file, list,
 };
 
@@ -30,15 +30,10 @@ fn create_file_in_temp_dir_is_listed_empty() {
     let path = dir.path().join("new.txt");
     let path_str = path.to_string_lossy().into_owned();
 
-    block_on(create_file(CreateFileArgs {
-        path: path_str.clone(),
-    }))
-    .expect("create_file should succeed");
+    block_on(create_file(path_str.clone())).expect("create_file should succeed");
 
-    let listed = block_on(list(ListArgs {
-        path: dir.path().to_string_lossy().into_owned(),
-    }))
-    .expect("list should succeed");
+    let listed =
+        block_on(list(dir.path().to_string_lossy().into_owned())).expect("list should succeed");
 
     let entry = listed
         .entries
@@ -58,9 +53,9 @@ fn create_file_second_call_returns_already_exists() {
     let dir = tempfile::tempdir().expect("temp dir");
     let path = dir.path().join("dup.txt").to_string_lossy().into_owned();
 
-    block_on(create_file(CreateFileArgs { path: path.clone() })).expect("first create_file");
+    block_on(create_file(path.clone())).expect("first create_file");
 
-    let second = block_on(create_file(CreateFileArgs { path }));
+    let second = block_on(create_file(path));
     assert!(matches!(second, Err(CreateFileError::AlreadyExists)));
 }
 
@@ -70,9 +65,7 @@ fn create_file_rejects_reserved_and_illegal_names() {
     let parent = dir.path();
 
     for name in ["NUL", "foo:bar", "bad<>.txt", "CON.txt"] {
-        let result = block_on(create_file(CreateFileArgs {
-            path: join_name(parent, name),
-        }));
+        let result = block_on(create_file(join_name(parent, name)));
         assert!(
             matches!(result, Err(CreateFileError::InvalidName)),
             "{name} should be InvalidName before I/O, got {result:?}"
@@ -85,15 +78,10 @@ fn create_dir_is_listed_as_dir() {
     let dir = tempfile::tempdir().expect("temp dir");
     let path = dir.path().join("folder");
 
-    block_on(create_dir(CreateDirArgs {
-        path: path.to_string_lossy().into_owned(),
-    }))
-    .expect("create_dir should succeed");
+    block_on(create_dir(path.to_string_lossy().into_owned())).expect("create_dir should succeed");
 
-    let listed = block_on(list(ListArgs {
-        path: dir.path().to_string_lossy().into_owned(),
-    }))
-    .expect("list should succeed");
+    let listed =
+        block_on(list(dir.path().to_string_lossy().into_owned())).expect("list should succeed");
 
     let entry = listed
         .entries
@@ -108,9 +96,7 @@ fn create_dir_missing_parent_returns_not_found() {
     let dir = tempfile::tempdir().expect("temp dir");
     let path = dir.path().join("missing").join("child");
 
-    let result = block_on(create_dir(CreateDirArgs {
-        path: path.to_string_lossy().into_owned(),
-    }));
+    let result = block_on(create_dir(path.to_string_lossy().into_owned()));
     assert!(matches!(result, Err(CreateDirError::NotFound)));
 }
 

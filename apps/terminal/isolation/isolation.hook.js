@@ -7,6 +7,7 @@
 //   - the core window commands the titlebar/traffic-lights use
 //   - opener open_url for the GenCore GitHub repository only
 //   - gencore-fs list/list_drives/create_file/create_dir/watch/unwatch
+//   - event listen/unlisten for gencore-fs://entry-changed only
 (() => {
   const ALLOWED_COMMANDS = [
     "plugin:gencore-core|get_app_info",
@@ -21,6 +22,8 @@
     "plugin:gencore-fs|create_dir",
     "plugin:gencore-fs|watch",
     "plugin:gencore-fs|unwatch",
+    "plugin:event|listen",
+    "plugin:event|unlisten",
   ];
   const OPEN_URL_CMD = "plugin:opener|open_url";
   const GET_APP_INFO_CMD = "plugin:gencore-core|get_app_info";
@@ -30,6 +33,9 @@
   const CREATE_DIR_CMD = "plugin:gencore-fs|create_dir";
   const WATCH_CMD = "plugin:gencore-fs|watch";
   const UNWATCH_CMD = "plugin:gencore-fs|unwatch";
+  const LISTEN_CMD = "plugin:event|listen";
+  const UNLISTEN_CMD = "plugin:event|unlisten";
+  const ENTRY_CHANGED_EVENT = "gencore-fs://entry-changed";
   const ALLOWED_OPEN_URL = "https://github.com/ATOMANGELETTI/GenCore";
   const MAIN_WINDOW_LABEL = "main";
   const PATH_MIN_LENGTH = 1;
@@ -127,6 +133,82 @@
     return hasPath && hasRecursive && isAllowedPath(args.path) && args.recursive === false;
   }
 
+  function isFiniteNumber(value) {
+    return typeof value === "number" && Number.isFinite(value);
+  }
+
+  function isAnyTarget(target) {
+    if (!isPlainObject(target)) {
+      return false;
+    }
+    const keys = Object.keys(target);
+    return keys.length === 1 && keys[0] === "kind" && target.kind === "Any";
+  }
+
+  function isListenArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    if (keys.length !== 3) {
+      return false;
+    }
+    let hasEvent = false;
+    let hasTarget = false;
+    let hasHandler = false;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key === "event") {
+        hasEvent = true;
+        continue;
+      }
+      if (key === "target") {
+        hasTarget = true;
+        continue;
+      }
+      if (key === "handler") {
+        hasHandler = true;
+        continue;
+      }
+      return false;
+    }
+    return (
+      hasEvent &&
+      hasTarget &&
+      hasHandler &&
+      args.event === ENTRY_CHANGED_EVENT &&
+      isAnyTarget(args.target) &&
+      isFiniteNumber(args.handler)
+    );
+  }
+
+  function isUnlistenArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    if (keys.length !== 2) {
+      return false;
+    }
+    let hasEvent = false;
+    let hasEventId = false;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key === "event") {
+        hasEvent = true;
+        continue;
+      }
+      if (key === "eventId") {
+        hasEventId = true;
+        continue;
+      }
+      return false;
+    }
+    return (
+      hasEvent && hasEventId && args.event === ENTRY_CHANGED_EVENT && isFiniteNumber(args.eventId)
+    );
+  }
+
   function reconstructInnerPayload(cmd, args) {
     if (cmd === OPEN_URL_CMD) {
       return { url: ALLOWED_OPEN_URL };
@@ -142,6 +224,16 @@
     }
     if (cmd === WATCH_CMD) {
       return { path: args.path, recursive: false };
+    }
+    if (cmd === LISTEN_CMD) {
+      return {
+        event: ENTRY_CHANGED_EVENT,
+        target: { kind: "Any" },
+        handler: args.handler,
+      };
+    }
+    if (cmd === UNLISTEN_CMD) {
+      return { event: ENTRY_CHANGED_EVENT, eventId: args.eventId };
     }
     if (isEmptyArgs(args)) {
       if (args === undefined || args === null) {
@@ -189,6 +281,14 @@
       }
     } else if (payload.cmd === WATCH_CMD) {
       if (!isWatchArgs(payload.payload)) {
+        reject();
+      }
+    } else if (payload.cmd === LISTEN_CMD) {
+      if (!isListenArgs(payload.payload)) {
+        reject();
+      }
+    } else if (payload.cmd === UNLISTEN_CMD) {
+      if (!isUnlistenArgs(payload.payload)) {
         reject();
       }
     } else if (!isMainWindowArgs(payload.payload)) {

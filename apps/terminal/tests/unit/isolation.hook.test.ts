@@ -32,7 +32,17 @@ const FS_PATH_COMMANDS = [
 ] as const;
 const FS_ALLOWED_COMMANDS = [FS_LIST_DRIVES_CMD, ...FS_PATH_COMMANDS, FS_WATCH_CMD] as const;
 
-const FORBIDDEN_TOKENS = ["gencore-pty", "core:default", "opener:default"] as const;
+const EVENT_LISTEN_CMD = "plugin:event|listen";
+const EVENT_UNLISTEN_CMD = "plugin:event|unlisten";
+const EVENT_EMIT_CMD = "plugin:event|emit";
+const ENTRY_CHANGED_EVENT = "gencore-fs://entry-changed";
+
+const FORBIDDEN_TOKENS = [
+  "gencore-pty",
+  "core:default",
+  "opener:default",
+  "core:event:default",
+] as const;
 
 const hookSource = readFileSync(resolve(process.cwd(), "isolation/isolation.hook.js"), "utf8");
 const capabilitySource = readFileSync(
@@ -204,6 +214,8 @@ describe("terminal isolation hook", () => {
       "gencore-fs:allow-create-dir",
       "gencore-fs:allow-watch",
       "gencore-fs:allow-unwatch",
+      "core:event:allow-listen",
+      "core:event:allow-unlisten",
       {
         identifier: "opener:allow-open-url",
         allow: [{ url: GENCORE_REPO_URL }],
@@ -311,6 +323,76 @@ describe("terminal isolation hook", () => {
     expect(() => hook(envelope(FS_WATCH_CMD, { path: "C:\\a\0b", recursive: false }))).toThrow();
     expect(() => hook(envelope(FS_WATCH_CMD, { path: "", recursive: false }))).toThrow();
     expect(() => hook(envelope(FS_WATCH_CMD, { path: "C:\\work", recursive: 0 }))).toThrow();
+  });
+
+  it("allowlists event listen and unlisten without emit", () => {
+    expect(hookSource).toContain(`"${EVENT_LISTEN_CMD}",`);
+    expect(hookSource).toContain(`"${EVENT_UNLISTEN_CMD}",`);
+    expect(hookSource).not.toContain("plugin:event|emit");
+  });
+
+  it("reconstructs listen for gencore-fs://entry-changed with Any target", () => {
+    const hook = getHook();
+    const inner = {
+      event: ENTRY_CHANGED_EVENT,
+      target: { kind: "Any" },
+      handler: 7,
+    };
+    const input = envelope(EVENT_LISTEN_CMD, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.cmd).toBe(EVENT_LISTEN_CMD);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({
+      event: ENTRY_CHANGED_EVENT,
+      target: { kind: "Any" },
+      handler: 7,
+    });
+    expect((result.payload as { target: unknown }).target).not.toBe(inner.target);
+  });
+
+  it("throws for listen with a wrong event, extra keys, or emit", () => {
+    const hook = getHook();
+    const validTarget = { kind: "Any" };
+    expect(() =>
+      hook(
+        envelope(EVENT_LISTEN_CMD, {
+          event: "tauri://click",
+          target: validTarget,
+          handler: 7,
+        }),
+      ),
+    ).toThrow();
+    expect(() =>
+      hook(
+        envelope(EVENT_LISTEN_CMD, {
+          event: ENTRY_CHANGED_EVENT,
+          target: validTarget,
+          handler: 7,
+          extra: true,
+        }),
+      ),
+    ).toThrow();
+    expect(() => hook(envelope(EVENT_EMIT_CMD, { event: ENTRY_CHANGED_EVENT }))).toThrow();
+  });
+
+  it("reconstructs unlisten for gencore-fs://entry-changed", () => {
+    const hook = getHook();
+    const inner = { event: ENTRY_CHANGED_EVENT, eventId: 3 };
+    const input = envelope(EVENT_UNLISTEN_CMD, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({ event: ENTRY_CHANGED_EVENT, eventId: 3 });
+  });
+
+  it("throws for unlisten with a wrong event", () => {
+    const hook = getHook();
+    expect(() =>
+      hook(envelope(EVENT_UNLISTEN_CMD, { event: "tauri://click", eventId: 3 })),
+    ).toThrow();
   });
 
   it("does not grant gencore-fs stat in capabilities", () => {

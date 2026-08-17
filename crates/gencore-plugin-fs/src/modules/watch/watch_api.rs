@@ -151,9 +151,10 @@ where
 pub async fn watch<R: Runtime>(
     app: AppHandle<R>,
     state: State<'_, Arc<Mutex<WatchMap>>>,
-    args: WatchArgs,
+    path: String,
+    recursive: bool,
 ) -> Result<(), WatchError> {
-    start_watch(&state, &args.path, args.recursive, move |payload| {
+    start_watch(&state, &path, recursive, move |payload| {
         let _ = app.emit(ENTRY_CHANGED_EVENT, payload);
     })
 }
