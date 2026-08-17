@@ -1,0 +1,201 @@
+apps/explorer/src-tauri/Cargo.toml
+  s_fe60f13cae36f0::t_b652b1044cc551 25
+apps/terminal/isolation/isolation.hook.js
+  s_fe60f13cae36f0::t_570b533d75fc48 15
+apps/explorer/package.json
+  s_92c6080e322699::t_6c0686a4fc3571 19
+.cursor/hooks/state/edited-files.json
+  s_66198689d0c282::t_a808e97da3048c 74-76
+  s_92c6080e322699::t_8d1febb359d149 70-73
+  s_75660039376c20::t_32471e339430fc 77-80
+apps/terminal/src/modules/app/app.component.tsx
+  s_562e4b434bf987::t_8c4c72f6978f74 6
+  s_56567788311a44::t_e018387588797d 45
+apps/explorer/tests/unit/app.component.test.tsx
+  s_56567788311a44::t_474d0412162969 8,16-17
+  s_56567788311a44::t_2e82dddb14dee9 68-86
+  s_75660039376c20::t_5c9f9447f9120d 18,87
+apps/terminal/tests/unit/app.component.test.tsx
+  s_56567788311a44::t_988fb9459dc31c 2
+  s_56567788311a44::t_2b45f7185f6e31 60-69
+  s_56567788311a44::t_5067054f650003 26-30
+  s_56567788311a44::t_faa8adf7a45c67 23-25
+  s_562e4b434bf987::t_b004e0cc4467d3 70-71
+apps/terminal/src-tauri/Cargo.toml
+  s_fe60f13cae36f0::t_1065033cd84fbf 20
+apps/terminal/package.json
+  s_0bb4716fba6e77::t_da1106d8fb02ac 19
+.changeset/shell-context-menus.md
+  s_ed21748e6d9301::t_54d7b62943f560 1-5
+.superpowers/sdd/progress.md
+  s_25626ee5658381::t_f7c1957df90e2d 109
+  s_25626ee5658381::t_92d8aad3e2ecf2 108
+  s_3889d1f3669e96::t_d3cc05d43dadf2 98
+  s_25626ee5658381::t_af27bc90d630d3 110
+packages/ui-kit/src/composites/titlebar/titlebar.variants.ts
+  s_0bb4716fba6e77::t_a955b46ccf4b38 41-53
+apps/explorer/isolation/isolation.hook.js
+  s_fe60f13cae36f0::t_9ceb0547ac9527 16
+apps/explorer/src/modules/app/app.component.tsx
+  s_56567788311a44::t_cfc5a88cc4bbb8 4
+  s_56567788311a44::t_00f42b221528bd 46
+apps/terminal/AGENTS.md
+  s_56567788311a44::t_a78abe35fe98aa 8-9
+apps/terminal/src-tauri/capabilities/main.json
+  s_fe60f13cae36f0::t_9389c0c7333caf 4,11-15
+.changeset/vite-hmr-workspace-watch.md
+  s_6ae184945342e4::t_c499ae8ab893b9 1-5
+packages/ui-kit/src/composites/titlebar/titlebar.component.tsx
+  s_0bb4716fba6e77::t_a295cddbd582e8 91-107
+  s_0bb4716fba6e77::t_d258462d450590 57
+  s_0bb4716fba6e77::t_b228b4e327d816 4-9
+packages/ui-kit/AGENTS.md
+  s_0bb4716fba6e77::t_ee4ca35ae6a442 9
+apps/terminal/src/modules/ipc/ipc.opener.ts
+  s_fe60f13cae36f0::t_5a76f9723c2b33 1-7
+apps/explorer/src-tauri/capabilities/main.json
+  s_fe60f13cae36f0::t_fbecaae0bd9411 4,11-15
+packages/ui-kit/src/composites/titlebar/titlebar.types.ts
+  s_0bb4716fba6e77::t_00f737e6e0c56c 8
+apps/terminal/src-tauri/src/lib.rs
+  s_fe60f13cae36f0::t_59610b50eb1eae 16
+apps/explorer/src/modules/ipc/ipc.opener.ts
+  s_fe60f13cae36f0::t_0524d6a3941fed 1-7
+.cursor/rules/security.mdc
+  s_56567788311a44::t_3e8f1f64b1a12d 31-33
+  s_6ae184945342e4::t_0f1fb21b25582f 11-14
+apps/explorer/src-tauri/src/lib.rs
+  s_fe60f13cae36f0::t_a3dfd876d80c5e 17
+packages/ui-kit/src/styles/globals.css
+  s_0bb4716fba6e77::t_4106d783fe3ff1 77-87
+Cargo.toml
+  s_fe60f13cae36f0::t_ac283e4f465c47 21
+.changeset/gilded-version-badge.md
+  s_0bb4716fba6e77::t_324b4d5c93a011 1-5
+packages/ui-kit/src/composites/app-shell/app-shell.component.tsx
+  s_0bb4716fba6e77::t_48c675a141eb9b 70
+  s_0bb4716fba6e77::t_b81110d7318fb5 45
+apps/explorer/tests/unit/ipc.opener.test.ts
+  s_fe60f13cae36f0::t_3f151c6382763a 1-21
+README.md
+  s_6ae184945342e4::t_0b8073a925046b 60-61
+packages/ui-kit/src/composites/titlebar/index.ts
+  s_0bb4716fba6e77::t_cdd9b87d2d9812 11
+apps/explorer/AGENTS.md
+  s_56567788311a44::t_33d39e15334ddf 8-9
+.cursor/skills/add-app/SKILL.md
+  s_6ae184945342e4::t_b7b78d892805e0 26-28
+apps/terminal/tests/unit/ipc.opener.test.ts
+  s_fe60f13cae36f0::t_6b2afbc4565a71 1-21
+AGENTS.md
+  s_66198689d0c282::t_99fcd6c907870f 68,72-74,79
+.cursor/hooks/state/continual-learning-index.json
+  s_66198689d0c282::t_1757afc5a389da 62-67,71-76,80-118,122-154,173-196,200-229,239-241,243,255,281-304,321-348
+Cargo.lock
+  s_92c6080e322699::t_b49403a5a3ae5c 85-215,311-323,523-531,943-969,987-1016,1138-1150,1310,1345,1574-1579,1869-1887,2116-2121,2491-2501,2508-2517,2543-2548,2637-2647,2693-2706,2980-2992,3270-3279,3669-3690,3794-3806,4110,4114-4124,4174-4184,5012-5081,5141-5181
+pnpm-lock.yaml
+  s_fe60f13cae36f0::t_b8d7a7aef5c4ea 44-46,102-104,1789-1791,4443-4446
+.cursor/hooks/state/continual-learning.json
+  s_25626ee5658381::t_a6d2a7bb8ca937 3-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "d4b619f660f9ef30f628deef2b08f4dec6b87ef7",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_0bb4716fba6e77": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "c2ae84b9-6084-45ea-9e1e-23784b5873f8",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_25626ee5658381": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "6f087349-87f2-4e4f-8371-fdbeb5969524",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_3889d1f3669e96": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "659e80ad-1685-4ec1-9133-064923f7d103",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_562e4b434bf987": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "324997d2-7304-45bd-b629-0bab21913f1f",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_56567788311a44": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "d18e71cc-3f2b-4b95-b27e-0408b22fece8",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_66198689d0c282": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "a65284e7-0464-46ce-b091-dd37162f4004",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_6ae184945342e4": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "b4acb2f6-b51a-423f-b277-d5ce0433ac59",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_75660039376c20": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "c8d15437-ec6b-4bba-9342-59e69840d4e3",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_92c6080e322699": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "f0e7d398-abf7-45ba-8388-03c05791f0bf",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_ed21748e6d9301": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4cfac7c3-2dca-4977-9387-b9275be40213",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_fe60f13cae36f0": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "6328c15b-e6e6-45f0-b1c2-e1df8e667770",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
