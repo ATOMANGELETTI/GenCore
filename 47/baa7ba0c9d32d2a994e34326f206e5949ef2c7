@@ -1,0 +1,33 @@
+packages/ui-kit/tests/primitives/input/input.test.tsx
+  s_0de1a52914bf84::t_dab5d043767ede 1-27
+packages/ui-kit/src/primitives/input/index.ts
+  s_0de1a52914bf84::t_20d6f698e213f2 1-3
+packages/ui-kit/tests/primitives/button.test.tsx
+  s_0de1a52914bf84::t_a6959674574349 32-37
+packages/ui-kit/src/primitives/input/input.variants.ts
+  s_0de1a52914bf84::t_4f667bcc104d62 1-5
+packages/ui-kit/src/primitives/input/input.component.tsx
+  s_0de1a52914bf84::t_124c1b42c74932 1-7
+packages/ui-kit/src/index.ts
+  s_0de1a52914bf84::t_01d764a1bd8574 10
+packages/ui-kit/src/primitives/button/button.variants.ts
+  s_0de1a52914bf84::t_f80351e5872420 34
+packages/ui-kit/src/primitives/input/input.types.ts
+  s_0de1a52914bf84::t_129395c0e478e1 1-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "47baa7ba0c9d32d2a994e34326f206e5949ef2c7",
+  "prompts": {},
+  "sessions": {
+    "s_0de1a52914bf84": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "49be72f7-056d-4765-9767-3d0730af74aa",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
