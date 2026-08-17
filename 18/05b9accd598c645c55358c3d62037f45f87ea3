@@ -1,0 +1,35 @@
+apps/terminal/src/modules/ipc/ipc.fs.ts
+  s_1580c22414ffb1::t_0a82c0243dd852 1-47
+apps/terminal/src/modules/ipc/ipc.types.ts
+  s_1580c22414ffb1::t_22b5c5fd022d3a 7-35
+apps/terminal/tests/unit/ipc.fs.test.ts
+  s_1580c22414ffb1::t_457907c93f5c12 1-103
+apps/terminal/tests/unit/isolation.hook.test.ts
+  s_1580c22414ffb1::t_d18c4307b334b0 25-35
+  s_1580c22414ffb1::t_43a3f6422b9861 13
+  s_1580c22414ffb1::t_63724c71c34649 220-222,224-320
+  s_1580c22414ffb1::t_e47e5ae3b4a498 203-206
+  s_1580c22414ffb1::t_980cb1d81d4c90 223
+  s_1580c22414ffb1::t_4e0018ee623d59 160,201-202,219
+apps/terminal/src-tauri/capabilities/main.json
+  s_1580c22414ffb1::t_13d76723745c57 4,12-17
+apps/terminal/isolation/isolation.hook.js
+  s_1580c22414ffb1::t_d3e088a733866a 9,18-23,27-32,35-36,82-129,134,140-145,182,186-191
+  s_1580c22414ffb1::t_d7c149736fedb6 192-193
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "1805b9accd598c645c55358c3d62037f45f87ea3",
+  "prompts": {},
+  "sessions": {
+    "s_1580c22414ffb1": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "70c1b33d-2e46-4f5d-a90f-586653740d23",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
