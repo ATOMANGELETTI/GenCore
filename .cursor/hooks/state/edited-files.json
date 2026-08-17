@@ -54,5 +54,14 @@
   ],
   "483b832c-0a7b-4ac7-b271-af245cd26e80": [
     "apps/terminal"
+  ],
+  "56555aa5-fec6-4938-9212-6223adefe438": [
+    "packages/ui-kit"
+  ],
+  "4e6054be-dc41-4055-b4e3-f069dc12b048": [
+    "packages/ui-kit"
+  ],
+  "03995ad6-1fba-465d-baea-232e5216ef70": [
+    "apps/terminal"
   ]
 }

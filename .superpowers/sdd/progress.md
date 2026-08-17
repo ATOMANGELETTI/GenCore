@@ -94,7 +94,7 @@ Controller session. SDD + writing-plans. Work in place on `main` (running `tauri
 - Briefs: `.superpowers/sdd/context-menus/`
 - Task 1 Shared menu variants: complete (commits 9aae58f..d72a583, review clean)
 - Task 2 ContextMenu primitive: complete (commits d72a583..9ba7574, review clean). Minors: no in-code note that Radix hardcodes sideOffset 2; checkbox/radio/group/label untested. Plan error: sideOffset={5} is invalid on radix-ui 1.6.7 ContextMenu.Content.
-- Task 3 AppShell slots and native-menu suppress: pending
+- Task 3 AppShell slots and native-menu suppress: complete (commits 87e7b5d..74d76c8, review clean). Minors: caller onContextMenu compose untested; no primitive-level asChild data-slot test; Titlebar/ContentArea spread can still overwrite data-slot; body-slot parent not re-asserted with content menu.
 - Task 4 Terminal titlebar and content menus: pending
 - Task 5 Changeset and verify: pending
 

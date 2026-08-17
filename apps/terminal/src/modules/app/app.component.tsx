@@ -1,5 +1,7 @@
 import { AppShell, ThemeProvider } from "@gencore/ui-kit";
 import * as React from "react";
+import { ContentContextMenu } from "../context-menu/context-menu.content";
+import { TitlebarContextMenu } from "../context-menu/context-menu.titlebar";
 import { getAppInfo } from "../ipc/ipc.app-info";
 import type { AppInfo } from "../ipc/ipc.types";
 import { closeWindow, minimizeWindow, toggleMaximizeWindow } from "../ipc/ipc.window";
@@ -39,6 +41,14 @@ export function App() {
         onClose={closeWindow}
         onMinimize={minimizeWindow}
         onToggleMaximize={toggleMaximizeWindow}
+        titlebarContextMenu={
+          <TitlebarContextMenu
+            onClose={closeWindow}
+            onMinimize={minimizeWindow}
+            onToggleMaximize={toggleMaximizeWindow}
+          />
+        }
+        contentContextMenu={<ContentContextMenu />}
         contentProps={{ centered: true }}
         sidebar={<SidePanel />}
       >
