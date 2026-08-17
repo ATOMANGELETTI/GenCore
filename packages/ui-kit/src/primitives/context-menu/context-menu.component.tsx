@@ -1,5 +1,6 @@
 import { CheckIcon, DotIcon } from "lucide-react";
 import { ContextMenu as ContextMenuPrimitive } from "radix-ui";
+import type * as React from "react";
 import { cn } from "../../lib/cn";
 import type {
   ContextMenuCheckboxItemProps,
@@ -43,13 +44,22 @@ export function ContextMenuRadioGroup(props: ContextMenuRadioGroupProps) {
   return <ContextMenuPrimitive.RadioGroup data-slot="context-menu-radio-group" {...props} />;
 }
 
-export function ContextMenuContent({ className, ...props }: ContextMenuContentProps) {
+export function ContextMenuContent({
+  className,
+  onOpenAutoFocus,
+  ...props
+}: ContextMenuContentProps) {
+  const contentProps = {
+    ...props,
+    onOpenAutoFocus,
+  } as React.ComponentPropsWithRef<typeof ContextMenuPrimitive.Content>;
+
   return (
     <ContextMenuPrimitive.Portal>
       <ContextMenuPrimitive.Content
         data-slot="context-menu-content"
         className={cn(contextMenuContentVariants(), className)}
-        {...props}
+        {...contentProps}
       />
     </ContextMenuPrimitive.Portal>
   );

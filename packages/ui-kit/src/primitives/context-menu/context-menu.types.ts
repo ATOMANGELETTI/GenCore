@@ -22,7 +22,9 @@ export type ContextMenuSeparatorProps = React.ComponentPropsWithRef<
 >;
 export type ContextMenuContentProps = React.ComponentPropsWithRef<
   typeof ContextMenuPrimitive.Content
->;
+> & {
+  onOpenAutoFocus?: (event: Event) => void;
+};
 export type ContextMenuShortcutProps = React.ComponentPropsWithRef<"span">;
 
 export interface ContextMenuItemProps

@@ -13,13 +13,8 @@ export function ContentContextMenu() {
   const [canPaste, setCanPaste] = React.useState(false);
   const [hasSelection, setHasSelection] = React.useState(false);
 
-  React.useEffect(() => {
-    void canReadClipboard().then(setCanPaste);
-  }, []);
-
   return (
     <ContextMenuContent
-      // @ts-expect-error Radix omits onOpenAutoFocus from public Menu Content props
       onOpenAutoFocus={() => {
         setHasSelection(hasTextSelection());
         void canReadClipboard().then(setCanPaste);

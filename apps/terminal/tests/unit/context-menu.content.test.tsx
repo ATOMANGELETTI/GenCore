@@ -22,6 +22,24 @@ describe("ContentContextMenu", () => {
     vi.unstubAllGlobals();
   });
 
+  it("does not read the clipboard until the menu opens", async () => {
+    const user = userEvent.setup();
+    const readText = vi.fn(() => Promise.resolve("x"));
+    vi.stubGlobal("navigator", {
+      clipboard: { readText },
+    });
+
+    renderContentMenu();
+    expect(readText).not.toHaveBeenCalled();
+
+    await user.pointer({ keys: "[MouseRight]", target: screen.getByText("Pane") });
+    const paste = await screen.findByRole("menuitem", { name: /Paste/ });
+    await waitFor(() => {
+      expect(paste).not.toHaveAttribute("aria-disabled", "true");
+    });
+    expect(readText).toHaveBeenCalled();
+  });
+
   it("lists Cut, Copy, Paste, and Select All with shortcuts", async () => {
     const user = userEvent.setup();
     vi.stubGlobal("navigator", {
