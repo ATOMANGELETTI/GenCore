@@ -2,7 +2,7 @@ import { cva } from "class-variance-authority";
 
 export const menuContentVariants = cva([
   "z-50 min-w-40 overflow-hidden rounded-md border border-border bg-popover p-1",
-  "text-sm text-popover-foreground",
+  "text-sm text-popover-foreground select-none",
 ]);
 
 export const menuItemVariants = cva(

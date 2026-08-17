@@ -21,6 +21,7 @@ describe("menu.variants", () => {
     expect(content).toContain("rounded-md");
     expect(content).toContain("p-1");
     expect(content).toContain("min-w-40");
+    expect(content).toContain("select-none");
     expect(content).not.toContain("shadow");
     expect(content).not.toContain("gradient");
     expect(content).not.toContain("origin-");

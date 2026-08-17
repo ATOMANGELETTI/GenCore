@@ -1,7 +1,7 @@
 import { cva } from "class-variance-authority";
 
 export const contentAreaVariants = cva(
-  "flex min-h-0 flex-1 flex-col overflow-auto bg-background text-foreground",
+  "flex min-h-0 flex-1 flex-col overflow-auto bg-background text-foreground select-text",
   {
     variants: {
       centered: {

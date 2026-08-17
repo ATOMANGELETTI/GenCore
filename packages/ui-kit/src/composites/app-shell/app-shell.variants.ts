@@ -5,7 +5,7 @@ import { cva } from "class-variance-authority";
  * whole window scales from one prop instead of per-component sizing props.
  */
 export const appShellVariants = cva(
-  "flex h-full min-h-0 w-full flex-col overflow-hidden bg-background font-sans text-foreground",
+  "flex h-full min-h-0 w-full flex-col overflow-hidden bg-background font-sans text-foreground select-none",
   {
     variants: {
       density: {

@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { AppShell } from "../../src/composites/app-shell";
 import { ContextMenuContent, ContextMenuItem } from "../../src/primitives/context-menu";
 
@@ -56,6 +56,13 @@ describe("AppShell", () => {
     render(<AppShell title="GenCore">content</AppShell>);
 
     expect(screen.getByRole("contentinfo")).toHaveTextContent("Ready");
+  });
+
+  it("makes chrome unselectable and keeps the content well copyable", () => {
+    render(<AppShell title="GenCore">Workbench</AppShell>);
+
+    expect(document.querySelector("[data-slot=app-shell]")).toHaveClass("select-none");
+    expect(screen.getByRole("main")).toHaveClass("select-text");
   });
 
   it("switches chrome heights with the density variant", () => {
