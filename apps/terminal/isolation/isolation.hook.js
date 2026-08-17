@@ -6,6 +6,7 @@
 //   - gencore-core's app-info query
 //   - the core window commands the titlebar/traffic-lights use
 //   - opener open_url for the GenCore GitHub repository only
+//   - gencore-fs list/list_drives/create_file/create_dir/watch/unwatch
 (() => {
   const ALLOWED_COMMANDS = [
     "plugin:gencore-core|get_app_info",
@@ -14,11 +15,25 @@
     "plugin:window|toggle_maximize",
     "plugin:window|start_dragging",
     "plugin:opener|open_url",
+    "plugin:gencore-fs|list_drives",
+    "plugin:gencore-fs|list",
+    "plugin:gencore-fs|create_file",
+    "plugin:gencore-fs|create_dir",
+    "plugin:gencore-fs|watch",
+    "plugin:gencore-fs|unwatch",
   ];
   const OPEN_URL_CMD = "plugin:opener|open_url";
   const GET_APP_INFO_CMD = "plugin:gencore-core|get_app_info";
+  const LIST_DRIVES_CMD = "plugin:gencore-fs|list_drives";
+  const LIST_CMD = "plugin:gencore-fs|list";
+  const CREATE_FILE_CMD = "plugin:gencore-fs|create_file";
+  const CREATE_DIR_CMD = "plugin:gencore-fs|create_dir";
+  const WATCH_CMD = "plugin:gencore-fs|watch";
+  const UNWATCH_CMD = "plugin:gencore-fs|unwatch";
   const ALLOWED_OPEN_URL = "https://github.com/ATOMANGELETTI/GenCore";
   const MAIN_WINDOW_LABEL = "main";
+  const PATH_MIN_LENGTH = 1;
+  const PATH_MAX_LENGTH = 32767;
 
   function isPlainObject(value) {
     return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -64,15 +79,69 @@
     return hasUrl;
   }
 
+  function isAllowedPath(path) {
+    return (
+      typeof path === "string" &&
+      path.length >= PATH_MIN_LENGTH &&
+      path.length <= PATH_MAX_LENGTH &&
+      path.indexOf("\0") === -1
+    );
+  }
+
+  function isFsPathCommand(cmd) {
+    return (
+      cmd === LIST_CMD || cmd === CREATE_FILE_CMD || cmd === CREATE_DIR_CMD || cmd === UNWATCH_CMD
+    );
+  }
+
+  function isPathOnlyArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    return keys.length === 1 && keys[0] === "path" && isAllowedPath(args.path);
+  }
+
+  function isWatchArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    if (keys.length !== 2) {
+      return false;
+    }
+    let hasPath = false;
+    let hasRecursive = false;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key === "path") {
+        hasPath = true;
+        continue;
+      }
+      if (key === "recursive") {
+        hasRecursive = true;
+        continue;
+      }
+      return false;
+    }
+    return hasPath && hasRecursive && isAllowedPath(args.path) && args.recursive === false;
+  }
+
   function reconstructInnerPayload(cmd, args) {
     if (cmd === OPEN_URL_CMD) {
       return { url: ALLOWED_OPEN_URL };
     }
-    if (cmd === GET_APP_INFO_CMD) {
+    if (cmd === GET_APP_INFO_CMD || cmd === LIST_DRIVES_CMD) {
       if (args === undefined || args === null) {
         return undefined;
       }
       return {};
+    }
+    if (isFsPathCommand(cmd)) {
+      return { path: args.path };
+    }
+    if (cmd === WATCH_CMD) {
+      return { path: args.path, recursive: false };
     }
     if (isEmptyArgs(args)) {
       if (args === undefined || args === null) {
@@ -110,8 +179,16 @@
       if (!isAllowedOpenUrlArgs(payload.payload)) {
         reject();
       }
-    } else if (payload.cmd === GET_APP_INFO_CMD) {
+    } else if (payload.cmd === GET_APP_INFO_CMD || payload.cmd === LIST_DRIVES_CMD) {
       if (!isEmptyArgs(payload.payload)) {
+        reject();
+      }
+    } else if (isFsPathCommand(payload.cmd)) {
+      if (!isPathOnlyArgs(payload.payload)) {
+        reject();
+      }
+    } else if (payload.cmd === WATCH_CMD) {
+      if (!isWatchArgs(payload.payload)) {
         reject();
       }
     } else if (!isMainWindowArgs(payload.payload)) {

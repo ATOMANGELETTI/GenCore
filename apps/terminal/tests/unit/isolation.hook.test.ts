@@ -10,6 +10,7 @@ const EMPTY_ARG_COMMANDS = [
   "plugin:window|minimize",
   "plugin:window|toggle_maximize",
   "plugin:window|start_dragging",
+  "plugin:gencore-fs|list_drives",
 ] as const;
 
 const WINDOW_COMMANDS = [
@@ -21,7 +22,17 @@ const WINDOW_COMMANDS = [
 
 const OPEN_URL_CMD = "plugin:opener|open_url";
 
-const FORBIDDEN_TOKENS = ["gencore-pty", "gencore-fs", "core:default", "opener:default"] as const;
+const FS_LIST_DRIVES_CMD = "plugin:gencore-fs|list_drives";
+const FS_WATCH_CMD = "plugin:gencore-fs|watch";
+const FS_PATH_COMMANDS = [
+  "plugin:gencore-fs|list",
+  "plugin:gencore-fs|create_file",
+  "plugin:gencore-fs|create_dir",
+  "plugin:gencore-fs|unwatch",
+] as const;
+const FS_ALLOWED_COMMANDS = [FS_LIST_DRIVES_CMD, ...FS_PATH_COMMANDS, FS_WATCH_CMD] as const;
+
+const FORBIDDEN_TOKENS = ["gencore-pty", "core:default", "opener:default"] as const;
 
 const hookSource = readFileSync(resolve(process.cwd(), "isolation/isolation.hook.js"), "utf8");
 const capabilitySource = readFileSync(
@@ -146,6 +157,7 @@ describe("terminal isolation hook", () => {
     const hook = getHook();
     expect(() => hook(envelope("plugin:gencore-pty|spawn"))).toThrow();
     expect(() => hook(envelope("plugin:gencore-fs|read"))).toThrow();
+    expect(() => hook(envelope("plugin:gencore-fs|stat"))).toThrow();
     expect(() => hook(envelope("plugin:opener|open_path"))).toThrow();
   });
 
@@ -186,6 +198,12 @@ describe("terminal isolation hook", () => {
       "core:window:allow-toggle-maximize",
       "core:window:allow-start-dragging",
       "gencore-core:allow-get-app-info",
+      "gencore-fs:allow-list",
+      "gencore-fs:allow-list-drives",
+      "gencore-fs:allow-create-file",
+      "gencore-fs:allow-create-dir",
+      "gencore-fs:allow-watch",
+      "gencore-fs:allow-unwatch",
       {
         identifier: "opener:allow-open-url",
         allow: [{ url: GENCORE_REPO_URL }],
@@ -196,6 +214,108 @@ describe("terminal isolation hook", () => {
     for (const token of FORBIDDEN_TOKENS) {
       expect(permissionText).not.toContain(token);
     }
+  });
+
+  it("allowlists the six gencore-fs commands used by the file tree and not stat", () => {
+    for (const cmd of FS_ALLOWED_COMMANDS) {
+      expect(hookSource).toContain(`"${cmd}",`);
+    }
+    expect(hookSource).not.toContain("plugin:gencore-fs|stat");
+  });
+
+  it.each([undefined, null] as const)("allows list_drives when payload args are %s", (payload) => {
+    const hook = getHook();
+    const input = envelope(FS_LIST_DRIVES_CMD, payload);
+    const result = hook(input);
+    expect(result).not.toBe(input);
+    expect(result.cmd).toBe(FS_LIST_DRIVES_CMD);
+    expect(result.payload).toBeUndefined();
+  });
+
+  it("throws for list_drives with extra args or a window label", () => {
+    const hook = getHook();
+    expect(() => hook(envelope(FS_LIST_DRIVES_CMD, { unexpected: true }))).toThrow();
+    expect(() => hook(envelope(FS_LIST_DRIVES_CMD, { label: "main" }))).toThrow();
+    expect(() => hook(envelope(FS_LIST_DRIVES_CMD, { path: "C:\\" }))).toThrow();
+  });
+
+  it.each(FS_PATH_COMMANDS)("reconstructs a path-only payload for %s", (cmd) => {
+    const hook = getHook();
+    const inner = { path: "C:\\work" };
+    const input = envelope(cmd, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.cmd).toBe(cmd);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({ path: "C:\\work" });
+    expect(Object.keys(result.payload as object)).toEqual(["path"]);
+  });
+
+  it.each(FS_PATH_COMMANDS)(
+    "throws for %s with extra keys, a missing path, or a non-string path",
+    (cmd) => {
+      const hook = getHook();
+      expect(() => hook(envelope(cmd, { path: "C:\\work", extra: true }))).toThrow();
+      expect(() => hook(envelope(cmd, { path: "C:\\work", label: "main" }))).toThrow();
+      expect(() => hook(envelope(cmd, { path: "C:\\work", recursive: false }))).toThrow();
+      expect(() => hook(envelope(cmd, {}))).toThrow();
+      expect(() => hook(envelope(cmd, { label: "main" }))).toThrow();
+      expect(() => hook(envelope(cmd, { path: 12 }))).toThrow();
+      expect(() => hook(envelope(cmd))).toThrow();
+    },
+  );
+
+  it("throws when a filesystem path is empty, contains NUL, or exceeds 32767 characters", () => {
+    const hook = getHook();
+    const cmd = "plugin:gencore-fs|list";
+    expect(() => hook(envelope(cmd, { path: "" }))).toThrow();
+    expect(() => hook(envelope(cmd, { path: "C:\\a\0b" }))).toThrow();
+    expect(() => hook(envelope(cmd, { path: "a".repeat(32768) }))).toThrow();
+  });
+
+  it("allows a filesystem path of length 32767", () => {
+    const hook = getHook();
+    const path = "a".repeat(32767);
+    const result = hook(envelope("plugin:gencore-fs|list", { path }));
+    expect(result.payload).toEqual({ path });
+  });
+
+  it("reconstructs watch as path plus recursive false", () => {
+    const hook = getHook();
+    const inner = { path: "C:\\work", recursive: false };
+    const input = envelope(FS_WATCH_CMD, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({ path: "C:\\work", recursive: false });
+  });
+
+  it("allows watch when recursive precedes path", () => {
+    const hook = getHook();
+    const inner = { recursive: false, path: "D:\\src" };
+    const result = hook(envelope(FS_WATCH_CMD, inner));
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({ path: "D:\\src", recursive: false });
+  });
+
+  it("throws for watch with recursive true, missing recursive, extra keys, or a bad path", () => {
+    const hook = getHook();
+    expect(() => hook(envelope(FS_WATCH_CMD, { path: "C:\\work", recursive: true }))).toThrow();
+    expect(() => hook(envelope(FS_WATCH_CMD, { path: "C:\\work" }))).toThrow();
+    expect(() => hook(envelope(FS_WATCH_CMD, { recursive: false }))).toThrow();
+    expect(() =>
+      hook(envelope(FS_WATCH_CMD, { path: "C:\\work", recursive: false, extra: true })),
+    ).toThrow();
+    expect(() => hook(envelope(FS_WATCH_CMD, { path: "C:\\a\0b", recursive: false }))).toThrow();
+    expect(() => hook(envelope(FS_WATCH_CMD, { path: "", recursive: false }))).toThrow();
+    expect(() => hook(envelope(FS_WATCH_CMD, { path: "C:\\work", recursive: 0 }))).toThrow();
+  });
+
+  it("does not grant gencore-fs stat in capabilities", () => {
+    expect(capabilitySource).not.toContain("gencore-fs:allow-stat");
+    expect(capabilitySource).not.toContain("gencore-fs:allow-read");
   });
 
   it("loads the isolation script from head", () => {
