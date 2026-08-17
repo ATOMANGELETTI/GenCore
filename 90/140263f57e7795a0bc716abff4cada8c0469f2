@@ -1,0 +1,25 @@
+AGENTS.md
+  s_03198eac3a4878::t_d806543821767a 68,76
+.cursor/hooks/state/continual-learning.json
+  s_03198eac3a4878::t_d806543821767a 3-6
+.cursor/hooks/state/edited-files.json
+  s_03198eac3a4878::t_d806543821767a 2-20
+.cursor/hooks/state/continual-learning-index.json
+  s_03198eac3a4878::t_30305fab42eed8 102,114,156
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "90140263f57e7795a0bc716abff4cada8c0469f2",
+  "prompts": {},
+  "sessions": {
+    "s_03198eac3a4878": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "cf34cfb5-b83c-4b02-801d-c44008566a8c",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
