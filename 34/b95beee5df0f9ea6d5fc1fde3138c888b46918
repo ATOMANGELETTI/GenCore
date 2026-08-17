@@ -1,0 +1,23 @@
+.superpowers/sdd/progress.md
+  s_3889d1f3669e96::t_d0b6eee0b79ae9 100
+.cursor/hooks/state/continual-learning.json
+  s_3889d1f3669e96::t_76e89586b852f4 4,6
+.cursor/hooks/state/edited-files.json
+  s_3889d1f3669e96::t_0532e0ee73020c 91-94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "34b95beee5df0f9ea6d5fc1fde3138c888b46918",
+  "prompts": {},
+  "sessions": {
+    "s_3889d1f3669e96": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "659e80ad-1685-4ec1-9133-064923f7d103",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
