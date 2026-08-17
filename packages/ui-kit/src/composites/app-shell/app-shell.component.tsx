@@ -72,7 +72,7 @@ export function AppShell({
         titlebarContextMenu,
       )}
 
-      {sidebar ? (
+      {sidebar != null ? (
         <div data-slot="app-shell-body" className="flex min-h-0 flex-1">
           {sidebar}
           {withContextMenu(

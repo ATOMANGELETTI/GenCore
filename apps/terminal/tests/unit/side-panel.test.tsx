@@ -82,10 +82,12 @@ describe("SidePanel", () => {
     expect(screen.getByRole("complementary")).toHaveStyle({ width: "240px" });
   });
 
-  it("exposes a vertical resize separator on the panel seam", () => {
+  it("exposes a vertical resize slider on the panel seam", () => {
     render(<SidePanel />);
 
-    const handle = screen.getByRole("separator", { name: "Resize side panel" });
+    const handle = screen.getByRole("slider", { name: "Resize side panel" });
+    expect(handle.tagName).not.toBe("HR");
+    expect(handle).toHaveAttribute("role", "slider");
     expect(handle).toHaveAttribute("data-slot", "side-panel-resize");
     expect(handle).toHaveAttribute("aria-orientation", "vertical");
     expect(handle).toHaveAttribute("aria-valuenow", "240");
@@ -96,7 +98,7 @@ describe("SidePanel", () => {
     const user = userEvent.setup();
     render(<SidePanel />);
 
-    const handle = screen.getByRole("separator", { name: "Resize side panel" });
+    const handle = screen.getByRole("slider", { name: "Resize side panel" });
     handle.focus();
     await user.keyboard("{ArrowRight}");
 
@@ -112,7 +114,7 @@ describe("SidePanel", () => {
     const user = userEvent.setup();
     render(<SidePanel />);
 
-    const handle = screen.getByRole("separator", { name: "Resize side panel" });
+    const handle = screen.getByRole("slider", { name: "Resize side panel" });
     handle.focus();
     await user.keyboard("{Home}");
 

@@ -10,6 +10,10 @@ type CspObject = {
   "font-src": string[];
   "object-src": string;
   "base-uri": string;
+  "script-src": string;
+  "frame-ancestors": string;
+  "form-action": string;
+  "worker-src": string;
 };
 
 const tauriConf = JSON.parse(
@@ -40,5 +44,22 @@ describe("explorer tauri.conf security", () => {
     expect(devCsp["font-src"]).toEqual(csp["font-src"]);
     expect(devCsp["object-src"]).toBe(csp["object-src"]);
     expect(devCsp["base-uri"]).toBe(csp["base-uri"]);
+    expect(devCsp["script-src"]).toBe(csp["script-src"]);
+    expect(devCsp["frame-ancestors"]).toBe(csp["frame-ancestors"]);
+    expect(devCsp["form-action"]).toBe(csp["form-action"]);
+    expect(devCsp["worker-src"]).toBe(csp["worker-src"]);
+  });
+
+  it("sets explicit script-src and deny directives on csp and devCsp", () => {
+    expect(csp["script-src"]).toBe("'self'");
+    expect(csp["frame-ancestors"]).toBe("'none'");
+    expect(csp["form-action"]).toBe("'none'");
+    expect(csp["worker-src"]).toBe("'none'");
+    expect(devCsp["script-src"]).toBe("'self'");
+    expect(devCsp["frame-ancestors"]).toBe("'none'");
+    expect(devCsp["form-action"]).toBe("'none'");
+    expect(devCsp["worker-src"]).toBe("'none'");
+    expect(csp).not.toHaveProperty("frame-src");
+    expect(devCsp).not.toHaveProperty("frame-src");
   });
 });

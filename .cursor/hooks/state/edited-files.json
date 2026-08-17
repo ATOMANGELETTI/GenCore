@@ -92,5 +92,23 @@
   "0430ecfc-37b3-4b54-915a-018cd3fc20f2": [
     "apps/terminal",
     "packages/ui-kit"
+  ],
+  "624f334d-5582-4ea6-be04-e1022c819888": [
+    "apps/terminal",
+    "packages/ui-kit",
+    "apps/explorer"
+  ],
+  "a9859d9f-4d6e-4c05-9c43-2c1ea406c1c2": [
+    "apps/terminal",
+    "apps/explorer"
+  ],
+  "823a3db0-59d0-4125-a0d6-379a32b7b0f7": [
+    "apps/terminal",
+    "apps/explorer"
+  ],
+  "99ddf001-81c6-47aa-8aab-2c4c49b1d2cb": [
+    "apps/terminal",
+    "apps/explorer",
+    "packages/ui-kit"
   ]
 }

@@ -14,9 +14,15 @@ runs:
   using: composite
   steps:
     - name: Setup Node.js
+      if: inputs.node-version != ''
       uses: actions/setup-node@v7
       with:
         node-version: ${{ inputs.node-version }}
+
+    - name: Setup Node.js
+      if: inputs.node-version == ''
+      uses: actions/setup-node@v7
+      with:
         node-version-file: .node-version
 
     - name: Enable Corepack
@@ -26,9 +32,16 @@ runs:
       run: corepack enable && corepack prepare --activate
 
     - name: Setup Node.js with pnpm cache
+      if: inputs.node-version != ''
       uses: actions/setup-node@v7
       with:
         node-version: ${{ inputs.node-version }}
+        cache: pnpm
+
+    - name: Setup Node.js with pnpm cache
+      if: inputs.node-version == ''
+      uses: actions/setup-node@v7
+      with:
         node-version-file: .node-version
         cache: pnpm
 

@@ -22,11 +22,12 @@ describe("ContentContextMenu", () => {
     vi.unstubAllGlobals();
   });
 
-  it("does not read the clipboard until the menu opens", async () => {
+  it("does not read clipboard text when the menu opens", async () => {
     const user = userEvent.setup();
     const readText = vi.fn(() => Promise.resolve("x"));
     vi.stubGlobal("navigator", {
       clipboard: { readText },
+      permissions: { query: vi.fn(() => Promise.resolve({ state: "granted" })) },
     });
 
     renderContentMenu();
@@ -37,7 +38,7 @@ describe("ContentContextMenu", () => {
     await waitFor(() => {
       expect(paste).not.toHaveAttribute("aria-disabled", "true");
     });
-    expect(readText).toHaveBeenCalled();
+    expect(readText).not.toHaveBeenCalled();
   });
 
   it("lists Cut, Copy, Paste, and Select All with shortcuts", async () => {
@@ -103,10 +104,12 @@ describe("ContentContextMenu", () => {
     });
   });
 
-  it("disables Paste when canReadClipboard / readText fails", async () => {
+  it("disables Paste when clipboard-read permission is denied", async () => {
     const user = userEvent.setup();
+    const readText = vi.fn(() => Promise.resolve("x"));
     vi.stubGlobal("navigator", {
-      clipboard: { readText: vi.fn(() => Promise.reject(new Error("denied"))) },
+      clipboard: { readText },
+      permissions: { query: vi.fn(() => Promise.resolve({ state: "denied" })) },
     });
 
     renderContentMenu();
@@ -116,5 +119,6 @@ describe("ContentContextMenu", () => {
     await waitFor(() => {
       expect(paste).toHaveAttribute("aria-disabled", "true");
     });
+    expect(readText).not.toHaveBeenCalled();
   });
 });

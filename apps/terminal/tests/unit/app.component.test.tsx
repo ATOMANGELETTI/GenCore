@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { APP_TITLE, App } from "../../src/modules/app/app.component";
+import { getAppInfo } from "../../src/modules/ipc/ipc.app-info";
 import type { AppInfo } from "../../src/modules/ipc/ipc.types";
 
 const mockAppInfo: AppInfo = {
@@ -76,5 +77,16 @@ describe("App", () => {
     expect(screen.getByRole("complementary")).toHaveAttribute("data-slot", "side-panel");
     expect(screen.getByText("Tab 1")).toBeVisible();
     expect(screen.getByRole("tablist", { name: "Side panel" })).toBeInTheDocument();
+  });
+
+  it("shows a getAppInfo error in the content area, not the statusbar", async () => {
+    vi.mocked(getAppInfo).mockRejectedValueOnce(new Error("core unavailable"));
+
+    render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("main")).toHaveTextContent("core unavailable");
+    });
+    expect(screen.getByRole("contentinfo")).not.toHaveTextContent("core unavailable");
   });
 });

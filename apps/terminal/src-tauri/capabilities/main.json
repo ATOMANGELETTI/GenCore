@@ -1,5 +1,5 @@
 {
-  "$schema": "../gen/schemas/desktop-schema.json",
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/tauri-v2.11.1/crates/tauri-schema-generator/schemas/capability.schema.json",
   "identifier": "main",
   "description": "Least-privilege capabilities for the GenCore Terminal main window: core window chrome controls, app-info, and scoped open-url for the GenCore GitHub repo only. No gencore-pty commands are granted yet.",
   "windows": ["main"],

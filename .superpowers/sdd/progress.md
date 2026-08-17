@@ -35,7 +35,7 @@ Controller session. No git commits unless the user asks.
 - Wave 5 husky/changesets/vscode: complete (review approved)
 - Wave 6a `.cursor/**`: complete (review approved after hook fail-open + rule/ignore fixes)
 - Wave 6b `.github/**`: complete (review approved; `changesets/action@v1` is latest stable)
-- Controller docs: `README.md`, `LICENSE` (MIT), root + nested `AGENTS.md`
+- Controller docs: `README.md`, `LICENSE` (GPL-3.0-or-later), root + nested `AGENTS.md`
 
 ## Feature: Terminal side panel (2026-08-16)
 
@@ -109,6 +109,20 @@ Controller session. SDD + writing-plans. Work in place on `main` (running `tauri
 - Task 2 Dev-only CSP lock tests and `devCsp`: complete (working tree, review approved). Production csp unchanged; object-form devCsp 5173/5174.
 - Task 3 Docs, agent rules, and changeset: complete (working tree, review approved). Changeset `.changeset/vite-hmr-workspace-watch.md`. Minor: README rust-rebuild sentence is brief-mandated and slightly ambiguous next to `pnpm dev`.
 - Final review: complete (approved, ready to merge scoped files only). No Critical/Important. Controller verify: config-vite 9/9, terminal 36/36, explorer 12/12. Vite HMR already firing in running `tauri:dev` (app + ui-kit `/@fs/` paths). Commit: none.
+
+## Feature: IDE Problems + security/quality (2026-08-16)
+
+Controller session. SDD + writing-plans. Work in place on `main` (running `tauri:dev`). No git commits unless the user asks.
+
+- Plan: `docs/superpowers/plans/2026-08-16-ide-problems-security-quality.md`
+- Briefs: `.superpowers/sdd/ide-problems-security-quality/`
+- Task 1 Inventory: complete (working tree, review approved). ⚠️ 45 Problems-panel items not enumerable via ReadLints. CLI: Biome 16 (not unknown-file), ui-kit lint fails on globals.css wrap only, typecheck/test/clippy green. Extra: 0-byte knip.json → Task 2.
+- Task 2 Biome/CSS/schema/slider: complete (working tree, review approved). Minors: schema tag tauri-v2.11.1 vs crate 2.11.5. ui-kit review clean.
+- Task 3 setup-node dual inputs: complete (working tree, review approved).
+- Task 4 Isolation/CSP + opener `with: undefined` fix: complete (working tree, spec+quality Approved, tauri-reviewer Approved). Minors/nits: no `with: null` test; window-label tests don’t assert payload identity; duplicated hooks.
+- Task 5 Quality/consistency: complete (working tree, spec+quality Approved, tauri-reviewer Approved, ui-kit-reviewer Approved). Minors: `clipboard-read` PermissionName cast; Explorer window tests consolidated 4→2; AppShell falsy-sidebar untested; changeset wording slightly inverted.
+- Task 6 Verification: complete (working tree). turbo retry 11/11 (172 JS); first turbo Explorer heading timeout flake under parallel load; cargo test 16; clippy 0; biome 147 files clean. Whole-diff tauri + ui-kit Approved. Bugbot: no bugs. Security Review: no medium/high/critical.
+- Task 7 Superpowers hygiene: complete (working tree). Plan already at `docs/superpowers/plans/2026-08-16-ide-problems-security-quality.md`. Moved 29 loose SDD-root `task-*.md` / `review-*.diff` into `.superpowers/sdd/archive/bootstrap/`.
 
 ## Follow-ups (not blocking)
 

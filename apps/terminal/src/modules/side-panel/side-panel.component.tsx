@@ -50,7 +50,6 @@ export function SidePanel() {
     }
 
     syncFromParent();
-    window.addEventListener("resize", syncFromParent);
 
     let observer: ResizeObserver | undefined;
     if (parent && typeof ResizeObserver !== "undefined") {
@@ -63,7 +62,6 @@ export function SidePanel() {
     }
 
     return () => {
-      window.removeEventListener("resize", syncFromParent);
       observer?.disconnect();
     };
   }, []);
@@ -105,12 +103,12 @@ export function SidePanel() {
     dragRef.current = null;
   }
 
-  function onHandlePointerDown(event: React.PointerEvent<HTMLHRElement>) {
+  function onHandlePointerDown(event: React.PointerEvent<HTMLDivElement>) {
     event.currentTarget.setPointerCapture(event.pointerId);
     dragRef.current = { startX: event.clientX, startWidth: width };
   }
 
-  function onHandlePointerMove(event: React.PointerEvent<HTMLHRElement>) {
+  function onHandlePointerMove(event: React.PointerEvent<HTMLDivElement>) {
     const drag = dragRef.current;
     if (!drag || !event.currentTarget.hasPointerCapture(event.pointerId)) {
       return;
@@ -119,7 +117,7 @@ export function SidePanel() {
     setWidth(clampSidePanelWidth(drag.startWidth + (event.clientX - drag.startX), containerWidth));
   }
 
-  function onHandleKeyDown(event: React.KeyboardEvent<HTMLHRElement>) {
+  function onHandleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     let nextWidth: number | undefined;
     if (event.key === "ArrowRight") {
       nextWidth = width + SIDE_PANEL_WIDTH_STEP;
@@ -209,7 +207,8 @@ export function SidePanel() {
           })}
         </div>
       </TooltipProvider>
-      <hr
+      <div
+        role="slider"
         data-slot="side-panel-resize"
         aria-orientation="vertical"
         aria-label="Resize side panel"

@@ -33,14 +33,25 @@ export function selectAllContent(): boolean {
 }
 
 export async function canReadClipboard(): Promise<boolean> {
+  if (!navigator.clipboard?.readText) {
+    return false;
+  }
+
+  const query = navigator.permissions?.query;
+  if (typeof query !== "function") {
+    return true;
+  }
+
   try {
-    if (!navigator.clipboard?.readText) {
+    const status = await query.call(navigator.permissions, {
+      name: "clipboard-read" as PermissionName,
+    });
+    if (status.state === "denied") {
       return false;
     }
-    await navigator.clipboard.readText();
     return true;
   } catch {
-    return false;
+    return true;
   }
 }
 

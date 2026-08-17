@@ -45,5 +45,8 @@
     "**/.turbo": true
   },
   "workbench.editor.pinnedTabSizing": "compact",
-  "workbench.editor.pinnedTabsOnSeparateRow": true
+  "workbench.editor.pinnedTabsOnSeparateRow": true,
+  "css.lint.unknownAtRules": "ignore",
+  "tailwindCSS.experimental.configFile": "packages/ui-kit/src/styles/globals.css",
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

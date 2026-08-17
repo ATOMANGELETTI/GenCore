@@ -12,9 +12,17 @@ Applies to every Tauri app in `apps/**`:
   directive into it. `connect-src` may add `'self'`, `ws://localhost:<vite-port>`, and
   `ws://127.0.0.1:<vite-port>` for Vite HMR only. Production `csp.connect-src` stays
   `ipc:` and `http://ipc.localhost` — never websocket localhost origins.
+  `TAURI_DEV_HOST` HMR is **unsupported**. `devCsp.connect-src` stays
+  `ws://localhost:<vite-port>` and `ws://127.0.0.1:<vite-port>` only. Do not add
+  other websocket origins to production `csp` or `devCsp`.
 - Isolation pattern must be enabled (`app.security.pattern` = `isolation`) with an
   allowlist hook that only lets through the exact IPC commands the UI actually calls.
 - `app.withGlobalTauri: false` always. Never reference `window.__TAURI__` from app code.
+- UI talks to Rust only through `src/modules/ipc/` wrappers, except
+  `data-tauri-drag-region` on the titlebar, which invokes
+  `plugin:window|start_dragging` in the WebView without going through
+  `ipc.window.ts`. Keep the capability. Prefer `startDraggingWindow()` for JS
+  callers.
 - `app.security.freezePrototype: true`.
 - `app.security.assetProtocol.enable: false` unless a task explicitly requires serving
   local assets through it.

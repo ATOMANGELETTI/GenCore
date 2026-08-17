@@ -87,11 +87,71 @@ describe("context-menu.clipboard", () => {
     exec.mockRestore();
   });
 
-  it("canReadClipboard is false when readText throws", async () => {
+  it("canReadClipboard never calls readText", async () => {
+    const readText = vi.fn(() => Promise.resolve("secret"));
+    const query = vi.fn(() => Promise.resolve({ state: "granted" }));
     vi.stubGlobal("navigator", {
-      clipboard: { readText: vi.fn(() => Promise.reject(new Error("denied"))) },
+      clipboard: { readText },
+      permissions: { query },
     });
+
+    expect(await canReadClipboard()).toBe(true);
+    expect(readText).not.toHaveBeenCalled();
+    expect(query).toHaveBeenCalledWith({ name: "clipboard-read" });
+  });
+
+  it("canReadClipboard is false when clipboard-read is denied", async () => {
+    const readText = vi.fn(() => Promise.resolve("secret"));
+    vi.stubGlobal("navigator", {
+      clipboard: { readText },
+      permissions: { query: vi.fn(() => Promise.resolve({ state: "denied" })) },
+    });
+
     expect(await canReadClipboard()).toBe(false);
+    expect(readText).not.toHaveBeenCalled();
+  });
+
+  it("canReadClipboard is true when clipboard-read is granted or prompt", async () => {
+    const readText = vi.fn(() => Promise.reject(new Error("should not read")));
+
+    vi.stubGlobal("navigator", {
+      clipboard: { readText },
+      permissions: { query: vi.fn(() => Promise.resolve({ state: "granted" })) },
+    });
+    expect(await canReadClipboard()).toBe(true);
+
+    vi.stubGlobal("navigator", {
+      clipboard: { readText },
+      permissions: { query: vi.fn(() => Promise.resolve({ state: "prompt" })) },
+    });
+    expect(await canReadClipboard()).toBe(true);
+    expect(readText).not.toHaveBeenCalled();
+  });
+
+  it("canReadClipboard is false when the clipboard API is missing", async () => {
+    vi.stubGlobal("navigator", {});
+    expect(await canReadClipboard()).toBe(false);
+  });
+
+  it("canReadClipboard is true when Permissions API is missing but readText exists", async () => {
+    const readText = vi.fn(() => Promise.reject(new Error("should not read")));
+    vi.stubGlobal("navigator", {
+      clipboard: { readText },
+    });
+
+    expect(await canReadClipboard()).toBe(true);
+    expect(readText).not.toHaveBeenCalled();
+  });
+
+  it("canReadClipboard is true when permissions.query throws", async () => {
+    const readText = vi.fn(() => Promise.reject(new Error("should not read")));
+    vi.stubGlobal("navigator", {
+      clipboard: { readText },
+      permissions: { query: vi.fn(() => Promise.reject(new Error("unsupported"))) },
+    });
+
+    expect(await canReadClipboard()).toBe(true);
+    expect(readText).not.toHaveBeenCalled();
   });
 
   it("pasteText inserts clipboard text and returns false when empty", async () => {

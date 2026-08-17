@@ -43,7 +43,11 @@
         "style-src": ["'self'", "'unsafe-inline'"],
         "font-src": ["'self'"],
         "object-src": "'none'",
-        "base-uri": "'none'"
+        "base-uri": "'none'",
+        "script-src": "'self'",
+        "frame-ancestors": "'none'",
+        "form-action": "'none'",
+        "worker-src": "'none'"
       },
       "devCsp": {
         "default-src": "'self'",
@@ -58,7 +62,11 @@
         "style-src": ["'self'", "'unsafe-inline'"],
         "font-src": ["'self'"],
         "object-src": "'none'",
-        "base-uri": "'none'"
+        "base-uri": "'none'",
+        "script-src": "'self'",
+        "frame-ancestors": "'none'",
+        "form-action": "'none'",
+        "worker-src": "'none'"
       },
       "headers": {
         "Cross-Origin-Opener-Policy": "same-origin"

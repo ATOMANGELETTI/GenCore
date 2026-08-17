@@ -7,8 +7,9 @@ const GET_APP_INFO_COMMAND = "plugin:gencore-core|get_app_info";
 /**
  * Reads application metadata from Tauri core.
  *
- * This is the only IPC call the terminal frontend makes; the UI never calls
- * `invoke` directly so the command surface stays auditable in one place.
+ * Every command goes through `src/modules/ipc/` wrappers (opener, window,
+ * app-info). The UI never calls `invoke` directly so the command surface
+ * stays auditable in one place.
  */
 export function getAppInfo(): Promise<AppInfo> {
   return invoke<AppInfo>(GET_APP_INFO_COMMAND);

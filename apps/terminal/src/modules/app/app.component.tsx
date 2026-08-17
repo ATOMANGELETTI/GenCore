@@ -14,6 +14,7 @@ export const APP_TITLE = "Tauri Terminal Template";
 
 export function App() {
   const [appInfo, setAppInfo] = React.useState<AppInfo | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -24,8 +25,10 @@ export function App() {
           setAppInfo(info);
         }
       })
-      .catch((error: unknown) => {
-        console.error("Failed to load app info", error);
+      .catch((cause: unknown) => {
+        if (!cancelled) {
+          setError(cause instanceof Error ? cause.message : String(cause));
+        }
       });
 
     return () => {
@@ -33,11 +36,13 @@ export function App() {
     };
   }, []);
 
+  const version = appInfo?.version;
+
   return (
     <ThemeProvider defaultTheme="polar-night">
       <AppShell
         title={APP_TITLE}
-        version={appInfo?.version}
+        version={version}
         density="compact"
         onClose={closeWindow}
         onMinimize={minimizeWindow}
@@ -56,9 +61,11 @@ export function App() {
       >
         <div className="flex flex-col items-center gap-2">
           <h1 className="font-semibold text-lg">{APP_TITLE}</h1>
-          {appInfo ? (
-            <p className="text-muted-foreground text-sm tabular-nums">v{appInfo.version}</p>
+          {version ? (
+            <p className="text-muted-foreground text-sm tabular-nums">v{version}</p>
           ) : null}
+          {!version && error ? <p className="text-sm text-destructive">{error}</p> : null}
+          {!version && !error ? <p className="text-sm text-muted-foreground">Loading…</p> : null}
         </div>
       </AppShell>
     </ThemeProvider>
