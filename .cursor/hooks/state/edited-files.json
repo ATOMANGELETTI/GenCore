@@ -110,13 +110,5 @@
     "apps/terminal",
     "apps/explorer",
     "packages/ui-kit"
-  ],
-  "5fa48768-6731-45a5-b0bb-28092906510b": [
-    "apps/explorer",
-    "apps/terminal"
-  ],
-  "7fc06754-7d02-475b-b800-00ce5fb74232": [
-    "packages/config-typescript",
-    "packages/config-vite"
   ]
 }
