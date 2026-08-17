@@ -1,0 +1,195 @@
+<h2>Files tab — toolbar layout</h2>
+<p class="subtitle">Which header feels most like a polished VS Code-style file tree in this Nord chrome?</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="gc-panel">
+        <div class="gc-toolbar">
+          <span class="gc-label">Files</span>
+          <div class="gc-actions">
+            <span class="gc-icon" title="New File">+</span>
+            <span class="gc-icon" title="New Folder">▣</span>
+            <span class="gc-icon" title="Refresh">↻</span>
+            <span class="gc-icon" title="Collapse All">▤</span>
+          </div>
+        </div>
+        <div class="gc-tree">
+          <div class="gc-row"><span class="gc-chev">▾</span><span class="gc-drive"></span><span class="gc-name">C:</span></div>
+          <div class="gc-row gc-indent"><span class="gc-chev">▸</span><span class="gc-fold"></span><span class="gc-name">Users</span></div>
+          <div class="gc-row gc-indent gc-sel"><span class="gc-file gc-ts"></span><span class="gc-name">app.tsx</span></div>
+          <div class="gc-row"><span class="gc-chev">▸</span><span class="gc-drive"></span><span class="gc-name">D:</span></div>
+        </div>
+        <div class="gc-tabs">
+          <span class="gc-tab gc-on">📁</span>
+          <span class="gc-tab">🤖</span>
+          <span class="gc-tab">⚙</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Section label + actions</h3>
+      <p>VS Code Explorer pattern. “Files” on the left, four ghost icons on the right. Clearest hierarchy.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="gc-panel">
+        <div class="gc-toolbar gc-toolbar-icons">
+          <div class="gc-actions gc-actions-left">
+            <span class="gc-icon" title="New File">+</span>
+            <span class="gc-icon" title="New Folder">▣</span>
+            <span class="gc-icon" title="Refresh">↻</span>
+            <span class="gc-icon" title="Collapse All">▤</span>
+          </div>
+        </div>
+        <div class="gc-tree">
+          <div class="gc-row"><span class="gc-chev">▾</span><span class="gc-drive"></span><span class="gc-name">C:</span></div>
+          <div class="gc-row gc-indent"><span class="gc-chev">▸</span><span class="gc-fold"></span><span class="gc-name">Users</span></div>
+          <div class="gc-row gc-indent gc-sel"><span class="gc-file gc-ts"></span><span class="gc-name">app.tsx</span></div>
+          <div class="gc-row"><span class="gc-chev">▸</span><span class="gc-drive"></span><span class="gc-name">D:</span></div>
+        </div>
+        <div class="gc-tabs">
+          <span class="gc-tab gc-on">📁</span>
+          <span class="gc-tab">🤖</span>
+          <span class="gc-tab">⚙</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Icon-only bar</h3>
+      <p>No section title. Tight and minimal. Relies on tooltips. More space for the tree.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="gc-panel">
+        <div class="gc-toolbar">
+          <div class="gc-actions gc-actions-left">
+            <span class="gc-icon" title="New File">+</span>
+            <span class="gc-icon" title="New Folder">▣</span>
+          </div>
+          <div class="gc-actions">
+            <span class="gc-icon" title="Refresh">↻</span>
+            <span class="gc-icon" title="Collapse All">▤</span>
+          </div>
+        </div>
+        <div class="gc-tree">
+          <div class="gc-row"><span class="gc-chev">▾</span><span class="gc-drive"></span><span class="gc-name">C:</span></div>
+          <div class="gc-row gc-indent"><span class="gc-chev">▸</span><span class="gc-fold"></span><span class="gc-name">Users</span></div>
+          <div class="gc-row gc-indent gc-sel"><span class="gc-file gc-ts"></span><span class="gc-name">app.tsx</span></div>
+          <div class="gc-row"><span class="gc-chev">▸</span><span class="gc-drive"></span><span class="gc-name">D:</span></div>
+        </div>
+        <div class="gc-tabs">
+          <span class="gc-tab gc-on">📁</span>
+          <span class="gc-tab">🤖</span>
+          <span class="gc-tab">⚙</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Split groups</h3>
+      <p>Create actions on the left, view actions on the right. No label. Balanced, slightly more “app-like.”</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .gc-panel {
+    width: 220px;
+    height: 220px;
+    margin: 16px auto;
+    background: #2E3440;
+    border: 1px solid #3B4252;
+    color: #D8DEE9;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .gc-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 28px;
+    padding: 0 8px;
+    border-bottom: 1px solid #3B4252;
+    background: #2E3440;
+  }
+  .gc-toolbar-icons { justify-content: flex-start; }
+  .gc-label {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #81A1C1;
+    font-weight: 600;
+  }
+  .gc-actions { display: flex; gap: 2px; }
+  .gc-actions-left { justify-content: flex-start; }
+  .gc-icon {
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #D8DEE9;
+    border-radius: 2px;
+    opacity: 0.75;
+  }
+  .gc-tree { flex: 1; padding: 4px 0; }
+  .gc-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 22px;
+    padding: 0 8px;
+  }
+  .gc-indent { padding-left: 22px; }
+  .gc-sel { background: #3B4252; }
+  .gc-chev { color: #4C566A; width: 8px; }
+  .gc-drive {
+    width: 12px;
+    height: 10px;
+    background: #5E81AC;
+    border-radius: 1px;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .gc-fold {
+    width: 12px;
+    height: 10px;
+    background: #EBCB8B;
+    border-radius: 1px;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .gc-file {
+    width: 10px;
+    height: 12px;
+    border-radius: 1px;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .gc-ts { background: #88C0D0; }
+  .gc-name { color: #ECEFF4; }
+  .gc-tabs {
+    display: flex;
+    height: 28px;
+    border-top: 1px solid #3B4252;
+  }
+  .gc-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4C566A;
+  }
+  .gc-tab.gc-on {
+    color: #88C0D0;
+    box-shadow: inset 0 2px 0 #88C0D0;
+    background: #3B4252;
+  }
+</style>
