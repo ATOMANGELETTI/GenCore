@@ -1,0 +1,21 @@
+apps/terminal/tests/unit/context-menu.file-tree.test.tsx
+  s_47e8e88444fcb9::t_c0071cf240c4ad 1-79
+apps/terminal/src/modules/context-menu/context-menu.file-tree.tsx
+  s_47e8e88444fcb9::t_25dada6d021460 1-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "cb981782e43d7eed3064487bcb6241ab51ac7882",
+  "prompts": {},
+  "sessions": {
+    "s_47e8e88444fcb9": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e95e6ef2-1275-4399-9eec-d2e45de70516",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
