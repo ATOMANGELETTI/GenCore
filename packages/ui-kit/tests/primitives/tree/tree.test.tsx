@@ -79,6 +79,9 @@ describe("Tree", () => {
     expect(file).toHaveAttribute("aria-level", "2");
     expect(file).toHaveAttribute("aria-selected", "false");
     expect(file).not.toHaveAttribute("aria-expanded");
+
+    expect(drive).toHaveAttribute("data-id", "C:\\");
+    expect(file).toHaveAttribute("data-id", "C:\\readme.txt");
   });
 
   it("calls onSelect when a file row is clicked", async () => {

@@ -191,6 +191,7 @@ export function Tree({
               key={virtualRow.key}
               role="treeitem"
               data-slot="tree-row"
+              data-id={row.id}
               aria-level={row.depth + 1}
               aria-selected={row.selected}
               aria-expanded={row.expandable ? row.expanded : undefined}
