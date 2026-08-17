@@ -218,9 +218,19 @@ export function useFileTree() {
     let unlisten: (() => void) | undefined;
 
     void listDrives()
-      .then((drives) => {
-        if (!cancelled) {
-          setState((current) => applyDrives(current, drives));
+      .then(async (drives) => {
+        if (cancelled) {
+          return;
+        }
+        setState((current) => applyDrives(current, drives));
+        const cDrive = drives.find((drive) => /^[Cc]:\\$/.test(drive.path));
+        if (!cDrive) {
+          return;
+        }
+        try {
+          await expand(cDrive.path);
+        } catch {
+          // C: stays visible and collapsed.
         }
       })
       .catch(() => undefined);
@@ -245,7 +255,7 @@ export function useFileTree() {
       cancelled = true;
       unlisten?.();
     };
-  }, [reloadDir]);
+  }, [expand, reloadDir]);
 
   function onSelect(id: string) {
     if (id === FILE_TREE_CREATE_ID) {
@@ -273,8 +283,8 @@ export function useFileTree() {
     void expand(id).catch(() => undefined);
   }
 
-  async function startCreate(kind: "file" | "dir") {
-    const selectedId = stateRef.current.selectedId;
+  async function startCreate(kind: "file" | "dir", targetPath?: string) {
+    const selectedId = targetPath ?? stateRef.current.selectedId;
     if (selectedId == null) {
       return;
     }
@@ -350,6 +360,27 @@ export function useFileTree() {
     }
   }
 
+  async function refreshPath(path: string) {
+    const node = stateRef.current.nodes[path];
+    if (!node) {
+      return;
+    }
+    const target = isExpandableKind(node.kind) ? path : parentWindowsPath(path);
+    const targetNode = stateRef.current.nodes[target];
+    if (!targetNode || !isExpandableKind(targetNode.kind)) {
+      return;
+    }
+    try {
+      if (targetNode.expanded) {
+        await reloadDir(target);
+        return;
+      }
+      await expand(target);
+    } catch {
+      // Keep the last listing.
+    }
+  }
+
   async function refresh() {
     setRefreshing(true);
     try {
@@ -384,5 +415,6 @@ export function useFileTree() {
     cancelCreate,
     collapseAll,
     refresh,
+    refreshPath,
   };
 }

@@ -124,13 +124,12 @@ describe("FileTree", () => {
   });
 
   it("lists mocked children when C: is expanded", async () => {
-    const { user } = await renderTree();
-
-    await user.click(screen.getByRole("treeitem", { name: /^C:/ }));
+    await renderTree();
 
     expect(await screen.findByText("Windows")).toBeVisible();
     expect(screen.getByText(".hidden")).toBeVisible();
     expect(screen.getByText("readme.txt")).toBeVisible();
+    expect(screen.queryByText("Windows")).toBeVisible();
     expect(listDir).toHaveBeenCalledWith("C:\\");
     expect(watchDir).toHaveBeenCalledWith("C:\\");
     const listOrder = listDir.mock.invocationCallOrder[0] ?? 0;
@@ -138,10 +137,16 @@ describe("FileTree", () => {
     expect(listOrder).toBeLessThan(watchOrder);
   });
 
-  it("dims a hidden child with opacity-45", async () => {
-    const { user } = await renderTree();
+  it("does not auto-expand D:", async () => {
+    await renderTree();
+    expect(await screen.findByText("Windows")).toBeVisible();
+    expect(listDir).toHaveBeenCalledWith("C:\\");
+    expect(listDir).not.toHaveBeenCalledWith("D:\\");
+    expect(watchDir).not.toHaveBeenCalledWith("D:\\");
+  });
 
-    await user.click(screen.getByRole("treeitem", { name: /^C:/ }));
+  it("dims a hidden child with opacity-45", async () => {
+    await renderTree();
 
     expect(await screen.findByRole("treeitem", { name: ".hidden" })).toHaveClass("opacity-45");
     expect(screen.getByRole("treeitem", { name: "readme.txt" })).not.toHaveClass("opacity-45");
@@ -153,7 +158,7 @@ describe("FileTree", () => {
     expect(screen.getByRole("button", { name: "New File" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "New Folder" })).toBeDisabled();
 
-    await user.click(screen.getByRole("treeitem", { name: /^C:/ }));
+    await user.click(await screen.findByRole("treeitem", { name: "readme.txt" }));
 
     expect(screen.getByRole("button", { name: "New File" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "New Folder" })).toBeEnabled();
@@ -162,8 +167,9 @@ describe("FileTree", () => {
   it("creates a file as a child of the selected folder", async () => {
     const { user } = await renderTree();
 
-    await user.click(screen.getByRole("treeitem", { name: /^C:/ }));
     await screen.findByText("Windows");
+    screen.getByRole("tree").focus();
+    await user.keyboard("{Enter}");
     await user.click(screen.getByRole("button", { name: "New File" }));
 
     const input = screen.getByRole("textbox");
@@ -183,7 +189,6 @@ describe("FileTree", () => {
   it("creates a file as a sibling of the selected file", async () => {
     const { user } = await renderTree();
 
-    await user.click(screen.getByRole("treeitem", { name: /^C:/ }));
     await user.click(await screen.findByRole("treeitem", { name: "readme.txt" }));
     await user.click(screen.getByRole("button", { name: "New File" }));
     await user.type(screen.getByRole("textbox"), "b.txt");
@@ -215,9 +220,8 @@ describe("FileTree", () => {
       onChange = handler;
       return () => {};
     });
-    const { user } = await renderTree();
+    await renderTree();
 
-    await user.click(screen.getByRole("treeitem", { name: /^C:/ }));
     await screen.findByText("Windows");
     listDir.mockClear();
 
@@ -231,7 +235,6 @@ describe("FileTree", () => {
   it("hides children on collapse all while keeping drive roots", async () => {
     const { user } = await renderTree();
 
-    await user.click(screen.getByRole("treeitem", { name: /^C:/ }));
     expect(await screen.findByText("Windows")).toBeVisible();
 
     await user.click(screen.getByRole("button", { name: "Collapse All" }));
@@ -246,8 +249,9 @@ describe("FileTree", () => {
     createFile.mockRejectedValue("path already exists");
     const { user } = await renderTree();
 
-    await user.click(screen.getByRole("treeitem", { name: /^C:/ }));
     await screen.findByText("Windows");
+    screen.getByRole("tree").focus();
+    await user.keyboard("{Enter}");
     await user.click(screen.getByRole("button", { name: "New File" }));
     await user.type(screen.getByRole("textbox"), "a.txt");
     await user.keyboard("{Enter}");
