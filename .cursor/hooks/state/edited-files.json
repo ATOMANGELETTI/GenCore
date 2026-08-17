@@ -88,5 +88,9 @@
     "crates/gencore-core",
     "crates/gencore-plugin-pty",
     "crates/gencore-plugin-fs"
+  ],
+  "0430ecfc-37b3-4b54-915a-018cd3fc20f2": [
+    "apps/terminal",
+    "packages/ui-kit"
   ]
 }
