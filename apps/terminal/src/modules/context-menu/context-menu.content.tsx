@@ -19,6 +19,7 @@ export function ContentContextMenu() {
 
   return (
     <ContextMenuContent
+      // @ts-expect-error Radix omits onOpenAutoFocus from public Menu Content props
       onOpenAutoFocus={() => {
         setHasSelection(hasTextSelection());
         void canReadClipboard().then(setCanPaste);

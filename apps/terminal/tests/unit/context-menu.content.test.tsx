@@ -17,9 +17,9 @@ function renderContentMenu() {
 
 describe("ContentContextMenu", () => {
   afterEach(() => {
+    vi.restoreAllMocks();
     window.getSelection()?.removeAllRanges();
     vi.unstubAllGlobals();
-    vi.restoreAllMocks();
   });
 
   it("lists Cut, Copy, Paste, and Select All with shortcuts", async () => {
@@ -54,10 +54,7 @@ describe("ContentContextMenu", () => {
       "aria-disabled",
       "true",
     );
-    expect(screen.getByRole("menuitem", { name: /Copy/ })).toHaveAttribute(
-      "aria-disabled",
-      "true",
-    );
+    expect(screen.getByRole("menuitem", { name: /Copy/ })).toHaveAttribute("aria-disabled", "true");
   });
 
   it("enables Cut and Copy when a non-empty selection is present when the menu opens", async () => {
