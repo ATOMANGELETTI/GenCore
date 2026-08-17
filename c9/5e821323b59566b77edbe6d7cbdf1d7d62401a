@@ -1,0 +1,30 @@
+apps/terminal/tests/unit/context-menu.content.test.tsx
+  s_7a6b53c85f0687::t_a69862596d8d5b 20
+  s_1510ba10fe2e10::t_f0ec8364ffd774 57
+apps/terminal/src/modules/context-menu/context-menu.content.tsx
+  s_7a6b53c85f0687::t_aba3bf8efd49cf 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "c95e821323b59566b77edbe6d7cbdf1d7d62401a",
+  "prompts": {},
+  "sessions": {
+    "s_1510ba10fe2e10": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "a2d0b1e7-77cf-4311-b7f7-32fbfda6d4ae",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_7a6b53c85f0687": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "7b63901a-cf8a-4eeb-867c-996fd0c92c1f",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
