@@ -44,24 +44,11 @@ export function stripAiCommitTrailers(text) {
   return `${kept.join(newline)}${newline}`;
 }
 
-function isMain() {
-  const entry = process.argv[1];
-  if (!entry) return false;
-  return import.meta.url === new URL(`file://${entry.replaceAll("\\", "/")}`).href
-    || process.argv[1].replaceAll("\\", "/").endsWith("strip-ai-commit-trailers.mjs");
+const filePath = process.argv[2];
+if (!filePath) {
+  process.stderr.write("usage: node scripts/strip-ai-commit-trailers.mjs <commit-msg-file>\n");
+  process.exit(1);
 }
 
-function main() {
-  const filePath = process.argv[2];
-  if (!filePath) {
-    process.stderr.write("usage: node scripts/strip-ai-commit-trailers.mjs <commit-msg-file>\n");
-    process.exit(1);
-  }
-
-  const original = readFileSync(filePath, "utf8");
-  writeFileSync(filePath, stripAiCommitTrailers(original), "utf8");
-}
-
-if (isMain()) {
-  main();
-}
+const original = readFileSync(filePath, "utf8");
+writeFileSync(filePath, stripAiCommitTrailers(original), "utf8");

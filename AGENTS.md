@@ -76,6 +76,7 @@ Do not create commits or push unless the user explicitly asks. Conventional comm
 - Keep Superpowers-generated folders (`docs/superpowers/`, plans, specs, `.superpowers/`) clean and organized; do not leave leftover plan or spec clutter in the repo.
 - Shell and chrome UI text is not selectable; keep the content area copyable. The statusbar has no right-click context menu.
 - Do not bump major versions without asking first; use minor and patch only while apps stay on 0.x.
+- Never add Cursor or AI attribution to commits or PRs (`Co-authored-by: Cursor`, `Made-with: Cursor`, Copilot/ChatGPT/Claude trailers, or similar). Human co-authors are fine. The Husky `commit-msg` hook strips AI trailers if they still appear.
 
 ## Learned Workspace Facts
 

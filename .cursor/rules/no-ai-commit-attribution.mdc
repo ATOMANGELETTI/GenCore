@@ -1,0 +1,25 @@
+---
+description: Never add Cursor or AI co-author trailers to commits or PRs
+alwaysApply: true
+---
+
+# No AI commit attribution
+
+Never add Cursor, Copilot, ChatGPT, Claude, or other AI attribution to git
+commits or pull requests. That includes the Source Control generate-commit-message
+button, `git commit`, and `gh pr create`.
+
+```
+# BAD — do not write or keep these
+Co-authored-by: Cursor <cursoragent@cursor.com>
+Made-with: Cursor
+Made with Cursor
+Generated-by: Cursor
+Assisted-by: AI
+
+# GOOD
+feat(ui-kit): add Tooltip primitive
+
+Human Co-authored-by trailers for real people are fine:
+Co-authored-by: Jane Doe <jane@example.com>
+```

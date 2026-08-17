@@ -1,1 +1,2 @@
+node scripts/strip-ai-commit-trailers.mjs "$1"
 pnpm exec commitlint --edit "$1"
