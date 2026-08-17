@@ -1,0 +1,49 @@
+apps/terminal/src/modules/file-tree/file-tree.component.tsx
+  s_335a881ddc4ee5::t_294648a7a7c759 73
+packages/ui-kit/src/primitives/tree/tree.component.tsx
+  s_335a881ddc4ee5::t_b23e675dc28bf5 197-203
+  s_335a881ddc4ee5::t_fc6d1f698ae8c0 241-244
+apps/terminal/src/modules/file-tree/file-tree.hook.ts
+  s_335a881ddc4ee5::t_79123eed023363 146
+crates/gencore-plugin-fs/src/modules/create_dir/create_dir_api.rs
+  s_335a881ddc4ee5::t_54dde2edb7b972 17-22
+crates/gencore-plugin-fs/tests/create_commands.rs
+  s_335a881ddc4ee5::t_4638c8fe9d070e 10
+crates/gencore-plugin-fs/src/modules/create_file/create_file_api.rs
+  s_335a881ddc4ee5::t_b6a135425e7935 19-24
+crates/gencore-plugin-fs/src/modules/list_drives/list_drives_api.rs
+  s_335a881ddc4ee5::t_395c1bdf9a625a 48-53
+apps/terminal/tests/unit/file-tree.test.tsx
+  s_335a881ddc4ee5::t_5ecbade4529fba 245-265
+packages/ui-kit/src/primitives/tree/tree.types.ts
+  s_335a881ddc4ee5::t_679d1f1b47bc46 11-12
+crates/gencore-plugin-fs/src/modules/watch/watch_api.rs
+  s_335a881ddc4ee5::t_3f0d40283d05c0 157-161,163-164
+crates/gencore-plugin-fs/src/modules/list/list_api.rs
+  s_335a881ddc4ee5::t_cc6eb7eaa5d052 57-62
+crates/gencore-plugin-fs/src/modules/unwatch/unwatch_api.rs
+  s_335a881ddc4ee5::t_95f8d02862cbde 31-34
+packages/ui-kit/tests/primitives/tree/tree.test.tsx
+  s_335a881ddc4ee5::t_5dda3e30d498ab 258-268
+  s_335a881ddc4ee5::t_6b0c2c23649571 228-229
+crates/gencore-plugin-fs/tests/list_commands.rs
+  s_335a881ddc4ee5::t_6ef68e744dec16 6
+packages/ui-kit/src/primitives/tree/tree.variants.ts
+  s_335a881ddc4ee5::t_5fc7e2ddb893cc 8,19-22,27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "410aefa8a354dac777a1d07540030d01ddf4288e",
+  "prompts": {},
+  "sessions": {
+    "s_335a881ddc4ee5": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "91c89fa6-5148-4546-bb86-eed1202ee44e",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
