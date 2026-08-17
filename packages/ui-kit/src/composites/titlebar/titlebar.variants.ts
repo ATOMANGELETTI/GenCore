@@ -38,3 +38,16 @@ export const trafficLightVariants = cva(
     defaultVariants: { active: true },
   },
 );
+
+export const titlebarVersionVariants = cva([
+  "cursor-pointer overflow-hidden",
+  "transition-[color,background-color,border-color,background-position] duration-200",
+  "outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
+  "hover:border-nord-aurora-13 hover:text-nord-polar-0",
+  "hover:bg-[linear-gradient(110deg,var(--nord-aurora-12)_0%,var(--nord-aurora-13)_35%,var(--nord-snow-6)_50%,var(--nord-aurora-13)_65%,var(--nord-aurora-12)_100%)]",
+  "hover:bg-[length:220%_100%] hover:animate-gild-sheen",
+  "focus-visible:border-nord-aurora-13 focus-visible:text-nord-polar-0",
+  "focus-visible:bg-[linear-gradient(110deg,var(--nord-aurora-12)_0%,var(--nord-aurora-13)_35%,var(--nord-snow-6)_50%,var(--nord-aurora-13)_65%,var(--nord-aurora-12)_100%)]",
+  "focus-visible:bg-[length:220%_100%] focus-visible:animate-gild-sheen",
+  "motion-reduce:transition-none motion-reduce:hover:animate-none motion-reduce:focus-visible:animate-none",
+]);

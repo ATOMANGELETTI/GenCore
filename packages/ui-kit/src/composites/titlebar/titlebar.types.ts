@@ -5,6 +5,7 @@ export interface WindowControlHandlers {
   onClose?: () => void;
   onMinimize?: () => void;
   onToggleMaximize?: () => void;
+  onVersionClick?: () => void;
 }
 
 export interface TitlebarProps

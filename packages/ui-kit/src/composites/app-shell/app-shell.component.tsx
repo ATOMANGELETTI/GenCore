@@ -42,6 +42,7 @@ export function AppShell({
   onClose,
   onMinimize,
   onToggleMaximize,
+  onVersionClick,
   children,
   ...props
 }: AppShellProps) {
@@ -66,6 +67,7 @@ export function AppShell({
           onClose={onClose}
           onMinimize={onMinimize}
           onToggleMaximize={onToggleMaximize}
+          onVersionClick={onVersionClick}
         />,
         titlebarContextMenu,
       )}

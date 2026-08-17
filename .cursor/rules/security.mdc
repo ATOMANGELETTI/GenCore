@@ -8,6 +8,10 @@ alwaysApply: true
 Applies to every Tauri app in `apps/**`:
 
 - `tauri.conf.json` `app.security.csp` must be the **object form**, not a raw string.
+- `app.security.devCsp` must also be the **object form**. Copy every production `csp`
+  directive into it. `connect-src` may add `'self'`, `ws://localhost:<vite-port>`, and
+  `ws://127.0.0.1:<vite-port>` for Vite HMR only. Production `csp.connect-src` stays
+  `ipc:` and `http://ipc.localhost` — never websocket localhost origins.
 - Isolation pattern must be enabled (`app.security.pattern` = `isolation`) with an
   allowlist hook that only lets through the exact IPC commands the UI actually calls.
 - `app.withGlobalTauri: false` always. Never reference `window.__TAURI__` from app code.
@@ -24,3 +28,6 @@ Applies to every Tauri app in `apps/**`:
   local `.env` files (git-ignored) instead.
 - No shadow MCP servers: do not add `.cursor/mcp.json`, `.mcp.json`, or any ad-hoc
   `npx -y @modelcontextprotocol/server-*` config. Team MCP is dashboard-managed only.
+- If the UI opens an external URL, grant only `opener:allow-open-url` scoped to
+  the exact URL(s) the UI opens. Never `opener:default`, `opener:allow-default-urls`,
+  or `shell:*`.

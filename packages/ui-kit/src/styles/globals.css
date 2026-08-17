@@ -74,6 +74,17 @@
 
   --font-sans: "Terminess Nerd Font", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   --font-mono: "Terminess Nerd Font", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --animate-gild-sheen: gild-sheen 1.2s linear infinite;
+}
+
+@keyframes gild-sheen {
+  from {
+    background-position: 100% 50%;
+  }
+  to {
+    background-position: 0% 50%;
+  }
 }
 
 @layer base {

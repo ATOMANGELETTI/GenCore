@@ -13,6 +13,7 @@
     "plugin:window|minimize",
     "plugin:window|toggle_maximize",
     "plugin:window|start_dragging",
+    "plugin:opener|open_url",
   ];
 
   window.__TAURI_ISOLATION_HOOK__ = (payload) => {

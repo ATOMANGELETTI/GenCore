@@ -1,6 +1,7 @@
 import { AppShell, ThemeProvider } from "@gencore/ui-kit";
 import * as React from "react";
 import { getAppInfo } from "../ipc/ipc.app-info";
+import { openRepoInBrowser } from "../ipc/ipc.opener";
 import type { AppInfo } from "../ipc/ipc.types";
 import { closeWindow, minimizeWindow, toggleMaximizeWindow } from "../ipc/ipc.window";
 
@@ -42,6 +43,7 @@ export function App() {
         onClose={closeWindow}
         onMinimize={minimizeWindow}
         onToggleMaximize={toggleMaximizeWindow}
+        onVersionClick={openRepoInBrowser}
       >
         <div className="flex flex-col items-center gap-2 text-center">
           <h1 className="text-lg font-semibold">{APP_TITLE}</h1>

@@ -57,6 +57,8 @@ pnpm install
 | Version a change | `pnpm changeset` |
 | Windows x64 portable ZIP | `pnpm package:win64` |
 
+Frontend files hot-reload through Vite while `tauri:dev` or `pnpm dev` is running, including `@gencore/ui-kit` source. Rust changes still rebuild via Tauri’s watcher. If a UI save does not refresh (network or unusual volume), restart with `GENCORE_VITE_POLL=1`.
+
 `tauri:build` compiles the exe with `--no-bundle` and does not emit NSIS/MSI or other installers. ZIP packaging runs only through `pnpm package:win64` (64-bit Windows). Output lands in `artifacts/`.
 
 VS Code tasks and LLDB launch configs live in `.vscode/`.

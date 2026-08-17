@@ -1,7 +1,12 @@
 import { cn } from "../../lib/cn";
 import { Badge } from "../../primitives/badge";
 import type { TitlebarProps, TrafficLightKind, TrafficLightsProps } from "./titlebar.types";
-import { titlebarTitleVariants, titlebarVariants, trafficLightVariants } from "./titlebar.variants";
+import {
+  titlebarTitleVariants,
+  titlebarVariants,
+  titlebarVersionVariants,
+  trafficLightVariants,
+} from "./titlebar.variants";
 
 const trafficLightLabel: Record<TrafficLightKind, string> = {
   close: "Close window",
@@ -49,6 +54,7 @@ export function Titlebar({
   onClose,
   onMinimize,
   onToggleMaximize,
+  onVersionClick,
   children,
   ...props
 }: TitlebarProps) {
@@ -82,9 +88,23 @@ export function Titlebar({
       <div data-slot="titlebar-end" className="z-10 ml-auto flex items-center gap-2">
         {titlebarEnd}
         {version ? (
-          <Badge data-slot="titlebar-version" variant="outline" numeric>
-            {version}
-          </Badge>
+          onVersionClick ? (
+            <Badge asChild variant="outline" numeric>
+              <button
+                type="button"
+                data-slot="titlebar-version"
+                aria-label="Open the GenCore GitHub repository"
+                onClick={onVersionClick}
+                className={titlebarVersionVariants()}
+              >
+                {version}
+              </button>
+            </Badge>
+          ) : (
+            <Badge data-slot="titlebar-version" variant="outline" numeric>
+              {version}
+            </Badge>
+          )
         ) : null}
       </div>
 

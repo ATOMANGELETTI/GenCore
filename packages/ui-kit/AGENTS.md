@@ -6,6 +6,7 @@ Shared design system. Apps consume it; they do not fork chrome.
 - Flat macOS chrome: solid planes, 1px separators, compact controls, Aurora traffic lights (`#BF616A` / `#EBCB8B` / `#A3BE8C`)
 - Bundled Terminess Nerd Font; no remote fonts; CSP `font-src` stays `'self'`
 - **Never import `@tauri-apps/*` or call IPC.** Titlebar actions are callbacks the app wires up
+- Version chip is an optional `onVersionClick` callback; the kit never opens URLs
 - Primitives from `radix-ui` (unified package) + CVA. Do not add raw HTML controls when a primitive exists
 - Modular files: `{module}.component.tsx`, `{module}.variants.ts`, `{module}.types.ts`
 - Tests only in `packages/ui-kit/tests/`

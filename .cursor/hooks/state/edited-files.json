@@ -67,5 +67,16 @@
   ],
   "c2ae84b9-6084-45ea-9e1e-23784b5873f8": [
     "packages/ui-kit"
+  ],
+  "6328c15b-e6e6-45f0-b1c2-e1df8e667770": [
+    "apps/terminal",
+    "apps/explorer"
+  ],
+  "c8d15437-ec6b-4bba-9342-59e69840d4e3": [
+    "packages/ui-kit"
+  ],
+  "d18e71cc-3f2b-4b95-b27e-0408b22fece8": [
+    "apps/terminal",
+    "apps/explorer"
   ]
 }

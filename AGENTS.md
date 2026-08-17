@@ -65,12 +65,16 @@ Do not create commits or push unless the user explicitly asks. Conventional comm
 
 ## Learned User Preferences
 
-- For multi-agent orchestration, use Grok 4.6 unless a stronger model is clearly required.
+- For multi-agent orchestration, use Grok 4.6 extra high unless a stronger model is clearly required. Prefer Kimi K3 or GLM 5.2 when a different model is needed; elevate to Opus 5, Sonnet 5, or GPT 5.6 (sol/luna/terra) only when necessary.
 - Do not show the app version in the statusbar; it already appears in the titlebar.
 - Reviewer skills (code-reviewer, security-reviewer, performance-reviewer) are read-only: propose a plan, ask which changes to apply, and do not edit unless asked.
 - Shared fonts belong in `@gencore/ui-kit` (`packages/ui-kit/src/assets/fonts/`) and may be used in the app shell (Terminus Nerd Font); do not copy font files into apps.
+- Keep Superpowers-generated folders (`docs/superpowers/`, plans, specs, `.superpowers/`) clean and organized; do not leave leftover plan or spec clutter in the repo.
+- Shell and chrome UI text is not selectable; keep the content area copyable.
+- Do not bump major versions without asking first; use minor and patch only while apps stay on 0.x.
 
 ## Learned Workspace Facts
 
 - CI and local version managers read `.node-version` (currently `22`); keep that file and keep it aligned with `engines.node` (`>=22.13.0`).
+- The public GitHub repository is https://github.com/ATOMANGELETTI/GenCore.
 

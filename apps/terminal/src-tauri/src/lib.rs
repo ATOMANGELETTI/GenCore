@@ -13,6 +13,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(gencore_core::init())
         .plugin(gencore_pty::init())
+        .plugin(tauri_plugin_opener::init())
         .setup(setup)
         .run(tauri::generate_context!())
         .expect("error while running GenCore Terminal");

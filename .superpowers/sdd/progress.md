@@ -95,7 +95,7 @@ Controller session. SDD + writing-plans. Work in place on `main` (running `tauri
 - Task 1 Shared menu variants: complete (commits 9aae58f..d72a583, review clean)
 - Task 2 ContextMenu primitive: complete (commits d72a583..9ba7574, review clean). Minors: no in-code note that Radix hardcodes sideOffset 2; checkbox/radio/group/label untested. Plan error: sideOffset={5} is invalid on radix-ui 1.6.7 ContextMenu.Content.
 - Task 3 AppShell slots and native-menu suppress: complete (commits 87e7b5d..74d76c8, review clean). Minors: caller onContextMenu compose untested; no primitive-level asChild data-slot test; Titlebar/ContentArea spread can still overwrite data-slot; body-slot parent not re-asserted with content menu.
-- Task 4 Terminal titlebar and content menus: pending
+- Task 4 Terminal titlebar and content menus: complete (commits 74d76c8..c95e821, review clean after at-open fix). Minors: @ts-expect-error on onOpenAutoFocus; execCommand shim in production clipboard module; no reverse disabled-flag case. Extra files in fd96e15 were reverted in 9014026.
 - Task 5 Changeset and verify: pending
 
 ## Feature: Dev live reload (2026-08-16)
@@ -105,8 +105,9 @@ Controller session. SDD + writing-plans. Work in place on `main` (running `tauri
 - Plan: `.cursor/plans/dev_live_reload_60090d11.plan.md` (Cursor-owned; do not copy into `docs/superpowers/`)
 - Briefs: `.superpowers/sdd/dev-live-reload/`
 - Task 1 Explicit Vite HMR and workspace watch: complete (working tree, review approved). Minors: file comment still mentions only src-tauri ignore; polling-off test does not stub GENCORE_VITE_POLL. ⚠️ TDD runs are report-only — controller accepts RED 5 fail / GREEN 9/9 from task-1-report.md.
-- Task 2 Dev-only CSP lock tests and `devCsp`: pending
-- Task 3 Docs, agent rules, and changeset: pending
+- Task 2 Dev-only CSP lock tests and `devCsp`: complete (working tree, review approved). Production csp unchanged; object-form devCsp 5173/5174.
+- Task 3 Docs, agent rules, and changeset: complete (working tree, review approved). Changeset `.changeset/vite-hmr-workspace-watch.md`. Minor: README rust-rebuild sentence is brief-mandated and slightly ambiguous next to `pnpm dev`.
+- Final review: complete (approved, ready to merge scoped files only). No Critical/Important. Controller verify: config-vite 9/9, terminal 36/36, explorer 12/12. Vite HMR already firing in running `tauri:dev` (app + ui-kit `/@fs/` paths). Commit: none.
 
 ## Follow-ups (not blocking)
 

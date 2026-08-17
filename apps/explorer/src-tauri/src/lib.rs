@@ -14,6 +14,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(gencore_core::init())
         .plugin(gencore_fs::init())
+        .plugin(tauri_plugin_opener::init())
         .setup(run_setup)
         .run(tauri::generate_context!())
         .expect("error while running the gencore-explorer application");

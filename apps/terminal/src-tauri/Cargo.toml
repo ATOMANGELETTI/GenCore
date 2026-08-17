@@ -17,3 +17,4 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 gencore-core = { path = "../../../crates/gencore-core" }
 gencore-pty = { path = "../../../crates/gencore-plugin-pty" }
+tauri-plugin-opener = { workspace = true }

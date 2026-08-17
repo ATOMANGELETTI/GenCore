@@ -3,6 +3,7 @@ import * as React from "react";
 import { ContentContextMenu } from "../context-menu/context-menu.content";
 import { TitlebarContextMenu } from "../context-menu/context-menu.titlebar";
 import { getAppInfo } from "../ipc/ipc.app-info";
+import { openRepoInBrowser } from "../ipc/ipc.opener";
 import type { AppInfo } from "../ipc/ipc.types";
 import { closeWindow, minimizeWindow, toggleMaximizeWindow } from "../ipc/ipc.window";
 import { SidePanel } from "../side-panel/side-panel.component";
@@ -41,6 +42,7 @@ export function App() {
         onClose={closeWindow}
         onMinimize={minimizeWindow}
         onToggleMaximize={toggleMaximizeWindow}
+        onVersionClick={openRepoInBrowser}
         titlebarContextMenu={
           <TitlebarContextMenu
             onClose={closeWindow}

@@ -23,6 +23,9 @@ Use this when adding a new app under `apps/{name}` (e.g. a third GenCore surface
      `isolation/` folder whose hook allowlists only the commands this app's UI calls.
    - `app.security.csp` object form (see `security` rule); `withGlobalTauri: false`;
      `freezePrototype: true`; `assetProtocol.enable: false`.
+   - `app.security.devCsp` object form: full copy of `csp`, plus `'self'` and
+     `ws://localhost:<port>` / `ws://127.0.0.1:<port>` on `connect-src` (the app’s
+     Vite `devUrl` port).
    - `bundle.active: false`. Windows icons only (PNG + `icon.ico`). Do not set
      `targets: "all"` and do not add `icon.icns`. Release ZIP is `pnpm package:win64`.
      New `icons/*.png` / `icon.ico` are Git LFS-tracked automatically.

@@ -8,5 +8,6 @@ export type {
 export {
   titlebarTitleVariants,
   titlebarVariants,
+  titlebarVersionVariants,
   trafficLightVariants,
 } from "./titlebar.variants";
