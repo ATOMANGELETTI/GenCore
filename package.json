@@ -1,6 +1,8 @@
 {
   "name": "gencore",
   "private": true,
+  "license": "GPL-3.0-or-later",
+  "author": "Dustin Angeletti",
   "packageManager": "pnpm@11.22.0",
   "engines": {
     "node": ">=22.13.0"

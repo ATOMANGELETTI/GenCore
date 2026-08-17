@@ -3,6 +3,9 @@ name = "gencore-terminal"
 version = "0.1.0"
 description = "GenCore Terminal — standalone Tauri 2 + Vite + React template shell."
 edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
 
 [lib]
 name = "gencore_terminal_lib"

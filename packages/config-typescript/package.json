@@ -2,7 +2,8 @@
   "name": "@gencore/config-typescript",
   "version": "0.0.0",
   "private": true,
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
+  "author": "Dustin Angeletti",
   "exports": {
     "./base": "./tsconfig.base.json",
     "./react-library": "./tsconfig.react-library.json",

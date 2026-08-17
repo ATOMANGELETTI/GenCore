@@ -2,6 +2,9 @@
 name = "gencore-explorer"
 version = "0.1.0"
 edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
 description = "GenCore Explorer — standalone Tauri 2 + Vite + React template app."
 publish = false
 

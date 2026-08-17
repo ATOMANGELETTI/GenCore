@@ -62,6 +62,10 @@ Follow the prompts to describe the change and select the affected packages.
 The changeset will be picked up by the release workflow to update versions
 and changelogs.
 
+## License
+
+Contributions are licensed under GPL-3.0-or-later. See [LICENSE](../LICENSE).
+
 ## Pull requests
 
 - Fill out the PR template, including the test plan and security checklist.

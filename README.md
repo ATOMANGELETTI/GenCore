@@ -94,3 +94,7 @@ Tests live under each unit’s `tests/` directory — never colocated next to so
 ## Contributing
 
 See [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md). Agent instructions: [AGENTS.md](AGENTS.md).
+
+## License
+
+Copyright (C) 2026 Dustin Angeletti. GenCore is licensed under [GPL-3.0-or-later](LICENSE).

@@ -10,6 +10,9 @@ members = [
 
 [workspace.package]
 edition = "2024"
+license = "GPL-3.0-or-later"
+authors = ["Dustin Angeletti"]
+repository = "https://github.com/ATOMANGELETTI/GenCore"
 
 [workspace.dependencies]
 tauri = "2.11.5"

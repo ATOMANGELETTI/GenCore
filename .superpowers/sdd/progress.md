@@ -96,7 +96,7 @@ Controller session. SDD + writing-plans. Work in place on `main` (running `tauri
 - Task 2 ContextMenu primitive: complete (commits d72a583..9ba7574, review clean). Minors: no in-code note that Radix hardcodes sideOffset 2; checkbox/radio/group/label untested. Plan error: sideOffset={5} is invalid on radix-ui 1.6.7 ContextMenu.Content.
 - Task 3 AppShell slots and native-menu suppress: complete (commits 87e7b5d..74d76c8, review clean). Minors: caller onContextMenu compose untested; no primitive-level asChild data-slot test; Titlebar/ContentArea spread can still overwrite data-slot; body-slot parent not re-asserted with content menu.
 - Task 4 Terminal titlebar and content menus: complete (commits 74d76c8..c95e821, review clean after at-open fix). Minors: @ts-expect-error on onOpenAutoFocus; execCommand shim in production clipboard module; no reverse disabled-flag case. Extra files in fd96e15 were reverted in 9014026.
-- Task 5 Changeset and verify: pending
+- Task 5 Changeset and verify: complete (changeset file matches brief; scooped into mixed commit `d4b619f`). ui-kit lint fails on pre-existing `globals.css` font-stack wrap (Terminess, not this feature). Terminal test/typecheck/lint clean.
 
 ## Feature: Dev live reload (2026-08-16)
 

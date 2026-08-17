@@ -78,5 +78,15 @@
   "d18e71cc-3f2b-4b95-b27e-0408b22fece8": [
     "apps/terminal",
     "apps/explorer"
+  ],
+  "4f76c9f9-b2d3-4af9-bcc4-2b392847e98e": [
+    "packages/ui-kit",
+    "packages/config-typescript",
+    "packages/config-vite",
+    "apps/terminal",
+    "apps/explorer",
+    "crates/gencore-core",
+    "crates/gencore-plugin-pty",
+    "crates/gencore-plugin-fs"
   ]
 }
