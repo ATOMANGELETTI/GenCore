@@ -11,6 +11,7 @@ export * from "./primitives/file-icon";
 export * from "./primitives/input";
 export * from "./primitives/separator";
 export * from "./primitives/tooltip";
+export * from "./primitives/tree";
 export { ThemeProvider, useTheme } from "./providers/theme.provider";
 export type {
   ThemeContextValue,
