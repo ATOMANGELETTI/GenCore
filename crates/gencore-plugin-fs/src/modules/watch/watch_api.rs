@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::path::Path;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use notify_debouncer_full::notify::{RecommendedWatcher, RecursiveMode};
@@ -85,12 +85,26 @@ pub fn apply_debounced_events(
     }
 }
 
+/// Drops a dead watcher after a debounce error and asks the UI to re-list.
+pub fn handle_debounce_error(
+    registry: &Arc<Mutex<WatchMap>>,
+    parent: &str,
+    mut emit: impl FnMut(EntryChangedPayload),
+) {
+    let key = normalize_path(parent);
+    registry.lock().expect("watch registry mutex").remove(&key);
+    emit(EntryChangedPayload {
+        parent: key,
+        kind: EntryChangeKind::Modified,
+    });
+}
+
 /// Starts a non-recursive watch on `path`.
 ///
 /// Watching an already-watched path is a no-op. `recursive: true` is rejected
 /// before a watcher is created.
 pub fn start_watch<F>(
-    registry: &mut WatchMap,
+    registry: &Arc<Mutex<WatchMap>>,
     path: &str,
     recursive: bool,
     on_event: F,
@@ -103,19 +117,23 @@ where
     }
 
     let key = normalize_path(path);
-    if registry.contains_key(&key) {
+    let mut map = registry.lock().expect("watch registry mutex");
+    if map.contains_key(&key) {
         return Ok(());
     }
 
     let parent = key.clone();
+    let registry_for_handler = Arc::clone(registry);
     let mut debouncer = new_debouncer(
         Duration::from_millis(250),
         None,
-        move |result: DebounceEventResult| {
-            let Ok(events) = result else {
-                return;
-            };
-            apply_debounced_events(&parent, events.iter().map(|event| event.kind), &on_event);
+        move |result: DebounceEventResult| match result {
+            Ok(events) => {
+                apply_debounced_events(&parent, events.iter().map(|event| event.kind), &on_event);
+            }
+            Err(_) => {
+                handle_debounce_error(&registry_for_handler, &parent, &on_event);
+            }
         },
     )
     .map_err(map_notify_error)?;
@@ -124,7 +142,7 @@ where
         .watch(Path::new(&key), RecursiveMode::NonRecursive)
         .map_err(map_notify_error)?;
 
-    registry.insert(key, debouncer);
+    map.insert(key, debouncer);
     Ok(())
 }
 
@@ -132,11 +150,10 @@ where
 #[tauri::command]
 pub async fn watch<R: Runtime>(
     app: AppHandle<R>,
-    state: State<'_, Mutex<WatchMap>>,
+    state: State<'_, Arc<Mutex<WatchMap>>>,
     args: WatchArgs,
 ) -> Result<(), WatchError> {
-    let mut registry = state.lock().expect("watch registry mutex");
-    start_watch(&mut registry, &args.path, args.recursive, move |payload| {
+    start_watch(&state, &args.path, args.recursive, move |payload| {
         let _ = app.emit(ENTRY_CHANGED_EVENT, payload);
     })
 }

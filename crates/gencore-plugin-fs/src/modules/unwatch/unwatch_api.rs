@@ -1,4 +1,4 @@
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
 use serde::Deserialize;
 use tauri::State;
@@ -16,18 +16,17 @@ pub struct UnwatchArgs {
 }
 
 /// Stops watching `path`. A path that is not watched is a no-op.
-pub fn stop_watch(registry: &mut WatchMap, path: &str) -> Result<(), UnwatchError> {
+pub fn stop_watch(registry: &Arc<Mutex<WatchMap>>, path: &str) -> Result<(), UnwatchError> {
     let key = normalize_path(path);
-    registry.remove(&key);
+    registry.lock().expect("watch registry mutex").remove(&key);
     Ok(())
 }
 
 /// Stops watching a path for filesystem changes.
 #[tauri::command]
 pub async fn unwatch(
-    state: State<'_, Mutex<WatchMap>>,
+    state: State<'_, Arc<Mutex<WatchMap>>>,
     args: UnwatchArgs,
 ) -> Result<(), UnwatchError> {
-    let mut registry = state.lock().expect("watch registry mutex");
-    stop_watch(&mut registry, &args.path)
+    stop_watch(&state, &args.path)
 }

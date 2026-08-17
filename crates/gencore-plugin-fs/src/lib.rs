@@ -19,10 +19,10 @@ pub use modules::unwatch::{UnwatchArgs, UnwatchError, stop_watch, unwatch};
 pub use modules::watch::{
     AccessKind, CreateKind, DataChange, EntryChangeKind, EntryChangedPayload, EventKind,
     ModifyKind, RemoveKind, RenameMode, WatchArgs, WatchError, WatchMap, apply_debounced_events,
-    map_event_kind, start_watch, watch,
+    handle_debounce_error, map_event_kind, start_watch, watch,
 };
 
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
 use tauri::{
     Manager, Runtime,
@@ -47,7 +47,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             unwatch
         ])
         .setup(|app, _api| {
-            app.manage(Mutex::new(WatchMap::new()));
+            app.manage(Arc::new(Mutex::new(WatchMap::new())));
             Ok(())
         })
         .build()
