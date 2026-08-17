@@ -1,7 +1,7 @@
 //! Filesystem plugin for GenCore.
 //!
-//! `list`, `list_drives`, `create_file`, and `create_dir` perform real Windows
-//! filesystem access. `stat` and `watch` remain stubs until later tasks.
+//! `list`, `list_drives`, `create_file`, `create_dir`, `watch`, and `unwatch`
+//! perform real Windows filesystem access. `stat` remains a stub until a later task.
 //!
 //! Note: this crate is deliberately not named `tauri-plugin-fs`, which is
 //! the official Tauri filesystem plugin.
@@ -15,10 +15,17 @@ pub use modules::list_drives::{
     DriveEntry, DriveKind, ListDrivesError, is_usable_mount, list_drives,
 };
 pub use modules::stat::{StatArgs, StatError, stat};
-pub use modules::watch::{WatchArgs, WatchError, watch};
+pub use modules::unwatch::{UnwatchArgs, UnwatchError, stop_watch, unwatch};
+pub use modules::watch::{
+    AccessKind, CreateKind, DataChange, EntryChangeKind, EntryChangedPayload, EventKind,
+    ModifyKind, RemoveKind, RenameMode, WatchArgs, WatchError, WatchMap, apply_debounced_events,
+    map_event_kind, start_watch, watch,
+};
+
+use std::sync::Mutex;
 
 use tauri::{
-    Runtime,
+    Manager, Runtime,
     plugin::{Builder, TauriPlugin},
 };
 
@@ -36,7 +43,12 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             create_file,
             create_dir,
             stat,
-            watch
+            watch,
+            unwatch
         ])
+        .setup(|app, _api| {
+            app.manage(Mutex::new(WatchMap::new()));
+            Ok(())
+        })
         .build()
 }

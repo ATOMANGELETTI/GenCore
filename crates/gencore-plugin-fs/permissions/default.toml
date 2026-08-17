@@ -1,5 +1,5 @@
 "$schema" = "schemas/schema.json"
 
 [default]
-description = "No commands are enabled by default for the gencore-fs plugin. Consumers must explicitly allow the list, list_drives, create_file, create_dir, stat, and watch commands they need."
+description = "No commands are enabled by default for the gencore-fs plugin. Consumers must explicitly allow the list, list_drives, create_file, create_dir, stat, watch, and unwatch commands they need."
 permissions = []

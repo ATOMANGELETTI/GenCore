@@ -2,7 +2,7 @@ use std::future::Future;
 use std::pin::pin;
 use std::task::{Context, Poll, Waker};
 
-use gencore_fs::{ListArgs, StatArgs, StatError, WatchArgs, WatchError, stat, watch};
+use gencore_fs::{ListArgs, StatArgs, StatError, WatchArgs, stat};
 
 /// Minimal, dependency-free executor for driving the stub commands' futures
 /// to completion in tests. All stub commands resolve on first poll, so a
@@ -24,15 +24,6 @@ fn stat_returns_not_implemented() {
         path: "/tmp/file.txt".into(),
     }));
     assert!(matches!(result, Err(StatError::NotImplemented)));
-}
-
-#[test]
-fn watch_returns_not_implemented() {
-    let result = block_on(watch(WatchArgs {
-        path: "/tmp".into(),
-        recursive: true,
-    }));
-    assert!(matches!(result, Err(WatchError::NotImplemented)));
 }
 
 #[test]

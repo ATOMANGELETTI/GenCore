@@ -5,6 +5,7 @@ const COMMANDS: &[&str] = &[
     "create_dir",
     "stat",
     "watch",
+    "unwatch",
 ];
 
 fn main() {

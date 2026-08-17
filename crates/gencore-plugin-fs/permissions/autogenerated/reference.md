@@ -1,6 +1,6 @@
 ## Default Permission
 
-No commands are enabled by default for the gencore-fs plugin. Consumers must explicitly allow the list, list_drives, create_file, create_dir, stat, and watch commands they need.
+No commands are enabled by default for the gencore-fs plugin. Consumers must explicitly allow the list, list_drives, create_file, create_dir, stat, watch, and unwatch commands they need.
 
 ## Permission Table
 
@@ -137,6 +137,32 @@ Enables the stat command without any pre-configured scope.
 <td>
 
 Denies the stat command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`gencore-fs:allow-unwatch`
+
+</td>
+<td>
+
+Enables the unwatch command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`gencore-fs:deny-unwatch`
+
+</td>
+<td>
+
+Denies the unwatch command without any pre-configured scope.
 
 </td>
 </tr>
