@@ -1,0 +1,32 @@
+apps/terminal/src/modules/file-tree/file-tree.hook.ts
+  s_e21dbfc2423f58::t_7a5e0b86b769d1 418
+  s_e21dbfc2423f58::t_dec7a16a6e7c5e 221-233
+  s_e21dbfc2423f58::t_d89356b6a78e82 258
+  s_e21dbfc2423f58::t_f782bd24115c71 363-383
+  s_e21dbfc2423f58::t_94d05698f5f0bd 286-287
+apps/terminal/tests/unit/file-tree.test.tsx
+  s_e21dbfc2423f58::t_7ceaaf39bfdc1c 253-254
+  s_e21dbfc2423f58::t_7b37d624fc4cf9 223
+  s_e21dbfc2423f58::t_4a6a2e42f8abc6 127,132,140-145
+  s_e21dbfc2423f58::t_424eba16b58621 171-172
+  s_e21dbfc2423f58::t_9d8fd311ed46a8 149
+  s_e21dbfc2423f58::t_ee494a5df53b81 161
+  s_e21dbfc2423f58::t_d27dd1497f7c4d 146
+  s_e21dbfc2423f58::t_60c514b9010824 148
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "0b861aafa9aea8e07e71acb0e0523cf3a1a8cbf0",
+  "prompts": {},
+  "sessions": {
+    "s_e21dbfc2423f58": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "8f9905e0-b3c6-4b3d-be6c-7a887baf8d11",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
