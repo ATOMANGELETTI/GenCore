@@ -110,5 +110,50 @@
     "apps/terminal",
     "apps/explorer",
     "packages/ui-kit"
+  ],
+  "b95d468f-267d-4e93-8deb-daea2c31af95": [
+    "crates/gencore-plugin-fs"
+  ],
+  "9faba538-47c5-49a8-a91e-a7e16f93d316": [
+    "crates/gencore-plugin-fs"
+  ],
+  "86d03994-a42f-4484-ad64-978cbcb2ce74": [
+    "crates/gencore-plugin-fs"
+  ],
+  "f4175452-7ac7-4756-8c79-3e8257021a1c": [
+    "crates/gencore-plugin-fs"
+  ],
+  "48cbceb0-3969-4c77-91a6-ee28c6c2288d": [
+    "crates/gencore-plugin-fs"
+  ],
+  "49be72f7-056d-4765-9767-3d0730af74aa": [
+    "packages/ui-kit"
+  ],
+  "eb7e78b5-23ee-4ea8-a512-da392c92c232": [
+    "packages/ui-kit"
+  ],
+  "47acb52a-84b2-462f-b5bf-2f398d732c1a": [
+    "packages/ui-kit"
+  ],
+  "70c1b33d-2e46-4f5d-a90f-586653740d23": [
+    "apps/terminal"
+  ],
+  "4ed1d396-cc45-4008-9ab0-5f49d4498faa": [
+    "apps/terminal",
+    "crates/gencore-plugin-fs"
+  ],
+  "8a12aa3c-d7f6-4216-a01c-7a5dba3dec24": [
+    "apps/terminal"
+  ],
+  "37714214-a71d-40ee-86f0-f457811ae7b8": [
+    "apps/terminal"
+  ],
+  "8a5c071c-ddc4-4795-a6a2-af4d3e7df976": [
+    "apps/terminal"
+  ],
+  "91c89fa6-5148-4546-bb86-eed1202ee44e": [
+    "packages/ui-kit",
+    "apps/terminal",
+    "crates/gencore-plugin-fs"
   ]
 }

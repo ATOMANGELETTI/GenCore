@@ -124,6 +124,25 @@ Controller session. SDD + writing-plans. Work in place on `main` (running `tauri
 - Task 6 Verification: complete (working tree). turbo retry 11/11 (172 JS); first turbo Explorer heading timeout flake under parallel load; cargo test 16; clippy 0; biome 147 files clean. Whole-diff tauri + ui-kit Approved. Bugbot: no bugs. Security Review: no medium/high/critical.
 - Task 7 Superpowers hygiene: complete (working tree). Plan already at `docs/superpowers/plans/2026-08-16-ide-problems-security-quality.md`. Moved 29 loose SDD-root `task-*.md` / `review-*.diff` into `.superpowers/sdd/archive/bootstrap/`.
 
+## Feature: Terminal Files-tab file tree (2026-08-16)
+
+Controller session. SDD + writing-plans. Work in place on `main` (running `tauri:dev`). Commits allowed (user approved SDD). Implementers stage only task files.
+
+- Spec: `docs/superpowers/specs/2026-08-16-terminal-file-tree-design.md`
+- Plan: `docs/superpowers/plans/2026-08-16-terminal-file-tree.md`
+- Briefs: `.superpowers/sdd/file-tree/`
+- Task 1 list + list_drives: complete (commits 5da30d9..a2045f2, review clean). Minors: unused `ListDrivesError::Io`; `is_usable_mount` is public crate API; blocking I/O on async commands; symlink hidden/system uses followed metadata. Known limit: sysinfo 0.39 Windows omits optical/network volumes. Spec skip empty/not-ready: `total_space == 0`.
+- Task 2 create_file + create_dir: complete (commits a2045f2..49211c8, review clean). Minors: create_dir InvalidName/AlreadyExists untested; `final_path_component` dead `unwrap_or`.
+- Task 3 watch + unwatch: complete (commits 49211c8..ab2bb89, review clean). Minors: unused `UnwatchError::Io`; crate-root re-export of notify `EventKind`. Mutex poison still `.expect` (minor, not fixed).
+- Task 4 Input + icon-sm Button: complete (commits ab2bb89..47baa7b, review clean). Minors: Input tests omit focus-ring classes; icon-sm test omits `p-0`; no disabled/placeholder tokens.
+- Task 5 FileIcon catalog: complete (commits 47baa7b..334abd0, review clean). Minor: `font` fill `snow-4` is low-contrast on Snow Storm.
+- Task 6 Tree primitive: complete (commits 334abd0..56d1a72, review clean). Minors: no `scrollToIndex` on keyboard selection; tests don't prove windowing; 8px chevron hit target.
+- Task 7 ipc.fs + Isolation + capabilities: complete (commits 56d1a72..96c0eb4, review clean). Flattened Rust `path` args; Isolation listen/unlisten locked to `gencore-fs://entry-changed`. Minors: listen tests omit wrong-target case; double-read of `args.path`.
+- Task 8 File tree UI + SidePanel: complete (commits 96c0eb4..2dee359, review clean). Minors: create error may clip in 22px overflow-hidden rows; jsdom 100% tree height; disabled create tooltips don't hover; `system` rows not muted (spec dimmed both; task only required hidden); create draft prepended as first child.
+- Whole-branch review: Important fixes in `410aefa` (create errors visible; fs I/O on `spawn_blocking`). Re-review clean. Remaining minors deferred (optical/network via sysinfo, system-row dimming, Tree scrollToIndex, dead Io variants, Mutex expect, EventKind re-export, font snow-4, disabled tooltips, draft insert position, listen wrong-target test, last-row viewport clip).
+
+
+
 ## Follow-ups (not blocking)
 
 - `pnpm approve-builds` may be required before production `vite` / `tauri` build (esbuild)
