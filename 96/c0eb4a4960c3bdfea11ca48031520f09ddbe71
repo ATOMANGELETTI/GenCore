@@ -1,0 +1,49 @@
+crates/gencore-plugin-fs/src/modules/list/list_api.rs
+  s_6640fff814919a::t_7fc108ea5bfc01 56-57
+apps/terminal/isolation/isolation.hook.js
+  s_6640fff814919a::t_625f7985089c37 10,25-26,36-38
+  s_6640fff814919a::t_6822321e84b1db 136-211
+  s_6640fff814919a::t_7fef142ce146d1 228-237
+  s_6640fff814919a::t_6367e8d06b2ce3 286-293
+crates/gencore-plugin-fs/src/modules/create_dir/create_dir_api.rs
+  s_6640fff814919a::t_4092ab4ac0ea21 16-17
+crates/gencore-plugin-fs/tests/create_commands.rs
+  s_6640fff814919a::t_7800a425204ea1 7
+  s_6640fff814919a::t_68868d984e5092 68
+  s_6640fff814919a::t_4d398573568ea1 56,58
+  s_6640fff814919a::t_671af2f01da42d 99
+  s_6640fff814919a::t_2909961c4c7230 33,35-36,81,83-84
+crates/gencore-plugin-fs/src/modules/create_file/create_file_api.rs
+  s_6640fff814919a::t_64aa3e98ed4040 18-19
+crates/gencore-plugin-fs/tests/list_commands.rs
+  s_6640fff814919a::t_9ec3af8390c6f0 128
+  s_6640fff814919a::t_2909961c4c7230 64-65
+  s_6640fff814919a::t_c08b4f9cc53572 5
+  s_6640fff814919a::t_5daa7a64948fb6 119
+apps/terminal/tests/unit/isolation.hook.test.ts
+  s_6640fff814919a::t_5484a398f2447a 217-218
+  s_6640fff814919a::t_89650db36e6df7 328-397
+  s_6640fff814919a::t_eacc7040aaab8e 35-45
+apps/terminal/src-tauri/capabilities/main.json
+  s_6640fff814919a::t_0150be4d9a752e 18-19
+crates/gencore-plugin-fs/src/modules/unwatch/unwatch_api.rs
+  s_6640fff814919a::t_9019c83c7186ea 29,31
+crates/gencore-plugin-fs/src/modules/watch/watch_api.rs
+  s_6640fff814919a::t_9afe8ae19f9503 154-155,157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "96c0eb4a4960c3bdfea11ca48031520f09ddbe71",
+  "prompts": {},
+  "sessions": {
+    "s_6640fff814919a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4ed1d396-cc45-4008-9ab0-5f49d4498faa",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
