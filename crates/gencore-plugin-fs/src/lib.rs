@@ -9,7 +9,9 @@
 mod modules;
 
 pub use modules::list::{FsEntry, FsKind, ListArgs, ListError, ListResult, list};
-pub use modules::list_drives::{DriveEntry, DriveKind, ListDrivesError, list_drives};
+pub use modules::list_drives::{
+    DriveEntry, DriveKind, ListDrivesError, is_usable_mount, list_drives,
+};
 pub use modules::stat::{StatArgs, StatError, stat};
 pub use modules::watch::{WatchArgs, WatchError, watch};
 

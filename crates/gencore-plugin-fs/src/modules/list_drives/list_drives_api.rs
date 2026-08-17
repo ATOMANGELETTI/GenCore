@@ -35,6 +35,13 @@ pub struct DriveEntry {
     pub label: Option<String>,
 }
 
+/// Whether a sysinfo disk should appear in [`list_drives`].
+///
+/// Empty and not-ready volumes typically report `total_space == 0`.
+pub fn is_usable_mount(total_space: u64) -> bool {
+    total_space > 0
+}
+
 /// Lists ready Windows drive roots (`C:\`, `D:\`, …).
 #[tauri::command]
 pub async fn list_drives() -> Result<Vec<DriveEntry>, ListDrivesError> {
@@ -42,6 +49,9 @@ pub async fn list_drives() -> Result<Vec<DriveEntry>, ListDrivesError> {
     let mut drives = Vec::new();
 
     for disk in disks.list() {
+        if !is_usable_mount(disk.total_space()) {
+            continue;
+        }
         let Some((name, path)) = drive_root(disk.mount_point()) else {
             continue;
         };

@@ -2,7 +2,7 @@ use std::future::Future;
 use std::pin::pin;
 use std::task::{Context, Poll, Waker};
 
-use gencore_fs::{FsKind, ListArgs, ListError, list};
+use gencore_fs::{FsKind, ListArgs, ListError, is_usable_mount, list};
 
 /// Minimal executor matching `stub_commands.rs` for driving async commands.
 fn block_on<F: Future>(future: F) -> F::Output {
@@ -133,6 +133,18 @@ fn list_file_path_returns_not_a_directory() {
         path: file.to_string_lossy().into_owned(),
     }));
     assert!(matches!(result, Err(ListError::NotADirectory)));
+}
+
+#[test]
+fn is_usable_mount_skips_empty_total_space() {
+    assert!(
+        !is_usable_mount(0),
+        "empty/not-ready mounts have zero total space"
+    );
+    assert!(
+        is_usable_mount(1),
+        "any positive total space is a usable mount"
+    );
 }
 
 #[cfg(windows)]
