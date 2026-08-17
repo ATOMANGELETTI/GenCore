@@ -1,0 +1,40 @@
+apps/terminal/tests/setup.ts
+  s_bce43d08949d36::t_9e2252ee01004e 5-12
+apps/terminal/src/modules/context-menu/context-menu.clipboard.ts
+  s_bce43d08949d36::t_4f2550942952c5 6-8,13-15,20-32,56
+  s_bce43d08949d36::t_a793e352eb0fc2 57-58
+packages/ui-kit/src/primitives/context-menu/context-menu.component.tsx
+  s_bce43d08949d36::t_6f1e8b66282643 47-51
+  s_bce43d08949d36::t_9570113e348e1a 3
+  s_bce43d08949d36::t_70fe787a47813c 52-56,62
+packages/ui-kit/src/primitives/context-menu/context-menu.types.ts
+  s_bce43d08949d36::t_a122ec2a3d96d6 25-27
+apps/terminal/tests/unit/context-menu.clipboard.test.ts
+  s_bce43d08949d36::t_f6d72662609c45 34,40-43,45-53,65-86
+  s_bce43d08949d36::t_020c7a71c599c4 54-64
+  s_bce43d08949d36::t_905e8a71b0cdbc 15
+  s_bce43d08949d36::t_ea5914c9c299fa 44
+apps/terminal/tests/unit/context-menu.content.test.tsx
+  s_bce43d08949d36::t_18cbba32ca8bf2 25-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "cd535f780e6fb4e33926785f4bc58764a018f8e6",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_bce43d08949d36": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "0430ecfc-37b3-4b54-915a-018cd3fc20f2",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
