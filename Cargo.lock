@@ -1359,6 +1359,7 @@ name = "gencore-terminal"
 version = "0.1.0"
 dependencies = [
  "gencore-core",
+ "gencore-fs",
  "gencore-pty",
  "serde",
  "serde_json",

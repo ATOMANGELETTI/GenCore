@@ -11,7 +11,7 @@ Template Tauri 2 shell — not a working terminal emulator. The Files tab is a r
 - Capabilities grant the matching `gencore-fs:allow-*` plus `core:event:allow-listen` / `allow-unlisten`
 - Still no `stat`, `gencore-pty`, `core:default`, `opener:default`, `core:event:default`, or emit
 - Repo URL opens through `ipc.opener.ts` (`openRepoInBrowser`)
-- `gencore-pty` is registered in Rust. **Do not** grant its stub commands in capabilities until a real UI calls them
+- `gencore-fs` and `gencore-pty` are registered in Rust. Grant only the six Files-tab `gencore-fs` commands. **Do not** grant `gencore-pty` stubs until a real UI calls them
 - Override density only in `src/modules/app/app.theme.css`. Keep Nord tokens
 - Tests: `apps/terminal/tests/` (JS) and `apps/terminal/src-tauri/tests/` (Rust)
 - Release packaging is root `pnpm package:win64` (Windows x64 portable ZIP only)

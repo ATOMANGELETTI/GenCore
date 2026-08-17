@@ -1,8 +1,8 @@
 //! GenCore Terminal desktop shell.
 //!
-//! Registers the shared `gencore-core` (app metadata) and `gencore-pty`
-//! (session stub) plugins. The frontend is only granted `gencore-core`'s
-//! `get_app_info` command today; see `capabilities/main.json`.
+//! Registers `gencore-core` (app metadata), `gencore-pty` (session stub), and
+//! `gencore-fs` (Files-tab tree). Capabilities grant `get_app_info` and the
+//! six file-tree `gencore-fs` commands; pty stubs stay ungranted.
 
 mod modules;
 
@@ -13,6 +13,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(gencore_core::init())
         .plugin(gencore_pty::init())
+        .plugin(gencore_fs::init())
         .plugin(tauri_plugin_opener::init())
         .setup(setup)
         .run(tauri::generate_context!())

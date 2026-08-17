@@ -49,6 +49,8 @@ const capabilitySource = readFileSync(
   resolve(process.cwd(), "src-tauri/capabilities/main.json"),
   "utf8",
 );
+const cargoTomlSource = readFileSync(resolve(process.cwd(), "src-tauri/Cargo.toml"), "utf8");
+const libRsSource = readFileSync(resolve(process.cwd(), "src-tauri/src/lib.rs"), "utf8");
 const isolationHtml = readFileSync(resolve(process.cwd(), "isolation/index.html"), "utf8");
 
 type IsolationEnvelope = {
@@ -226,6 +228,13 @@ describe("terminal isolation hook", () => {
     for (const token of FORBIDDEN_TOKENS) {
       expect(permissionText).not.toContain(token);
     }
+  });
+
+  it("registers gencore-fs so capability grants resolve at build time", () => {
+    expect(cargoTomlSource).toContain(
+      'gencore-fs = { path = "../../../crates/gencore-plugin-fs" }',
+    );
+    expect(libRsSource).toContain("gencore_fs::init()");
   });
 
   it("allowlists the six gencore-fs commands used by the file tree and not stat", () => {
