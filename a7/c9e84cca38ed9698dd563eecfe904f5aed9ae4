@@ -1,0 +1,48 @@
+.changeset/tsconfig-es2022-target.md
+  s_ce5ffb28095129::t_51af46e3024721 1-4
+  s_ce5ffb28095129::t_1c3b3b45732b38 5
+packages/config-typescript/tsconfig.base.json
+  s_ce5ffb28095129::t_515ad5f4ddacda 4
+  s_ce5ffb28095129::t_dd5c12b284a82c 5
+packages/config-typescript/tsconfig.vite-app.json
+  s_ce5ffb28095129::t_1dcd341def4788 5
+apps/terminal/tests/unit/isolation.hook.test.ts
+  s_d0c302a78304dd::t_b3a16ac62cc48e 203
+.cursor/hooks/state/edited-files.json
+  s_d0c302a78304dd::t_57ead775b93939 113-119
+  s_d0c302a78304dd::t_058d9065ed5f16 120
+apps/terminal/isolation/index.html
+  s_d0c302a78304dd::t_a031d6f5b5c08c 5
+packages/config-typescript/tsconfig.react-library.json
+  s_ce5ffb28095129::t_72ae09ad6dbf6a 5
+apps/explorer/tests/unit/isolation.hook.test.ts
+  s_d0c302a78304dd::t_6d57e4503800d5 203
+apps/explorer/isolation/index.html
+  s_d0c302a78304dd::t_a0159e75fbabae 5
+packages/config-vite/tsconfig.json
+  s_ce5ffb28095129::t_d5fdff6ea7ce0d 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "a7c9e84cca38ed9698dd563eecfe904f5aed9ae4",
+  "prompts": {},
+  "sessions": {
+    "s_ce5ffb28095129": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "7fc06754-7d02-475b-b800-00ce5fb74232",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_d0c302a78304dd": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "5fa48768-6731-45a5-b0bb-28092906510b",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
