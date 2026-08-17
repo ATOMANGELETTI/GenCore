@@ -1,0 +1,22 @@
+apps/terminal/src/modules/context-menu/context-menu.clipboard.ts
+  s_b0fad4c616fa67::t_9c41bfed43fa5e 75-86
+apps/terminal/tests/unit/context-menu.clipboard.test.ts
+  s_b0fad4c616fa67::t_22e13bd9ffdaa3 172-194
+  s_b0fad4c616fa67::t_7b06b93e5de5d6 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "8af6de53fc04bcd71314523e579cda54c15a5bd3",
+  "prompts": {},
+  "sessions": {
+    "s_b0fad4c616fa67": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "ee100ad1-f3d5-45f9-97cc-a2f0737e3c76",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
