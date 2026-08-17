@@ -1,0 +1,27 @@
+AGENTS.md
+  s_02cd504f535dbb::t_03f41b3acdb75c 79
+scripts/strip-ai-commit-trailers.mjs
+  s_02cd504f535dbb::t_e616c6e7389a82 47-50,53-54
+.husky/commit-msg
+  s_02cd504f535dbb::t_0a31c346b61b65 1
+.cursorrules
+  s_02cd504f535dbb::t_50419b34ada90e 1
+.cursor/rules/no-ai-commit-attribution.mdc
+  s_02cd504f535dbb::t_c9319c3d75b06c 1-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "23d9e1c068345ef7de0ddad036c4088063c1bcbf",
+  "prompts": {},
+  "sessions": {
+    "s_02cd504f535dbb": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "5bd0ddad-b6ca-414b-b40a-c9757554d309",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
