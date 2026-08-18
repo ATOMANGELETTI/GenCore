@@ -143,6 +143,21 @@ Controller session. SDD + writing-plans. Work in place on `main` (running `tauri
 
 
 
+## Feature: Files-tab context menu + default C: expand (2026-08-17)
+
+Controller session. SDD + writing-plans. Work in place on `main` (running `tauri:dev`). Commits allowed (user approved SDD). Implementers stage only task files.
+
+- Spec: `docs/superpowers/specs/2026-08-17-file-tree-context-menu-design.md`
+- Plan: `docs/superpowers/plans/2026-08-17-file-tree-context-menu.md`
+- Briefs: `.superpowers/sdd/file-tree-context-menu/`
+- Model: implementers and task reviewers `cursor-grok-4.6-xhigh-fast` unless blocked; elevate only if needed.
+- Task 1 Tree row data-id: complete (commits a585402..58679eb, review clean). ⚠️ TDD/trailers not in diff package; controller confirmed RED `data-id` null then GREEN 16/16, commit body has no AI trailers.
+- Task 2 copyText: complete (commits 58679eb..8af6de5, review clean).
+- Task 3 FileTreeContextMenu: complete (commits 8af6de5..cb98178, review clean). Minor: only New File handler asserted (plan-mandated).
+- Task 4 Auto-expand C: + hook helpers: complete (commits cb98178..0b861aa, review clean). Minors: no cancelled check after expand; no missing-C: test; redundant Windows query.
+- Task 5 Wire menu + tests: complete (commits 0b861aa..2a21b3e, review clean). Minors: first-blur 0ms ignore for Radix focus-restore; redundant clipboard stubGlobal; create-draft/blank-selection untested.
+- Whole-branch review: complete (9f98ecd..2a21b3e). Code review Ready to merge: Yes. ui-kit-reviewer Approved. tauri-reviewer Approved. No Critical/Important. Controller verify: ui-kit tree 16/16, terminal file-tree+menu+clipboard 36/36.
+
 ## Follow-ups (not blocking)
 
 - `pnpm approve-builds` may be required before production `vite` / `tauri` build (esbuild)

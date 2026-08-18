@@ -155,5 +155,20 @@
     "packages/ui-kit",
     "apps/terminal",
     "crates/gencore-plugin-fs"
+  ],
+  "6b36a4b4-ce10-41f1-a220-46f24e633f4f": [
+    "packages/ui-kit"
+  ],
+  "ee100ad1-f3d5-45f9-97cc-a2f0737e3c76": [
+    "apps/terminal"
+  ],
+  "e95e6ef2-1275-4399-9eec-d2e45de70516": [
+    "apps/terminal"
+  ],
+  "8f9905e0-b3c6-4b3d-be6c-7a887baf8d11": [
+    "apps/terminal"
+  ],
+  "a5f3b67b-907a-4552-a814-53fc4f719fa1": [
+    "apps/terminal"
   ]
 }
