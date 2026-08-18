@@ -1,0 +1,20 @@
+docs/superpowers/specs/2026-08-17-side-panel-chrome-density-design.md
+  s_37eefb26140d21::t_94cf636d5cbc58 1-30,32-36,38-75
+  s_37eefb26140d21::t_f350a25cfc1fda 31,37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "a268de8b8991c81b98a7c1dd3363bcbe1ff068f3",
+  "prompts": {},
+  "sessions": {
+    "s_37eefb26140d21": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "080150bf-7fb1-4b29-b2d5-65395ecec224",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
