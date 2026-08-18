@@ -1,0 +1,23 @@
+.changeset/button-icon-xs.md
+  s_71c95c5cb11734::t_3765c97940cd4d 1-5
+packages/ui-kit/src/primitives/button/button.variants.ts
+  s_71c95c5cb11734::t_04486e1d2eb701 35
+packages/ui-kit/tests/primitives/button.test.tsx
+  s_71c95c5cb11734::t_5cf8963e599476 38-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "38da18d0bf5488c3296285d419d215f81ca90c9f",
+  "prompts": {},
+  "sessions": {
+    "s_71c95c5cb11734": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "069a53b2-602d-48f2-975c-9a244dceee84",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
