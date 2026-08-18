@@ -1,0 +1,183 @@
+<h2>How small should the four FILES actions be?</h2>
+<p class="subtitle">Header row stays 28px. Bottom tabs stay 24px. Only the New File / New Folder / Refresh / Collapse hit targets change.</p>
+
+<div class="cards">
+  <div class="card" data-choice="btn-24" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="gc-panel">
+        <div class="gc-toolbar">
+          <span class="gc-label">Files</span>
+          <div class="gc-actions">
+            <span class="gc-icon gc-icon-24">+</span>
+            <span class="gc-icon gc-icon-24">▣</span>
+            <span class="gc-icon gc-icon-24">↻</span>
+            <span class="gc-icon gc-icon-24">▤</span>
+          </div>
+        </div>
+        <div class="gc-tree">
+          <div class="gc-row"><span class="gc-chev">▾</span><span class="gc-drive"></span><span class="gc-name">C:</span></div>
+          <div class="gc-row gc-indent"><span class="gc-chev">▸</span><span class="gc-fold"></span><span class="gc-name">Users</span></div>
+          <div class="gc-row gc-indent gc-sel"><span class="gc-file gc-ts"></span><span class="gc-name">app.tsx</span></div>
+          <div class="gc-row"><span class="gc-chev">▸</span><span class="gc-drive"></span><span class="gc-name">D:</span></div>
+        </div>
+        <div class="gc-tabs">
+          <span class="gc-tab gc-on">📁</span>
+          <span class="gc-tab">🤖</span>
+          <span class="gc-tab">⚙</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — 24px buttons</h3>
+      <p>Same scale as the new tabs and statusbar. A little smaller, still easy to click. Recommended.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="btn-20" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="gc-panel">
+        <div class="gc-toolbar">
+          <span class="gc-label">Files</span>
+          <div class="gc-actions">
+            <span class="gc-icon gc-icon-20">+</span>
+            <span class="gc-icon gc-icon-20">▣</span>
+            <span class="gc-icon gc-icon-20">↻</span>
+            <span class="gc-icon gc-icon-20">▤</span>
+          </div>
+        </div>
+        <div class="gc-tree">
+          <div class="gc-row"><span class="gc-chev">▾</span><span class="gc-drive"></span><span class="gc-name">C:</span></div>
+          <div class="gc-row gc-indent"><span class="gc-chev">▸</span><span class="gc-fold"></span><span class="gc-name">Users</span></div>
+          <div class="gc-row gc-indent gc-sel"><span class="gc-file gc-ts"></span><span class="gc-name">app.tsx</span></div>
+          <div class="gc-row"><span class="gc-chev">▸</span><span class="gc-drive"></span><span class="gc-name">D:</span></div>
+        </div>
+        <div class="gc-tabs">
+          <span class="gc-tab gc-on">📁</span>
+          <span class="gc-tab">🤖</span>
+          <span class="gc-tab">⚙</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — 20px buttons</h3>
+      <p>More air in the 28px header. Tighter, a bit fiddlier to hit.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="btn-icons-only" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="gc-panel">
+        <div class="gc-toolbar">
+          <span class="gc-label">Files</span>
+          <div class="gc-actions">
+            <span class="gc-icon gc-icon-fill">+</span>
+            <span class="gc-icon gc-icon-fill">▣</span>
+            <span class="gc-icon gc-icon-fill">↻</span>
+            <span class="gc-icon gc-icon-fill">▤</span>
+          </div>
+        </div>
+        <div class="gc-tree">
+          <div class="gc-row"><span class="gc-chev">▾</span><span class="gc-drive"></span><span class="gc-name">C:</span></div>
+          <div class="gc-row gc-indent"><span class="gc-chev">▸</span><span class="gc-fold"></span><span class="gc-name">Users</span></div>
+          <div class="gc-row gc-indent gc-sel"><span class="gc-file gc-ts"></span><span class="gc-name">app.tsx</span></div>
+          <div class="gc-row"><span class="gc-chev">▸</span><span class="gc-drive"></span><span class="gc-name">D:</span></div>
+        </div>
+        <div class="gc-tabs">
+          <span class="gc-tab gc-on">📁</span>
+          <span class="gc-tab">🤖</span>
+          <span class="gc-tab">⚙</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — keep 28px, smaller glyphs</h3>
+      <p>Hover squares still fill the header. Least change; the bar still reads chunky.</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .gc-panel {
+    width: 220px;
+    height: 220px;
+    margin: 16px auto;
+    background: #2E3440;
+    border: 1px solid #3B4252;
+    color: #D8DEE9;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .gc-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 28px;
+    padding: 0 8px;
+    border-bottom: 1px solid #3B4252;
+    background: #2E3440;
+    flex-shrink: 0;
+  }
+  .gc-label {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #4C566A;
+    font-weight: 600;
+  }
+  .gc-actions { display: flex; gap: 1px; align-items: center; }
+  .gc-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #D8DEE9;
+    border-radius: 2px;
+    background: #3B4252;
+    opacity: 0.9;
+  }
+  .gc-icon-24 { width: 24px; height: 24px; font-size: 12px; }
+  .gc-icon-20 { width: 20px; height: 20px; font-size: 11px; }
+  .gc-icon-fill { width: 28px; height: 28px; font-size: 11px; background: transparent; opacity: 0.75; }
+  .gc-tree { flex: 1; padding: 4px 0; min-height: 0; }
+  .gc-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 22px;
+    padding: 0 8px;
+  }
+  .gc-indent { padding-left: 22px; }
+  .gc-sel { background: #3B4252; }
+  .gc-chev { color: #4C566A; width: 8px; }
+  .gc-drive, .gc-fold, .gc-file {
+    display: inline-block;
+    flex-shrink: 0;
+    border-radius: 1px;
+  }
+  .gc-drive { width: 12px; height: 10px; background: #5E81AC; }
+  .gc-fold { width: 12px; height: 10px; background: #EBCB8B; }
+  .gc-file { width: 10px; height: 12px; }
+  .gc-ts { background: #88C0D0; }
+  .gc-name { color: #ECEFF4; }
+  .gc-tabs {
+    display: flex;
+    height: 24px;
+    border-top: 1px solid #3B4252;
+    flex-shrink: 0;
+  }
+  .gc-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4C566A;
+    font-size: 12px;
+  }
+  .gc-tab.gc-on {
+    color: #88C0D0;
+    box-shadow: inset 0 2px 0 #88C0D0;
+    background: #3B4252;
+  }
+</style>

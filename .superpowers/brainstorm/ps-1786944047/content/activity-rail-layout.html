@@ -1,0 +1,260 @@
+<h2>Where should the tab icons sit?</h2>
+<p class="subtitle">Bottom strip is gone. No overflow chevron. Active tab keeps a square; hover draws the same square. Click the layout that matches “float to the left of the side panel.”</p>
+
+<div class="cards">
+  <div class="card" data-choice="column" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="gc-win">
+        <div class="gc-titlebar">
+          <span class="gc-dot gc-red"></span><span class="gc-dot gc-yel"></span><span class="gc-dot gc-grn"></span>
+          <span class="gc-title">Tauri Terminal Template</span>
+        </div>
+        <div class="gc-body">
+          <div class="gc-rail">
+            <span class="gc-ico gc-on" title="Files">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            </span>
+            <span class="gc-ico gc-hover" title="Assistant">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="8" width="14" height="10" rx="2"/><path d="M12 8V5M8 13h.01M16 13h.01"/></svg>
+            </span>
+            <span class="gc-ico" title="Settings">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4l1.4-1.4M17 7l1.4-1.4"/></svg>
+            </span>
+          </div>
+          <div class="gc-panel">
+            <div class="gc-toolbar"><span class="gc-label">Files</span></div>
+            <div class="gc-tree">
+              <div class="gc-row"><span class="gc-chev">▾</span><span class="gc-drive"></span><span class="gc-name">C:</span></div>
+              <div class="gc-row gc-indent"><span class="gc-chev">▸</span><span class="gc-fold"></span><span class="gc-name">Users</span></div>
+              <div class="gc-row gc-indent gc-sel"><span class="gc-file"></span><span class="gc-name">app.tsx</span></div>
+            </div>
+          </div>
+          <div class="gc-editor"></div>
+        </div>
+        <div class="gc-status"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Own column (recommended)</h3>
+      <p>Classic Cursor activity bar. Rail sits beside the panel, same chrome as the titlebar above it. File tree keeps its width; rail adds ~36px.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="carved" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="gc-win">
+        <div class="gc-titlebar">
+          <span class="gc-dot gc-red"></span><span class="gc-dot gc-yel"></span><span class="gc-dot gc-grn"></span>
+          <span class="gc-title">Tauri Terminal Template</span>
+        </div>
+        <div class="gc-body">
+          <div class="gc-aside gc-aside-carved">
+            <div class="gc-rail gc-rail-inner">
+              <span class="gc-ico gc-on">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              </span>
+              <span class="gc-ico gc-hover">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="8" width="14" height="10" rx="2"/><path d="M12 8V5M8 13h.01M16 13h.01"/></svg>
+              </span>
+              <span class="gc-ico">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4l1.4-1.4M17 7l1.4-1.4"/></svg>
+              </span>
+            </div>
+            <div class="gc-panel gc-panel-tight">
+              <div class="gc-toolbar"><span class="gc-label">Files</span></div>
+              <div class="gc-tree">
+                <div class="gc-row"><span class="gc-chev">▾</span><span class="gc-drive"></span><span class="gc-name">C:</span></div>
+                <div class="gc-row gc-indent"><span class="gc-chev">▸</span><span class="gc-fold"></span><span class="gc-name">Users</span></div>
+                <div class="gc-row gc-indent gc-sel"><span class="gc-file"></span><span class="gc-name">app.tsx</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="gc-editor"></div>
+        </div>
+        <div class="gc-status"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Carved from the panel</h3>
+      <p>Same total sidebar width as today (240px). Icons eat into the tree. No extra window width, but the file list gets tighter.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="overlay" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="gc-win">
+        <div class="gc-titlebar">
+          <span class="gc-dot gc-red"></span><span class="gc-dot gc-yel"></span><span class="gc-dot gc-grn"></span>
+          <span class="gc-title">Tauri Terminal Template</span>
+        </div>
+        <div class="gc-body">
+          <div class="gc-aside gc-aside-float">
+            <div class="gc-rail gc-rail-float">
+              <span class="gc-ico gc-on">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              </span>
+              <span class="gc-ico gc-hover">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="8" width="14" height="10" rx="2"/><path d="M12 8V5M8 13h.01M16 13h.01"/></svg>
+              </span>
+              <span class="gc-ico">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4l1.4-1.4M17 7l1.4-1.4"/></svg>
+              </span>
+            </div>
+            <div class="gc-panel">
+              <div class="gc-toolbar"><span class="gc-label">Files</span></div>
+              <div class="gc-tree gc-tree-under">
+                <div class="gc-row"><span class="gc-chev">▾</span><span class="gc-drive"></span><span class="gc-name">C:</span></div>
+                <div class="gc-row gc-indent"><span class="gc-chev">▸</span><span class="gc-fold"></span><span class="gc-name">Users</span></div>
+                <div class="gc-row gc-indent gc-sel"><span class="gc-file"></span><span class="gc-name">app.tsx</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="gc-editor"></div>
+        </div>
+        <div class="gc-status"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Overlay float</h3>
+      <p>Icons sit on top of the panel’s left edge. Total width unchanged, but the tree runs under the rail unless we add inner padding.</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .gc-win {
+    width: 280px;
+    height: 210px;
+    margin: 16px auto;
+    background: #2e3440;
+    border: 1px solid #434c5e;
+    color: #d8dee9;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 10px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .gc-titlebar {
+    height: 22px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 8px;
+    background: #3b4252;
+    border-bottom: 1px solid #434c5e;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .gc-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  .gc-red { background: #bf616a; }
+  .gc-yel { background: #ebcb8b; }
+  .gc-grn { background: #a3be8c; }
+  .gc-title {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: #d8dee9;
+    pointer-events: none;
+  }
+  .gc-body { display: flex; flex: 1; min-height: 0; }
+  .gc-status { height: 14px; background: #3b4252; border-top: 1px solid #434c5e; flex-shrink: 0; }
+  .gc-rail {
+    width: 28px;
+    background: #3b4252;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 0;
+    flex-shrink: 0;
+  }
+  .gc-rail-inner { width: 26px; }
+  .gc-aside { display: flex; width: 148px; flex-shrink: 0; background: #3b4252; }
+  .gc-aside-carved { width: 148px; }
+  .gc-aside-float { position: relative; width: 132px; }
+  .gc-rail-float {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 2;
+    background: transparent;
+  }
+  .gc-panel {
+    width: 120px;
+    background: #3b4252;
+    border-right: 1px solid #434c5e;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .gc-panel-tight { width: auto; flex: 1; }
+  .gc-toolbar {
+    height: 18px;
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    border-bottom: 1px solid #434c5e;
+    flex-shrink: 0;
+  }
+  .gc-label {
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #4c566a;
+    font-weight: 600;
+  }
+  .gc-tree { flex: 1; padding: 3px 0; }
+  .gc-tree-under { padding-left: 22px; }
+  .gc-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 14px;
+    padding: 0 6px;
+  }
+  .gc-indent { padding-left: 16px; }
+  .gc-sel { background: #434c5e; }
+  .gc-chev { color: #4c566a; width: 6px; }
+  .gc-drive, .gc-fold, .gc-file {
+    display: inline-block;
+    flex-shrink: 0;
+    border-radius: 1px;
+  }
+  .gc-drive { width: 8px; height: 7px; background: #5e81ac; }
+  .gc-fold { width: 8px; height: 7px; background: #ebcb8b; }
+  .gc-file { width: 7px; height: 8px; background: #88c0d0; }
+  .gc-name { color: #eceff4; white-space: nowrap; overflow: hidden; }
+  .gc-editor { flex: 1; background: #2e3440; min-width: 0; }
+  .gc-ico {
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #4c566a;
+    border-radius: 3px;
+    background: transparent;
+  }
+  .gc-ico svg {
+    width: 12px;
+    height: 12px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .gc-ico.gc-on {
+    color: #88c0d0;
+    background: #434c5e;
+  }
+  .gc-ico.gc-hover {
+    color: #d8dee9;
+    background: #434c5e;
+  }
+</style>

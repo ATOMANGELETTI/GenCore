@@ -69,7 +69,7 @@ Do not create commits or push unless the user explicitly asks. Conventional comm
 
 ## Learned User Preferences
 
-- For multi-agent orchestration, use Grok 4.6 extra high unless a stronger model is clearly required. Prefer Kimi K3 or GLM 5.2 when a different model is needed; elevate to Opus 5, Sonnet 5, or GPT 5.6 (sol/luna/terra) only when necessary. Pick the specialized agent best suited to each task.
+- For multi-agent orchestration, use Grok 4.6 extra high (Fast Mode) unless a stronger model is clearly required. Prefer Kimi K3 or GLM 5.2 when a different model is needed; elevate to Opus 5, Sonnet 5, or GPT 5.6 (sol/luna/terra) only when necessary. Pick the specialized agent best suited to each task.
 - Do not show the app version in the statusbar; it already appears in the titlebar. The titlebar version chip uses a Nord gilded hover and opens the GitHub repo in the system browser on click.
 - Reviewer skills (code-reviewer, security-reviewer, performance-reviewer) are read-only: propose a plan, ask which changes to apply, and do not edit unless asked.
 - Shared fonts belong in `@gencore/ui-kit` (`packages/ui-kit/src/assets/fonts/`) and may be used in the app shell (Terminess Nerd Font); do not copy font files into apps.
@@ -77,6 +77,8 @@ Do not create commits or push unless the user explicitly asks. Conventional comm
 - Shell and chrome UI text is not selectable; keep the content area copyable. The statusbar has no right-click context menu.
 - Do not bump major versions without asking first; use minor and patch only while apps stay on 0.x.
 - Never add Cursor or AI attribution to commits or PRs (`Co-authored-by: Cursor`, `Made-with: Cursor`, Copilot/ChatGPT/Claude trailers, or similar). Human co-authors are fine. The Husky `commit-msg` hook strips AI trailers if they still appear.
+- Keep Files-tab toolbar actions and the side-panel Files/Agent/Settings tabs compact; oversized chrome looks unprofessional.
+- Prefer `portable-pty` for the terminal PTY backend unless a clearly better option is identified.
 
 ## Learned Workspace Facts
 
@@ -84,4 +86,5 @@ Do not create commits or push unless the user explicitly asks. Conventional comm
 - The public GitHub repository is https://github.com/ATOMANGELETTI/GenCore.
 - `TAURI_DEV_HOST` HMR is unsupported; Vite live reload uses `devCsp.connect-src` localhost websockets only.
 - The project license is GPL-3.0-or-later.
+- The terminal left panel has Files, Agent, and Settings tabs; Agent is a planned tab that should interact with the terminal, file tree, settings, and the app.
 

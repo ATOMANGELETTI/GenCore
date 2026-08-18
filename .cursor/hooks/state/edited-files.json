@@ -170,5 +170,14 @@
   ],
   "a5f3b67b-907a-4552-a814-53fc4f719fa1": [
     "apps/terminal"
+  ],
+  "069a53b2-602d-48f2-975c-9a244dceee84": [
+    "packages/ui-kit"
+  ],
+  "96751da1-a71d-44b6-b849-5c190ca58f4d": [
+    "apps/terminal"
+  ],
+  "249a2669-84ba-4971-88d2-2adc891734dd": [
+    "apps/terminal"
   ]
 }

@@ -1,0 +1,185 @@
+<h2>How tall should the bottom tabs be?</h2>
+<p class="subtitle">FILES row stays 28px. Action buttons stay a bit smaller than today. Only the Files / Assistant / Settings strip changes.</p>
+
+<div class="cards">
+  <div class="card" data-choice="tabs-28" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="gc-panel">
+        <div class="gc-toolbar">
+          <span class="gc-label">Files</span>
+          <div class="gc-actions">
+            <span class="gc-icon">+</span>
+            <span class="gc-icon">▣</span>
+            <span class="gc-icon">↻</span>
+            <span class="gc-icon">▤</span>
+          </div>
+        </div>
+        <div class="gc-tree">
+          <div class="gc-row"><span class="gc-chev">▾</span><span class="gc-drive"></span><span class="gc-name">C:</span></div>
+          <div class="gc-row gc-indent"><span class="gc-chev">▸</span><span class="gc-fold"></span><span class="gc-name">Users</span></div>
+          <div class="gc-row gc-indent gc-sel"><span class="gc-file gc-ts"></span><span class="gc-name">app.tsx</span></div>
+          <div class="gc-row"><span class="gc-chev">▸</span><span class="gc-drive"></span><span class="gc-name">D:</span></div>
+        </div>
+        <div class="gc-tabs gc-tabs-28">
+          <span class="gc-tab gc-on">📁</span>
+          <span class="gc-tab">🤖</span>
+          <span class="gc-tab">⚙</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — 28px</h3>
+      <p>Match the FILES header and titlebar. Subtle step down from the current 32px.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="tabs-24" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="gc-panel">
+        <div class="gc-toolbar">
+          <span class="gc-label">Files</span>
+          <div class="gc-actions">
+            <span class="gc-icon">+</span>
+            <span class="gc-icon">▣</span>
+            <span class="gc-icon">↻</span>
+            <span class="gc-icon">▤</span>
+          </div>
+        </div>
+        <div class="gc-tree">
+          <div class="gc-row"><span class="gc-chev">▾</span><span class="gc-drive"></span><span class="gc-name">C:</span></div>
+          <div class="gc-row gc-indent"><span class="gc-chev">▸</span><span class="gc-fold"></span><span class="gc-name">Users</span></div>
+          <div class="gc-row gc-indent gc-sel"><span class="gc-file gc-ts"></span><span class="gc-name">app.tsx</span></div>
+          <div class="gc-row"><span class="gc-chev">▸</span><span class="gc-drive"></span><span class="gc-name">D:</span></div>
+        </div>
+        <div class="gc-tabs gc-tabs-24">
+          <span class="gc-tab gc-on">📁</span>
+          <span class="gc-tab">🤖</span>
+          <span class="gc-tab">⚙</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — 24px</h3>
+      <p>Match the statusbar sitting under it. Most even compact chrome. Recommended.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="tabs-32-icons" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="gc-panel">
+        <div class="gc-toolbar">
+          <span class="gc-label">Files</span>
+          <div class="gc-actions">
+            <span class="gc-icon">+</span>
+            <span class="gc-icon">▣</span>
+            <span class="gc-icon">↻</span>
+            <span class="gc-icon">▤</span>
+          </div>
+        </div>
+        <div class="gc-tree">
+          <div class="gc-row"><span class="gc-chev">▾</span><span class="gc-drive"></span><span class="gc-name">C:</span></div>
+          <div class="gc-row gc-indent"><span class="gc-chev">▸</span><span class="gc-fold"></span><span class="gc-name">Users</span></div>
+          <div class="gc-row gc-indent gc-sel"><span class="gc-file gc-ts"></span><span class="gc-name">app.tsx</span></div>
+          <div class="gc-row"><span class="gc-chev">▸</span><span class="gc-drive"></span><span class="gc-name">D:</span></div>
+        </div>
+        <div class="gc-tabs gc-tabs-32">
+          <span class="gc-tab gc-on gc-tab-smicon">📁</span>
+          <span class="gc-tab gc-tab-smicon">🤖</span>
+          <span class="gc-tab gc-tab-smicon">⚙</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — keep 32px</h3>
+      <p>Same tall strip as today. Only the glyphs shrink. Least change, still reads chunky next to the 24px statusbar.</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .gc-panel {
+    width: 220px;
+    height: 220px;
+    margin: 16px auto;
+    background: #2E3440;
+    border: 1px solid #3B4252;
+    color: #D8DEE9;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .gc-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 28px;
+    padding: 0 8px;
+    border-bottom: 1px solid #3B4252;
+    background: #2E3440;
+    flex-shrink: 0;
+  }
+  .gc-label {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #4C566A;
+    font-weight: 600;
+  }
+  .gc-actions { display: flex; gap: 1px; }
+  .gc-icon {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #D8DEE9;
+    border-radius: 2px;
+    opacity: 0.8;
+    font-size: 11px;
+  }
+  .gc-tree { flex: 1; padding: 4px 0; min-height: 0; }
+  .gc-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 22px;
+    padding: 0 8px;
+  }
+  .gc-indent { padding-left: 22px; }
+  .gc-sel { background: #3B4252; }
+  .gc-chev { color: #4C566A; width: 8px; }
+  .gc-drive, .gc-fold, .gc-file {
+    display: inline-block;
+    flex-shrink: 0;
+    border-radius: 1px;
+  }
+  .gc-drive { width: 12px; height: 10px; background: #5E81AC; }
+  .gc-fold { width: 12px; height: 10px; background: #EBCB8B; }
+  .gc-file { width: 10px; height: 12px; }
+  .gc-ts { background: #88C0D0; }
+  .gc-name { color: #ECEFF4; }
+  .gc-tabs {
+    display: flex;
+    border-top: 1px solid #3B4252;
+    flex-shrink: 0;
+  }
+  .gc-tabs-32 { height: 32px; }
+  .gc-tabs-28 { height: 28px; }
+  .gc-tabs-24 { height: 24px; }
+  .gc-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4C566A;
+    font-size: 13px;
+  }
+  .gc-tab-smicon { font-size: 11px; }
+  .gc-tab.gc-on {
+    color: #88C0D0;
+    box-shadow: inset 0 2px 0 #88C0D0;
+    background: #3B4252;
+  }
+</style>

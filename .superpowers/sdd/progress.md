@@ -158,6 +158,20 @@ Controller session. SDD + writing-plans. Work in place on `main` (running `tauri
 - Task 5 Wire menu + tests: complete (commits 0b861aa..2a21b3e, review clean). Minors: first-blur 0ms ignore for Radix focus-restore; redundant clipboard stubGlobal; create-draft/blank-selection untested.
 - Whole-branch review: complete (9f98ecd..2a21b3e). Code review Ready to merge: Yes. ui-kit-reviewer Approved. tauri-reviewer Approved. No Critical/Important. Controller verify: ui-kit tree 16/16, terminal file-tree+menu+clipboard 36/36.
 
+## Feature: Side-panel chrome density (2026-08-17)
+
+Controller session. SDD + writing-plans. Work in place on current branch. Commits allowed (user approved SDD). Implementers stage only task files.
+
+- Spec: `docs/superpowers/specs/2026-08-17-side-panel-chrome-density-design.md`
+- Plan: `docs/superpowers/plans/2026-08-17-side-panel-chrome-density.md`
+- Briefs: `.superpowers/sdd/side-panel-chrome-density/`
+- Model: implementers and task reviewers `cursor-grok-4.6-xhigh-fast` unless blocked; elevate only if needed.
+- Task 1: complete (commits a268de8..38da18d, review clean). Minor: commit subject added “for compact design”. ⚠️ TDD/trailers/worktree resolved by controller (RED size-5 missing then GREEN 6/6; no AI trailer; still on main).
+- Task 2: complete (commits 38da18d..e931416, review clean). ⚠️ TDD/trailers resolved (RED size-7 vs size-5 then GREEN 16/16; no AI trailer).
+- Task 3: complete (commits e931416..a976887, review clean). Minor: `size-3` checks never ran red (test stopped at `h-6`). ⚠️ TDD/trailers resolved (RED h-8 vs h-6 then GREEN 25/25; no AI trailer).
+- Whole-branch review: complete (a268de8..a976887). Code review Ready to merge: Yes. ui-kit-reviewer Approved. No Critical/Important. Minors left: commit subject extra words; Task 3 TDD stopped at h-6; icon-xs test does not lock SVG size-3; stretched tabs keep size-8+h-full (CSS order currently wins).
+- Controller verify: ui-kit button 6/6, terminal file-tree+side-panel 25/25.
+
 ## Follow-ups (not blocking)
 
 - `pnpm approve-builds` may be required before production `vite` / `tauri` build (esbuild)
