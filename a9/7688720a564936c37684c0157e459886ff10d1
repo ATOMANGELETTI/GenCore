@@ -1,0 +1,22 @@
+apps/terminal/tests/unit/side-panel.test.tsx
+  s_29233f6632cfab::t_30d520b6b20eb3 91-93,97-101
+apps/terminal/src/modules/side-panel/side-panel.component.tsx
+  s_29233f6632cfab::t_a113890489ea94 174
+  s_29233f6632cfab::t_73fe4b96b3e948 208
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "a97688720a564936c37684c0157e459886ff10d1",
+  "prompts": {},
+  "sessions": {
+    "s_29233f6632cfab": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "249a2669-84ba-4971-88d2-2adc891734dd",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
