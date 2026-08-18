@@ -1,0 +1,21 @@
+apps/terminal/src/modules/file-tree/file-tree.component.tsx
+  s_b388db7267b306::t_033c6ad0e5dfe8 216,232,248,266
+apps/terminal/tests/unit/file-tree.test.tsx
+  s_b388db7267b306::t_a0bc4039f31d2b 125-127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "e93141627095ffd9f6e53fdf1500f6eacae064c1",
+  "prompts": {},
+  "sessions": {
+    "s_b388db7267b306": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "96751da1-a71d-44b6-b849-5c190ca58f4d",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
