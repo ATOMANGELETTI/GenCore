@@ -213,7 +213,7 @@ export function FileTree() {
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="icon-sm"
+                  size="icon-xs"
                   aria-label="New File"
                   disabled={createDisabled}
                   onClick={() => {
@@ -229,7 +229,7 @@ export function FileTree() {
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="icon-sm"
+                  size="icon-xs"
                   aria-label="New Folder"
                   disabled={createDisabled}
                   onClick={() => {
@@ -245,7 +245,7 @@ export function FileTree() {
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="icon-sm"
+                  size="icon-xs"
                   aria-label="Refresh"
                   onClick={() => {
                     void tree.refresh();
@@ -263,7 +263,7 @@ export function FileTree() {
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="icon-sm"
+                  size="icon-xs"
                   aria-label="Collapse All"
                   onClick={tree.collapseAll}
                 >

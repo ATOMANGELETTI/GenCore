@@ -122,6 +122,9 @@ describe("FileTree", () => {
     expect(screen.getByRole("button", { name: "New Folder" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Refresh" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Collapse All" })).toBeInTheDocument();
+    for (const name of ["New File", "New Folder", "Refresh", "Collapse All"] as const) {
+      expect(screen.getByRole("button", { name })).toHaveClass("size-5");
+    }
   });
 
   it("shows mocked C:\\ and D:\\ drive names", async () => {
