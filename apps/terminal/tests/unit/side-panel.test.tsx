@@ -88,10 +88,17 @@ describe("SidePanel", () => {
   it("exposes a Side panel tablist with Files, Assistant, and Settings tabs", async () => {
     await renderSidePanel();
 
-    expect(screen.getByRole("tablist", { name: "Side panel" })).toBeInTheDocument();
+    const tablist = screen.getByRole("tablist", { name: "Side panel" });
+    expect(tablist).toBeInTheDocument();
+    expect(tablist).toHaveClass("h-6");
     expect(screen.getByRole("tab", { name: "Files" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Assistant" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Settings" })).toBeInTheDocument();
+
+    for (const name of ["Files", "Assistant", "Settings"] as const) {
+      const icon = screen.getByRole("tab", { name }).querySelector("svg");
+      expect(icon).toHaveClass("size-3");
+    }
   });
 
   it("renders an aside complementary root with the side-panel slot", async () => {

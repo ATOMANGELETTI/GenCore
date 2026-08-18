@@ -171,7 +171,7 @@ export function SidePanel() {
         <div
           role="tablist"
           aria-label="Side panel"
-          className="flex h-8 shrink-0 border-t border-border"
+          className="flex h-6 shrink-0 border-t border-border"
         >
           {TABS.map((tab) => {
             const isSelected = selected === tab.id;
@@ -205,7 +205,7 @@ export function SidePanel() {
                       onTabKeyDown(event, tab.id);
                     }}
                   >
-                    <Icon aria-hidden="true" />
+                    <Icon aria-hidden="true" className="size-3" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>{tab.label}</TooltipContent>
