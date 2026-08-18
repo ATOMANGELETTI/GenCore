@@ -32,6 +32,7 @@ export const buttonVariants = cva(
         lg: "h-9 px-4 text-sm",
         icon: "size-8 p-0",
         "icon-sm": "size-7 p-0",
+        "icon-xs": "size-5 p-0 [&_svg:not([class*='size-'])]:size-3",
       },
     },
     defaultVariants: {

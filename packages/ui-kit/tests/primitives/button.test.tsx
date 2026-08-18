@@ -35,6 +35,12 @@ describe("Button", () => {
     expect(screen.getByRole("button")).toHaveClass("size-7");
   });
 
+  it("applies the icon-xs size classes", () => {
+    render(<Button size="icon-xs">Go</Button>);
+
+    expect(screen.getByRole("button")).toHaveClass("size-5");
+  });
+
   it("renders the child element when asChild is set", () => {
     render(
       <Button asChild>
