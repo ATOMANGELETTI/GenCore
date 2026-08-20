@@ -6,7 +6,7 @@ import type { AppInfo } from "../ipc/ipc.types";
 import { closeWindow, minimizeWindow, toggleMaximizeWindow } from "../ipc/ipc.window";
 
 /** Exact template copy; the version segment comes from `get_app_info`. */
-export const APP_TITLE = "Tauri Explorer Template";
+const APP_TITLE = "Tauri Explorer Template";
 
 export function App() {
   const [appInfo, setAppInfo] = React.useState<AppInfo | null>(null);

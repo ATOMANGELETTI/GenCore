@@ -1,0 +1,17 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": [
+        ".cursor/hooks/{session-start,before-shell-execution,after-file-edit,before-submit-prompt,stop}.mjs",
+        "scripts/*.mjs"
+      ]
+    },
+    "apps/terminal": {
+      "entry": ["isolation/isolation.hook.js"]
+    },
+    "apps/explorer": {
+      "entry": ["isolation/isolation.hook.js"]
+    }
+  }
+}
