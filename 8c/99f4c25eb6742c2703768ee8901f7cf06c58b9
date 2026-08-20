@@ -1,0 +1,30 @@
+knip.json
+  s_0a0ab0f16bfa60::t_59e84b42338c29 8,10-13
+  s_0a0ab0f16bfa60::t_487b1a3a9a2b3c 1-7,9,14-17
+apps/explorer/src/modules/app/app.component.tsx
+  s_0de63da2a79a71::t_d4a8131c0d0bdd 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "8c99f4c25eb6742c2703768ee8901f7cf06c58b9",
+  "prompts": {},
+  "sessions": {
+    "s_0a0ab0f16bfa60": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "da141b55-45f5-4816-8f30-aeaefabfd696",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_0de63da2a79a71": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "93acdc69-86be-43ac-8733-bd9619e1ffaf",
+        "model": "default"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
