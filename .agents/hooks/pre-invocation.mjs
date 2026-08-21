@@ -59,20 +59,30 @@ export async function handlePreInvocation(input, deps = {}) {
 
   const transcript = await readTranscript(input?.transcriptPath);
   const lastUser = lastUserTextFromTranscript(transcript);
-  if (looksLikeSecret(lastUser)) {
-    injectSteps.push({ ephemeralMessage: SECRET_WARNING });
-  }
-
   const conversationId = input?.conversationId ?? "unknown";
   const state = await readState();
-  const current = state[conversationId];
+  const current = state[conversationId] ?? {};
+  let next = { ...current };
+  let dirty = false;
+
+  if (looksLikeSecret(lastUser) && lastUser !== current.secretWarnedText) {
+    injectSteps.push({ ephemeralMessage: SECRET_WARNING });
+    next = { ...next, secretWarnedText: lastUser };
+    dirty = true;
+  }
+
   if (current?.members?.length && current.testReminderSent !== true) {
     const reminder = testReminderMessage(current.members);
     if (reminder) {
       injectSteps.push({ ephemeralMessage: reminder });
-      state[conversationId] = { ...current, testReminderSent: true };
-      await writeState(state);
+      next = { ...next, testReminderSent: true };
+      dirty = true;
     }
+  }
+
+  if (dirty) {
+    state[conversationId] = next;
+    await writeState(state);
   }
 
   return injectSteps.length > 0 ? { injectSteps } : {};

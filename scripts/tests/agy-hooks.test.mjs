@@ -48,12 +48,14 @@ test("handlePreInvocation injects repo map once, secret warning, and one test re
 
   const second = await handlePreInvocation(
     { invocationNum: 1, conversationId: "conv", transcriptPath: "t.jsonl" },
-    {
-      ...deps,
-      readTranscript: async () => "",
-    },
+    deps,
   );
   assert.deepEqual(second, {});
+  assert.equal(
+    JSON.stringify(second).includes(SECRET_WARNING),
+    false,
+    "same transcript must not inject SECRET_WARNING again",
+  );
 });
 
 test("handlePostToolUse records workspace members from TargetFile", async () => {

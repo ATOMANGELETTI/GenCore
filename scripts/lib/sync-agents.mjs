@@ -22,15 +22,24 @@ export function GENERATED_HEADER(sourceRel) {
  * @returns {string}
  */
 export function rewriteAgyBody(body) {
-  return body
-    .replace(
-      /7\. Add the app's dev port to `\.cursor\/environment\.json` `ports` if it needs cloud\n {3}preview \(coordinate with the controller — this file is shared\)\.\n/,
-      "7. Do not register the app port in `.cursor/environment.json` — that file is Cursor-only.\n",
-    )
-    .replace(
-      "- No shadow MCP servers: do not add `.cursor/mcp.json`, `.mcp.json`, or any ad-hoc",
-      "- No shadow MCP servers: do not add `.cursor/mcp.json`, `.agents/mcp_config.json`, `.mcp.json`, or any ad-hoc",
-    );
+  const withEnv = body.replace(
+    /^(\d+)\.\s+[^\n]*\.cursor\/environment\.json[^\n]*(?:\n[ \t-].*)*/gm,
+    "$1. Do not register the app port in `.cursor/environment.json` — that file is Cursor-only.",
+  );
+  const withExactMcp = withEnv.replace(
+    "- No shadow MCP servers: do not add `.cursor/mcp.json`, `.mcp.json`, or any ad-hoc",
+    "- No shadow MCP servers: do not add `.cursor/mcp.json`, `.agents/mcp_config.json`, `.mcp.json`, or any ad-hoc",
+  );
+  return withExactMcp.replace(/^.*\.mcp\.json.*$/gm, (line) => {
+    if (line.includes(".agents/mcp_config.json")) return line;
+    if (line.includes("`.cursor/mcp.json`")) {
+      return line.replace("`.cursor/mcp.json`", "`.cursor/mcp.json`, `.agents/mcp_config.json`");
+    }
+    if (line.includes("`.mcp.json`")) {
+      return line.replace("`.mcp.json`", "`.agents/mcp_config.json`, `.mcp.json`");
+    }
+    return line.replace(".mcp.json", ".agents/mcp_config.json, .mcp.json");
+  });
 }
 
 /**

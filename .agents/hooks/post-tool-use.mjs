@@ -43,6 +43,7 @@ export async function handlePostToolUse(input, deps = {}) {
   const members = new Set(current.members ?? []);
   members.add(member);
   state[conversationId] = {
+    ...current,
     members: Array.from(members),
     testReminderSent: false,
   };

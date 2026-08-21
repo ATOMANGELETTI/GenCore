@@ -63,13 +63,21 @@ export function workspaceMember(filePath) {
   return `${match[1]}/${match[2]}`;
 }
 
+const CRATE_PACKAGE_BY_FOLDER = {
+  "gencore-plugin-pty": "gencore-pty",
+  "gencore-plugin-fs": "gencore-fs"
+};
+
 /**
  * @param {string} member
  * @returns {string | null}
  */
 export function testCommandFor(member) {
   const [root, name] = member.split("/");
-  if (root === "crates") return `cargo test -p ${name}`;
+  if (root === "crates") {
+    const crateName = CRATE_PACKAGE_BY_FOLDER[name] ?? name;
+    return `cargo test -p ${crateName}`;
+  }
   if (root === "apps") return `pnpm --filter @gencore/${name} test`;
   if (root === "packages") return `pnpm --filter @gencore/${name} test`;
   return null;

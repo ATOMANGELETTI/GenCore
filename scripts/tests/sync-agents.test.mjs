@@ -114,15 +114,22 @@ test("convertRule throws when the output exceeds MAX_RULE_CHARS", () => {
 
 test("rewriteAgyBody replaces Cursor-only environment.json and MCP paths", () => {
   const skill = rewriteAgyBody(
-    "7. Add the app's dev port to `.cursor/environment.json` `ports` if it needs cloud\n   preview (coordinate with the controller — this file is shared).\n",
+    "7. Add the app's dev port to `.cursor/environment.json` `ports` if it needs cloud\n-  preview (coordinate with the controller - this file is shared).\n",
   );
   assert.match(skill, /Cursor-only/);
   assert.doesNotMatch(skill, /cloud preview/);
+  assert.doesNotMatch(skill, /this file is shared/);
 
   const rule = rewriteAgyBody(
     "- No shadow MCP servers: do not add `.cursor/mcp.json`, `.mcp.json`, or any ad-hoc\n",
   );
   assert.match(rule, /\.agents\/mcp_config\.json/);
+
+  const already = rewriteAgyBody(rule);
+  assert.equal(already.match(/\.agents\/mcp_config\.json/g)?.length, 1);
+
+  const listed = rewriteAgyBody("Team MCP only; never add `.mcp.json` locally.\n");
+  assert.match(listed, /\.agents\/mcp_config\.json/);
 });
 
 test("convertSkill keeps name and description and drops Cursor paths field from output frontmatter", () => {
