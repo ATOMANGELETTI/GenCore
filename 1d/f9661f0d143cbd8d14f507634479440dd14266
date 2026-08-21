@@ -1,0 +1,67 @@
+crates/gencore-plugin-pty/tests/session_commands.rs
+  s_0384d1f79c8d94::t_654f2465c81b65 11-12
+  s_a173fcc437235f::t_6af6145a09c54d 43-59
+  s_a173fcc437235f::t_6b08a41a5fde7e 1-10,13-42,60-111,117-122
+  s_a173fcc437235f::t_22655ab12f4b0f 112-116
+crates/gencore-plugin-pty/src/modules/io/io_error.rs
+  s_a173fcc437235f::t_af4f0c79f00fa3 6-11
+crates/gencore-plugin-pty/src/modules/session/session_error.rs
+  s_a173fcc437235f::t_806ab3c3f3c372 6-20
+crates/gencore-plugin-pty/src/modules/io/mod.rs
+  s_a173fcc437235f::t_3da58628a2b080 4
+crates/gencore-plugin-pty/src/lib.rs
+  s_a173fcc437235f::t_461830af099165 38-42
+  s_0384d1f79c8d94::t_654f2465c81b65 12-14
+  s_a173fcc437235f::t_f2b5ad20638973 1,3-5,9-11,15-17,20,33-37,43-44
+crates/gencore-plugin-pty/src/modules/session/session_map.rs
+  s_0384d1f79c8d94::t_654f2465c81b65 148
+  s_a173fcc437235f::t_8e3bf81c459eda 3
+  s_a173fcc437235f::t_6912f24f57da6d 125,134-142
+  s_a173fcc437235f::t_0f9940ddfe75f5 1-2,4-99,116-124,126-133,143-147,149-169,171-173,175-178,180-185,187-203,205-206
+  s_a173fcc437235f::t_72214508ad2dcc 100-115
+  s_a173fcc437235f::t_580e790d9e2fa7 170,174,179,186,204
+crates/gencore-plugin-pty/src/modules/resize/resize_error.rs
+  s_a173fcc437235f::t_7442ff4b97ad87 6-11
+crates/gencore-plugin-pty/src/modules/resize/resize_api.rs
+  s_a173fcc437235f::t_d680024afcb04a 1-3,5,8,23-42,44-53
+crates/gencore-plugin-pty/src/modules/session/mod.rs
+  s_a173fcc437235f::t_e8bfd6e4dfe287 3-4,6,8-12
+crates/gencore-plugin-pty/src/modules/session/session_api.rs
+  s_0384d1f79c8d94::t_654f2465c81b65 7
+  s_a173fcc437235f::t_44fb60f3fa5f71 1-4,17-29,40,42-64,69-76
+crates/gencore-plugin-pty/src/modules/resize/mod.rs
+  s_a173fcc437235f::t_1627f29712c3bb 4
+crates/gencore-plugin-pty/tests/stub_commands.rs
+  s_a173fcc437235f::t_3280d7527a5415 1,4-7,11-22,26-29,33-40,45-47
+crates/gencore-plugin-pty/Cargo.toml
+  s_a173fcc437235f::t_f8a3d2600a890e 8
+  s_a173fcc437235f::t_8271ab6bc408a4 15-17
+crates/gencore-plugin-pty/src/modules/io/io_api.rs
+  s_a173fcc437235f::t_bb3dbaa1cb4f78 1-3,5,8,20-34,37-44
+Cargo.lock
+  s_a173fcc437235f::t_8c7b6b967ebf57 263-268,497-502,884-889,952,1069-1079,1379-1380,1386,2153-2158,2349-2360,2898-2918,3407-3417,3460-3475,5253-5261
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "1df9661f0d143cbd8d14f507634479440dd14266",
+  "prompts": {},
+  "sessions": {
+    "s_0384d1f79c8d94": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "86bd186a-7f47-4efa-8e4a-86efbbf0229d",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_a173fcc437235f": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "713bc828-0055-4fa7-91c1-3e6f789c4b60",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
