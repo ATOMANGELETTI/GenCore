@@ -1,0 +1,40 @@
+.agents/hooks/pre-invocation.mjs
+  s_fa0867ce67381c::t_56598daf8e845e 62-68,70-71,78-79,83-85
+  s_68894414575cf5::t_a1000958237bd8 86-87
+scripts/tests/hook-policy.test.mjs
+  s_fa0867ce67381c::t_e12d69d5ff8f6b 32-33
+.cursor/hooks/policy.mjs
+  s_fa0867ce67381c::t_17210fd37eb988 66-70,77-80
+scripts/lib/sync-agents.mjs
+  s_fa0867ce67381c::t_cf977daa9fe906 25-42
+scripts/tests/agy-hooks.test.mjs
+  s_fa0867ce67381c::t_6ee9219fa21d27 51,54-58
+scripts/tests/sync-agents.test.mjs
+  s_fa0867ce67381c::t_bf4abc73b77cdd 117,121,127-132
+.agents/hooks/post-tool-use.mjs
+  s_fa0867ce67381c::t_399c37ce4f8739 46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "587f9de13ac34b8cbb95ddb00de2d1977da34683",
+  "prompts": {},
+  "sessions": {
+    "s_68894414575cf5": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "cbc3098f-c211-4e12-9e87-91a07eb92ca4",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_fa0867ce67381c": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "eb231d7b-5809-473c-a258-43bdc3230063",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
