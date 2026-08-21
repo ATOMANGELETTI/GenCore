@@ -1,0 +1,29 @@
+.agents/hooks/stop.mjs
+  s_e20fec808a85be::t_40b76e4a851d5b 1-26
+.agents/hooks/pre-tool-use.mjs
+  s_e20fec808a85be::t_95af8defa0e6d7 1-37
+.agents/hooks/pre-invocation.mjs
+  s_e20fec808a85be::t_74fcb2eb7e18c0 1-90
+.agents/hooks.json
+  s_e20fec808a85be::t_dc3426e17efea8 1-45
+scripts/tests/agy-hooks.test.mjs
+  s_e20fec808a85be::t_52c2cb88b61ae1 1-80
+.agents/hooks/post-tool-use.mjs
+  s_e20fec808a85be::t_c858cfd08517d9 1-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "3377fb65989d0f7c4feb65513acb0fd2791001f8",
+  "prompts": {},
+  "sessions": {
+    "s_e20fec808a85be": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "d33793c2-7587-445e-936b-70793b036e19",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
