@@ -69,7 +69,7 @@ Do not create commits or push unless the user explicitly asks. Conventional comm
 
 ## Learned User Preferences
 
-- For multi-agent orchestration, use Grok 4.6 extra high (Fast Mode) unless a stronger model is clearly required. Prefer Kimi K3 or GLM 5.2 when a different model is needed; elevate to Opus 5, Sonnet 5, or GPT 5.6 (sol/luna/terra) only when necessary. Pick the specialized agent best suited to each task.
+- For Superpowers and multi-agent Task dispatches, default to Grok 4.6 extra high (Fast Mode). Prefer Kimi K3, GLM 5.2, and other cheap enabled models when a different cheap model is needed. Elevate to Sonnet 5 or Opus 5 when planning or orchestration decides a stronger model is needed, or when a cheaper subagent is stuck / cannot finish. Always pass `model` explicitly; never inherit. GPT 5.6 is allowed if enabled but is not a default. Pick the specialized agent best suited to each task.
 - Do not show the app version in the statusbar; it already appears in the titlebar. The titlebar version chip uses a Nord gilded hover and opens the GitHub repo in the system browser on click.
 - Reviewer skills (code-reviewer, security-reviewer, performance-reviewer) are read-only: propose a plan, ask which changes to apply, and do not edit unless asked.
 - Shared fonts belong in `@gencore/ui-kit` (`packages/ui-kit/src/assets/fonts/`) and may be used in the app shell (Terminess Nerd Font); do not copy font files into apps.
@@ -87,4 +87,5 @@ Do not create commits or push unless the user explicitly asks. Conventional comm
 - `TAURI_DEV_HOST` HMR is unsupported; Vite live reload uses `devCsp.connect-src` localhost websockets only.
 - The project license is GPL-3.0-or-later.
 - The terminal left panel has Files, Agent, and Settings tabs; Agent is a planned tab that should interact with the terminal, file tree, settings, and the app.
+- Tauri plugin builds cache absolute permission-file paths under `target/`; after relocating the repo, run `cargo clean` before `tauri:dev`.
 

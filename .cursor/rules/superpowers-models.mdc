@@ -1,0 +1,58 @@
+---
+description: Superpowers and Task subagent model selection — prefer cheap models
+alwaysApply: true
+---
+
+# Superpowers model selection
+
+When Superpowers (SDD, parallel agents, reviews) or the Task tool
+dispatches a subagent, **always set `model` explicitly**. Never omit it
+and never use `inherit` — that silently uses the parent session model,
+often an expensive flagship.
+
+This rule does not change the chat model picked in the Cursor UI. It
+only binds Superpowers / Task dispatches.
+
+## Default
+
+Use **Grok 4.6 extra high (Fast Mode)** (`cursor-grok-4.6-xhigh-fast`)
+for implementers, reviewers, explore, general-purpose, and specialized
+reviewers (`tauri-reviewer`, `ui-kit-reviewer`).
+
+## Cheap alternatives
+
+If a different model is needed, prefer cheaper enabled options, in this
+order:
+
+1. Kimi K3 (`kimi-k3-max`)
+2. GLM 5.2 (`glm-5.2-high`)
+3. Other cheap enabled models (Composer 2.5 Fast, Gemini 3.7 Flash, …)
+
+Any enabled Cursor model is allowed. This is a preference order, not a
+ban list. GPT 5.6 (sol/luna/terra) is allowed if enabled, but is not a
+default.
+
+## When to elevate
+
+Pick the model during **planning and orchestration**, before dispatch.
+Choose the cheapest model that can do that task. Do not start on
+flagship by default.
+
+Use **Sonnet 5** (`claude-sonnet-5-thinking-high`) first, then **Opus 5**
+(`claude-opus-5-thinking-high`) when either:
+
+1. Planning or orchestration decides Grok / Kimi / GLM are not enough
+   (architecture, high-risk security, subtle concurrency, multi-crate
+   design).
+2. A cheaper subagent gets stuck or cannot finish — re-dispatch on a
+   more capable expensive model. Do not retry the same cheap model with
+   the same prompt.
+
+Prefer Sonnet 5 over Opus 5 when either would do.
+
+## Reviews
+
+Superpowers’ “final review = most capable” default does **not** apply.
+Whole-branch review, Bugbot, and Security Review stay on Grok unless
+planning classified the review as needing a flagship model, or a cheaper
+reviewer got stuck. Do not spend Opus on a mechanical spec check.
