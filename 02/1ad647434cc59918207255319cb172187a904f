@@ -1,0 +1,38 @@
+apps/terminal/src/modules/terminal/terminal.component.tsx
+  s_89356648bd0149::t_126595e21b7de2 16,19
+  s_89356648bd0149::t_ecb31641ae40c8 328
+  s_89356648bd0149::t_d8f7c0e07bcc8a 249,254,262-265,270-272
+apps/terminal/src/modules/terminal/terminal.hook.ts
+  s_89356648bd0149::t_1bcfcaf7eb7b07 27-30
+  s_89356648bd0149::t_2767d98a691c46 3,15-16
+  s_89356648bd0149::t_bc77644537b04b 100-104,110-233
+  s_89356648bd0149::t_7e2f3df49de339 105-109
+  s_89356648bd0149::t_1a4b5588c5e22e 17,99,362
+  s_89356648bd0149::t_691b37c5be5a41 260-261,273-275,283-287,296-350,352,354,356-361,363-367,370,376,400-402,412,420,424,427,430,432,443,445,448-466,476,483,486,488,496,502,506,509,514-515,549-557,559-574,576-578,618-654,676-682,706-710,713,716,722,751,766
+apps/terminal/src/modules/terminal/terminal.xterm.ts
+  s_89356648bd0149::t_1f2d0a66175ba9 52-65
+apps/terminal/tests/unit/terminal.hook.test.ts
+  s_89356648bd0149::t_519ff5c3bf2d1b 59,61-127
+  s_89356648bd0149::t_6d85ac48635a4e 2-9
+  s_89356648bd0149::t_1a4b5588c5e22e 60
+  s_89356648bd0149::t_46151420805322 10-19
+apps/terminal/src/modules/terminal/terminal.types.ts
+  s_89356648bd0149::t_1c5da71af94a1e 61
+  s_89356648bd0149::t_d00fc969e6c3fd 5-23,31-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "021ad647434cc59918207255319cb172187a904f",
+  "prompts": {},
+  "sessions": {
+    "s_89356648bd0149": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "65cebe3d-d7fa-49cb-ae38-602f77318696",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
