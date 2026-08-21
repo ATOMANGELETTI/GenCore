@@ -1,0 +1,21 @@
+packages/ui-kit/tests/primitives/badge/badge.test.tsx
+  s_801c23f99dd32a::t_16c68614da70ad 1-17
+packages/ui-kit/src/primitives/badge/badge.variants.ts
+  s_801c23f99dd32a::t_00d56942e0433c 20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "6c6f63d5a440816be0e74015c9eeddd862ba6008",
+  "prompts": {},
+  "sessions": {
+    "s_801c23f99dd32a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e12881f1-66bb-4f1a-8868-a1c2e3dd28f2",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
