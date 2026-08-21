@@ -1,0 +1,29 @@
+apps/terminal/tests/unit/terminal.hook.test.ts
+  s_f07362e0a74a00::t_5b37881731a827 129-143
+  s_f07362e0a74a00::t_421737da9ec9eb 4
+apps/terminal/src/modules/terminal/terminal.hook.ts
+  s_f07362e0a74a00::t_e7986ac9d5319f 674-681
+  s_f07362e0a74a00::t_ae46c663ef6ec3 175-178
+  s_f07362e0a74a00::t_ca0a95019df5a9 356
+  s_f07362e0a74a00::t_506b28c63da5fb 315,317,319-326
+  s_f07362e0a74a00::t_8b6c8c0f7acc85 456
+  s_f07362e0a74a00::t_54becfa40a2379 490
+  s_f07362e0a74a00::t_63cfa9769aebf6 514
+  s_f07362e0a74a00::t_79b996a0323153 280-281,314,316,353-355,364,446,453,487,511,532,541,543,671-673
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "126c7d45f7580ea7fb8d08834487e2328a1dab8a",
+  "prompts": {},
+  "sessions": {
+    "s_f07362e0a74a00": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "a2d5f9d9-b377-4090-9473-7818f91c1b73",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
