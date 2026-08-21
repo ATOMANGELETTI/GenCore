@@ -1,0 +1,26 @@
+.changeset/terminess-nerd-font-mono.md
+  s_d2780de37f8bee::t_3288a1d77966cc 1-5
+packages/ui-kit/src/styles/fonts.css
+  s_d2780de37f8bee::t_e0c7e1793ad036 32-47
+  s_d2780de37f8bee::t_df8542fd59912a 48
+packages/ui-kit/src/assets/fonts/nerdfonts/terminus/TerminessNerdFontMono-Bold.ttf
+  s_d2780de37f8bee::t_837c0f184bb13d 1-3
+packages/ui-kit/src/assets/fonts/nerdfonts/terminus/TerminessNerdFontMono-Regular.ttf
+  s_d2780de37f8bee::t_8575b3bfdefc9b 1-3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "66c15318b59148243d239347923fdfa55d77417a",
+  "prompts": {},
+  "sessions": {
+    "s_d2780de37f8bee": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "8b18ea52-bc56-49c9-8d11-057457843a5e",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
