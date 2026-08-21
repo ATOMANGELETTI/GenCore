@@ -215,6 +215,13 @@ Controller session. SDD + writing-plans. Work in place on `main`. Commits allowe
 - Task 1: complete (commits fc4f2d9..90e194b, review clean)
 - Task 2: complete (commits 90e194b..941b575, review clean). Minor: dual import/re-export of parseFrontmatter in sync-agents.mjs.
 - Task 3: complete (commits 941b575..7008ad2, review clean). Minors: skills walk assumes directories; orphan delete leaves empty dirs; test tmpdirs not removed.
+- Task 4: complete (commits 951a882..a996e92, review clean). Unrelated commits landed on main around this task.
+- Task 5: complete (commits 66c1531..3377fb6, review clean). Minors: cwd-relative state path; CLI stdin/fail-open untested; duplicated isMain.
+- Task 6: complete (commits c29ad07..739bca4, review clean). Minor: test:scripts glob vs directory form (Windows Node).
+- Whole-branch review: With fixes (plugin crate `-p` names, one-shot secret warning, brittle rewriteAgyBody). Fix commit 587f9de; re-review Ready to merge: Yes. Minor: PostToolUse does not assert secretWarnedText survives a write.
+- Controller verify after fix: `pnpm test:scripts` 21/21; `pnpm sync:agents --check` clean.
+- Task 4: complete (commits 951a882..a996e92, review clean). Unrelated commits 951a882 and df42786 landed on main around this task; do not include them in task diffs.
+- Task 5: complete (commits 66c1531..3377fb6, review clean). Minors: cwd-relative state path; CLI stdin/fail-open untested; duplicated isMain.
 
 ## Feature: Terminal Config tab (2026-08-20)
 
@@ -225,6 +232,9 @@ Controller session. SDD + writing-plans. Work in place on `main` (running `tauri
 - Briefs: `.superpowers/sdd/`
 - Model: implementers and task reviewers `cursor-grok-4.6-xhigh-fast` unless blocked; elevate only if needed.
 - BASE before Task 1: `951a8820e1c1babd55aade0ed3f09042d487d3db`
+- Task 1: complete (net files `951a882..c29ad07`, review clean). Implementation scooped into `df42786` plus shim commit `c29ad07`. Minors: jsdom `_localStorage` restore is test-only; `DEFAULT_CONFIG` is a shared mutable object. Task 2 tests must restore jsdom `localStorage` (Node 26 shadows it).
+- Task 2: complete (commit `ec77ca5`, review clean). JSX in `config.hook.ts` became `React.createElement` (Vite). Minors: `useConfig` throw untested; unlisten assignment race vs StrictMode; ConfigProvider describe does not reset IPC mocks.
+- Task 3: complete (commit `d4b0d2b`, review clean). Reviewer subagent timed out; controller gated from `review-ec77ca5..d4b0d2b.diff`. Minor: radiogroup keyboard untested.
 
 ## Feature: Terminal window xterm + PTY (2026-08-20)
 
@@ -235,8 +245,8 @@ Controller session. SDD + writing-plans. Work in place on `main` (running `tauri
 - Briefs: `.superpowers/sdd/terminal-window/`
 - Model: implementers and task reviewers `cursor-grok-4.6-xhigh-fast` unless blocked; elevate only if needed.
 - BASE before Task 1: `951a8820e1c1babd55aade0ed3f09042d487d3db`
-
-## Follow-ups (not blocking)
+- Task 1: complete (commits 66c1531, review clean). Minors: Mono test landed in mixed parent `df42786`; biome wrapped Regular `src` line. Do not amend `df42786`.
+- Task 2: complete (commits 1e04f52, review clean). Minors: load does not cap an oversized existing file; `save_pinned_tabs` later flattened to `json: String` in `2e5bed3` (mixed commit). Task 4 Isolation must reconstruct `{ json }`.
 
 - `pnpm approve-builds` may be required before production `vite` / `tauri` build (esbuild)
 - Fill CODEOWNERS / GitHub handles when the remote exists

@@ -210,5 +210,23 @@
   ],
   "8b18ea52-bc56-49c9-8d11-057457843a5e": [
     "packages/ui-kit"
+  ],
+  "5ab842ca-6c65-4fc1-953b-aed2dad6b39b": [
+    "apps/terminal"
+  ],
+  "d258f2f6-3ca3-4ee6-aa88-387aa4bfe5bd": [
+    "apps/terminal"
+  ],
+  "b2b08776-3769-4aee-825d-d5d8d35d8f6f": [
+    "crates/gencore-core"
+  ],
+  "97dc0f18-1664-4e47-a322-6038d42b7e48": [
+    "apps/terminal"
+  ],
+  "713bc828-0055-4fa7-91c1-3e6f789c4b60": [
+    "crates/gencore-plugin-pty"
+  ],
+  "9f043334-8293-4e9c-84cd-8e9e0c82b559": [
+    "apps/terminal"
   ]
 }

@@ -13,7 +13,7 @@ pub const PINNED_TABS_JSON_MAX_BYTES: usize = 8 * 1024 * 1024;
 /// JSON returned when the pinned-tabs file does not exist yet.
 pub const DEFAULT_PINNED_TABS_JSON: &str = "{\"version\":1,\"activeId\":null,\"tabs\":[]}";
 
-/// Arguments for [`save_pinned_tabs`].
+/// Pinned-tabs JSON payload (`{ json }`). Kept for `deny_unknown_fields` tests.
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SavePinnedTabsArgs {
@@ -62,11 +62,11 @@ pub async fn load_pinned_tabs<R: Runtime>(app: AppHandle<R>) -> Result<String, C
 #[tauri::command]
 pub async fn save_pinned_tabs<R: Runtime>(
     app: AppHandle<R>,
-    args: SavePinnedTabsArgs,
+    json: String,
 ) -> Result<(), CoreError> {
     let dir = app
         .path()
         .app_data_dir()
         .map_err(|_| PinnedStoreError::AppDataDir)?;
-    Ok(write_pinned_tabs_file(&pinned_tabs_path(&dir), &args.json)?)
+    Ok(write_pinned_tabs_file(&pinned_tabs_path(&dir), &json)?)
 }
