@@ -1,0 +1,29 @@
+apps/terminal/src/modules/config/config.hook.ts
+  s_441dc4fa3a4d7b::t_174dd11c400842 1-84
+apps/terminal/tests/unit/config.hook.test.tsx
+  s_82c3c45da76e62::t_a4f7c9d3030a9f 1-156
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "ec77ca5daefdfd0667684a3d5c8966f66d0a120b",
+  "prompts": {},
+  "sessions": {
+    "s_441dc4fa3a4d7b": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "5ab842ca-6c65-4fc1-953b-aed2dad6b39b",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_82c3c45da76e62": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "9eae708d-05cb-436d-88ec-cc331c014bc4",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
