@@ -1,0 +1,69 @@
+.agents/rules/release.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-22
+.agents/rules/no-ai-commit-attribution.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-28
+.agents/rules/architecture.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-33
+.agents/skills/add-ui-primitive/SKILL.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-35
+.agents/agents/ui-kit-reviewer/agent.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-36
+.agents/rules/tauri-rust.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-26
+.agents/workflows/new-module.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-22
+.agents/skills/tauri-capability/SKILL.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-35
+.agents/workflows/new-changeset.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-20
+package.json
+  s_3569d1995728f9::t_14a5471e6b7c6f 19-20
+.agents/rules/modular-naming.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-34
+.agents/workflows/check-workspace.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-22
+scripts/sync-agents.mjs
+  s_3569d1995728f9::t_fc31f0ee0ac73d 1-16
+.agents/skills/add-crate-module/SKILL.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-35
+scripts/lib/sync-agents.mjs
+  s_3569d1995728f9::t_6ece84440f2527 3-4
+  s_3569d1995728f9::t_b4d06cf1f28432 135-308
+.agents/rules/react-ui-kit.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-28
+.agents/rules/security.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-44
+.agents/rules/superpowers.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-30
+.agents/agents/monorepo-debugger/agent.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-41
+.agents/rules/testing.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-22
+.agents/rules/versions.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-22
+.agents/skills/add-app/SKILL.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-44
+.agents/agents/tauri-reviewer/agent.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-37
+.agents/skills/cut-changeset/SKILL.md
+  s_3569d1995728f9::t_e1e39b640cd3b3 1-39
+scripts/tests/sync-agents.test.mjs
+  s_3569d1995728f9::t_e948cad8fd91a9 197-283
+  s_3569d1995728f9::t_b09b3ddca281f6 2-4,7,14,16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "7008ad22599ffb958bb2f2570b299dcb8fe4d9bd",
+  "prompts": {},
+  "sessions": {
+    "s_3569d1995728f9": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "34022b6d-3c30-4f83-a679-4b09af3c725e",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
