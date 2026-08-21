@@ -13,10 +13,10 @@ import {
 import { Pin, Plus, X } from "lucide-react";
 import * as React from "react";
 import { TabContextMenu } from "../context-menu/context-menu.terminal";
-import { autoTitle, clampPtyDim, useTerminalSession } from "./terminal.hook";
+import { autoTitle, clampPtyDim, seamLine, useTerminalSession } from "./terminal.hook";
 import { nordXtermTheme } from "./terminal.theme";
 import type { TerminalTab } from "./terminal.types";
-import { createXterm, type XtermHost } from "./terminal.xterm";
+import { createXterm, restoreSerializedBuffer, type XtermHost } from "./terminal.xterm";
 
 export function TerminalView() {
   const session = useTerminalSession();
@@ -246,10 +246,12 @@ function TerminalHostPane({
   const themeRef = React.useRef(theme);
   const onRegisterRef = React.useRef(onRegister);
   const activeRef = React.useRef(active);
+  const restoreRef = React.useRef(tab.restore);
   sessionRef.current = session;
   themeRef.current = theme;
   onRegisterRef.current = onRegister;
   activeRef.current = active;
+  restoreRef.current = tab.restore;
 
   React.useEffect(() => {
     const node = nodeRef.current;
@@ -257,10 +259,17 @@ function TerminalHostPane({
       return;
     }
     const host = createXterm(node, themeRef.current);
+    const restore = restoreRef.current;
+    if (restore) {
+      restoreSerializedBuffer(host.terminal, restore.scrollback, seamLine(restore.cols));
+    }
     onRegisterRef.current(tab.id, host);
     const unreg = sessionRef.current.registerWriter(tab.id, (data) => {
       host.terminal.write(data);
     });
+    const unregSerialize = sessionRef.current.registerSerializer(tab.id, () =>
+      host.serialize.serialize(),
+    );
     const dataSub = host.terminal.onData((data) => {
       sessionRef.current.onTerminalInput(tab.id, data);
     });
@@ -316,6 +325,7 @@ function TerminalHostPane({
     });
     return () => {
       unreg();
+      unregSerialize();
       dataSub.dispose();
       onRegisterRef.current(tab.id, null);
       host.dispose();

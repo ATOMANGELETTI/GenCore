@@ -1,5 +1,6 @@
 import { type ThemeName, useTheme } from "@gencore/ui-kit";
 import * as React from "react";
+import { loadPinnedTabs, savePinnedTabs } from "../ipc/ipc.pinned";
 import {
   closePty,
   openPty,
@@ -11,6 +12,9 @@ import {
 import type { OpenPtyArgs } from "../ipc/ipc.types";
 import { scanOsc7 } from "./terminal.osc7";
 import type {
+  PinnedTabRecord,
+  PinnedTabSource,
+  PinnedTabsFile,
   ShellName,
   TerminalClipboardApi,
   TerminalSessionApi,
@@ -20,6 +24,10 @@ import type {
 const DEFAULT_COLS = 80;
 const DEFAULT_ROWS = 24;
 const DEFAULT_SHELL: ShellName = "pwsh";
+export const MAX_PINNED_TABS = 16;
+export const MAX_SCROLLBACK_BYTES = 256 * 1024;
+export const SAVE_DEBOUNCE_MS = 2000;
+const SEAM_MAX_COLS = 80;
 
 export function clampPtyDim(value: number): number {
   if (!Number.isFinite(value)) {
@@ -88,8 +96,141 @@ export function nextActiveId(
   return remaining[Math.min(index, remaining.length - 1)]?.id ?? remaining[0]?.id ?? null;
 }
 
-/** Persistence is Task 6. */
-export async function savePinned(): Promise<void> {}
+export function capScrollback(scrollback: string, maxBytes = MAX_SCROLLBACK_BYTES): string {
+  const encoded = new TextEncoder().encode(scrollback);
+  if (encoded.byteLength <= maxBytes) {
+    return scrollback;
+  }
+  let start = encoded.byteLength - maxBytes;
+  while (start < encoded.byteLength) {
+    const byte = encoded[start];
+    if (byte === undefined || (byte & 0b1100_0000) !== 0b1000_0000) {
+      break;
+    }
+    start += 1;
+  }
+  return new TextDecoder("utf-8").decode(encoded.subarray(start));
+}
+
+export function seamLine(cols: number): string {
+  if (!Number.isFinite(cols)) {
+    return "";
+  }
+  const width = Math.max(0, Math.min(SEAM_MAX_COLS, Math.floor(cols)));
+  return "─".repeat(width);
+}
+
+export function toPinnedFile(
+  tabs: readonly PinnedTabSource[],
+  activeId: string | null,
+): PinnedTabsFile {
+  const pinned = tabs.filter((tab) => tab.pinned).slice(0, MAX_PINNED_TABS);
+  const pinnedIds = new Set(pinned.map((tab) => tab.id));
+  return {
+    version: 1,
+    activeId: activeId !== null && pinnedIds.has(activeId) ? activeId : null,
+    tabs: pinned.map((tab) => ({
+      id: tab.id,
+      name: tab.name,
+      cwd: tab.cwd,
+      scrollback: capScrollback(tab.scrollback),
+      cols: tab.cols,
+      rows: tab.rows,
+    })),
+  };
+}
+
+function parsePinnedRecord(value: unknown): PinnedTabRecord | null {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+  const rec = value as Record<string, unknown>;
+  if (typeof rec.id !== "string" || rec.id.length === 0) {
+    return null;
+  }
+  if (rec.name !== null && rec.name !== undefined && typeof rec.name !== "string") {
+    return null;
+  }
+  if (rec.cwd !== null && rec.cwd !== undefined && typeof rec.cwd !== "string") {
+    return null;
+  }
+  if (typeof rec.scrollback !== "string") {
+    return null;
+  }
+  const cols = typeof rec.cols === "number" ? rec.cols : Number(rec.cols);
+  const rows = typeof rec.rows === "number" ? rec.rows : Number(rec.rows);
+  if (!Number.isFinite(cols) || !Number.isFinite(rows)) {
+    return null;
+  }
+  return {
+    id: rec.id,
+    name: typeof rec.name === "string" ? rec.name : null,
+    cwd: typeof rec.cwd === "string" ? rec.cwd : null,
+    scrollback: rec.scrollback,
+    cols: clampPtyDim(cols),
+    rows: clampPtyDim(rows),
+  };
+}
+
+export function fromPinnedFile(value: unknown): PinnedTabsFile | null {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+  const rec = value as Record<string, unknown>;
+  if (rec.version !== 1) {
+    return null;
+  }
+  if (!Array.isArray(rec.tabs)) {
+    return null;
+  }
+  const tabs: PinnedTabRecord[] = [];
+  for (const item of rec.tabs) {
+    const parsed = parsePinnedRecord(item);
+    if (parsed) {
+      tabs.push(parsed);
+    }
+    if (tabs.length >= MAX_PINNED_TABS) {
+      break;
+    }
+  }
+  return {
+    version: 1,
+    activeId: typeof rec.activeId === "string" ? rec.activeId : null,
+    tabs,
+  };
+}
+
+function isInvalidCwd(error: unknown): boolean {
+  if (typeof error === "string") {
+    return error.includes("invalid working directory") || error.includes("InvalidCwd");
+  }
+  if (error instanceof Error) {
+    return (
+      error.message.includes("invalid working directory") || error.message.includes("InvalidCwd")
+    );
+  }
+  try {
+    return JSON.stringify(error).includes("invalid working directory");
+  } catch {
+    return false;
+  }
+}
+
+function recordToTab(record: PinnedTabRecord): TerminalTab {
+  return {
+    id: record.id,
+    name: record.name,
+    pinned: true,
+    cwd: record.cwd,
+    sessionId: null,
+    status: "live",
+    restore: {
+      scrollback: record.scrollback,
+      cols: record.cols,
+      rows: record.rows,
+    },
+  };
+}
 
 function createEmptyTab(): TerminalTab {
   return {
@@ -116,8 +257,8 @@ function buildOpenArgs(
 
 export function TerminalProvider({ children }: { children: React.ReactNode }) {
   const { theme } = useTheme();
-  const [tabs, setTabs] = React.useState<TerminalTab[]>(() => [createEmptyTab()]);
-  const [activeId, setActiveId] = React.useState(() => tabs[0]?.id ?? "");
+  const [tabs, setTabs] = React.useState<TerminalTab[]>([]);
+  const [activeId, setActiveId] = React.useState("");
   const [cols, setCols] = React.useState(DEFAULT_COLS);
   const [rows, setRows] = React.useState(DEFAULT_ROWS);
 
@@ -129,6 +270,9 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
   const queuesRef = React.useRef(new Map<string, Uint8Array[]>());
   const clipboardRef = React.useRef<TerminalClipboardApi>(NOOP_CLIPBOARD);
   const spawnGenRef = React.useRef(new Map<string, number>());
+  const serializersRef = React.useRef(new Map<string, () => string>());
+  const scrollbackCacheRef = React.useRef(new Map<string, string>());
+  const saveTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   tabsRef.current = tabs;
   activeIdRef.current = activeId;
@@ -136,7 +280,11 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
   sizeRef.current = { cols, rows };
 
   const updateTab = React.useCallback((id: string, patch: Partial<TerminalTab>) => {
-    setTabs((current) => current.map((tab) => (tab.id === id ? { ...tab, ...patch } : tab)));
+    setTabs((current) => {
+      const next = current.map((tab) => (tab.id === id ? { ...tab, ...patch } : tab));
+      tabsRef.current = next;
+      return next;
+    });
   }, []);
 
   const bumpSpawn = React.useCallback((id: string): number => {
@@ -145,23 +293,87 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
     return next;
   }, []);
 
+  const readScrollback = React.useCallback((tab: TerminalTab): string => {
+    try {
+      const serialized = serializersRef.current.get(tab.id)?.();
+      if (typeof serialized === "string") {
+        return serialized;
+      }
+    } catch {
+      // Terminal may already be disposed.
+    }
+    return scrollbackCacheRef.current.get(tab.id) ?? tab.restore?.scrollback ?? "";
+  }, []);
+
+  const flushSave = React.useCallback(async () => {
+    if (saveTimerRef.current !== null) {
+      clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+    }
+    const { cols: nextCols, rows: nextRows } = sizeRef.current;
+    const sources: PinnedTabSource[] = tabsRef.current.map((tab) => ({
+      id: tab.id,
+      name: tab.name,
+      pinned: tab.pinned,
+      cwd: tab.cwd,
+      scrollback: readScrollback(tab),
+      cols: nextCols,
+      rows: nextRows,
+    }));
+    const file = toPinnedFile(sources, activeIdRef.current || null);
+    for (const record of file.tabs) {
+      scrollbackCacheRef.current.set(record.id, record.scrollback);
+    }
+    try {
+      await savePinnedTabs(JSON.stringify(file));
+    } catch {
+      // Best-effort persist; Isolation/IPC may be unavailable in tests.
+    }
+  }, [readScrollback]);
+
+  const scheduleSave = React.useCallback(() => {
+    if (saveTimerRef.current !== null) {
+      clearTimeout(saveTimerRef.current);
+    }
+    saveTimerRef.current = setTimeout(() => {
+      saveTimerRef.current = null;
+      void flushSave();
+    }, SAVE_DEBOUNCE_MS);
+  }, [flushSave]);
+
+  const dropTabRuntime = React.useCallback((id: string) => {
+    writersRef.current.delete(id);
+    queuesRef.current.delete(id);
+    serializersRef.current.delete(id);
+    scrollbackCacheRef.current.delete(id);
+  }, []);
+
   const spawnSession = React.useCallback(
-    async (tabId: string, cwd?: string | null) => {
+    async (tabId: string, cwd?: string | null, size?: { cols: number; rows: number }) => {
       const generation = bumpSpawn(tabId);
-      const { cols: nextCols, rows: nextRows } = sizeRef.current;
+      const { cols: nextCols, rows: nextRows } = size ?? sizeRef.current;
       try {
-        const { session_id } = await openPty(
-          buildOpenArgs(nextCols, nextRows, themeRef.current, cwd),
-        );
+        let sessionId: string;
+        try {
+          const opened = await openPty(buildOpenArgs(nextCols, nextRows, themeRef.current, cwd));
+          sessionId = opened.session_id;
+        } catch (error) {
+          if (cwd && isInvalidCwd(error)) {
+            const opened = await openPty(buildOpenArgs(nextCols, nextRows, themeRef.current, null));
+            sessionId = opened.session_id;
+          } else {
+            throw error;
+          }
+        }
         if (spawnGenRef.current.get(tabId) !== generation) {
           try {
-            await closePty(session_id);
+            await closePty(sessionId);
           } catch {
             // Replaced or closed while opening.
           }
           return;
         }
-        updateTab(tabId, { sessionId: session_id, status: "live" });
+        updateTab(tabId, { sessionId, status: "live" });
       } catch {
         if (spawnGenRef.current.get(tabId) !== generation) {
           return;
@@ -185,7 +397,9 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
 
   const newTab = React.useCallback(() => {
     const tab = createEmptyTab();
-    setTabs((current) => [...current, tab]);
+    const next = [...tabsRef.current, tab];
+    tabsRef.current = next;
+    setTabs(next);
     setActiveId(tab.id);
     void spawnSession(tab.id);
   }, [spawnSession]);
@@ -195,8 +409,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       const current = tabsRef.current;
       const closing = current.find((tab) => tab.id === id);
       bumpSpawn(id);
-      writersRef.current.delete(id);
-      queuesRef.current.delete(id);
+      dropTabRuntime(id);
       void killSession(closing?.sessionId ?? null);
 
       const ordered = sortTabs(current);
@@ -204,17 +417,19 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       const remaining = current.filter((tab) => tab.id !== id);
       if (remaining.length === 0) {
         const fresh = createEmptyTab();
+        tabsRef.current = [fresh];
         setTabs([fresh]);
         setActiveId(fresh.id);
         void spawnSession(fresh.id);
-        void savePinned();
+        void flushSave();
         return;
       }
+      tabsRef.current = remaining;
       setTabs(remaining);
       setActiveId(nextId ?? remaining[0]?.id ?? "");
-      void savePinned();
+      void flushSave();
     },
-    [bumpSpawn, killSession, spawnSession],
+    [bumpSpawn, dropTabRuntime, flushSave, killSession, spawnSession],
   );
 
   const setActive = React.useCallback((id: string) => {
@@ -225,17 +440,30 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
     (id: string, name: string | null) => {
       const trimmed = name?.trim() ? name.trim() : null;
       updateTab(id, { name: trimmed });
-      void savePinned();
+      scheduleSave();
     },
-    [updateTab],
+    [scheduleSave, updateTab],
   );
 
-  const togglePin = React.useCallback((id: string) => {
-    setTabs((current) =>
-      current.map((tab) => (tab.id === id ? { ...tab, pinned: !tab.pinned } : tab)),
-    );
-    void savePinned();
-  }, []);
+  const togglePin = React.useCallback(
+    (id: string) => {
+      const current = tabsRef.current;
+      const tab = current.find((item) => item.id === id);
+      if (!tab) {
+        return;
+      }
+      if (!tab.pinned && current.filter((item) => item.pinned).length >= MAX_PINNED_TABS) {
+        return;
+      }
+      const next = current.map((item) =>
+        item.id === id ? { ...item, pinned: !item.pinned } : item,
+      );
+      tabsRef.current = next;
+      setTabs(next);
+      void flushSave();
+    },
+    [flushSave],
+  );
 
   const closeOthers = React.useCallback(
     (id: string) => {
@@ -245,19 +473,19 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
           continue;
         }
         bumpSpawn(tab.id);
-        writersRef.current.delete(tab.id);
-        queuesRef.current.delete(tab.id);
+        dropTabRuntime(tab.id);
         void killSession(tab.sessionId);
       }
       const keep = current.find((tab) => tab.id === id);
       if (!keep) {
         return;
       }
+      tabsRef.current = [keep];
       setTabs([keep]);
       setActiveId(keep.id);
-      void savePinned();
+      void flushSave();
     },
-    [bumpSpawn, killSession],
+    [bumpSpawn, dropTabRuntime, flushSave, killSession],
   );
 
   const closeUnpinned = React.useCallback(() => {
@@ -265,25 +493,26 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
     const dropping = current.filter((tab) => !tab.pinned);
     for (const tab of dropping) {
       bumpSpawn(tab.id);
-      writersRef.current.delete(tab.id);
-      queuesRef.current.delete(tab.id);
+      dropTabRuntime(tab.id);
       void killSession(tab.sessionId);
     }
     const remaining = current.filter((tab) => tab.pinned);
     if (remaining.length === 0) {
       const fresh = createEmptyTab();
+      tabsRef.current = [fresh];
       setTabs([fresh]);
       setActiveId(fresh.id);
       void spawnSession(fresh.id);
-      void savePinned();
+      void flushSave();
       return;
     }
+    tabsRef.current = remaining;
     setTabs(remaining);
     if (!remaining.some((tab) => tab.id === activeIdRef.current)) {
       setActiveId(remaining[0]?.id ?? "");
     }
-    void savePinned();
-  }, [bumpSpawn, killSession, spawnSession]);
+    void flushSave();
+  }, [bumpSpawn, dropTabRuntime, flushSave, killSession, spawnSession]);
 
   const restartTab = React.useCallback(
     (id: string) => {
@@ -317,17 +546,36 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
     [updateTab],
   );
 
-  const registerWriter = React.useCallback((tabId: string, write: (data: Uint8Array) => void) => {
-    writersRef.current.set(tabId, write);
-    const queued = queuesRef.current.get(tabId);
-    if (queued) {
-      for (const chunk of queued) {
-        write(chunk);
+  const registerWriter = React.useCallback(
+    (tabId: string, write: (data: Uint8Array) => void) => {
+      writersRef.current.set(tabId, write);
+      const queued = queuesRef.current.get(tabId);
+      if (queued) {
+        for (const chunk of queued) {
+          write(chunk);
+        }
+        queuesRef.current.delete(tabId);
       }
-      queuesRef.current.delete(tabId);
-    }
+      const tab = tabsRef.current.find((item) => item.id === tabId);
+      if (tab?.restore && !tab.sessionId && tab.status === "live") {
+        void spawnSession(tabId, tab.cwd, {
+          cols: tab.restore.cols,
+          rows: tab.restore.rows,
+        });
+      }
+      return () => {
+        writersRef.current.delete(tabId);
+      };
+    },
+    [spawnSession],
+  );
+
+  const registerSerializer = React.useCallback((tabId: string, serialize: () => string) => {
+    serializersRef.current.set(tabId, serialize);
     return () => {
-      writersRef.current.delete(tabId);
+      if (serializersRef.current.get(tabId) === serialize) {
+        serializersRef.current.delete(tabId);
+      }
     };
   }, []);
 
@@ -363,14 +611,46 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
   );
 
   React.useEffect(() => {
-    const initialId = tabsRef.current[0]?.id;
-    if (initialId) {
-      void spawnSession(initialId);
-    }
-
     let cancelled = false;
     let unlistenData: (() => void) | undefined;
     let unlistenExit: (() => void) | undefined;
+
+    async function restorePinned() {
+      let parsed: PinnedTabsFile | null = null;
+      try {
+        const json = await loadPinnedTabs();
+        try {
+          parsed = fromPinnedFile(JSON.parse(json) as unknown);
+        } catch {
+          parsed = null;
+        }
+      } catch {
+        parsed = null;
+      }
+      if (cancelled) {
+        return;
+      }
+      if (parsed && parsed.tabs.length > 0) {
+        const restored = parsed.tabs.map(recordToTab);
+        tabsRef.current = restored;
+        const focus =
+          parsed.activeId && restored.some((tab) => tab.id === parsed.activeId)
+            ? parsed.activeId
+            : (restored[0]?.id ?? "");
+        activeIdRef.current = focus;
+        setTabs(restored);
+        setActiveId(focus);
+        return;
+      }
+      const home = createEmptyTab();
+      tabsRef.current = [home];
+      activeIdRef.current = home.id;
+      setTabs([home]);
+      setActiveId(home.id);
+      void spawnSession(home.id);
+    }
+
+    void restorePinned();
 
     void subscribePtyData((payload) => {
       let bytes: Uint8Array;
@@ -393,11 +673,14 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       const write = writersRef.current.get(tab.id);
       if (write) {
         write(bytes);
-        return;
+      } else {
+        const queue = queuesRef.current.get(tab.id) ?? [];
+        queue.push(bytes);
+        queuesRef.current.set(tab.id, queue);
       }
-      const queue = queuesRef.current.get(tab.id) ?? [];
-      queue.push(bytes);
-      queuesRef.current.set(tab.id, queue);
+      if (tab.pinned) {
+        scheduleSave();
+      }
     }).then((stop) => {
       if (cancelled) {
         stop();
@@ -420,16 +703,23 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       unlistenExit = stop;
     });
 
+    function onBeforeUnload() {
+      void flushSave();
+    }
+    window.addEventListener("beforeunload", onBeforeUnload);
+
     return () => {
       cancelled = true;
+      window.removeEventListener("beforeunload", onBeforeUnload);
       unlistenData?.();
       unlistenExit?.();
+      void flushSave();
       for (const tab of tabsRef.current) {
         bumpSpawn(tab.id);
         void killSession(tab.sessionId);
       }
     };
-  }, [bumpSpawn, killSession, spawnSession, updateTab]);
+  }, [bumpSpawn, flushSave, killSession, scheduleSave, spawnSession, updateTab]);
 
   const clipboard: TerminalClipboardApi = React.useMemo(
     () => ({
@@ -458,6 +748,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       restartTab,
       setViewport,
       registerWriter,
+      registerSerializer,
       registerClipboard,
       onTerminalInput,
       clipboard,
@@ -472,6 +763,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       newTab,
       onTerminalInput,
       registerClipboard,
+      registerSerializer,
       registerWriter,
       renameTab,
       restartTab,

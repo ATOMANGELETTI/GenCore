@@ -1,5 +1,22 @@
 import { describe, expect, it } from "vitest";
-import { autoTitle, nextActiveId, sortTabs } from "../../src/modules/terminal/terminal.hook";
+import {
+  autoTitle,
+  fromPinnedFile,
+  nextActiveId,
+  seamLine,
+  sortTabs,
+  toPinnedFile,
+} from "../../src/modules/terminal/terminal.hook";
+
+type PinnedTabSource = {
+  id: string;
+  name: string | null;
+  pinned: boolean;
+  cwd: string | null;
+  scrollback: string;
+  cols: number;
+  rows: number;
+};
 
 describe("sortTabs", () => {
   it("sorts pinned tabs before unpinned and keeps relative order", () => {
@@ -37,5 +54,74 @@ describe("nextActiveId", () => {
 
   it("returns null when closing the last tab", () => {
     expect(nextActiveId([{ id: "only" }], "only", "only")).toBeNull();
+  });
+});
+
+function pinnedSource(id: string, overrides: Partial<PinnedTabSource> = {}): PinnedTabSource {
+  return {
+    id,
+    name: null,
+    pinned: true,
+    cwd: "C:\\work",
+    scrollback: "",
+    cols: 80,
+    rows: 24,
+    ...overrides,
+  };
+}
+
+describe("toPinnedFile", () => {
+  it("toPinnedFile includes only pinned tabs and caps at 16", () => {
+    const tabs = [
+      ...Array.from({ length: 18 }, (_, i) =>
+        pinnedSource(`p${i}`, { name: i === 0 ? "First" : null, scrollback: `out-${i}` }),
+      ),
+      pinnedSource("u1", { pinned: false, name: "Loose", scrollback: "nope" }),
+    ];
+
+    const file = toPinnedFile(tabs, "p0");
+
+    expect(file.version).toBe(1);
+    expect(file.activeId).toBe("p0");
+    expect(file.tabs).toHaveLength(16);
+    expect(file.tabs.map((tab) => tab.id)).toEqual(Array.from({ length: 16 }, (_, i) => `p${i}`));
+    expect(file.tabs.some((tab) => tab.id === "u1")).toBe(false);
+    expect(file.tabs[0]).toEqual({
+      id: "p0",
+      name: "First",
+      cwd: "C:\\work",
+      scrollback: "out-0",
+      cols: 80,
+      rows: 24,
+    });
+    expect(toPinnedFile(tabs, "u1").activeId).toBeNull();
+  });
+
+  it("toPinnedFile drops oldest serialized output over 256 KiB", () => {
+    const overflow = `OLD-${"n".repeat(256 * 1024)}`;
+    const file = toPinnedFile([pinnedSource("p0", { scrollback: overflow })], "p0");
+    const bytes = new TextEncoder().encode(file.tabs[0]?.scrollback ?? "");
+
+    expect(bytes.byteLength).toBeLessThanOrEqual(256 * 1024);
+    expect(file.tabs[0]?.scrollback.startsWith("OLD-")).toBe(false);
+    expect(file.tabs[0]?.scrollback.endsWith("n")).toBe(true);
+  });
+});
+
+describe("fromPinnedFile", () => {
+  it("fromPinnedFile ignores version !== 1 and returns null", () => {
+    expect(fromPinnedFile({ version: 2, activeId: "x", tabs: [] })).toBeNull();
+    expect(fromPinnedFile({ version: 1, activeId: null, tabs: [] })).toEqual({
+      version: 1,
+      activeId: null,
+      tabs: [],
+    });
+  });
+});
+
+describe("seamLine", () => {
+  it("seamLine is muted dashes up to 80", () => {
+    expect(seamLine(120).length).toBe(80);
+    expect(seamLine(40).length).toBe(40);
   });
 });

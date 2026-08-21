@@ -49,3 +49,17 @@ export function createXterm(el: HTMLElement, theme: ThemeName): XtermHost {
     },
   };
 }
+
+const SESSION_SEAM_SGR = "\x1b[38;2;76;86;106m";
+const SESSION_SEAM_RESET = "\x1b[0m";
+
+export function restoreSerializedBuffer(
+  terminal: Pick<Terminal, "write">,
+  scrollback: string,
+  seam: string,
+): void {
+  if (scrollback) {
+    terminal.write(scrollback);
+  }
+  terminal.write(`${SESSION_SEAM_SGR}${seam}${SESSION_SEAM_RESET}\r\n`);
+}
