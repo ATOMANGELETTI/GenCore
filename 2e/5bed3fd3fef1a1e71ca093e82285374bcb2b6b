@@ -1,0 +1,59 @@
+.cursor/hooks/state/edited-files.json
+  s_be9a94e9e9857a::t_9fbed919c7885d 213-218
+  s_9c3d866055f7b2::t_68e1d0a5568a33 219-221
+apps/terminal/tests/unit/config.component.test.tsx
+  s_9c3d866055f7b2::t_f2c75218dae545 1-55
+.superpowers/sdd/progress.md
+  s_eecfcd1baa599d::t_b2f23045561f8d 236
+  s_be9a94e9e9857a::t_ee0d194a443057 221-222
+  s_be9a94e9e9857a::t_0699032a93b1c7 218-220,224
+  s_9c3d866055f7b2::t_0497fca1a8719b 223,235,247
+apps/terminal/src/modules/config/config.component.tsx
+  s_065f133ca02c41::t_729b1713196dc4 1,20,26
+  s_9c3d866055f7b2::t_58847d9e81a854 2-19,21-25,27-124
+crates/gencore-core/src/modules/pinned_store/pinned_store_api.rs
+  s_065f133ca02c41::t_f695d5f9f29343 65,71
+  s_065f133ca02c41::t_7d16fea54b9949 16
+.cursor/hooks/state/continual-learning.json
+  s_9c3d866055f7b2::t_382fc501083294 4,6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "2e5bed3fd3fef1a1e71ca093e82285374bcb2b6b",
+  "prompts": {},
+  "sessions": {
+    "s_065f133ca02c41": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "b2b08776-3769-4aee-825d-d5d8d35d8f6f",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_9c3d866055f7b2": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "d258f2f6-3ca3-4ee6-aa88-387aa4bfe5bd",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_be9a94e9e9857a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "ee20711e-e0d6-4f90-a50b-f016a475eb80",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_eecfcd1baa599d": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "c1caa638-9047-4867-96a4-feee5282ceff",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
