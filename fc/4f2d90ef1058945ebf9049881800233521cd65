@@ -1,0 +1,14 @@
+.cursor/hooks/state/continual-learning.json
+  h_90ad036e211778 4,6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "fc4f2d90ef1058945ebf9049881800233521cd65",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
