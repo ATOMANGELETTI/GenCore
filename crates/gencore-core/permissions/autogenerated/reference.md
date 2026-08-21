@@ -40,4 +40,56 @@ Denies the get_app_info command without any pre-configured scope.
 
 </td>
 </tr>
+
+<tr>
+<td>
+
+`gencore-core:allow-load-pinned-tabs`
+
+</td>
+<td>
+
+Enables the load_pinned_tabs command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`gencore-core:deny-load-pinned-tabs`
+
+</td>
+<td>
+
+Denies the load_pinned_tabs command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`gencore-core:allow-save-pinned-tabs`
+
+</td>
+<td>
+
+Enables the save_pinned_tabs command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`gencore-core:deny-save-pinned-tabs`
+
+</td>
+<td>
+
+Denies the save_pinned_tabs command without any pre-configured scope.
+
+</td>
+</tr>
 </table>

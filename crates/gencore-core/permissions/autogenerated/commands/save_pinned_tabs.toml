@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-save-pinned-tabs"
+description = "Enables the save_pinned_tabs command without any pre-configured scope."
+commands.allow = ["save_pinned_tabs"]
+
+[[permission]]
+identifier = "deny-save-pinned-tabs"
+description = "Denies the save_pinned_tabs command without any pre-configured scope."
+commands.deny = ["save_pinned_tabs"]

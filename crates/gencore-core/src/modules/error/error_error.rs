@@ -1,6 +1,7 @@
 use thiserror::Error;
 
 use crate::modules::app_info::AppInfoError;
+use crate::modules::pinned_store::PinnedStoreError;
 
 /// Aggregated, typed error surfaced by `gencore-core` plugin commands.
 ///
@@ -11,6 +12,9 @@ pub enum CoreError {
     /// An error occurred while collecting application metadata.
     #[error(transparent)]
     AppInfo(#[from] AppInfoError),
+    /// An error occurred while reading or writing pinned tabs.
+    #[error(transparent)]
+    PinnedStore(#[from] PinnedStoreError),
 }
 
 impl serde::Serialize for CoreError {
