@@ -9,9 +9,9 @@ mod modules;
 pub use modules::io::{IoError, WriteArgs, write, write_session};
 pub use modules::resize::{ResizeArgs, ResizeError, resize, resize_session};
 pub use modules::session::{
-    CloseArgs, OpenArgs, OpenResult, PTY_DATA_EVENT, PTY_EXIT_EVENT, PtyDataPayload,
-    PtyExitPayload, SessionError, SessionMap, close, kill_session, open, resolve_shell,
-    spawn_session,
+    CloseArgs, OhMyPoshSpawn, OpenArgs, OpenResult, PTY_DATA_EVENT, PTY_EXIT_EVENT, PtyDataPayload,
+    PtyExitPayload, SessionError, SessionMap, close, kill_session, open, resolve_oh_my_posh,
+    resolve_shell, spawn_session,
 };
 
 use std::sync::{Arc, Mutex};

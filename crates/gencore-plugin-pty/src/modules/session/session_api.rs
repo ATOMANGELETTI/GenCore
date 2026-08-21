@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
 use serde::{Deserialize, Serialize};
-use tauri::{AppHandle, Emitter, Runtime, State};
+use tauri::{AppHandle, Emitter, Manager, Runtime, State};
 
 use super::session_error::SessionError;
 use super::session_map::{PTY_DATA_EVENT, PTY_EXIT_EVENT, SessionMap, kill_session, spawn_session};
@@ -53,6 +53,7 @@ pub async fn open<R: Runtime>(
         cwd,
         theme,
     };
+    let resource_dir = app.path().resource_dir().ok();
     let map = Arc::clone(state.inner());
     let app_data = app.clone();
     let app_exit = app.clone();
@@ -60,6 +61,7 @@ pub async fn open<R: Runtime>(
         spawn_session(
             &map,
             args,
+            resource_dir,
             move |payload| {
                 let _ = app_data.emit(PTY_DATA_EVENT, payload);
             },

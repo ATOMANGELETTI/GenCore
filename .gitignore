@@ -10,6 +10,7 @@ target
 !.env.example
 **/src-tauri/gen/
 artifacts/
+apps/terminal/src-tauri/resources/oh-my-posh/oh-my-posh.exe
 
 # Superpowers generated scratch — keep .superpowers/docs/ tracked
 .superpowers/brainstorm/

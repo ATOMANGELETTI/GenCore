@@ -11,6 +11,7 @@ import {
 } from "../ipc/ipc.pty";
 import type { OpenPtyArgs } from "../ipc/ipc.types";
 import { scanOsc7 } from "./terminal.osc7";
+import { poshThemeSwapCommand } from "./terminal.prompt";
 import type {
   PinnedTabRecord,
   PinnedTabSource,
@@ -292,6 +293,22 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       return next;
     });
   }, []);
+
+  const themeReadyRef = React.useRef(false);
+  React.useEffect(() => {
+    if (!themeReadyRef.current) {
+      themeReadyRef.current = true;
+      return;
+    }
+    const command = poshThemeSwapCommand(theme);
+    for (const tab of tabsRef.current) {
+      if (tab.sessionId && tab.status === "live") {
+        void writePty(tab.sessionId, command).catch(() => {
+          updateTab(tab.id, { status: "exited", sessionId: null });
+        });
+      }
+    }
+  }, [theme, updateTab]);
 
   const bumpSpawn = React.useCallback((id: string): number => {
     const next = (spawnGenRef.current.get(id) ?? 0) + 1;

@@ -3,7 +3,8 @@ use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use gencore_pty::{
-    IoError, OpenArgs, SessionError, SessionMap, kill_session, spawn_session, write_session,
+    IoError, OpenArgs, SessionError, SessionMap, kill_session, resolve_oh_my_posh, spawn_session,
+    write_session,
 };
 
 #[test]
@@ -33,6 +34,7 @@ fn spawn_session_rejects_invalid_theme() {
             cwd: None,
             theme: Some("nord".into()),
         },
+        None,
         |_| {},
         |_| {},
     );
@@ -50,6 +52,7 @@ fn spawn_session_rejects_invalid_cwd() {
             cwd: Some("C:\\gencore-pty-invalid-cwd-test".into()),
             theme: None,
         },
+        None,
         |_| {},
         |_| {},
     );
@@ -91,6 +94,7 @@ fn open_echo_and_close() {
             cwd: None,
             theme: None,
         },
+        None,
         move |payload| {
             let _ = data_tx.send(payload);
         },
@@ -119,4 +123,60 @@ fn open_echo_and_close() {
 
     kill_session(&map, &session_id).expect("kill_session");
     assert!(got_output, "expected ConPTY output within 3s");
+}
+
+#[test]
+fn resolve_oh_my_posh_none_without_resource_dir() {
+    assert!(resolve_oh_my_posh(None, None).is_none());
+    assert!(resolve_oh_my_posh(None, Some("snow-storm")).is_none());
+}
+
+#[test]
+fn resolve_oh_my_posh_none_when_exe_or_script_missing() {
+    let dir = std::env::temp_dir().join(format!("gencore-pty-omp-missing-{}", std::process::id()));
+    let omp = dir.join("oh-my-posh");
+    std::fs::create_dir_all(&omp).unwrap();
+    std::fs::write(omp.join("gencore-prompt.ps1"), "#").unwrap();
+    assert!(resolve_oh_my_posh(Some(&dir), None).is_none());
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn resolve_oh_my_posh_uses_absolute_theme_json() {
+    let dir = std::env::temp_dir().join(format!("gencore-pty-omp-ok-{}", std::process::id()));
+    let omp = dir.join("oh-my-posh");
+    std::fs::create_dir_all(&omp).unwrap();
+    std::fs::write(omp.join("oh-my-posh.exe"), []).unwrap();
+    std::fs::write(omp.join("gencore-prompt.ps1"), "#").unwrap();
+    std::fs::write(omp.join("gencore-polar-night.omp.json"), "{}").unwrap();
+    std::fs::write(omp.join("gencore-snow-storm.omp.json"), "{}").unwrap();
+
+    let polar = resolve_oh_my_posh(Some(&dir), Some("polar-night")).expect("polar-night");
+    assert!(polar.theme.is_absolute());
+    assert!(polar.prompt_script.is_absolute());
+    assert!(polar.theme.ends_with("gencore-polar-night.omp.json"));
+    assert!(polar.prompt_script.ends_with("gencore-prompt.ps1"));
+
+    let snow = resolve_oh_my_posh(Some(&dir), Some("snow-storm")).expect("snow-storm");
+    assert!(snow.theme.ends_with("gencore-snow-storm.omp.json"));
+
+    let omitted = resolve_oh_my_posh(Some(&dir), None).expect("default polar-night");
+    assert!(omitted.theme.ends_with("gencore-polar-night.omp.json"));
+
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn resolve_oh_my_posh_accepts_resources_subdirectory() {
+    let dir = std::env::temp_dir().join(format!("gencore-pty-omp-nested-{}", std::process::id()));
+    let nested = dir.join("resources").join("oh-my-posh");
+    std::fs::create_dir_all(&nested).unwrap();
+    std::fs::write(nested.join("oh-my-posh.exe"), []).unwrap();
+    std::fs::write(nested.join("gencore-prompt.ps1"), "#").unwrap();
+    std::fs::write(nested.join("gencore-polar-night.omp.json"), "{}").unwrap();
+
+    let resolved = resolve_oh_my_posh(Some(&dir), None).expect("nested resources");
+    assert!(resolved.theme.ends_with("gencore-polar-night.omp.json"));
+
+    let _ = std::fs::remove_dir_all(&dir);
 }

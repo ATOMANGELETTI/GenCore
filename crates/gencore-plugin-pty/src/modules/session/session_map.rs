@@ -12,7 +12,7 @@ use uuid::Uuid;
 
 use super::session_api::OpenArgs;
 use super::session_error::SessionError;
-use super::session_shell::resolve_shell;
+use super::session_shell::{prepend_path, resolve_oh_my_posh, resolve_shell};
 
 /// Event name for raw pty output chunks (standard base64).
 pub const PTY_DATA_EVENT: &str = "gencore-pty://data";
@@ -71,6 +71,7 @@ pub type SessionMap = HashMap<String, PtySession>;
 pub fn spawn_session(
     map: &Arc<Mutex<SessionMap>>,
     args: OpenArgs,
+    resource_dir: Option<PathBuf>,
     on_data: impl Fn(PtyDataPayload) + Send + 'static,
     on_exit: impl Fn(PtyExitPayload) + Send + 'static,
 ) -> Result<String, SessionError> {
@@ -88,6 +89,15 @@ pub fn spawn_session(
 
     let mut cmd = CommandBuilder::new(resolve_shell());
     cmd.arg("-NoLogo");
+    if let Some(omp) = resolve_oh_my_posh(resource_dir.as_deref(), args.theme.as_deref()) {
+        cmd.arg("-NoProfile");
+        cmd.arg("-ExecutionPolicy");
+        cmd.arg("Bypass");
+        cmd.arg("-File");
+        cmd.arg(&omp.prompt_script);
+        cmd.env("POSH_THEME", &omp.theme);
+        cmd.env("PATH", prepend_path(&omp.dir));
+    }
     if let Some(cwd) = cwd {
         cmd.cwd(cwd);
     }

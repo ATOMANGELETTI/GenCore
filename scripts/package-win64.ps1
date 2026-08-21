@@ -52,6 +52,11 @@ foreach ($App in $Apps) {
   $StageDir = Join-Path $StagingRoot $StageName
   New-Item -ItemType Directory -Force -Path $StageDir | Out-Null
 
+  if ($App.Filter -eq '@gencore/terminal') {
+    Write-Host 'Fetching Oh My Posh...'
+    & (Join-Path $PSScriptRoot 'fetch-oh-my-posh.ps1')
+  }
+
   Write-Host "Building $ProductName $Version (windows-x64)..."
   pnpm --filter $App.Filter exec -- tauri build --no-bundle --target x86_64-pc-windows-msvc
   if ($LASTEXITCODE -ne 0) {
@@ -64,6 +69,16 @@ foreach ($App in $Apps) {
   }
 
   Copy-Item -LiteralPath $ExeSrc -Destination (Join-Path $StageDir $App.Exe)
+
+  if ($App.Filter -eq '@gencore/terminal') {
+    $OmpSrc = Join-Path $RepoRoot 'apps/terminal/src-tauri/resources/oh-my-posh'
+    if (-not (Test-Path -LiteralPath (Join-Path $OmpSrc 'oh-my-posh.exe'))) {
+      throw "Oh My Posh exe missing after fetch: $OmpSrc"
+    }
+    $OmpDestParent = Join-Path $StageDir 'resources'
+    New-Item -ItemType Directory -Force -Path $OmpDestParent | Out-Null
+    Copy-Item -LiteralPath $OmpSrc -Destination (Join-Path $OmpDestParent 'oh-my-posh') -Recurse -Force
+  }
 
   $ZipPath = Join-Path $ArtifactsDir "$Slug-$Version-windows-x64.zip"
   if (Test-Path -LiteralPath $ZipPath) {
