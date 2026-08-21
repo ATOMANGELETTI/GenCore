@@ -3,13 +3,14 @@
 // here is dropped, regardless of what the (untrusted) main frontend sends.
 //
 // Allowed:
-//   - gencore-core's app-info query
+//   - gencore-core's app-info query and tray_action
 //   - the core window commands the titlebar/traffic-lights use, plus theme()
 //   - opener open_url for the GenCore GitHub repository only
-//   - event listen/unlisten for tauri://theme-changed (Window main) only
+//   - event listen/unlisten for tauri://theme-changed (Window main or tray-menu) only
 (() => {
   const ALLOWED_COMMANDS = [
     "plugin:gencore-core|get_app_info",
+    "plugin:gencore-core|tray_action",
     "plugin:window|close",
     "plugin:window|minimize",
     "plugin:window|toggle_maximize",
@@ -21,11 +22,14 @@
   ];
   const OPEN_URL_CMD = "plugin:opener|open_url";
   const GET_APP_INFO_CMD = "plugin:gencore-core|get_app_info";
+  const TRAY_ACTION_CMD = "plugin:gencore-core|tray_action";
+  const THEME_CMD = "plugin:window|theme";
   const LISTEN_CMD = "plugin:event|listen";
   const UNLISTEN_CMD = "plugin:event|unlisten";
   const THEME_CHANGED_EVENT = "tauri://theme-changed";
   const ALLOWED_OPEN_URL = "https://github.com/ATOMANGELETTI/GenCore";
   const MAIN_WINDOW_LABEL = "main";
+  const TRAY_MENU_WINDOW_LABEL = "tray-menu";
 
   function isPlainObject(value) {
     return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -46,6 +50,17 @@
     }
     const keys = Object.keys(args);
     return keys.length === 1 && keys[0] === "label" && args.label === MAIN_WINDOW_LABEL;
+  }
+
+  function isThemeWindowArgs(args) {
+    if (isEmptyArgs(args)) {
+      return true;
+    }
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    return keys.length === 1 && keys[0] === "label" && isAllowedWindowLabel(args.label);
   }
 
   function isAllowedOpenUrlArgs(args) {
@@ -71,8 +86,24 @@
     return hasUrl;
   }
 
+  function isAllowedWindowLabel(label) {
+    return label === MAIN_WINDOW_LABEL || label === TRAY_MENU_WINDOW_LABEL;
+  }
+
   function isFiniteNumber(value) {
     return typeof value === "number" && Number.isFinite(value);
+  }
+
+  function isTrayActionArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    return (
+      keys.length === 1 &&
+      keys[0] === "action" &&
+      (args.action === "show" || args.action === "hide" || args.action === "quit")
+    );
   }
 
   function isWindowTarget(target) {
@@ -97,7 +128,7 @@
       }
       return false;
     }
-    return hasKind && hasLabel && target.kind === "Window" && target.label === MAIN_WINDOW_LABEL;
+    return hasKind && hasLabel && target.kind === "Window" && isAllowedWindowLabel(target.label);
   }
 
   function isListenArgs(args) {
@@ -174,15 +205,21 @@
       }
       return {};
     }
+    if (cmd === TRAY_ACTION_CMD) {
+      return { action: args.action };
+    }
     if (cmd === LISTEN_CMD) {
       return {
         event: THEME_CHANGED_EVENT,
-        target: { kind: "Window", label: MAIN_WINDOW_LABEL },
+        target: { kind: "Window", label: args.target.label },
         handler: args.handler,
       };
     }
     if (cmd === UNLISTEN_CMD) {
       return { event: THEME_CHANGED_EVENT, eventId: args.eventId };
+    }
+    if (cmd === THEME_CMD && !isEmptyArgs(args)) {
+      return { label: args.label };
     }
     if (isEmptyArgs(args)) {
       if (args === undefined || args === null) {
@@ -224,12 +261,20 @@
       if (!isEmptyArgs(payload.payload)) {
         reject();
       }
+    } else if (payload.cmd === TRAY_ACTION_CMD) {
+      if (!isTrayActionArgs(payload.payload)) {
+        reject();
+      }
     } else if (payload.cmd === LISTEN_CMD) {
       if (!isListenArgs(payload.payload)) {
         reject();
       }
     } else if (payload.cmd === UNLISTEN_CMD) {
       if (!isUnlistenArgs(payload.payload)) {
+        reject();
+      }
+    } else if (payload.cmd === THEME_CMD) {
+      if (!isThemeWindowArgs(payload.payload)) {
         reject();
       }
     } else if (!isMainWindowArgs(payload.payload)) {

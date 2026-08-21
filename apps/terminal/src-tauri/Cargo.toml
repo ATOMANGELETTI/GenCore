@@ -15,7 +15,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { workspace = true, features = ["isolation"] }
 
 [dependencies]
-tauri = { workspace = true, features = ["isolation"] }
+tauri = { workspace = true, features = ["isolation", "tray-icon", "image-png"] }
 serde = { workspace = true }
 serde_json = { workspace = true }
 gencore-core = { path = "../../../crates/gencore-core" }

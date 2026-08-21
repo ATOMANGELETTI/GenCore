@@ -42,6 +42,8 @@ const PTY_CLOSE_CMD = "plugin:gencore-pty|close";
 const PTY_ALLOWED_COMMANDS = [PTY_OPEN_CMD, PTY_WRITE_CMD, PTY_RESIZE_CMD, PTY_CLOSE_CMD] as const;
 const LOAD_PINNED_CMD = "plugin:gencore-core|load_pinned_tabs";
 const SAVE_PINNED_CMD = "plugin:gencore-core|save_pinned_tabs";
+const TRAY_ACTION_CMD = "plugin:gencore-core|tray_action";
+const TRAY_ACTIONS = ["show", "hide", "quit"] as const;
 
 const EVENT_LISTEN_CMD = "plugin:event|listen";
 const EVENT_UNLISTEN_CMD = "plugin:event|unlisten";
@@ -212,6 +214,30 @@ describe("terminal isolation hook", () => {
     expect(result.payload).toEqual({ label: "main" });
   });
 
+  it("allows plugin:window|theme with the tray-menu window label", () => {
+    const hook = getHook();
+    const input = envelope("plugin:window|theme", { label: "tray-menu" });
+    const result = hook(input);
+    expect(result).not.toBe(input);
+    expect(result.cmd).toBe("plugin:window|theme");
+    expect(result.payload).toEqual({ label: "tray-menu" });
+  });
+
+  it("throws for plugin:window|theme with a non-allowed window label", () => {
+    const hook = getHook();
+    expect(() => hook(envelope("plugin:window|theme", { label: "other" }))).toThrow();
+  });
+
+  it.each([
+    "plugin:window|close",
+    "plugin:window|minimize",
+    "plugin:window|toggle_maximize",
+    "plugin:window|start_dragging",
+  ] as const)("throws for %s with the tray-menu window label", (cmd) => {
+    const hook = getHook();
+    expect(() => hook(envelope(cmd, { label: "tray-menu" }))).toThrow();
+  });
+
   it("does not mention forbidden capability tokens in the hook source", () => {
     for (const token of FORBIDDEN_TOKENS) {
       expect(hookSource).not.toContain(token);
@@ -249,9 +275,30 @@ describe("terminal isolation hook", () => {
     ]);
 
     const permissionText = JSON.stringify(capability.permissions);
+    expect(permissionText).not.toContain("gencore-core:allow-tray-action");
     for (const token of FORBIDDEN_TOKENS) {
       expect(permissionText).not.toContain(token);
     }
+  });
+
+  it("scopes the tray-menu capability to tray-menu with exactly four permissions", () => {
+    const trayMenuCapabilitySource = readFileSync(
+      resolve(process.cwd(), "src-tauri/capabilities/tray-menu.json"),
+      "utf8",
+    );
+    const capability = JSON.parse(trayMenuCapabilitySource) as CapabilityFile;
+    expect(capability.windows).toEqual(["tray-menu"]);
+    expect(capability.permissions).toEqual([
+      "gencore-core:allow-tray-action",
+      "core:window:allow-theme",
+      "core:event:allow-listen",
+      "core:event:allow-unlisten",
+    ]);
+    const permissionText = JSON.stringify(capability.permissions);
+    expect(permissionText).not.toContain("gencore-fs");
+    expect(permissionText).not.toContain("gencore-pty");
+    expect(permissionText).not.toContain("core:default");
+    expect(permissionText).not.toContain("core:tray");
   });
 
   it("registers gencore-fs so capability grants resolve at build time", () => {
@@ -462,6 +509,26 @@ describe("terminal isolation hook", () => {
       target: { kind: "Window", label: "main" },
       handler: 11,
     });
+  });
+
+  it("reconstructs listen for tauri://theme-changed with Window tray-menu target", () => {
+    const hook = getHook();
+    const inner = {
+      event: THEME_CHANGED_EVENT,
+      target: { kind: "Window", label: "tray-menu" },
+      handler: 11,
+    };
+    const input = envelope(EVENT_LISTEN_CMD, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({
+      event: THEME_CHANGED_EVENT,
+      target: { kind: "Window", label: "tray-menu" },
+      handler: 11,
+    });
+    expect((result.payload as { target: unknown }).target).not.toBe(inner.target);
   });
 
   it("throws for theme-changed listen with Any target or a non-main window", () => {
@@ -696,6 +763,30 @@ describe("terminal isolation hook", () => {
         }),
       ),
     ).toThrow();
+  });
+
+  it.each(TRAY_ACTIONS)(
+    "allows tray_action %s and reconstructs an action-only payload",
+    (action) => {
+      const hook = getHook();
+      const inner = { action };
+      const input = envelope(TRAY_ACTION_CMD, inner);
+      const result = hook(input);
+
+      expect(result).not.toBe(input);
+      expect(result.cmd).toBe(TRAY_ACTION_CMD);
+      expect(result.payload).not.toBe(inner);
+      expect(result.payload).toEqual({ action });
+      expect(Object.keys(result.payload as object)).toEqual(["action"]);
+    },
+  );
+
+  it("throws for tray_action with extra keys or an unknown action", () => {
+    const hook = getHook();
+    expect(() => hook(envelope(TRAY_ACTION_CMD, { action: "show", extra: true }))).toThrow();
+    expect(() => hook(envelope(TRAY_ACTION_CMD, { action: "foo" }))).toThrow();
+    expect(() => hook(envelope(TRAY_ACTION_CMD, {}))).toThrow();
+    expect(() => hook(envelope(TRAY_ACTION_CMD, { label: "main" }))).toThrow();
   });
 
   it("loads the isolation script from head", () => {

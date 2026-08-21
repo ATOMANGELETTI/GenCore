@@ -14,6 +14,9 @@ pub use modules::pinned_store::{
     SavePinnedTabsArgs, load_pinned_tabs, pinned_tabs_path, read_pinned_tabs_file,
     save_pinned_tabs, write_pinned_tabs_file,
 };
+pub use modules::tray::{
+    PxRect, PxSize, TrayAction, TrayActionArgs, TrayError, tray_action, tray_menu_origin,
+};
 
 use tauri::{
     Runtime,
@@ -29,7 +32,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
         .invoke_handler(tauri::generate_handler![
             get_app_info,
             load_pinned_tabs,
-            save_pinned_tabs
+            save_pinned_tabs,
+            tray_action
         ])
         .build()
 }

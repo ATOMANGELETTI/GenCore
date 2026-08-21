@@ -2,6 +2,7 @@ use thiserror::Error;
 
 use crate::modules::app_info::AppInfoError;
 use crate::modules::pinned_store::PinnedStoreError;
+use crate::modules::tray::TrayError;
 
 /// Aggregated, typed error surfaced by `gencore-core` plugin commands.
 ///
@@ -15,6 +16,9 @@ pub enum CoreError {
     /// An error occurred while reading or writing pinned tabs.
     #[error(transparent)]
     PinnedStore(#[from] PinnedStoreError),
+    /// An error occurred while applying a tray action.
+    #[error(transparent)]
+    Tray(#[from] TrayError),
 }
 
 impl serde::Serialize for CoreError {

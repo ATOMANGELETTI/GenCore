@@ -23,6 +23,20 @@
         "decorations": false,
         "transparent": false,
         "center": true
+      },
+      {
+        "label": "tray-menu",
+        "url": "tray-menu.html",
+        "width": 200,
+        "height": 140,
+        "visible": false,
+        "decorations": false,
+        "transparent": true,
+        "skipTaskbar": true,
+        "alwaysOnTop": true,
+        "resizable": false,
+        "shadow": false,
+        "focus": false
       }
     ],
     "security": {

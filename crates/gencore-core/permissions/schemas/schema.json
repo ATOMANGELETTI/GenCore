@@ -331,6 +331,18 @@
           "markdownDescription": "Denies the save_pinned_tabs command without any pre-configured scope."
         },
         {
+          "description": "Enables the tray_action command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-tray-action",
+          "markdownDescription": "Enables the tray_action command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the tray_action command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-tray-action",
+          "markdownDescription": "Denies the tray_action command without any pre-configured scope."
+        },
+        {
           "description": "Default permissions for the gencore-core plugin. Allows reading application metadata via `get_app_info`.\n#### This default permission set includes:\n\n- `allow-get-app-info`",
           "type": "string",
           "const": "default",

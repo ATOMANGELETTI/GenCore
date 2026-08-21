@@ -26,9 +26,12 @@ Applies to every Tauri app in `apps/**`:
 - `app.security.freezePrototype: true`.
 - `app.security.assetProtocol.enable: false` unless a task explicitly requires serving
   local assets through it.
-- Capabilities (`src-tauri/capabilities/*.json`): least privilege, scoped to
-  `"windows": ["main"]` only. Grant only the identifiers the UI invokes
-  (`core:window:allow-close`, `gencore-core:allow-get-app-info`, …) — never `core:default`.
+- Capabilities (`src-tauri/capabilities/*.json`): the **main** capability stays
+  `"windows": ["main"]` only; any extra window (for example `tray-menu`) gets its
+  **own** capability file scoped to that label, still least privilege, never
+  `core:default`. Grant only the identifiers the UI invokes
+  (`core:window:allow-close`, `gencore-core:allow-get-app-info`, …) — never
+  `core:default`.
 - Do not grant `gencore-pty` / `gencore-fs` command permissions in any capability until
   the UI actually invokes them. Stub plugin commands stay ungranted until wired up.
 - Never set any `dangerous*` Tauri config flag.

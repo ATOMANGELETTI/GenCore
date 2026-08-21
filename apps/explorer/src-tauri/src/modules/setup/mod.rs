@@ -7,6 +7,6 @@ use tauri::{App, Runtime};
 /// diagnostics initialization.
 pub fn run_setup<R: Runtime>(app: &mut App<R>) -> Result<(), Box<dyn std::error::Error>> {
     gencore_core::init_logging()?;
-    let _ = app;
+    super::tray::setup(app)?;
     Ok(())
 }

@@ -92,4 +92,30 @@ Denies the save_pinned_tabs command without any pre-configured scope.
 
 </td>
 </tr>
+
+<tr>
+<td>
+
+`gencore-core:allow-tray-action`
+
+</td>
+<td>
+
+Enables the tray_action command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`gencore-core:deny-tray-action`
+
+</td>
+<td>
+
+Denies the tray_action command without any pre-configured scope.
+
+</td>
+</tr>
 </table>
