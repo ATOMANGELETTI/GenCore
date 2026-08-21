@@ -44,3 +44,10 @@ jobs:
       - name: Test
         if: inputs.test
         run: pnpm turbo run test
+
+      - name: Script tests
+        if: inputs.test
+        run: pnpm test:scripts
+
+      - name: Agents sync check
+        run: pnpm sync:agents --check

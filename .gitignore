@@ -14,3 +14,6 @@ artifacts/
 # Superpowers generated scratch — keep .superpowers/docs/ tracked
 .superpowers/brainstorm/
 .superpowers/sdd/
+
+# Antigravity / Cursor hook runtime state
+.agents/hooks/state/

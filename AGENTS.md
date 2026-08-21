@@ -1,6 +1,6 @@
 # GenCore agent instructions
 
-This file is the repo-wide brief. Nested `AGENTS.md` files add path-specific rules and win on conflict. Project Cursor rules in `.cursor/rules/` apply as well (`security.mdc` is always on).
+This file is the repo-wide brief. Nested `AGENTS.md` files add path-specific rules and win on conflict. Project Cursor rules in `.cursor/rules/` apply in Cursor (`security.mdc` is always on). Antigravity CLI (`agy`) reads the generated `.agents/` tree (rules, skills, workflows, agents, hooks) plus this file. After editing `.cursor/`, run `pnpm sync:agents` and commit both trees. Do not hand-edit generated `.agents/rules`, `.agents/skills`, `.agents/workflows`, or `.agents/agents` files.
 
 ## What this is
 
@@ -32,7 +32,7 @@ Folder-per-module. Files are `{module}.{role}.{ext}` (JS) or `{module}_api.rs` /
   `plugin:window|start_dragging` in the WebView without going through
   `ipc.window.ts`. Keep the capability. Prefer `startDraggingWindow()` for JS
   callers.
-- No secrets in the repo. No in-repo MCP configs (`.cursor/mcp.json`, `.mcp.json`, ad-hoc `npx` MCP servers). Team MCP is dashboard-only.
+- No secrets in the repo. No in-repo MCP configs (`.cursor/mcp.json`, `.agents/mcp_config.json`, `.mcp.json`, ad-hoc `npx` MCP servers). Team MCP is dashboard-only.
 
 ## UI
 
@@ -66,6 +66,16 @@ Scoped: `pnpm --filter @gencore/<pkg> test` or `cargo test -p <crate>`. Release 
 ## Git
 
 Do not create commits or push unless the user explicitly asks. Conventional commits when they do. Add a changeset for `@gencore/*` package behavior changes (`pnpm changeset`). Binary assets listed in `.gitattributes` (icons, fonts, media, archives) are Git LFS-tracked; run `git lfs install` once.
+
+## Antigravity CLI (`agy`)
+
+Install Superpowers once per machine (re-run to update):
+
+```sh
+agy plugin install https://github.com/obra/superpowers
+```
+
+The plugin is not vendored. GenCore’s always-on Superpowers rule (artifact paths under `.superpowers/`) is generated into `.agents/rules/superpowers.md`. Do not add `.agents/mcp_config.json`. Team MCP stays dashboard-only.
 
 ## Learned User Preferences
 

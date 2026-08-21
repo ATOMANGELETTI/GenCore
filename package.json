@@ -17,7 +17,8 @@
     "changeset": "changeset",
     "package:win64": "pwsh -NoProfile -File scripts/package-win64.ps1",
     "prepare": "husky",
-    "sync:agents": "node scripts/sync-agents.mjs"
+    "sync:agents": "node scripts/sync-agents.mjs",
+    "test:scripts": "node --test scripts/tests/**/*.test.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.8",
