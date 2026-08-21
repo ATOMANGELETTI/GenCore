@@ -1,0 +1,32 @@
+.cursor/hooks/state/continual-learning-index.json
+  s_1bd5e0801ba9ca::t_5a9b2c562746d7 3,5-6,8-9,11-12,14-15,17-18
+.cursor/rules/superpowers-models.mdc
+  s_ef8eb46fdde708::t_6b4f23e7f838d0 1-58
+AGENTS.md
+  s_1bd5e0801ba9ca::t_87ab0e79f0ee10 90
+  s_ef8eb46fdde708::t_372b7f6c949be7 72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "bd1411ad6c54dcd9680611a9e28f9955aaa9c2c6",
+  "prompts": {},
+  "sessions": {
+    "s_1bd5e0801ba9ca": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "6ebc6290-764e-4f4a-80af-940126bb8035",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_ef8eb46fdde708": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "bbabe28d-6ab4-434d-a141-b1275397b136",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
