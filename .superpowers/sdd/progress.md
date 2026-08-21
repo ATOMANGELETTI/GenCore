@@ -214,6 +214,27 @@ Controller session. SDD + writing-plans. Work in place on `main`. Commits allowe
 - BASE before Task 1: `fc4f2d90ef1058945ebf9049881800233521cd65`
 - Task 1: complete (commits fc4f2d9..90e194b, review clean)
 - Task 2: complete (commits 90e194b..941b575, review clean). Minor: dual import/re-export of parseFrontmatter in sync-agents.mjs.
+- Task 3: complete (commits 941b575..7008ad2, review clean). Minors: skills walk assumes directories; orphan delete leaves empty dirs; test tmpdirs not removed.
+
+## Feature: Terminal Config tab (2026-08-20)
+
+Controller session. SDD + writing-plans. Work in place on `main` (running `tauri:dev`). Commits allowed (user chose SDD execution of the plan). Implementers stage only task files.
+
+- Spec: `.superpowers/docs/specs/2026-08-20-terminal-config-tab-design.md`
+- Plan: `.superpowers/docs/plans/2026-08-20-terminal-config-tab.md`
+- Briefs: `.superpowers/sdd/`
+- Model: implementers and task reviewers `cursor-grok-4.6-xhigh-fast` unless blocked; elevate only if needed.
+- BASE before Task 1: `951a8820e1c1babd55aade0ed3f09042d487d3db`
+
+## Feature: Terminal window xterm + PTY (2026-08-20)
+
+Controller session. SDD + writing-plans. Work in place on `main` (running `tauri:dev`). Commits allowed (user chose SDD execution of the plan). Implementers stage only task files. Do not stage `.cursor/hooks/**`, Config-tab files, or other dirty unrelated paths.
+
+- Spec: `.superpowers/docs/specs/2026-08-20-terminal-window-design.md`
+- Plan: `.superpowers/docs/plans/2026-08-20-terminal-window.md`
+- Briefs: `.superpowers/sdd/terminal-window/`
+- Model: implementers and task reviewers `cursor-grok-4.6-xhigh-fast` unless blocked; elevate only if needed.
+- BASE before Task 1: `951a8820e1c1babd55aade0ed3f09042d487d3db`
 
 ## Follow-ups (not blocking)
 

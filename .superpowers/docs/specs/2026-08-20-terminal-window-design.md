@@ -39,7 +39,7 @@ Four layers. The kit never talks to Tauri. The PTY plugin never knows about Reac
 - **Use:** Terminal UI only. Explorer does not register grants.
 - **Depends on:** `portable-pty` (latest stable), existing Tauri/serde/thiserror.
 
-`open` returns `{ session_id }` (UUID string). `OpenArgs`: `cols`, `rows`, optional `cwd`. **No shell path from the UI.** Rust resolves `pwsh` then `powershell`. If `cwd` is omitted or not a directory, use the user profile directory.
+`open` returns `{ session_id }` (UUID string). `OpenArgs`: `cols`, `rows`, optional `cwd`, optional `theme` (`"polar-night"` | `"snow-storm"` only). **No shell path and no filesystem theme path from the UI.** Rust resolves `pwsh` then `powershell`. If `cwd` is omitted or not a directory, use the user profile directory. Rust maps `theme` to the bundled JSON and sets `POSH_THEME`.
 
 `write` takes `{ session_id, data }` as UTF-8 text from xterm `onData`.
 
@@ -67,7 +67,7 @@ Grant only when `ipc.pty.ts` / `ipc.pinned.ts` exist and the UI calls the comman
 
 Isolation allowlist adds `plugin:gencore-pty|open|write|resize|close`. Reconstruct:
 
-- `open`: always `{ cols, rows }`. Optional `cwd` string uses the same path rules as `gencore-fs` (length 1..32767, no NUL). When `cwd` is omitted, reconstruct `{ cols, rows }` only. `cols`/`rows` are finite numbers in `1..=999`.
+- `open`: always `{ cols, rows }`. Optional `cwd` string uses the same path rules as `gencore-fs` (length 1..32767, no NUL). Optional `theme` is exactly `"polar-night"` or `"snow-storm"`. When both optionals are omitted, reconstruct `{ cols, rows }` only. `cols`/`rows` are finite numbers in `1..=999`.
 - `write`: `{ session_id, data }` — `session_id` non-empty string ≤ 64 chars; `data` string ≤ 64 KiB per invoke.
 - `resize`: `{ session_id, cols, rows }`
 - `close`: `{ session_id }`

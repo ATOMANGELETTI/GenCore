@@ -32,3 +32,23 @@ describe("globals.css font wiring", () => {
     expect(globalsCss).toMatch(/--font-mono:\s*"Terminess Nerd Font"/);
   });
 });
+
+const terminessMonoFaces = [
+  "../assets/fonts/nerdfonts/terminus/TerminessNerdFontMono-Regular.ttf",
+  "../assets/fonts/nerdfonts/terminus/TerminessNerdFontMono-Bold.ttf",
+] as const;
+
+describe("fonts.css Mono cut", () => {
+  it("registers Terminess Nerd Font Mono without rebinding chrome stacks", () => {
+    const fontsCss = readStylesheet("fonts.css");
+    const globalsCss = readStylesheet("globals.css");
+
+    expect(fontsCss).toContain('font-family: "Terminess Nerd Font Mono"');
+    for (const url of terminessMonoFaces) {
+      expect(fontsCss).toContain(url);
+    }
+    expect(globalsCss).toMatch(/--font-sans:\s*"Terminess Nerd Font"/);
+    expect(globalsCss).toMatch(/--font-mono:\s*"Terminess Nerd Font"/);
+    expect(globalsCss).not.toContain("Terminess Nerd Font Mono");
+  });
+});

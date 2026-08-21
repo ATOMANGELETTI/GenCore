@@ -204,5 +204,11 @@
   ],
   "290fa825-babf-4c28-8bc7-7554cd5f26f1": [
     "apps/terminal"
+  ],
+  "cbc3098f-c211-4e12-9e87-91a07eb92ca4": [
+    "apps/terminal"
+  ],
+  "8b18ea52-bc56-49c9-8d11-057457843a5e": [
+    "packages/ui-kit"
   ]
 }
