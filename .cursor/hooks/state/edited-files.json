@@ -228,5 +228,42 @@
   ],
   "9f043334-8293-4e9c-84cd-8e9e0c82b559": [
     "apps/terminal"
+  ],
+  "5e76508d-4454-401d-8503-fb9b4469c0d6": [
+    "apps/terminal",
+    "crates/gencore-plugin-pty"
+  ],
+  "f2bd6407-f5d1-4c0a-ad4a-d67a0a84eaf4": [
+    "apps/terminal"
+  ],
+  "65cebe3d-d7fa-49cb-ae38-602f77318696": [
+    "apps/terminal"
+  ],
+  "a2d5f9d9-b377-4090-9473-7818f91c1b73": [
+    "apps/terminal"
+  ],
+  "c6c9d9a7-d341-49da-9d1b-26fade39391a": [
+    "apps/terminal",
+    "crates/gencore-plugin-pty"
+  ],
+  "1b709353-8a87-435a-8185-59c6952736dc": [
+    "crates/gencore-plugin-pty"
+  ],
+  "036845f2-4a84-4d68-8780-adc9ccb4e64a": [
+    "apps/terminal",
+    "apps/explorer"
+  ],
+  "994f3694-b9d9-49ba-93db-b57c580eb597": [
+    "crates/gencore-plugin-pty",
+    "apps/terminal"
+  ],
+  "7c86697c-fa0a-470b-9dc4-016595e82df7": [
+    "packages/ui-kit",
+    "apps/terminal",
+    "apps/explorer"
+  ],
+  "0d09029f-4853-4ef2-9e41-43ef8bdb84bf": [
+    "apps/terminal",
+    "apps/explorer"
   ]
 }

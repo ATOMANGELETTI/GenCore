@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>GenCore Explorer tray</title>
+  <g transform="translate(512 512) scale(1.69) translate(-512 -512)">
+    <path d="M304 334 L402 334 Q428 334 441.9 356 L462.1 388 Q476 410 502 410 L720 410 A40 40 0 0 1 760 450 L760 650 A40 40 0 0 1 720 690 L304 690 A40 40 0 0 1 264 650 L264 374 A40 40 0 0 1 304 334 Z" fill="#88C0D0" />
+  </g>
+</svg>

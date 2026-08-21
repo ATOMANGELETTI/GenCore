@@ -1,7 +1,6 @@
 import type { ThemeName } from "@gencore/ui-kit";
 import { FitAddon } from "@xterm/addon-fit";
 import { SerializeAddon } from "@xterm/addon-serialize";
-import { WebglAddon } from "@xterm/addon-webgl";
 import { Terminal } from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
 import { nordXtermTheme } from "./terminal.theme";
@@ -31,20 +30,11 @@ export function createXterm(el: HTMLElement, theme: ThemeName): XtermHost {
   terminal.loadAddon(serialize);
   terminal.open(el);
 
-  let webgl: WebglAddon | undefined;
-  try {
-    webgl = new WebglAddon();
-    terminal.loadAddon(webgl);
-  } catch {
-    webgl = undefined;
-  }
-
   return {
     terminal,
     fit,
     serialize,
     dispose: () => {
-      webgl?.dispose();
       terminal.dispose();
     },
   };

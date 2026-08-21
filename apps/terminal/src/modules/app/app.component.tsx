@@ -10,6 +10,7 @@ import { closeWindow, minimizeWindow, toggleMaximizeWindow } from "../ipc/ipc.wi
 import { SidePanel } from "../side-panel/side-panel.component";
 import { TerminalView } from "../terminal/terminal.component";
 import { TerminalProvider, useTerminalSession } from "../terminal/terminal.hook";
+import { TerminalErrorBoundary } from "./app.error-boundary";
 import "./app.theme.css";
 
 /** Exact product copy for this template app; also fed into the titlebar via `version`. */
@@ -105,7 +106,9 @@ function AppShellFrame({ title, version }: { title: string; version: string | un
         </span>
       }
     >
-      <TerminalView />
+      <TerminalErrorBoundary>
+        <TerminalView />
+      </TerminalErrorBoundary>
     </AppShell>
   );
 }

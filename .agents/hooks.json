@@ -3,7 +3,7 @@
     "PreInvocation": [
       {
         "type": "command",
-        "command": "node .agents/hooks/pre-invocation.mjs",
+        "command": "node hooks/pre-invocation.mjs",
         "timeout": 30
       }
     ]
@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .agents/hooks/pre-tool-use.mjs"
+            "command": "node hooks/pre-tool-use.mjs"
           }
         ]
       }
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .agents/hooks/post-tool-use.mjs"
+            "command": "node hooks/post-tool-use.mjs"
           }
         ]
       }
@@ -38,7 +38,7 @@
     "Stop": [
       {
         "type": "command",
-        "command": "node .agents/hooks/stop.mjs"
+        "command": "node hooks/stop.mjs"
       }
     ]
   }

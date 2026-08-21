@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>GenCore Explorer</title>
+  <rect x="96" y="96" width="832" height="832" rx="184" ry="184" fill="#2E3440" stroke="#88C0D0" stroke-width="32" />
+  <path d="M304 334 L402 334 Q428 334 441.9 356 L462.1 388 Q476 410 502 410 L720 410 A40 40 0 0 1 760 450 L760 650 A40 40 0 0 1 720 690 L304 690 A40 40 0 0 1 264 650 L264 374 A40 40 0 0 1 304 334 Z" fill="#88C0D0" />
+</svg>

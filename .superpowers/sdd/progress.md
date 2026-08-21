@@ -234,7 +234,10 @@ Controller session. SDD + writing-plans. Work in place on `main` (running `tauri
 - BASE before Task 1: `951a8820e1c1babd55aade0ed3f09042d487d3db`
 - Task 1: complete (net files `951a882..c29ad07`, review clean). Implementation scooped into `df42786` plus shim commit `c29ad07`. Minors: jsdom `_localStorage` restore is test-only; `DEFAULT_CONFIG` is a shared mutable object. Task 2 tests must restore jsdom `localStorage` (Node 26 shadows it).
 - Task 2: complete (commit `ec77ca5`, review clean). JSX in `config.hook.ts` became `React.createElement` (Vite). Minors: `useConfig` throw untested; unlisten assignment race vs StrictMode; ConfigProvider describe does not reset IPC mocks.
-- Task 3: complete (commit `d4b0d2b`, review clean). Reviewer subagent timed out; controller gated from `review-ec77ca5..d4b0d2b.diff`. Minor: radiogroup keyboard untested.
+- Task 3: complete (commit `d4b0d2b`, review clean). Minor: radiogroup keyboard untested.
+- Task 4: complete (commit `7cf3c85`, review clean). Minors: duplicated jsdom localStorage restore in two test files; root AGENTS.md still has OS-only theme fact; package lint fails on unrelated `ipc.window.test.ts`.
+- Whole-branch review: complete (feature-scoped `951a882..7cf3c85`). Code review Ready to merge: Yes. No Critical/Important. Minors deferred (DEFAULT_CONFIG mutable, jsdom restore copied 4×, useConfig throw untested, keyboard untested, mocked preference cannot prove check moves, side-panel tests do not mock ipc.window, AGENTS.md OS-only fact, ipc.window.test.ts lint).
+- Controller verify: config+side-panel+app 5 files / 34 passed.
 
 ## Feature: Terminal window xterm + PTY (2026-08-20)
 
@@ -247,8 +250,30 @@ Controller session. SDD + writing-plans. Work in place on `main` (running `tauri
 - BASE before Task 1: `951a8820e1c1babd55aade0ed3f09042d487d3db`
 - Task 1: complete (commits 66c1531, review clean). Minors: Mono test landed in mixed parent `df42786`; biome wrapped Regular `src` line. Do not amend `df42786`.
 - Task 2: complete (commits 1e04f52, review clean). Minors: load does not cap an oversized existing file; `save_pinned_tabs` later flattened to `json: String` in `2e5bed3` (mixed commit). Task 4 Isolation must reconstruct `{ json }`.
+- Task 3: complete (commits 1df9661, review clean). Minors: session-map mutex held during write/resize I/O; smoke test accepts any PTY output; exit event untested; invalid-cwd path is hardcoded.
+- Task 4: complete (commits 137d6ba, review clean). Tauri review Approved. Minors: reconstructListen duplication; crate docs still say PTY stub; Rust write does not re-cap 64 KiB.
+- Task 5: complete (commits 8e296dd, review clean). Minors: OSC 7 per-chunk only; rename commit can freeze auto titles; statusbar always `pwsh` (`OpenResult` has no resolved shell).
+- Task 6: complete (commits 021ad64, 126c7d4, review clean). Minors: malformed v1 records with zero parsed tabs can persist empty; gate tests cover helper only; duplicated PinnedTabSource in tests.
+- Task 7: complete (commits 88264ff, c07355d, review clean). Tauri review Approved. Minors: git conflict template order; missing-ps1 test gap; swap helper vs hook; `\r\n`; temp dir leaks.
+- Whole-branch review: Tauri Approved. First pass Ready to merge: With fixes. Important fixed in d084221, 9934ed3 (Opus 5 after Grok dispatch abort). Re-review Approved. Residual: Alt+F4 persist uses pagehide not awaited destroy; waiter/reader comment nit.
 
 - `pnpm approve-builds` may be required before production `vite` / `tauri` build (esbuild)
 - Fill CODEOWNERS / GitHub handles when the remote exists
 - Optional: smoke `pnpm --filter @gencore/terminal tauri:dev`
 - No git commit until the user asks
+
+## Feature: Nord app icons, tray icons, tray menu (2026-08-20)
+
+Controller session. SDD + writing-plans. Work in place on `main`. No git commits unless the user asks. Implementers stage only task files. Do not stage `.cursor/hooks/state/**` or unrelated dirty paths.
+
+- Spec: `.superpowers/docs/specs/2026-08-20-app-icons-design.md`
+- Plan: `.superpowers/docs/plans/2026-08-20-app-icons.md`
+- Briefs: `.superpowers/sdd/`
+- Model: implementers and task reviewers `cursor-grok-4.6-xhigh-fast` unless blocked. Task 2 SVG authoring uses `claude-opus-5-thinking-high`.
+- BASE before Task 1: working tree (no task commit)
+- Task 1: complete (working tree, review approved). Minors: hex lock is 6-digit only; TILE/path regexes assume single-line double-quoted attributes.
+- Task 2: complete (working tree, review approved). Minors: 16px tiled app icon is tight; folder heavier than chevron; explorer path uses 441.9/462.1. Tray `<g scale>` accepted (shared `d` + 16–32px fill).
+- Task 3: complete (working tree, review approved). Minor: cleanup contract (no icns leftovers) is untested.
+- Task 4: complete (working tree, review approved after transparent overlay CSS fix). Minors deferred: ConfigProvider storage listener, ipc.tray.ts constant drift, Hide/Quit IPC tests.
+- Task 5: in progress
+

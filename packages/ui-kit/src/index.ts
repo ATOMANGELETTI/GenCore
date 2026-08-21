@@ -2,6 +2,7 @@ export * from "./composites/app-shell";
 export * from "./composites/content-area";
 export * from "./composites/statusbar";
 export * from "./composites/titlebar";
+export * from "./composites/tray-menu";
 export { cn } from "./lib/cn";
 export * from "./primitives/badge";
 export * from "./primitives/button";

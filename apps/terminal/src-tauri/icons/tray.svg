@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>GenCore Terminal tray</title>
+  <g transform="translate(512 512) scale(1.85) translate(-512 -512)">
+    <path d="M286 285 L499 512 L286 739 L286 605 L373 512 L286 419 Z" fill="#88C0D0" />
+    <rect x="574" y="362" width="164" height="300" rx="40" ry="40" fill="#88C0D0" />
+  </g>
+</svg>
