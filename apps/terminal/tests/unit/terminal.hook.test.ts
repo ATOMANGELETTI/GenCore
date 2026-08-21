@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   autoTitle,
   canFlushPinnedSave,
+  chunkPtyWrite,
   fromPinnedFile,
+  isSessionNotFound,
+  MAX_PTY_WRITE_CHARS,
   nextActiveId,
   seamLine,
   sortTabs,
@@ -139,5 +142,49 @@ describe("canFlushPinnedSave", () => {
 
   it("saves after hydrate when persist is allowed", () => {
     expect(canFlushPinnedSave({ hydrated: true, persistAllowed: true })).toBe(true);
+  });
+});
+
+describe("isSessionNotFound", () => {
+  it("matches the serialized pty SessionNotFound error in every shape", () => {
+    expect(isSessionNotFound("pty session not found")).toBe(true);
+    expect(isSessionNotFound(new Error("pty session not found"))).toBe(true);
+    expect(isSessionNotFound({ error: "SessionNotFound" })).toBe(true);
+  });
+
+  it("does not treat Isolation, size, or transient IPC faults as an exit", () => {
+    expect(isSessionNotFound("IPC command is not allowlisted by the isolation hook")).toBe(false);
+    expect(isSessionNotFound(new Error("data too large"))).toBe(false);
+    expect(isSessionNotFound("invalid working directory")).toBe(false);
+    expect(isSessionNotFound(undefined)).toBe(false);
+    expect(isSessionNotFound(null)).toBe(false);
+  });
+});
+
+describe("chunkPtyWrite", () => {
+  it("keeps small writes as a single chunk and drops empty writes", () => {
+    expect(chunkPtyWrite("echo hi\r\n")).toEqual(["echo hi\r\n"]);
+    expect(chunkPtyWrite("")).toEqual([]);
+    expect(chunkPtyWrite("a".repeat(MAX_PTY_WRITE_CHARS))).toHaveLength(1);
+  });
+
+  it("splits oversized writes into Isolation-sized chunks that rejoin exactly", () => {
+    const data = "a".repeat(MAX_PTY_WRITE_CHARS * 2 + 5);
+    const chunks = chunkPtyWrite(data);
+
+    expect(chunks).toHaveLength(3);
+    for (const chunk of chunks) {
+      expect(chunk.length).toBeLessThanOrEqual(MAX_PTY_WRITE_CHARS);
+    }
+    expect(chunks.join("")).toBe(data);
+  });
+
+  it("never splits a surrogate pair across two writes", () => {
+    const chunks = chunkPtyWrite(`${"a".repeat(3)}\u{1F600}${"b".repeat(3)}`, 4);
+
+    expect(chunks).toEqual(["aaa", "\u{1F600}bb", "b"]);
+    for (const chunk of chunks) {
+      expect(chunk).not.toMatch(/[\uD800-\uDBFF]$/);
+    }
   });
 });

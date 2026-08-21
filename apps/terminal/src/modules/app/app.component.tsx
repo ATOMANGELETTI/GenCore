@@ -60,19 +60,31 @@ function AppShellFrame({ title, version }: { title: string; version: string | un
   const session = useTerminalSession();
   const active = session.tabs.find((tab) => tab.id === session.activeId);
   const cwd = active?.cwd;
+  const { flushPinnedSave } = session;
+
+  // The window tears the WebView down as soon as it closes, so the pinned-tab
+  // write has to complete before `close()` is issued.
+  const closeAfterSave = React.useCallback(() => {
+    void (async () => {
+      await flushPinnedSave();
+      await closeWindow();
+    })().catch(() => {
+      // Window already gone; nothing left to persist to.
+    });
+  }, [flushPinnedSave]);
 
   return (
     <AppShell
       title={title}
       version={version}
       density="compact"
-      onClose={closeWindow}
+      onClose={closeAfterSave}
       onMinimize={minimizeWindow}
       onToggleMaximize={toggleMaximizeWindow}
       onVersionClick={openRepoInBrowser}
       titlebarContextMenu={
         <TitlebarContextMenu
-          onClose={closeWindow}
+          onClose={closeAfterSave}
           onMinimize={minimizeWindow}
           onToggleMaximize={toggleMaximizeWindow}
         />

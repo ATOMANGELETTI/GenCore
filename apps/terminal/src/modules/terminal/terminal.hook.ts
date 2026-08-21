@@ -29,6 +29,8 @@ export const MAX_PINNED_TABS = 16;
 export const MAX_SCROLLBACK_BYTES = 256 * 1024;
 export const SAVE_DEBOUNCE_MS = 2000;
 const SEAM_MAX_COLS = 80;
+/** Mirrors the Isolation hook's `WRITE_DATA_MAX_LENGTH` cap on `write` payloads. */
+export const MAX_PTY_WRITE_CHARS = 65536;
 
 export function clampPtyDim(value: number): number {
   if (!Number.isFinite(value)) {
@@ -205,20 +207,54 @@ export function fromPinnedFile(value: unknown): PinnedTabsFile | null {
   };
 }
 
-function isInvalidCwd(error: unknown): boolean {
+function errorText(error: unknown): string {
   if (typeof error === "string") {
-    return error.includes("invalid working directory") || error.includes("InvalidCwd");
+    return error;
   }
   if (error instanceof Error) {
-    return (
-      error.message.includes("invalid working directory") || error.message.includes("InvalidCwd")
-    );
+    return error.message;
   }
   try {
-    return JSON.stringify(error).includes("invalid working directory");
+    return JSON.stringify(error) ?? "";
   } catch {
-    return false;
+    return "";
   }
+}
+
+function isInvalidCwd(error: unknown): boolean {
+  const text = errorText(error);
+  return text.includes("invalid working directory") || text.includes("InvalidCwd");
+}
+
+/**
+ * Only a reaped/unknown session means the shell is gone. Isolation rejections,
+ * oversized payloads, and transient IPC faults must not mark the tab exited.
+ */
+export function isSessionNotFound(error: unknown): boolean {
+  const text = errorText(error);
+  return text.includes("pty session not found") || text.includes("SessionNotFound");
+}
+
+/** Split a write into Isolation-sized chunks without breaking a surrogate pair. */
+export function chunkPtyWrite(data: string, maxChars = MAX_PTY_WRITE_CHARS): string[] {
+  if (data.length === 0) {
+    return [];
+  }
+  if (data.length <= maxChars) {
+    return [data];
+  }
+  const chunks: string[] = [];
+  let start = 0;
+  while (start < data.length) {
+    let end = Math.min(start + maxChars, data.length);
+    const lastCode = data.charCodeAt(end - 1);
+    if (end < data.length && end - 1 > start && lastCode >= 0xd800 && lastCode <= 0xdbff) {
+      end -= 1;
+    }
+    chunks.push(data.slice(start, end));
+    start = end;
+  }
+  return chunks;
 }
 
 function recordToTab(record: PinnedTabRecord): TerminalTab {
@@ -294,6 +330,28 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const markExited = React.useCallback(
+    (tabId: string, error: unknown) => {
+      if (isSessionNotFound(error)) {
+        updateTab(tabId, { status: "exited", sessionId: null });
+      }
+    },
+    [updateTab],
+  );
+
+  const writeSession = React.useCallback(
+    async (tabId: string, sessionId: string, data: string) => {
+      try {
+        for (const chunk of chunkPtyWrite(data)) {
+          await writePty(sessionId, chunk);
+        }
+      } catch (error) {
+        markExited(tabId, error);
+      }
+    },
+    [markExited],
+  );
+
   const themeReadyRef = React.useRef(false);
   React.useEffect(() => {
     if (!themeReadyRef.current) {
@@ -303,12 +361,10 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
     const command = poshThemeSwapCommand(theme);
     for (const tab of tabsRef.current) {
       if (tab.sessionId && tab.status === "live") {
-        void writePty(tab.sessionId, command).catch(() => {
-          updateTab(tab.id, { status: "exited", sessionId: null });
-        });
+        void writeSession(tab.id, tab.sessionId, command);
       }
     }
-  }, [theme, updateTab]);
+  }, [theme, writeSession]);
 
   const bumpSpawn = React.useCallback((id: string): number => {
     const next = (spawnGenRef.current.get(id) ?? 0) + 1;
@@ -582,13 +638,13 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       sizeRef.current = { cols: colsClamped, rows: rowsClamped };
       for (const tab of tabsRef.current) {
         if (tab.sessionId && tab.status === "live") {
-          void resizePty(tab.sessionId, colsClamped, rowsClamped).catch(() => {
-            updateTab(tab.id, { status: "exited", sessionId: null });
+          void resizePty(tab.sessionId, colsClamped, rowsClamped).catch((error: unknown) => {
+            markExited(tab.id, error);
           });
         }
       }
     },
-    [updateTab],
+    [markExited],
   );
 
   const registerWriter = React.useCallback(
@@ -648,11 +704,9 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       if (!tab.sessionId) {
         return;
       }
-      void writePty(tab.sessionId, data).catch(() => {
-        updateTab(tabId, { status: "exited", sessionId: null });
-      });
+      void writeSession(tabId, tab.sessionId, data);
     },
-    [restartTab, updateTab],
+    [restartTab, writeSession],
   );
 
   React.useEffect(() => {
@@ -739,6 +793,9 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
     });
 
     void subscribePtyExit((payload) => {
+      // Rust reaps the map entry on the reader-exit path; this is the belt to
+      // that brace, so a dropped exit event can never strand a ConPTY session.
+      void killSession(payload.session_id);
       const tab = tabsRef.current.find((item) => item.sessionId === payload.session_id);
       if (!tab) {
         return;
@@ -752,14 +809,21 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       unlistenExit = stop;
     });
 
-    function onBeforeUnload() {
+    function onPageHide() {
       void flushSave();
     }
-    window.addEventListener("beforeunload", onBeforeUnload);
+    function onVisibilityChange() {
+      if (document.visibilityState === "hidden") {
+        void flushSave();
+      }
+    }
+    window.addEventListener("pagehide", onPageHide);
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
       cancelled = true;
-      window.removeEventListener("beforeunload", onBeforeUnload);
+      window.removeEventListener("pagehide", onPageHide);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       unlistenData?.();
       unlistenExit?.();
       void flushSave();
@@ -801,6 +865,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       registerClipboard,
       onTerminalInput,
       clipboard,
+      flushPinnedSave: flushSave,
     }),
     [
       activeId,
@@ -809,6 +874,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       closeTab,
       closeUnpinned,
       cols,
+      flushSave,
       newTab,
       onTerminalInput,
       registerClipboard,

@@ -62,4 +62,6 @@ export interface TerminalSessionApi {
   registerClipboard: (api: TerminalClipboardApi) => () => void;
   onTerminalInput: (tabId: string, data: string) => void;
   clipboard: TerminalClipboardApi;
+  /** Persists pinned tabs immediately; awaited on the window-close path. */
+  flushPinnedSave: () => Promise<void>;
 }

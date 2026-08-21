@@ -36,7 +36,13 @@ function lastWindowsPath(matches: Iterable<string>): string | null {
   return last;
 }
 
-/** Scan a PTY chunk for OSC 7 (`ESC ] 7 ; file://… BEL|ST`) and return a Windows cwd. */
+/**
+ * Scan a PTY chunk for OSC 7 (`ESC ] 7 ; file://… BEL|ST`) and return a Windows cwd.
+ *
+ * Only a complete, correctly terminated OSC 7 sequence counts. A bare `file://`
+ * URI printed by the shell (`cat`, `git log`, a pasted link) must never move the
+ * tab's cwd.
+ */
 export function scanOsc7(chunk: string): string | null {
   if (!chunk) {
     return null;
@@ -51,17 +57,5 @@ export function scanOsc7(chunk: string): string | null {
     oscPaths.push(osc[1] ?? "");
     osc = osc7.exec(chunk);
   }
-  const fromOsc = lastWindowsPath(oscPaths);
-  if (fromOsc) {
-    return fromOsc;
-  }
-
-  const fileUris: string[] = [];
-  const fileUri = new RegExp(`file://[^\\s${bel}${esc}]*`, "g");
-  let file = fileUri.exec(chunk);
-  while (file) {
-    fileUris.push(file[0] ?? "");
-    file = fileUri.exec(chunk);
-  }
-  return lastWindowsPath(fileUris);
+  return lastWindowsPath(oscPaths);
 }
