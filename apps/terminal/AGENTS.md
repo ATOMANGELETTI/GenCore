@@ -7,10 +7,11 @@ Template Tauri 2 shell — not a working terminal emulator. The Files tab is a r
 - Window chrome goes through `src/modules/ipc/ipc.window.ts` (`getCurrentWindow()`). App info through `ipc.app-info.ts`. UI never calls `invoke` directly
 - Files tab uses `gencore-fs` `list` / `list_drives` / `create_file` / `create_dir` / `watch` / `unwatch` through `src/modules/ipc/ipc.fs.ts`
 - Files tab right-click uses the ui-kit ContextMenu (Terminal-owned items: Expand/Collapse, New File, New Folder, Refresh, Copy Path; blank area Refresh + Collapse All). `C:\` expands on load. No new Isolation grants
-- Isolation hook allowlist and `capabilities/main.json` stay least-privilege: window close/minimize/toggle-maximize/start-dragging + `gencore-core:allow-get-app-info` + scoped `opener:allow-open-url` for `https://github.com/ATOMANGELETTI/GenCore`
-- Isolation also allowlists the six `gencore-fs` commands above **and** `plugin:event|listen` / `plugin:event|unlisten` reconstructed only for `gencore-fs://entry-changed`
-- Capabilities grant the matching `gencore-fs:allow-*` plus `core:event:allow-listen` / `allow-unlisten`
-- Still no `stat`, `gencore-pty`, `core:default`, `opener:default`, `core:event:default`, or emit
+- Isolation hook allowlist and `capabilities/main.json` stay least-privilege: window close/minimize/toggle-maximize/start-dragging/theme + `gencore-core:allow-get-app-info` + scoped `opener:allow-open-url` for `https://github.com/ATOMANGELETTI/GenCore`
+- Isolation also allowlists the six `gencore-fs` commands above **and** `plugin:event|listen` / `plugin:event|unlisten` reconstructed only for `gencore-fs://entry-changed` (Any) and `tauri://theme-changed` (`{ kind: "Window", label: "main" }`)
+- Capabilities grant the matching `gencore-fs:allow-*` plus `core:window:allow-theme` and `core:event:allow-listen` / `allow-unlisten`
+- OS appearance maps dark → Polar Night, light → Snow Storm, IPC failure/null → Polar Night. No theme picker. Window theme IPC is `getWindowTheme` / `subscribeWindowTheme` in `ipc.window.ts`
+- Still no `stat`, `gencore-pty`, `core:default`, `opener:default`, `core:event:default`, `core:window:default`, `core:window:allow-set-theme`, or emit
 - Repo URL opens through `ipc.opener.ts` (`openRepoInBrowser`)
 - `gencore-fs` and `gencore-pty` are registered in Rust. Grant only the six Files-tab `gencore-fs` commands. **Do not** grant `gencore-pty` stubs until a real UI calls them
 - Override density only in `src/modules/app/app.theme.css`. Keep Nord tokens

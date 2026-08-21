@@ -115,8 +115,13 @@ describe("Titlebar", () => {
     const chip = screen.getByRole("button", { name: "Open the GenCore GitHub repository" });
     expect(chip).toHaveClass("cursor-pointer");
     expect(chip).toHaveClass("hover:animate-gild-sheen");
-    expect(chip).toHaveClass("hover:border-nord-aurora-13");
-    expect(chip).toHaveClass("hover:text-nord-polar-0");
+    expect(chip).toHaveClass("hover:text-transparent");
+    expect(chip).toHaveClass("hover:border-transparent");
+    expect(chip).toHaveClass("hover:[-webkit-text-fill-color:transparent]");
+    expect(chip).toHaveClass("hover:[background-clip:text,padding-box,border-box]");
+    expect(chip.className).toContain("linear-gradient(var(--titlebar),var(--titlebar))");
     expect(chip).toHaveClass("motion-reduce:hover:animate-none");
+    expect(chip).toHaveClass("motion-reduce:hover:text-nord-aurora-13");
+    expect(chip).not.toHaveClass("hover:text-nord-polar-0");
   });
 });

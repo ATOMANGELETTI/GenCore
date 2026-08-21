@@ -10,6 +10,7 @@ const EMPTY_ARG_COMMANDS = [
   "plugin:window|minimize",
   "plugin:window|toggle_maximize",
   "plugin:window|start_dragging",
+  "plugin:window|theme",
   "plugin:gencore-fs|list_drives",
 ] as const;
 
@@ -18,6 +19,7 @@ const WINDOW_COMMANDS = [
   "plugin:window|minimize",
   "plugin:window|toggle_maximize",
   "plugin:window|start_dragging",
+  "plugin:window|theme",
 ] as const;
 
 const OPEN_URL_CMD = "plugin:opener|open_url";
@@ -36,12 +38,15 @@ const EVENT_LISTEN_CMD = "plugin:event|listen";
 const EVENT_UNLISTEN_CMD = "plugin:event|unlisten";
 const EVENT_EMIT_CMD = "plugin:event|emit";
 const ENTRY_CHANGED_EVENT = "gencore-fs://entry-changed";
+const THEME_CHANGED_EVENT = "tauri://theme-changed";
 
 const FORBIDDEN_TOKENS = [
   "gencore-pty",
   "core:default",
   "opener:default",
   "core:event:default",
+  "core:window:default",
+  "core:window:allow-set-theme",
 ] as const;
 
 const hookSource = readFileSync(resolve(process.cwd(), "isolation/isolation.hook.js"), "utf8");
@@ -209,6 +214,7 @@ describe("terminal isolation hook", () => {
       "core:window:allow-minimize",
       "core:window:allow-toggle-maximize",
       "core:window:allow-start-dragging",
+      "core:window:allow-theme",
       "gencore-core:allow-get-app-info",
       "gencore-fs:allow-list",
       "gencore-fs:allow-list-drives",
@@ -402,6 +408,88 @@ describe("terminal isolation hook", () => {
     expect(() =>
       hook(envelope(EVENT_UNLISTEN_CMD, { event: "tauri://click", eventId: 3 })),
     ).toThrow();
+  });
+
+  it("reconstructs listen for tauri://theme-changed with Window main target", () => {
+    const hook = getHook();
+    const inner = {
+      event: THEME_CHANGED_EVENT,
+      target: { kind: "Window", label: "main" },
+      handler: 11,
+    };
+    const input = envelope(EVENT_LISTEN_CMD, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.cmd).toBe(EVENT_LISTEN_CMD);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({
+      event: THEME_CHANGED_EVENT,
+      target: { kind: "Window", label: "main" },
+      handler: 11,
+    });
+    expect((result.payload as { target: unknown }).target).not.toBe(inner.target);
+  });
+
+  it("allows theme-changed listen when label precedes kind", () => {
+    const hook = getHook();
+    const inner = {
+      event: THEME_CHANGED_EVENT,
+      target: { label: "main", kind: "Window" },
+      handler: 11,
+    };
+    const result = hook(envelope(EVENT_LISTEN_CMD, inner));
+    expect(result.payload).toEqual({
+      event: THEME_CHANGED_EVENT,
+      target: { kind: "Window", label: "main" },
+      handler: 11,
+    });
+  });
+
+  it("throws for theme-changed listen with Any target or a non-main window", () => {
+    const hook = getHook();
+    expect(() =>
+      hook(
+        envelope(EVENT_LISTEN_CMD, {
+          event: THEME_CHANGED_EVENT,
+          target: { kind: "Any" },
+          handler: 7,
+        }),
+      ),
+    ).toThrow();
+    expect(() =>
+      hook(
+        envelope(EVENT_LISTEN_CMD, {
+          event: THEME_CHANGED_EVENT,
+          target: { kind: "Window", label: "other" },
+          handler: 7,
+        }),
+      ),
+    ).toThrow();
+  });
+
+  it("throws for entry-changed listen with a Window target", () => {
+    const hook = getHook();
+    expect(() =>
+      hook(
+        envelope(EVENT_LISTEN_CMD, {
+          event: ENTRY_CHANGED_EVENT,
+          target: { kind: "Window", label: "main" },
+          handler: 7,
+        }),
+      ),
+    ).toThrow();
+  });
+
+  it("reconstructs unlisten for tauri://theme-changed", () => {
+    const hook = getHook();
+    const inner = { event: THEME_CHANGED_EVENT, eventId: 5 };
+    const input = envelope(EVENT_UNLISTEN_CMD, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({ event: THEME_CHANGED_EVENT, eventId: 5 });
   });
 
   it("does not grant gencore-fs stat in capabilities", () => {

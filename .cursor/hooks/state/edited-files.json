@@ -179,5 +179,30 @@
   ],
   "249a2669-84ba-4971-88d2-2adc891734dd": [
     "apps/terminal"
+  ],
+  "9b8d8b04-f391-4249-a158-3105db77ccc8": [
+    "packages/ui-kit"
+  ],
+  "e12881f1-66bb-4f1a-8868-a1c2e3dd28f2": [
+    "packages/ui-kit"
+  ],
+  "f92296dd-6538-4d11-8417-bde1f43ba955": [
+    "packages/ui-kit"
+  ],
+  "df441631-be72-472f-ae68-7ea74e6c84da": [
+    "apps/terminal"
+  ],
+  "4abd918e-a765-41ff-96ed-d9c19e09a483": [
+    "packages/ui-kit"
+  ],
+  "ef8b69a8-5bb5-4a95-a335-68b47a54982d": [
+    "packages/ui-kit"
+  ],
+  "86a83900-f81b-44aa-8fe7-d8b298db9f06": [
+    "apps/terminal",
+    "apps/explorer"
+  ],
+  "290fa825-babf-4c28-8bc7-7554cd5f26f1": [
+    "apps/terminal"
   ]
 }

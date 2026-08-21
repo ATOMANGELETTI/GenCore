@@ -1,14 +1,17 @@
 {
   "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/tauri-v2.11.1/crates/tauri-schema-generator/schemas/capability.schema.json",
   "identifier": "main",
-  "description": "Least-privilege capability for the Explorer main window: window chrome controls, app-info, and scoped open-url for the GenCore GitHub repo only. No filesystem, shell, or http access.",
+  "description": "Least-privilege capability for the Explorer main window: window chrome controls, OS window theme, app-info, and scoped open-url for the GenCore GitHub repo only. No filesystem, shell, or http access.",
   "windows": ["main"],
   "permissions": [
     "core:window:allow-close",
     "core:window:allow-minimize",
     "core:window:allow-toggle-maximize",
     "core:window:allow-start-dragging",
+    "core:window:allow-theme",
     "gencore-core:allow-get-app-info",
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
     {
       "identifier": "opener:allow-open-url",
       "allow": [{ "url": "https://github.com/ATOMANGELETTI/GenCore" }]

@@ -50,6 +50,20 @@ export function ThemeProvider({
     [theme, setTheme, tokens],
   );
 
+  React.useEffect(() => {
+    const root = document.documentElement;
+    const applied = themeClassName[theme].split(" ");
+    const opposite =
+      theme === "polar-night" ? themeClassName["snow-storm"] : themeClassName["polar-night"];
+
+    root.classList.remove(...opposite.split(" "));
+    root.classList.add(...applied);
+
+    return () => {
+      root.classList.remove(...applied);
+    };
+  }, [theme]);
+
   return (
     <ThemeContext.Provider value={value}>
       <div

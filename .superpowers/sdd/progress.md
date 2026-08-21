@@ -172,6 +172,36 @@ Controller session. SDD + writing-plans. Work in place on current branch. Commit
 - Whole-branch review: complete (a268de8..a976887). Code review Ready to merge: Yes. ui-kit-reviewer Approved. No Critical/Important. Minors left: commit subject extra words; Task 3 TDD stopped at h-6; icon-xs test does not lock SVG size-3; stretched tabs keep size-8+h-full (CSS order currently wins).
 - Controller verify: ui-kit button 6/6, terminal file-tree+side-panel 25/25.
 
+## Feature: Nord official theme roles (2026-08-20)
+
+Controller session. SDD + writing-plans. Work in place on `main` (running `tauri:dev`). Commits allowed (user chose SDD execution of the plan). Implementers stage only task files.
+
+- Spec: `.superpowers/docs/specs/2026-08-20-nord-theme-roles-design.md`
+- Plan: `.superpowers/docs/plans/2026-08-20-nord-theme-roles.md`
+- Briefs: `.superpowers/sdd/`
+- Model: implementers and task reviewers `cursor-grok-4.6-xhigh-fast` unless blocked; elevate only if needed.
+- BASE before Task 1: `bd1411ad6c54dcd9680611a9e28f9955aaa9c2c6`
+- Task 1: complete (commits bd1411a..5d49cc4, review clean). ⚠️ trailers/TDD/defaultTheme resolved by controller (no AI trailer; RED then GREEN in report; apps untouched).
+- Task 2: complete (commits 5d49cc4..6c6f63d, review clean). ⚠️ trailers/TDD resolved (no AI trailer).
+- Task 3: complete (commits 6c6f63d..b545a42, review clean). Minor: selected tree assertion does not prove `text-foreground` is gone. ⚠️ trailers resolved (no AI trailer).
+- Task 4: complete (commits b545a42..8310462, review clean). ⚠️ trailers resolved (no AI trailer).
+- Whole-branch review: complete (bd1411a..8310462). Code review Ready to merge: Yes. ui-kit-reviewer Approved. No Critical/Important. Minors left: tree selected assertion vs `text-foreground`; `--color-caution` / `tokens.colors.ts` not locked by tests; selected chevron stays `text-foreground/80`.
+- Controller verify: ui-kit 153/153, terminal 127/127.
+- Finish: already on `main` (in-place commits). Local merge is a no-op. No worktree to clean up. Not pushed (`main` ahead of origin by 4). Spec/plan still untracked under `.superpowers/docs/`.
+
+## Feature: FileIcon outline glyphs (2026-08-20)
+
+Controller session. SDD + writing-plans. Work in place on `main` (running `tauri:dev`). Commits allowed (user chose SDD). Implementers stage only task files. Unrelated dirty tree (titlebar gilded outline) must not be staged.
+
+- Spec: `.superpowers/docs/specs/2026-08-20-file-icon-monochrome-design.md`
+- Plan: `.superpowers/docs/plans/2026-08-20-file-icon-monochrome.md`
+- Briefs: `.superpowers/sdd/file-icon-monochrome/`
+- Model: implementers and task reviewers `cursor-grok-4.6-xhigh-fast` unless blocked; elevate only if needed.
+- BASE before Task 1: `8310462ee683953e5bf62f86a507d171721d62ef`
+- Task 1: complete (commits 8310462..d7730b0, review clean). ⚠️ trailers/visual resolved by controller (`git log -1` body is subject only, no AI trailers; theme colors inherit from unchanged Tree `text-foreground` / `text-accent-foreground`).
+- Whole-branch review: complete (8310462..d7730b0). Code review Ready to merge: Yes. ui-kit-reviewer Approved. No Critical/Important. Minors left: `js` is a bare circle; `pdf` is a dog-eared sheet; `video`/`sh` both use a play triangle. Controller verify: file-icon 78/78.
+- Finish: already on `main` (in-place commit). Local merge is a no-op. No worktree to clean up. Not pushed (`main` ahead of origin). Spec/plan still untracked under `.superpowers/docs/`.
+
 ## Follow-ups (not blocking)
 
 - `pnpm approve-builds` may be required before production `vite` / `tauri` build (esbuild)

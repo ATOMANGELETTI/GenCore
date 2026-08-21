@@ -32,3 +32,15 @@ export function toggleMaximizeWindow(): Promise<void> {
 export function startDraggingWindow(): Promise<void> {
   return appWindow().startDragging();
 }
+
+export function getWindowTheme(): Promise<"light" | "dark" | null> {
+  return appWindow().theme();
+}
+
+export function subscribeWindowTheme(
+  handler: (theme: "light" | "dark") => void,
+): Promise<() => void> {
+  return appWindow().onThemeChanged((event) => {
+    handler(event.payload);
+  });
+}

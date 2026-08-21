@@ -1,13 +1,14 @@
 {
   "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/tauri-v2.11.1/crates/tauri-schema-generator/schemas/capability.schema.json",
   "identifier": "main",
-  "description": "Least-privilege capabilities for the GenCore Terminal main window: core window chrome controls, app-info, scoped gencore-fs list/create/watch for the file tree, and scoped open-url for the GenCore GitHub repo only. No gencore-pty commands are granted yet.",
+  "description": "Least-privilege capabilities for the GenCore Terminal main window: core window chrome controls, OS window theme, app-info, scoped gencore-fs list/create/watch for the file tree, and scoped open-url for the GenCore GitHub repo only. No gencore-pty commands are granted yet.",
   "windows": ["main"],
   "permissions": [
     "core:window:allow-close",
     "core:window:allow-minimize",
     "core:window:allow-toggle-maximize",
     "core:window:allow-start-dragging",
+    "core:window:allow-theme",
     "gencore-core:allow-get-app-info",
     "gencore-fs:allow-list",
     "gencore-fs:allow-list-drives",

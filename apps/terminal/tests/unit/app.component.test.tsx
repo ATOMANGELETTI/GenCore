@@ -1,9 +1,10 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { APP_TITLE, App } from "../../src/modules/app/app.component";
 import { getAppInfo } from "../../src/modules/ipc/ipc.app-info";
 import type { AppInfo } from "../../src/modules/ipc/ipc.types";
+import { getWindowTheme, subscribeWindowTheme } from "../../src/modules/ipc/ipc.window";
 
 const mockAppInfo: AppInfo = {
   name: "GenCore Terminal",
@@ -15,10 +16,18 @@ vi.mock("../../src/modules/ipc/ipc.app-info", () => ({
   getAppInfo: vi.fn(() => Promise.resolve(mockAppInfo)),
 }));
 
+const { getWindowTheme: getWindowThemeMock, subscribeWindowTheme: subscribeWindowThemeMock } =
+  vi.hoisted(() => ({
+    getWindowTheme: vi.fn(() => Promise.resolve("dark" as const)),
+    subscribeWindowTheme: vi.fn(async () => () => undefined),
+  }));
+
 vi.mock("../../src/modules/ipc/ipc.window", () => ({
   closeWindow: vi.fn(() => Promise.resolve()),
   minimizeWindow: vi.fn(() => Promise.resolve()),
   toggleMaximizeWindow: vi.fn(() => Promise.resolve()),
+  getWindowTheme: getWindowThemeMock,
+  subscribeWindowTheme: subscribeWindowThemeMock,
 }));
 
 const { openRepoInBrowser } = vi.hoisted(() => ({
@@ -42,6 +51,8 @@ vi.mock("../../src/modules/ipc/ipc.fs", () => ({
 describe("App", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(getWindowTheme).mockResolvedValue("dark");
+    vi.mocked(subscribeWindowTheme).mockResolvedValue(() => undefined);
   });
 
   it("renders the exact template title in the heading and titlebar", async () => {
@@ -99,5 +110,43 @@ describe("App", () => {
       expect(screen.getByRole("main")).toHaveTextContent("core unavailable");
     });
     expect(screen.getByRole("contentinfo")).not.toHaveTextContent("core unavailable");
+  });
+
+  it("applies Snow Storm after the OS window theme resolves to light", async () => {
+    vi.mocked(getWindowTheme).mockResolvedValueOnce("light");
+
+    render(<App />);
+
+    await waitFor(() => {
+      const wrapper = document.querySelector('[data-slot="theme-provider"]');
+      expect(wrapper).toHaveAttribute("data-theme", "snow-storm");
+      expect(wrapper).toHaveClass("theme-snow-storm", "light");
+    });
+  });
+
+  it("flips Polar Night to Snow Storm when the window theme subscription reports light", async () => {
+    let onTheme: ((theme: "light" | "dark") => void) | undefined;
+    vi.mocked(subscribeWindowTheme).mockImplementation(
+      async (handler: (theme: "light" | "dark") => void) => {
+        onTheme = handler;
+        return () => undefined;
+      },
+    );
+
+    render(<App />);
+
+    await waitFor(() => expect(subscribeWindowTheme).toHaveBeenCalledTimes(1));
+    const wrapper = document.querySelector('[data-slot="theme-provider"]');
+    expect(wrapper).toHaveAttribute("data-theme", "polar-night");
+    expect(wrapper).toHaveClass("theme-polar-night", "dark");
+
+    act(() => {
+      onTheme?.("light");
+    });
+
+    await waitFor(() => {
+      expect(wrapper).toHaveAttribute("data-theme", "snow-storm");
+      expect(wrapper).toHaveClass("theme-snow-storm", "light");
+    });
   });
 });

@@ -4,8 +4,9 @@
 //
 // Allowed:
 //   - gencore-core's app-info query
-//   - the core window commands the titlebar/traffic-lights use
+//   - the core window commands the titlebar/traffic-lights use, plus theme()
 //   - opener open_url for the GenCore GitHub repository only
+//   - event listen/unlisten for tauri://theme-changed (Window main) only
 (() => {
   const ALLOWED_COMMANDS = [
     "plugin:gencore-core|get_app_info",
@@ -13,10 +14,16 @@
     "plugin:window|minimize",
     "plugin:window|toggle_maximize",
     "plugin:window|start_dragging",
+    "plugin:window|theme",
     "plugin:opener|open_url",
+    "plugin:event|listen",
+    "plugin:event|unlisten",
   ];
   const OPEN_URL_CMD = "plugin:opener|open_url";
   const GET_APP_INFO_CMD = "plugin:gencore-core|get_app_info";
+  const LISTEN_CMD = "plugin:event|listen";
+  const UNLISTEN_CMD = "plugin:event|unlisten";
+  const THEME_CHANGED_EVENT = "tauri://theme-changed";
   const ALLOWED_OPEN_URL = "https://github.com/ATOMANGELETTI/GenCore";
   const MAIN_WINDOW_LABEL = "main";
 
@@ -64,6 +71,99 @@
     return hasUrl;
   }
 
+  function isFiniteNumber(value) {
+    return typeof value === "number" && Number.isFinite(value);
+  }
+
+  function isWindowTarget(target) {
+    if (!isPlainObject(target)) {
+      return false;
+    }
+    const keys = Object.keys(target);
+    if (keys.length !== 2) {
+      return false;
+    }
+    let hasKind = false;
+    let hasLabel = false;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key === "kind") {
+        hasKind = true;
+        continue;
+      }
+      if (key === "label") {
+        hasLabel = true;
+        continue;
+      }
+      return false;
+    }
+    return hasKind && hasLabel && target.kind === "Window" && target.label === MAIN_WINDOW_LABEL;
+  }
+
+  function isListenArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    if (keys.length !== 3) {
+      return false;
+    }
+    let hasEvent = false;
+    let hasTarget = false;
+    let hasHandler = false;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key === "event") {
+        hasEvent = true;
+        continue;
+      }
+      if (key === "target") {
+        hasTarget = true;
+        continue;
+      }
+      if (key === "handler") {
+        hasHandler = true;
+        continue;
+      }
+      return false;
+    }
+    return (
+      hasEvent &&
+      hasTarget &&
+      hasHandler &&
+      args.event === THEME_CHANGED_EVENT &&
+      isWindowTarget(args.target) &&
+      isFiniteNumber(args.handler)
+    );
+  }
+
+  function isUnlistenArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    if (keys.length !== 2) {
+      return false;
+    }
+    let hasEvent = false;
+    let hasEventId = false;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key === "event") {
+        hasEvent = true;
+        continue;
+      }
+      if (key === "eventId") {
+        hasEventId = true;
+        continue;
+      }
+      return false;
+    }
+    return (
+      hasEvent && hasEventId && args.event === THEME_CHANGED_EVENT && isFiniteNumber(args.eventId)
+    );
+  }
+
   function reconstructInnerPayload(cmd, args) {
     if (cmd === OPEN_URL_CMD) {
       return { url: ALLOWED_OPEN_URL };
@@ -73,6 +173,16 @@
         return undefined;
       }
       return {};
+    }
+    if (cmd === LISTEN_CMD) {
+      return {
+        event: THEME_CHANGED_EVENT,
+        target: { kind: "Window", label: MAIN_WINDOW_LABEL },
+        handler: args.handler,
+      };
+    }
+    if (cmd === UNLISTEN_CMD) {
+      return { event: THEME_CHANGED_EVENT, eventId: args.eventId };
     }
     if (isEmptyArgs(args)) {
       if (args === undefined || args === null) {
@@ -112,6 +222,14 @@
       }
     } else if (payload.cmd === GET_APP_INFO_CMD) {
       if (!isEmptyArgs(payload.payload)) {
+        reject();
+      }
+    } else if (payload.cmd === LISTEN_CMD) {
+      if (!isListenArgs(payload.payload)) {
+        reject();
+      }
+    } else if (payload.cmd === UNLISTEN_CMD) {
+      if (!isUnlistenArgs(payload.payload)) {
         reject();
       }
     } else if (!isMainWindowArgs(payload.payload)) {

@@ -7,12 +7,14 @@ import { openRepoInBrowser } from "../ipc/ipc.opener";
 import type { AppInfo } from "../ipc/ipc.types";
 import { closeWindow, minimizeWindow, toggleMaximizeWindow } from "../ipc/ipc.window";
 import { SidePanel } from "../side-panel/side-panel.component";
+import { useOsTheme } from "./app.hook";
 import "./app.theme.css";
 
 /** Exact product copy for this template app; also fed into the titlebar via `version`. */
 export const APP_TITLE = "Tauri Terminal Template";
 
 export function App() {
+  const osTheme = useOsTheme();
   const [appInfo, setAppInfo] = React.useState<AppInfo | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -39,7 +41,7 @@ export function App() {
   const version = appInfo?.version;
 
   return (
-    <ThemeProvider defaultTheme="polar-night">
+    <ThemeProvider theme={osTheme}>
       <AppShell
         title={APP_TITLE}
         version={version}

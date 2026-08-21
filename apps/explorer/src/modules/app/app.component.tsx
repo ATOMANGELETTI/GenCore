@@ -4,11 +4,13 @@ import { getAppInfo } from "../ipc/ipc.app-info";
 import { openRepoInBrowser } from "../ipc/ipc.opener";
 import type { AppInfo } from "../ipc/ipc.types";
 import { closeWindow, minimizeWindow, toggleMaximizeWindow } from "../ipc/ipc.window";
+import { useOsTheme } from "./app.hook";
 
 /** Exact template copy; the version segment comes from `get_app_info`. */
 const APP_TITLE = "Tauri Explorer Template";
 
 export function App() {
+  const osTheme = useOsTheme();
   const [appInfo, setAppInfo] = React.useState<AppInfo | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -35,7 +37,7 @@ export function App() {
   const version = appInfo?.version;
 
   return (
-    <ThemeProvider defaultTheme="polar-night">
+    <ThemeProvider theme={osTheme}>
       <AppShell
         title={APP_TITLE}
         version={version}

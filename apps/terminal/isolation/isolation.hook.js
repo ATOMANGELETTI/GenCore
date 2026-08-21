@@ -4,10 +4,11 @@
 //
 // Allowed:
 //   - gencore-core's app-info query
-//   - the core window commands the titlebar/traffic-lights use
+//   - the core window commands the titlebar/traffic-lights use, plus theme()
 //   - opener open_url for the GenCore GitHub repository only
 //   - gencore-fs list/list_drives/create_file/create_dir/watch/unwatch
-//   - event listen/unlisten for gencore-fs://entry-changed only
+//   - event listen/unlisten for gencore-fs://entry-changed (Any) and
+//     tauri://theme-changed (Window main) only
 (() => {
   const ALLOWED_COMMANDS = [
     "plugin:gencore-core|get_app_info",
@@ -15,6 +16,7 @@
     "plugin:window|minimize",
     "plugin:window|toggle_maximize",
     "plugin:window|start_dragging",
+    "plugin:window|theme",
     "plugin:opener|open_url",
     "plugin:gencore-fs|list_drives",
     "plugin:gencore-fs|list",
@@ -36,6 +38,7 @@
   const LISTEN_CMD = "plugin:event|listen";
   const UNLISTEN_CMD = "plugin:event|unlisten";
   const ENTRY_CHANGED_EVENT = "gencore-fs://entry-changed";
+  const THEME_CHANGED_EVENT = "tauri://theme-changed";
   const ALLOWED_OPEN_URL = "https://github.com/ATOMANGELETTI/GenCore";
   const MAIN_WINDOW_LABEL = "main";
   const PATH_MIN_LENGTH = 1;
@@ -145,6 +148,41 @@
     return keys.length === 1 && keys[0] === "kind" && target.kind === "Any";
   }
 
+  function isWindowTarget(target) {
+    if (!isPlainObject(target)) {
+      return false;
+    }
+    const keys = Object.keys(target);
+    if (keys.length !== 2) {
+      return false;
+    }
+    let hasKind = false;
+    let hasLabel = false;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key === "kind") {
+        hasKind = true;
+        continue;
+      }
+      if (key === "label") {
+        hasLabel = true;
+        continue;
+      }
+      return false;
+    }
+    return hasKind && hasLabel && target.kind === "Window" && target.label === MAIN_WINDOW_LABEL;
+  }
+
+  function isAllowedListenEvent(event, target) {
+    if (event === ENTRY_CHANGED_EVENT) {
+      return isAnyTarget(target);
+    }
+    if (event === THEME_CHANGED_EVENT) {
+      return isWindowTarget(target);
+    }
+    return false;
+  }
+
   function isListenArgs(args) {
     if (!isPlainObject(args)) {
       return false;
@@ -176,8 +214,7 @@
       hasEvent &&
       hasTarget &&
       hasHandler &&
-      args.event === ENTRY_CHANGED_EVENT &&
-      isAnyTarget(args.target) &&
+      isAllowedListenEvent(args.event, args.target) &&
       isFiniteNumber(args.handler)
     );
   }
@@ -205,7 +242,10 @@
       return false;
     }
     return (
-      hasEvent && hasEventId && args.event === ENTRY_CHANGED_EVENT && isFiniteNumber(args.eventId)
+      hasEvent &&
+      hasEventId &&
+      (args.event === ENTRY_CHANGED_EVENT || args.event === THEME_CHANGED_EVENT) &&
+      isFiniteNumber(args.eventId)
     );
   }
 
@@ -226,6 +266,13 @@
       return { path: args.path, recursive: false };
     }
     if (cmd === LISTEN_CMD) {
+      if (args.event === THEME_CHANGED_EVENT) {
+        return {
+          event: THEME_CHANGED_EVENT,
+          target: { kind: "Window", label: MAIN_WINDOW_LABEL },
+          handler: args.handler,
+        };
+      }
       return {
         event: ENTRY_CHANGED_EVENT,
         target: { kind: "Any" },
@@ -233,7 +280,7 @@
       };
     }
     if (cmd === UNLISTEN_CMD) {
-      return { event: ENTRY_CHANGED_EVENT, eventId: args.eventId };
+      return { event: args.event, eventId: args.eventId };
     }
     if (isEmptyArgs(args)) {
       if (args === undefined || args === null) {

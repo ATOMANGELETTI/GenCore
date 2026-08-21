@@ -1,10 +1,12 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { act, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const getAppInfo = vi.fn();
 const closeWindow = vi.fn();
 const minimizeWindow = vi.fn();
 const toggleMaximizeWindow = vi.fn();
+const getWindowTheme = vi.fn();
+const subscribeWindowTheme = vi.fn();
 const openRepoInBrowser = vi.fn();
 
 vi.mock("../../src/modules/ipc/ipc.app-info", () => ({ getAppInfo }));
@@ -12,12 +14,21 @@ vi.mock("../../src/modules/ipc/ipc.window", () => ({
   closeWindow,
   minimizeWindow,
   toggleMaximizeWindow,
+  getWindowTheme,
+  subscribeWindowTheme,
 }));
 vi.mock("../../src/modules/ipc/ipc.opener", () => ({
   openRepoInBrowser,
 }));
 
 describe("App", () => {
+  beforeEach(() => {
+    getWindowTheme.mockReset();
+    subscribeWindowTheme.mockReset();
+    getWindowTheme.mockResolvedValue("dark");
+    subscribeWindowTheme.mockResolvedValue(() => undefined);
+  });
+
   it("renders the exact template heading", async () => {
     getAppInfo.mockResolvedValue({
       name: "GenCore Explorer",
@@ -84,5 +95,43 @@ describe("App", () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Open the GenCore GitHub repository" }));
     expect(openRepoInBrowser).toHaveBeenCalledTimes(1);
+  });
+
+  it("applies Snow Storm after the OS window theme resolves to light", async () => {
+    getWindowTheme.mockResolvedValueOnce("light");
+
+    const { App } = await import("../../src/modules/app/app.component");
+    render(<App />);
+
+    await waitFor(() => {
+      const wrapper = document.querySelector('[data-slot="theme-provider"]');
+      expect(wrapper).toHaveAttribute("data-theme", "snow-storm");
+      expect(wrapper).toHaveClass("theme-snow-storm", "light");
+    });
+  });
+
+  it("flips Polar Night to Snow Storm when the window theme subscription reports light", async () => {
+    let onTheme: ((theme: "light" | "dark") => void) | undefined;
+    subscribeWindowTheme.mockImplementation(async (handler: (theme: "light" | "dark") => void) => {
+      onTheme = handler;
+      return () => undefined;
+    });
+
+    const { App } = await import("../../src/modules/app/app.component");
+    render(<App />);
+
+    await waitFor(() => expect(subscribeWindowTheme).toHaveBeenCalledTimes(1));
+    const wrapper = document.querySelector('[data-slot="theme-provider"]');
+    expect(wrapper).toHaveAttribute("data-theme", "polar-night");
+    expect(wrapper).toHaveClass("theme-polar-night", "dark");
+
+    act(() => {
+      onTheme?.("light");
+    });
+
+    await waitFor(() => {
+      expect(wrapper).toHaveAttribute("data-theme", "snow-storm");
+      expect(wrapper).toHaveClass("theme-snow-storm", "light");
+    });
   });
 });
