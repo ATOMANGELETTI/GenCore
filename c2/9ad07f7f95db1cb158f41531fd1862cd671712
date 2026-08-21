@@ -1,0 +1,23 @@
+apps/terminal/tests/unit/config.storage.test.ts
+  s_68894414575cf5::t_85ae5a49330d55 72-73
+  s_68894414575cf5::t_bc774d50b7d61b 70-71,74-82
+  s_68894414575cf5::t_a9879c4f5e1ff0 10-11
+apps/terminal/src/modules/config/config.storage.ts
+  s_68894414575cf5::t_099362a229cd8e 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "c29ad07f7f95db1cb158f41531fd1862cd671712",
+  "prompts": {},
+  "sessions": {
+    "s_68894414575cf5": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "cbc3098f-c211-4e12-9e87-91a07eb92ca4",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
