@@ -4,11 +4,7 @@ export const CONFIG_STORAGE_KEY = "gencore.terminal.config";
 
 export const DEFAULT_CONFIG: TerminalConfigV1 = { version: 1, theme: "system" };
 
-const THEME_PREFERENCES: ReadonlySet<string> = new Set([
-  "system",
-  "polar-night",
-  "snow-storm",
-]);
+const THEME_PREFERENCES: ReadonlySet<string> = new Set(["system", "polar-night", "snow-storm"]);
 
 export function parseConfig(raw: string | null): TerminalConfigV1 {
   if (raw == null || raw === "") {

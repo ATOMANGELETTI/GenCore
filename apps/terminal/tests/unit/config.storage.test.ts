@@ -7,6 +7,8 @@ import {
   saveConfig,
 } from "../../src/modules/config/config.storage";
 
+restoreJsdomLocalStorage();
+
 describe("parseConfig", () => {
   it("returns Match system for missing, empty, invalid, wrong version, or unknown theme", () => {
     expect(parseConfig(null)).toEqual(DEFAULT_CONFIG);
@@ -65,3 +67,16 @@ describe("loadConfig / saveConfig", () => {
     expect(saveConfig({ version: 1, theme: "system" })).toBe(false);
   });
 });
+
+function restoreJsdomLocalStorage(): void {
+  const jsdomStorage = (window as unknown as { _localStorage?: Storage })._localStorage;
+  if (!jsdomStorage) {
+    return;
+  }
+
+  Object.defineProperty(window, "localStorage", {
+    configurable: true,
+    enumerable: true,
+    get: () => jsdomStorage,
+  });
+}
