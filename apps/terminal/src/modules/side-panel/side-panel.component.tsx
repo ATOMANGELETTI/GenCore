@@ -195,7 +195,7 @@ export function SidePanel() {
                     className={cn(
                       "relative h-full w-auto flex-1 rounded-none",
                       isSelected
-                        ? "bg-accent text-primary hover:bg-accent hover:text-primary before:absolute before:inset-x-0 before:top-0 before:h-0.5 before:bg-primary"
+                        ? "bg-accent text-accent-foreground hover:bg-accent hover:text-accent-foreground before:absolute before:inset-x-0 before:top-0 before:h-0.5 before:bg-primary"
                         : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
                     )}
                     onClick={() => {

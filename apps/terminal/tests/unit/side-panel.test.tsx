@@ -99,6 +99,12 @@ describe("SidePanel", () => {
       const icon = screen.getByRole("tab", { name }).querySelector("svg");
       expect(icon).toHaveClass("size-3");
     }
+
+    const filesTab = screen.getByRole("tab", { name: "Files" });
+    expect(filesTab).toHaveClass("text-accent-foreground", "before:bg-primary");
+    expect(filesTab).not.toHaveClass("text-primary");
+
+    expect(screen.getByRole("tab", { name: "Assistant" })).toHaveClass("text-muted-foreground");
   });
 
   it("renders an aside complementary root with the side-panel slot", async () => {
