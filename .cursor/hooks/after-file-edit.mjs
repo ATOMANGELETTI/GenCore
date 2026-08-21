@@ -11,22 +11,10 @@
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { readStdinJson, writeJson } from "./_util.mjs";
+import { formatterHint, workspaceMember } from "./policy.mjs";
 
 const STATE_DIR = ".cursor/hooks/state";
 const STATE_PATH = path.join(STATE_DIR, "edited-files.json");
-
-function formatterHint(filePath) {
-  if (/\.(rs)$/i.test(filePath)) return "cargo fmt";
-  if (/\.(mts|cts|ts|tsx|mjs|cjs|js|jsx|json|css)$/i.test(filePath)) return "biome format --write";
-  return null;
-}
-
-function workspaceMember(filePath) {
-  const normalized = filePath.replace(/\\/g, "/");
-  const match = normalized.match(/(?:^|\/)(apps|packages|crates)\/([^/]+)\//);
-  if (!match) return null;
-  return `${match[1]}/${match[2]}`;
-}
 
 async function readState() {
   try {

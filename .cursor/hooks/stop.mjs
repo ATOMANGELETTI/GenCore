@@ -5,17 +5,10 @@
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { readStdinJson, writeJson } from "./_util.mjs";
+import { testReminderMessage } from "./policy.mjs";
 
 const STATE_DIR = ".cursor/hooks/state";
 const STATE_PATH = path.join(STATE_DIR, "edited-files.json");
-
-function testCommandFor(member) {
-  const [root, name] = member.split("/");
-  if (root === "crates") return `cargo test -p ${name}`;
-  if (root === "apps") return `pnpm --filter @gencore/${name} test`;
-  if (root === "packages") return `pnpm --filter @gencore/${name} test`;
-  return null;
-}
 
 async function readState() {
   try {
@@ -48,20 +41,16 @@ async function main() {
     return;
   }
 
-  const commands = members.map(testCommandFor).filter(Boolean);
-
-  // Clear so the reminder fires once per batch of edits, not on every future stop.
+  const reminder = testReminderMessage(members);
   delete state[conversationId];
   await writeState(state);
 
-  if (commands.length === 0) {
+  if (!reminder) {
     writeJson({});
     return;
   }
 
-  writeJson({
-    followup_message: `Reminder: run tests for the packages/crates touched this turn: ${commands.join(", ")}`
-  });
+  writeJson({ followup_message: reminder });
 }
 
 main().catch(() => {
