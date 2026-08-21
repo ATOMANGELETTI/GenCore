@@ -1,0 +1,73 @@
+.superpowers/docs/specs/2026-08-20-terminal-window-design.md
+  s_68894414575cf5::t_8c5eaa255693d1 70
+  s_aa39d75a5afa67::t_1455798d8cd19e 42
+packages/ui-kit/tests/styles/fonts.test.ts
+  s_d2780de37f8bee::t_d575d9c82fce99 35-54
+.superpowers/docs/plans/2026-08-20-terminal-window.md
+  s_aa39d75a5afa67::t_de2c2f65c97ff8 1-849
+apps/terminal/src/modules/config/config.types.ts
+  s_68894414575cf5::t_0ce5995f612fba 1-14
+.superpowers/sdd/progress.md
+  s_be9a94e9e9857a::t_d93715de83b252 217
+  s_eecfcd1baa599d::t_436a9992f620e7 218-227
+  s_aa39d75a5afa67::t_4f1475db78c4fd 228-237
+apps/terminal/src/modules/config/config.storage.ts
+  s_68894414575cf5::t_d80349c23b3958 1-53
+apps/terminal/tests/unit/_localstorage-diag.test.ts
+  s_68894414575cf5::t_2b6df1e4993cd2 7,11,13,15-16,20-22
+  s_68894414575cf5::t_4091d13e919b3b 5-6,8-10,12,14,17-19,23
+  s_68894414575cf5::t_9e1c8d5242cc60 1-4,24-25
+.cursor/hooks/state/edited-files.json
+  s_aa39d75a5afa67::t_8ffdf56bcea987 207-209
+  s_be9a94e9e9857a::t_7d1e9d5ca8d812 210-212
+apps/terminal/tests/unit/config.storage.test.ts
+  s_68894414575cf5::t_960d01b01a72dd 1-67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "df42786fb9d90e071aee6c48c354d24b3b17add6",
+  "prompts": {},
+  "sessions": {
+    "s_68894414575cf5": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "cbc3098f-c211-4e12-9e87-91a07eb92ca4",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_aa39d75a5afa67": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "b7b137f6-bf1f-4dd5-99f1-bda87eeddfbb",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_be9a94e9e9857a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "ee20711e-e0d6-4f90-a50b-f016a475eb80",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_d2780de37f8bee": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "8b18ea52-bc56-49c9-8d11-057457843a5e",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_eecfcd1baa599d": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "c1caa638-9047-4867-96a4-feee5282ceff",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
