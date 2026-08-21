@@ -1,0 +1,38 @@
+apps/terminal/tests/unit/terminal.hook.test.ts
+  s_cdec2f1aac53ae::t_d12c1f64554bb3 5,7-8
+  s_cdec2f1aac53ae::t_5b224a4d9f689f 147-190
+apps/terminal/tests/unit/terminal.provider.test.tsx
+  s_cdec2f1aac53ae::t_39a8cfda0bdfc7 1-182
+apps/terminal/src/modules/terminal/terminal.types.ts
+  s_cdec2f1aac53ae::t_bb2249fcd1b09d 65-66
+apps/terminal/src/modules/app/app.component.tsx
+  s_cdec2f1aac53ae::t_edba49d9e70c3d 63-74,81,87
+apps/terminal/tests/unit/terminal.osc7.test.ts
+  s_cdec2f1aac53ae::t_e680a8ee01d5e4 14-31,37
+apps/terminal/src/modules/terminal/terminal.hook.ts
+  s_cdec2f1aac53ae::t_7fb203252a621a 796-798,812,815-821,825-826
+  s_cdec2f1aac53ae::t_1c0aca504cfe1f 32-33
+  s_cdec2f1aac53ae::t_b358f8e0ee9da7 707,709
+  s_cdec2f1aac53ae::t_3856b5a4c21538 333-354,364,367
+  s_cdec2f1aac53ae::t_f40695e9e473ac 868,877
+  s_cdec2f1aac53ae::t_8b9913c0f2e24e 210,212,215,218,220-255,257
+  s_cdec2f1aac53ae::t_c8a0a8122403cf 641-642,647
+apps/terminal/src/modules/terminal/terminal.osc7.ts
+  s_cdec2f1aac53ae::t_7f23fc08f11e98 39-45,60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "9934ed39ce6175c60c330c6e777eaeed38b7ea2c",
+  "prompts": {},
+  "sessions": {
+    "s_cdec2f1aac53ae": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "994f3694-b9d9-49ba-93db-b57c580eb597",
+        "model": "claude-opus-5-thinking-high"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
