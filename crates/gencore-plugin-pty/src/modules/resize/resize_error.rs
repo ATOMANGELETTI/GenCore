@@ -3,9 +3,12 @@ use thiserror::Error;
 /// Errors surfaced by the pty `resize` command.
 #[derive(Debug, Error)]
 pub enum ResizeError {
-    /// The pty resize backend has not been implemented yet.
-    #[error("pty resize support is not implemented yet")]
-    NotImplemented,
+    /// No session exists for the given identifier.
+    #[error("pty session not found")]
+    SessionNotFound,
+    /// Resizing the pty failed.
+    #[error("{0}")]
+    Io(String),
 }
 
 impl serde::Serialize for ResizeError {

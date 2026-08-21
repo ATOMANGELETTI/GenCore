@@ -3,9 +3,12 @@ use thiserror::Error;
 /// Errors surfaced by pty I/O commands (`write`).
 #[derive(Debug, Error)]
 pub enum IoError {
-    /// The pty I/O backend has not been implemented yet.
-    #[error("pty write support is not implemented yet")]
-    NotImplemented,
+    /// No session exists for the given identifier.
+    #[error("pty session not found")]
+    SessionNotFound,
+    /// Writing to the pty failed.
+    #[error("{0}")]
+    Io(String),
 }
 
 impl serde::Serialize for IoError {
