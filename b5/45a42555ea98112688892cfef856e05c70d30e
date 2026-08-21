@@ -1,0 +1,21 @@
+packages/ui-kit/tests/primitives/tree/tree.test.tsx
+  s_c85ee7bd2bfa9c::t_af4f136089bbc1 231-237
+packages/ui-kit/src/primitives/tree/tree.variants.ts
+  s_c85ee7bd2bfa9c::t_c4bc1fbada8174 12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "b545a42555ea98112688892cfef856e05c70d30e",
+  "prompts": {},
+  "sessions": {
+    "s_c85ee7bd2bfa9c": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "f92296dd-6538-4d11-8417-bde1f43ba955",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
