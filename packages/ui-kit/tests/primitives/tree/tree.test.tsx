@@ -228,7 +228,13 @@ describe("Tree", () => {
     const drive = rowNamed("C:");
     const file = rowNamed("readme.txt");
 
-    expect(drive).toHaveClass("h-[22px]", "select-none", "bg-accent", "overflow-hidden");
+    expect(drive).toHaveClass(
+      "h-[22px]",
+      "select-none",
+      "bg-accent",
+      "text-accent-foreground",
+      "overflow-hidden",
+    );
     expect(file).toHaveClass("h-[22px]", "select-none", "opacity-45", "overflow-hidden");
     expect(file).not.toHaveClass("bg-accent");
     expect(drive).toHaveStyle({ paddingLeft: "0px" });

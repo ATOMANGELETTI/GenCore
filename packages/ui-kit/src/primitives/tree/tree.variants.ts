@@ -9,7 +9,7 @@ export const treeRowVariants = cva(
   {
     variants: {
       selected: {
-        true: "bg-accent",
+        true: "bg-accent text-accent-foreground",
         false: "",
       },
       muted: {
