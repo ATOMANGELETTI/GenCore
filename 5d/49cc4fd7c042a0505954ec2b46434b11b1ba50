@@ -1,0 +1,37 @@
+packages/ui-kit/src/styles/theme.snow-storm.css
+  s_c349908ffb3fbe::t_a092c1bb6fb0f6 51,56-58
+packages/ui-kit/AGENTS.md
+  s_c349908ffb3fbe::t_8eee7a3f5c93b8 5
+.changeset/nord-theme-roles.md
+  s_c349908ffb3fbe::t_e36450063a75b0 1-5
+packages/ui-kit/tests/styles/theme.polar-night.test.ts
+  s_c349908ffb3fbe::t_f907e77a9a0485 68-74
+  s_c349908ffb3fbe::t_08c55f7ce33732 27-28,33-35
+packages/ui-kit/src/styles/theme.polar-night.css
+  s_c349908ffb3fbe::t_8b3eed0a575fa8 53,58-60
+packages/ui-kit/src/tokens/tokens.nord.ts
+  s_c349908ffb3fbe::t_480bf2bb1820c0 30
+packages/ui-kit/src/tokens/tokens.colors.ts
+  s_c349908ffb3fbe::t_cd44aa315dcb17 56,59-61
+  s_c349908ffb3fbe::t_bcc9fbfc0c23ec 91,94-96
+  s_c349908ffb3fbe::t_4899a268d361c8 24-25
+  s_c349908ffb3fbe::t_feee2f53a029e8 76
+packages/ui-kit/src/styles/globals.css
+  s_c349908ffb3fbe::t_e1cc65ae24a2f3 52-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "5d49cc4fd7c042a0505954ec2b46434b11b1ba50",
+  "prompts": {},
+  "sessions": {
+    "s_c349908ffb3fbe": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "9b8d8b04-f391-4249-a158-3105db77ccc8",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
