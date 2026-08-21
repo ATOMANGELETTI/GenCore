@@ -1,0 +1,27 @@
+packages/ui-kit/tests/primitives/file-icon/file-icon.test.tsx
+  s_3b5601235aef0f::t_fdb2011bf67df7 174-199
+  s_3b5601235aef0f::t_04ca4c8b8bcfb2 229-230,234-235,239-257
+  s_3b5601235aef0f::t_bf319ad1ca370f 258
+packages/ui-kit/src/primitives/file-icon/file-icon.component.tsx
+  s_3b5601235aef0f::t_b274b82638f652 14-18
+packages/ui-kit/src/primitives/file-icon/file-icon.glyphs.tsx
+  s_3b5601235aef0f::t_ef9cf470241147 4-150,152-153,157
+.changeset/file-icon-monochrome.md
+  s_3b5601235aef0f::t_5d52786a7a42a5 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "d7730b0a8e8503feab13ced3b4ae6b3f4e10b725",
+  "prompts": {},
+  "sessions": {
+    "s_3b5601235aef0f": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "ef8b69a8-5bb5-4a95-a335-68b47a54982d",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
