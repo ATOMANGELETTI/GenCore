@@ -1,0 +1,75 @@
+apps/terminal/src/modules/terminal/terminal.osc7.ts
+  s_68500c516e7dfb::t_fff4930c045ba4 1-44,47,49-59,61-67
+  s_68500c516e7dfb::t_58ddd05a45a408 45-46,48,60
+apps/terminal/tests/unit/terminal.osc7.test.ts
+  s_68500c516e7dfb::t_12298c99bb9bbd 1-23
+apps/terminal/package.json
+  s_68500c516e7dfb::t_d8642ab8f0b315 22-25
+apps/terminal/src/modules/terminal/terminal.hook.ts
+  s_68500c516e7dfb::t_daf1605a570765 2-23,38-223,232-301,315,319-485,487-495
+  s_68500c516e7dfb::t_616476773914d7 33
+  s_68500c516e7dfb::t_2512c2b7843f2c 24-32,34-37
+  s_68500c516e7dfb::t_cb1bcaa128d02d 1,224-231,302-314,316-318
+  s_68500c516e7dfb::t_05686110042141 486
+apps/terminal/tests/unit/terminal.theme.test.ts
+  s_68500c516e7dfb::t_ca38163b082d62 1-59
+apps/terminal/src/modules/terminal/terminal.component.tsx
+  s_68500c516e7dfb::t_b6465e441763f1 309-313,320
+  s_68500c516e7dfb::t_34b8df3447548c 471
+  s_68500c516e7dfb::t_25c200e55b5b49 172
+  s_68500c516e7dfb::t_c1c2d5568052fa 27
+  s_68500c516e7dfb::t_307f5ae7b51d13 245-252,259-261,265
+  s_68500c516e7dfb::t_91fdf76ca34f74 11,18,25,88-89,92,161-162,165,216-224,228-244,253-258,262-264,266-308,314-319,321-344,388,390,394-395,405-410,434-436,445
+  s_68500c516e7dfb::t_31ea09debf2a42 1-4,6-10,12-15,17,20-24,26,28-87,90-91,93-135,138-147,163-164,166-171,173-215,225-227,345-387,389,391-393,396-404,411-433,437-444,446-470,472-513
+  s_68500c516e7dfb::t_cb1bcaa128d02d 5,136-137
+  s_68500c516e7dfb::t_7ce3396bc3c99d 159-160
+  s_68500c516e7dfb::t_bc17c3fcbbf7e3 148-158
+  s_68500c516e7dfb::t_311111dbfa470b 16,19
+apps/terminal/src/modules/context-menu/context-menu.terminal.tsx
+  s_68500c516e7dfb::t_78b60112e6cbbc 2-3,5-65
+  s_68500c516e7dfb::t_77fd8b9b3fab63 4
+  s_68500c516e7dfb::t_dd4f8df3ca53d1 1
+apps/terminal/src/modules/terminal/terminal.types.ts
+  s_68500c516e7dfb::t_e745a32cbef983 1-40
+apps/terminal/tests/unit/terminal.hook.test.ts
+  s_68500c516e7dfb::t_7d9123b6b4b4af 1-41
+apps/terminal/src/modules/terminal/terminal.theme.ts
+  s_68500c516e7dfb::t_c1b453acad60a0 1-46
+apps/terminal/src/modules/ipc/ipc.pty.ts
+  s_68500c516e7dfb::t_12638b59161d45 17
+apps/terminal/src/modules/terminal/terminal.xterm.ts
+  s_68500c516e7dfb::t_99da8a5a2836c6 2-51
+  s_68500c516e7dfb::t_7e976bb8c778cc 1
+apps/terminal/tests/unit/app.component.test.tsx
+  s_68500c516e7dfb::t_3486ddaab9ca5e 137,140-142,147
+  s_68500c516e7dfb::t_0a62c5a49a4fb5 52-89
+  s_68500c516e7dfb::t_f353e4a46dd44c 150,156,159
+  s_68500c516e7dfb::t_9fb0fadfed2acb 100,103-106
+apps/terminal/src/modules/app/app.component.tsx
+  s_68500c516e7dfb::t_cb1bcaa128d02d 84-86
+  s_68500c516e7dfb::t_518c7d6eb53c91 4,11-12,39-40,52-54,58-83,87-97
+  s_68500c516e7dfb::t_955042462e3375 98-99
+pnpm-lock.yaml
+  s_68500c516e7dfb::t_d42fd4ab3f6160 105-116,2072-2083,4682-4689
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "8e296dd155405ecfb16e5fb052ac33b2a0f51d50",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_68500c516e7dfb": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "f2bd6407-f5d1-4c0a-ad4a-d67a0a84eaf4",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
