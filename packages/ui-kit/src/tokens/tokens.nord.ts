@@ -27,7 +27,7 @@ export const nordFrost = {
   "frost-10": "#5E81AC",
 } as const;
 
-/** `nord11`–`nord15`. Vivid accents reserved for state (error/warning/success/info). */
+/** `nord11`–`nord15`. Vivid accents reserved for state (error/caution/warning/success/info). */
 export const nordAurora = {
   "aurora-11": "#BF616A",
   "aurora-12": "#D08770",

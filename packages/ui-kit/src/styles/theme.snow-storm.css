@@ -48,12 +48,14 @@
   --muted: var(--nord-snow-5);
   --muted-foreground: var(--nord-polar-3);
   --accent: var(--nord-snow-4);
-  --accent-foreground: var(--nord-polar-0);
+  --accent-foreground: var(--nord-frost-10);
 
   /* State */
   --destructive: var(--nord-aurora-11);
   --destructive-foreground: var(--nord-snow-6);
-  --warning: var(--nord-aurora-12);
+  --caution: var(--nord-aurora-12);
+  --caution-foreground: var(--nord-polar-0);
+  --warning: var(--nord-aurora-13);
   --warning-foreground: var(--nord-polar-0);
   --success: var(--nord-aurora-14);
   --success-foreground: var(--nord-polar-0);

@@ -21,6 +21,8 @@ export interface SemanticColorScale {
   accentForeground: NordColorName;
   destructive: NordColorName;
   destructiveForeground: NordColorName;
+  caution: NordColorName;
+  cautionForeground: NordColorName;
   warning: NordColorName;
   warningForeground: NordColorName;
   success: NordColorName;
@@ -51,10 +53,12 @@ export const polarNightColors: SemanticColorScale = {
   muted: "polar-1",
   mutedForeground: "polar-3",
   accent: "polar-2",
-  accentForeground: "snow-6",
+  accentForeground: "frost-8",
   destructive: "aurora-11",
   destructiveForeground: "snow-6",
-  warning: "aurora-12",
+  caution: "aurora-12",
+  cautionForeground: "polar-0",
+  warning: "aurora-13",
   warningForeground: "polar-0",
   success: "aurora-14",
   successForeground: "polar-0",
@@ -69,7 +73,7 @@ export const polarNightColors: SemanticColorScale = {
   statusbarForeground: "snow-4",
 };
 
-/** Light theme: Snow Storm. Frost and Aurora keep the same semantic roles. */
+/** Light theme: Snow Storm. Frost primary is nord8; selected text is nord10 on nord4 fills. */
 export const snowStormColors: SemanticColorScale = {
   background: "snow-6",
   foreground: "polar-0",
@@ -84,10 +88,12 @@ export const snowStormColors: SemanticColorScale = {
   muted: "snow-5",
   mutedForeground: "polar-3",
   accent: "snow-4",
-  accentForeground: "polar-0",
+  accentForeground: "frost-10",
   destructive: "aurora-11",
   destructiveForeground: "snow-6",
-  warning: "aurora-12",
+  caution: "aurora-12",
+  cautionForeground: "polar-0",
+  warning: "aurora-13",
   warningForeground: "polar-0",
   success: "aurora-14",
   successForeground: "polar-0",
