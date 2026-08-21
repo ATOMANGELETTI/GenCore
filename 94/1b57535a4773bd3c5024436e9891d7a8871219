@@ -1,0 +1,25 @@
+scripts/lib/sync-agents.mjs
+  s_f679719947f21d::t_212cc9ad704013 1-132
+scripts/tests/sync-agents.test.mjs
+  s_f679719947f21d::t_33b132e8879f2f 1-187
+  s_f679719947f21d::t_a698bca5ae4c14 188-190
+scripts/lib/frontmatter.mjs
+  s_f679719947f21d::t_39e9e9a9fec87f 1-100,105-109
+  s_f679719947f21d::t_2797f739377e86 101-104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "941b57535a4773bd3c5024436e9891d7a8871219",
+  "prompts": {},
+  "sessions": {
+    "s_f679719947f21d": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "b13d07a8-273f-44a8-adc1-0d808d41f13a",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
