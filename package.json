@@ -16,7 +16,8 @@
     "format": "turbo run format",
     "changeset": "changeset",
     "package:win64": "pwsh -NoProfile -File scripts/package-win64.ps1",
-    "prepare": "husky"
+    "prepare": "husky",
+    "sync:agents": "node scripts/sync-agents.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.8",

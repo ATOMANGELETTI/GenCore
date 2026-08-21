@@ -1,13 +1,19 @@
 import assert from "node:assert/strict";
+import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import test from "node:test";
 import {
+  CURSOR_SKIP_TOP,
   convertAgent,
   convertCommand,
   convertRule,
   convertSkill,
   MAX_RULE_CHARS,
   parseFrontmatter,
+  planGeneratedFiles,
   rewriteAgyBody,
+  syncAgents,
 } from "../lib/sync-agents.mjs";
 
 test("parseFrontmatter reads scalars, booleans, globs, and lists", () => {
@@ -187,4 +193,91 @@ model: inherit
 `,
   });
   assert.match(debuggerAgent.content, /run_command/);
+});
+
+test("planGeneratedFiles skips Cursor-only top-level files and superpowers-models", async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "gencore-agents-"));
+  await mkdir(path.join(root, ".cursor", "rules"), { recursive: true });
+  await mkdir(path.join(root, ".cursor", "skills", "demo"), { recursive: true });
+  await mkdir(path.join(root, ".cursor", "commands"), { recursive: true });
+  await mkdir(path.join(root, ".cursor", "agents"), { recursive: true });
+  await writeFile(path.join(root, ".cursor", "environment.json"), "{}");
+  await writeFile(
+    path.join(root, ".cursor", "rules", "security.mdc"),
+    `---
+description: security
+alwaysApply: true
+---
+
+# Security
+`,
+  );
+  await writeFile(
+    path.join(root, ".cursor", "rules", "superpowers-models.mdc"),
+    `---
+alwaysApply: true
+---
+
+# Models
+`,
+  );
+  await writeFile(
+    path.join(root, ".cursor", "skills", "demo", "SKILL.md"),
+    `---
+name: demo
+description: Demo skill
+---
+
+# Demo
+`,
+  );
+  await writeFile(path.join(root, ".cursor", "commands", "new-module.md"), "Scaffold a module.\n");
+  await writeFile(
+    path.join(root, ".cursor", "agents", "tauri-reviewer.md"),
+    `---
+name: tauri-reviewer
+description: Review Tauri
+readonly: true
+---
+
+# Tauri
+`,
+  );
+  const planned = await planGeneratedFiles(root);
+  assert.equal(planned.has("rules/security.md"), true);
+  assert.equal(planned.has("rules/superpowers-models.md"), false);
+  assert.equal(planned.has("skills/demo/SKILL.md"), true);
+  assert.equal(planned.has("workflows/new-module.md"), true);
+  assert.equal(planned.has("agents/tauri-reviewer/agent.md"), true);
+  assert.ok(CURSOR_SKIP_TOP.has("environment.json"));
+});
+
+test("planGeneratedFiles throws on unknown .cursor top-level entries", async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "gencore-agents-"));
+  await mkdir(path.join(root, ".cursor"), { recursive: true });
+  await writeFile(path.join(root, ".cursor", "surprise.txt"), "nope");
+  await assert.rejects(() => planGeneratedFiles(root), /surprise\.txt/);
+});
+
+test("syncAgents --check is dirty before write and clean after", async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "gencore-agents-"));
+  await mkdir(path.join(root, ".cursor", "rules"), { recursive: true });
+  await writeFile(
+    path.join(root, ".cursor", "rules", "versions.mdc"),
+    `---
+description: versions
+alwaysApply: true
+---
+
+# Versions
+`,
+  );
+  const dirty = await syncAgents(root, { check: true });
+  assert.equal(dirty.status, "dirty");
+  const wrote = await syncAgents(root, { check: false });
+  assert.equal(wrote.status, "wrote");
+  const onDisk = await readFile(path.join(root, ".agents", "rules", "versions.md"), "utf8");
+  assert.match(onDisk, /trigger: always_on/);
+  const clean = await syncAgents(root, { check: true });
+  assert.equal(clean.status, "clean");
 });

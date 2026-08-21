@@ -1,0 +1,44 @@
+---
+trigger: always_on
+description: "Tauri security baseline — CSP, Isolation, capabilities, secrets"
+---
+
+<!-- Generated from .cursor/rules/security.mdc by `pnpm sync:agents`. Do not edit. -->
+
+
+# Security
+
+Applies to every Tauri app in `apps/**`:
+
+- `tauri.conf.json` `app.security.csp` must be the **object form**, not a raw string.
+- `app.security.devCsp` must also be the **object form**. Copy every production `csp`
+  directive into it. `connect-src` may add `'self'`, `ws://localhost:<vite-port>`, and
+  `ws://127.0.0.1:<vite-port>` for Vite HMR only. Production `csp.connect-src` stays
+  `ipc:` and `http://ipc.localhost` — never websocket localhost origins.
+  `TAURI_DEV_HOST` HMR is **unsupported**. `devCsp.connect-src` stays
+  `ws://localhost:<vite-port>` and `ws://127.0.0.1:<vite-port>` only. Do not add
+  other websocket origins to production `csp` or `devCsp`.
+- Isolation pattern must be enabled (`app.security.pattern` = `isolation`) with an
+  allowlist hook that only lets through the exact IPC commands the UI actually calls.
+- `app.withGlobalTauri: false` always. Never reference `window.__TAURI__` from app code.
+- UI talks to Rust only through `src/modules/ipc/` wrappers, except
+  `data-tauri-drag-region` on the titlebar, which invokes
+  `plugin:window|start_dragging` in the WebView without going through
+  `ipc.window.ts`. Keep the capability. Prefer `startDraggingWindow()` for JS
+  callers.
+- `app.security.freezePrototype: true`.
+- `app.security.assetProtocol.enable: false` unless a task explicitly requires serving
+  local assets through it.
+- Capabilities (`src-tauri/capabilities/*.json`): least privilege, scoped to
+  `"windows": ["main"]` only. Grant only the identifiers the UI invokes
+  (`core:window:allow-close`, `gencore-core:allow-get-app-info`, …) — never `core:default`.
+- Do not grant `gencore-pty` / `gencore-fs` command permissions in any capability until
+  the UI actually invokes them. Stub plugin commands stay ungranted until wired up.
+- Never set any `dangerous*` Tauri config flag.
+- No secrets, tokens, or credentials committed to the repo. Use environment variables /
+  local `.env` files (git-ignored) instead.
+- No shadow MCP servers: do not add `.cursor/mcp.json`, `.agents/mcp_config.json`, `.mcp.json`, or any ad-hoc
+  `npx -y @modelcontextprotocol/server-*` config. Team MCP is dashboard-managed only.
+- If the UI opens an external URL, grant only `opener:allow-open-url` scoped to
+  the exact URL(s) the UI opens. Never `opener:default`, `opener:allow-default-urls`,
+  or `shell:*`.
