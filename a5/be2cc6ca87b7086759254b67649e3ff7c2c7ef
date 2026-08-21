@@ -1,0 +1,59 @@
+crates/gencore-plugin-pty/src/modules/session/session_map.rs
+  s_cdec2f1aac53ae::t_30b772dd949b28 211,213-216,218-219,221,223,244-258,260-263
+  s_cdec2f1aac53ae::t_e6f2ae1f373a18 212,217,220,222,224-225
+  s_cdec2f1aac53ae::t_d59b97570870d7 131-132,138-139,141,150-160,167
+  s_cdec2f1aac53ae::t_1fb3a0bcfbf304 134-137,161,170
+  s_cdec2f1aac53ae::t_53b26a37ead816 4
+apps/terminal/src/modules/app/app.component.tsx
+  s_cdec2f1aac53ae::t_edba49d9e70c3d 63-74,81,87
+apps/terminal/src-tauri/src/lib.rs
+  s_9c89e49926f572::t_91c6f8cebf72cc 3-6
+apps/terminal/src/modules/terminal/terminal.types.ts
+  s_cdec2f1aac53ae::t_bb2249fcd1b09d 65-66
+apps/terminal/src/modules/terminal/terminal.osc7.ts
+  s_cdec2f1aac53ae::t_7f23fc08f11e98 39-45,60
+apps/terminal/tests/unit/terminal.provider.test.tsx
+  s_cdec2f1aac53ae::t_39a8cfda0bdfc7 1-182
+crates/gencore-plugin-pty/tests/session_commands.rs
+  s_cdec2f1aac53ae::t_93637f6252ed30 134-137,139-150,154-162,197,199-200
+  s_cdec2f1aac53ae::t_59795f88fa4090 138,151-153,163-196,198
+  s_cdec2f1aac53ae::t_53fe85d4199092 5-6,12-14
+  s_cdec2f1aac53ae::t_4f86ac05a6cf3f 15
+apps/terminal/tests/unit/terminal.osc7.test.ts
+  s_cdec2f1aac53ae::t_e680a8ee01d5e4 14-31,37
+apps/terminal/tests/unit/terminal.hook.test.ts
+  s_cdec2f1aac53ae::t_d12c1f64554bb3 5,7-8
+  s_cdec2f1aac53ae::t_5b224a4d9f689f 147-190
+apps/terminal/src/modules/terminal/terminal.hook.ts
+  s_cdec2f1aac53ae::t_3856b5a4c21538 333-354,364,367
+  s_cdec2f1aac53ae::t_7fb203252a621a 796-798,812,815-821,825-826
+  s_cdec2f1aac53ae::t_f40695e9e473ac 868,877
+  s_cdec2f1aac53ae::t_1c0aca504cfe1f 32-33
+  s_cdec2f1aac53ae::t_8b9913c0f2e24e 210,212,215,218,220-255,257
+  s_cdec2f1aac53ae::t_c8a0a8122403cf 641-642,647
+  s_cdec2f1aac53ae::t_b358f8e0ee9da7 707,709
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "a5be2cc6ca87b7086759254b67649e3ff7c2c7ef",
+  "prompts": {},
+  "sessions": {
+    "s_9c89e49926f572": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "036845f2-4a84-4d68-8780-adc9ccb4e64a",
+        "model": "claude-opus-5-thinking-high"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_cdec2f1aac53ae": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "994f3694-b9d9-49ba-93db-b57c580eb597",
+        "model": "claude-opus-5-thinking-high"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
