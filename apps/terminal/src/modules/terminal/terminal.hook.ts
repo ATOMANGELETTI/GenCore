@@ -172,6 +172,10 @@ function parsePinnedRecord(value: unknown): PinnedTabRecord | null {
   };
 }
 
+export function canFlushPinnedSave(gate: { hydrated: boolean; persistAllowed: boolean }): boolean {
+  return gate.hydrated && gate.persistAllowed;
+}
+
 export function fromPinnedFile(value: unknown): PinnedTabsFile | null {
   if (!value || typeof value !== "object") {
     return null;
@@ -273,6 +277,8 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
   const serializersRef = React.useRef(new Map<string, () => string>());
   const scrollbackCacheRef = React.useRef(new Map<string, string>());
   const saveTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hydratedRef = React.useRef(false);
+  const persistAllowedRef = React.useRef(false);
 
   tabsRef.current = tabs;
   activeIdRef.current = activeId;
@@ -305,7 +311,19 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
     return scrollbackCacheRef.current.get(tab.id) ?? tab.restore?.scrollback ?? "";
   }, []);
 
+  const allowPersist = React.useCallback(() => {
+    persistAllowedRef.current = true;
+  }, []);
+
   const flushSave = React.useCallback(async () => {
+    if (
+      !canFlushPinnedSave({
+        hydrated: hydratedRef.current,
+        persistAllowed: persistAllowedRef.current,
+      })
+    ) {
+      return;
+    }
     if (saveTimerRef.current !== null) {
       clearTimeout(saveTimerRef.current);
       saveTimerRef.current = null;
@@ -332,6 +350,10 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
   }, [readScrollback]);
 
   const scheduleSave = React.useCallback(() => {
+    if (!hydratedRef.current) {
+      return;
+    }
+    allowPersist();
     if (saveTimerRef.current !== null) {
       clearTimeout(saveTimerRef.current);
     }
@@ -339,7 +361,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       saveTimerRef.current = null;
       void flushSave();
     }, SAVE_DEBOUNCE_MS);
-  }, [flushSave]);
+  }, [allowPersist, flushSave]);
 
   const dropTabRuntime = React.useCallback((id: string) => {
     writersRef.current.delete(id);
@@ -421,15 +443,17 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
         setTabs([fresh]);
         setActiveId(fresh.id);
         void spawnSession(fresh.id);
+        allowPersist();
         void flushSave();
         return;
       }
       tabsRef.current = remaining;
       setTabs(remaining);
       setActiveId(nextId ?? remaining[0]?.id ?? "");
+      allowPersist();
       void flushSave();
     },
-    [bumpSpawn, dropTabRuntime, flushSave, killSession, spawnSession],
+    [allowPersist, bumpSpawn, dropTabRuntime, flushSave, killSession, spawnSession],
   );
 
   const setActive = React.useCallback((id: string) => {
@@ -460,9 +484,10 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       );
       tabsRef.current = next;
       setTabs(next);
+      allowPersist();
       void flushSave();
     },
-    [flushSave],
+    [allowPersist, flushSave],
   );
 
   const closeOthers = React.useCallback(
@@ -483,9 +508,10 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       tabsRef.current = [keep];
       setTabs([keep]);
       setActiveId(keep.id);
+      allowPersist();
       void flushSave();
     },
-    [bumpSpawn, dropTabRuntime, flushSave, killSession],
+    [allowPersist, bumpSpawn, dropTabRuntime, flushSave, killSession],
   );
 
   const closeUnpinned = React.useCallback(() => {
@@ -503,6 +529,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       setTabs([fresh]);
       setActiveId(fresh.id);
       void spawnSession(fresh.id);
+      allowPersist();
       void flushSave();
       return;
     }
@@ -511,8 +538,9 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
     if (!remaining.some((tab) => tab.id === activeIdRef.current)) {
       setActiveId(remaining[0]?.id ?? "");
     }
+    allowPersist();
     void flushSave();
-  }, [bumpSpawn, dropTabRuntime, flushSave, killSession, spawnSession]);
+  }, [allowPersist, bumpSpawn, dropTabRuntime, flushSave, killSession, spawnSession]);
 
   const restartTab = React.useCallback(
     (id: string) => {
@@ -640,14 +668,18 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
         activeIdRef.current = focus;
         setTabs(restored);
         setActiveId(focus);
-        return;
+      } else {
+        const home = createEmptyTab();
+        tabsRef.current = [home];
+        activeIdRef.current = home.id;
+        setTabs([home]);
+        setActiveId(home.id);
+        void spawnSession(home.id);
       }
-      const home = createEmptyTab();
-      tabsRef.current = [home];
-      activeIdRef.current = home.id;
-      setTabs([home]);
-      setActiveId(home.id);
-      void spawnSession(home.id);
+      hydratedRef.current = true;
+      if (parsed) {
+        persistAllowedRef.current = true;
+      }
     }
 
     void restorePinned();

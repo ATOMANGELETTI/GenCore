@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   autoTitle,
+  canFlushPinnedSave,
   fromPinnedFile,
   nextActiveId,
   seamLine,
@@ -123,5 +124,20 @@ describe("seamLine", () => {
   it("seamLine is muted dashes up to 80", () => {
     expect(seamLine(120).length).toBe(80);
     expect(seamLine(40).length).toBe(40);
+  });
+});
+
+describe("canFlushPinnedSave", () => {
+  it("does not save before hydrate completes", () => {
+    expect(canFlushPinnedSave({ hydrated: false, persistAllowed: false })).toBe(false);
+    expect(canFlushPinnedSave({ hydrated: false, persistAllowed: true })).toBe(false);
+  });
+
+  it("does not save after hydrate when persist is not allowed", () => {
+    expect(canFlushPinnedSave({ hydrated: true, persistAllowed: false })).toBe(false);
+  });
+
+  it("saves after hydrate when persist is allowed", () => {
+    expect(canFlushPinnedSave({ hydrated: true, persistAllowed: true })).toBe(true);
   });
 });
