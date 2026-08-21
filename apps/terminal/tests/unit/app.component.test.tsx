@@ -49,6 +49,44 @@ vi.mock("../../src/modules/ipc/ipc.fs", () => ({
   subscribeFsChanges: vi.fn(async () => () => {}),
 }));
 
+vi.mock("../../src/modules/ipc/ipc.pty", () => ({
+  openPty: vi.fn(async () => ({ session_id: "session-test" })),
+  writePty: vi.fn(async () => undefined),
+  resizePty: vi.fn(async () => undefined),
+  closePty: vi.fn(async () => undefined),
+  subscribePtyData: vi.fn(async () => () => undefined),
+  subscribePtyExit: vi.fn(async () => () => undefined),
+}));
+
+vi.mock("../../src/modules/terminal/terminal.xterm", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../src/modules/terminal/terminal.xterm")>();
+  return {
+    ...actual,
+    createXterm: vi.fn(() => {
+      const terminal = {
+        cols: 80,
+        rows: 24,
+        options: { theme: {} },
+        onData: vi.fn(() => ({ dispose: vi.fn() })),
+        attachCustomKeyEventHandler: vi.fn(),
+        write: vi.fn(),
+        focus: vi.fn(),
+        getSelection: vi.fn(() => ""),
+        hasSelection: vi.fn(() => false),
+        selectAll: vi.fn(),
+        paste: vi.fn(),
+        dispose: vi.fn(),
+      };
+      return {
+        terminal,
+        fit: { fit: vi.fn() },
+        serialize: { serialize: vi.fn(() => "") },
+        dispose: vi.fn(),
+      };
+    }),
+  };
+});
+
 restoreJsdomLocalStorage();
 
 describe("App", () => {
@@ -59,12 +97,13 @@ describe("App", () => {
     vi.mocked(subscribeWindowTheme).mockResolvedValue(() => undefined);
   });
 
-  it("renders the exact template title in the heading and titlebar", async () => {
+  it("renders the exact template title in the titlebar", async () => {
     render(<App />);
 
-    const matches = await screen.findAllByText(APP_TITLE);
-    expect(matches.length).toBeGreaterThanOrEqual(2);
-    expect(screen.getByRole("heading", { name: APP_TITLE })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByRole("banner")).toHaveTextContent(APP_TITLE);
+    });
+    expect(screen.queryByRole("heading", { name: APP_TITLE })).not.toBeInTheDocument();
   });
 
   it("renders the version from get_app_info in the titlebar, not the statusbar", async () => {
@@ -95,25 +134,29 @@ describe("App", () => {
     expect(openRepoInBrowser).toHaveBeenCalledTimes(1);
   });
 
-  it("renders SidePanel in the sidebar without replacing the workbench heading", async () => {
+  it("renders SidePanel in the sidebar without replacing the workbench titlebar", async () => {
     render(<App />);
 
-    expect(screen.getByRole("heading", { name: APP_TITLE })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByRole("banner")).toHaveTextContent(APP_TITLE);
+    });
     expect(screen.getByRole("complementary")).toHaveAttribute("data-slot", "side-panel");
     expect(await screen.findByText("FILES")).toBeVisible();
     expect(screen.queryByText("Tab 1")).toBeNull();
     expect(screen.getByRole("tablist", { name: "Side panel" })).toBeInTheDocument();
+    expect(screen.getByRole("tablist", { name: "Terminal sessions" })).toBeInTheDocument();
   });
 
-  it("shows a getAppInfo error in the content area, not the statusbar", async () => {
+  it("does not show a getAppInfo error in the statusbar", async () => {
     vi.mocked(getAppInfo).mockRejectedValueOnce(new Error("core unavailable"));
 
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByRole("main")).toHaveTextContent("core unavailable");
+      expect(screen.getByRole("banner")).toHaveTextContent(APP_TITLE);
     });
     expect(screen.getByRole("contentinfo")).not.toHaveTextContent("core unavailable");
+    expect(screen.getByRole("contentinfo")).not.toHaveTextContent(mockAppInfo.version);
   });
 
   it("applies Snow Storm after the OS window theme resolves to light", async () => {

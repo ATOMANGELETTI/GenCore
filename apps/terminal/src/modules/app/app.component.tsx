@@ -1,13 +1,15 @@
 import { AppShell, ThemeProvider } from "@gencore/ui-kit";
 import * as React from "react";
 import { ConfigProvider, useConfig } from "../config/config.hook";
-import { ContentContextMenu } from "../context-menu/context-menu.content";
+import { TerminalContextMenu } from "../context-menu/context-menu.terminal";
 import { TitlebarContextMenu } from "../context-menu/context-menu.titlebar";
 import { getAppInfo } from "../ipc/ipc.app-info";
 import { openRepoInBrowser } from "../ipc/ipc.opener";
 import type { AppInfo } from "../ipc/ipc.types";
 import { closeWindow, minimizeWindow, toggleMaximizeWindow } from "../ipc/ipc.window";
 import { SidePanel } from "../side-panel/side-panel.component";
+import { TerminalView } from "../terminal/terminal.component";
+import { TerminalProvider, useTerminalSession } from "../terminal/terminal.hook";
 import "./app.theme.css";
 
 /** Exact product copy for this template app; also fed into the titlebar via `version`. */
@@ -24,7 +26,6 @@ export function App() {
 function AppShellTree() {
   const { resolvedTheme } = useConfig();
   const [appInfo, setAppInfo] = React.useState<AppInfo | null>(null);
-  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -35,10 +36,8 @@ function AppShellTree() {
           setAppInfo(info);
         }
       })
-      .catch((cause: unknown) => {
-        if (!cancelled) {
-          setError(cause instanceof Error ? cause.message : String(cause));
-        }
+      .catch(() => {
+        // Version chip stays empty; do not surface the error in the statusbar.
       });
 
     return () => {
@@ -50,34 +49,51 @@ function AppShellTree() {
 
   return (
     <ThemeProvider theme={resolvedTheme}>
-      <AppShell
-        title={APP_TITLE}
-        version={version}
-        density="compact"
-        onClose={closeWindow}
-        onMinimize={minimizeWindow}
-        onToggleMaximize={toggleMaximizeWindow}
-        onVersionClick={openRepoInBrowser}
-        titlebarContextMenu={
-          <TitlebarContextMenu
-            onClose={closeWindow}
-            onMinimize={minimizeWindow}
-            onToggleMaximize={toggleMaximizeWindow}
-          />
-        }
-        contentContextMenu={<ContentContextMenu />}
-        contentProps={{ centered: true }}
-        sidebar={<SidePanel />}
-      >
-        <div className="flex flex-col items-center gap-2">
-          <h1 className="font-semibold text-lg">{APP_TITLE}</h1>
-          {version ? (
-            <p className="text-muted-foreground text-sm tabular-nums">v{version}</p>
-          ) : null}
-          {!version && error ? <p className="text-sm text-destructive">{error}</p> : null}
-          {!version && !error ? <p className="text-sm text-muted-foreground">Loading…</p> : null}
-        </div>
-      </AppShell>
+      <TerminalProvider>
+        <AppShellFrame title={APP_TITLE} version={version} />
+      </TerminalProvider>
     </ThemeProvider>
+  );
+}
+
+function AppShellFrame({ title, version }: { title: string; version: string | undefined }) {
+  const session = useTerminalSession();
+  const active = session.tabs.find((tab) => tab.id === session.activeId);
+  const cwd = active?.cwd;
+
+  return (
+    <AppShell
+      title={title}
+      version={version}
+      density="compact"
+      onClose={closeWindow}
+      onMinimize={minimizeWindow}
+      onToggleMaximize={toggleMaximizeWindow}
+      onVersionClick={openRepoInBrowser}
+      titlebarContextMenu={
+        <TitlebarContextMenu
+          onClose={closeWindow}
+          onMinimize={minimizeWindow}
+          onToggleMaximize={toggleMaximizeWindow}
+        />
+      }
+      contentContextMenu={<TerminalContextMenu />}
+      contentProps={{ centered: false, padded: false, className: "min-h-0 overflow-hidden" }}
+      sidebar={<SidePanel />}
+      statusbarStart={
+        cwd ? (
+          <span className="truncate text-muted-foreground">{cwd}</span>
+        ) : (
+          <span className="truncate text-muted-foreground" />
+        )
+      }
+      statusbarEnd={
+        <span className="tabular-nums">
+          {session.shellName} · {session.cols}×{session.rows}
+        </span>
+      }
+    >
+      <TerminalView />
+    </AppShell>
   );
 }

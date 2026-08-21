@@ -14,7 +14,7 @@ const PTY_EXIT_EVENT = "gencore-pty://exit";
  * the Isolation allowlist and capabilities stay auditable in one place.
  */
 export function openPty(args: OpenPtyArgs): Promise<OpenPtyResult> {
-  return invoke<OpenPtyResult>(OPEN_COMMAND, args);
+  return invoke<OpenPtyResult>(OPEN_COMMAND, { ...args });
 }
 
 export function writePty(sessionId: string, data: string): Promise<void> {
