@@ -1,0 +1,21 @@
+crates/gencore-plugin-pty/src/modules/session/session_shell.rs
+  s_48ac1496090821::t_bc05b42126be31 36-37
+crates/gencore-plugin-pty/tests/session_commands.rs
+  s_48ac1496090821::t_74152b2fd335bf 157-166
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "c07355de3fa7ae0d3e3e63126eb566eff41ea6d4",
+  "prompts": {},
+  "sessions": {
+    "s_48ac1496090821": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "1b709353-8a87-435a-8185-59c6952736dc",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
