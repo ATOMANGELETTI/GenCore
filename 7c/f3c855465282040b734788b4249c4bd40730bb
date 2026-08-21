@@ -1,0 +1,39 @@
+AGENTS.md
+  s_4da0746a4bfb63::t_3badf8c4c91967 101
+apps/terminal/AGENTS.md
+  s_4da0746a4bfb63::t_53366251fbc45e 13
+.superpowers/docs/specs/2026-08-20-terminal-config-tab-design.md
+  s_4da0746a4bfb63::t_5d94cd82371f7d 4
+apps/terminal/tests/unit/app.component.test.tsx
+  s_4da0746a4bfb63::t_c78ad20b018b23 5
+  s_4da0746a4bfb63::t_2b46e506931127 158
+  s_fa0867ce67381c::t_9ca5e466ad4c13 52-53,57,156-157,159-169,171-183
+apps/terminal/tests/unit/side-panel.test.tsx
+  s_4da0746a4bfb63::t_4bfe9263c9ba16 17,20-22,28,39-43
+  s_4da0746a4bfb63::t_1b1411e9162706 61,64
+  s_4da0746a4bfb63::t_2084b0420c5544 75,78,81,85,87-89,91,96,104-105,107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "7cf3c855465282040b734788b4249c4bd40730bb",
+  "prompts": {},
+  "sessions": {
+    "s_4da0746a4bfb63": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "9f043334-8293-4e9c-84cd-8e9e0c82b559",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_fa0867ce67381c": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "eb231d7b-5809-473c-a258-43bdc3230063",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
