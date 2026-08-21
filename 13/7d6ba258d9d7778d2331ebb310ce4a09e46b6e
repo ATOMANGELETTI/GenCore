@@ -1,0 +1,53 @@
+apps/terminal/tests/unit/ipc.pinned.test.ts
+  s_466e0209935d86::t_ccb7cca8418008 16,21,28,31
+  s_466e0209935d86::t_0bd68f37e89fb8 1-15,17-20,22-27,29-30,32-34
+apps/terminal/isolation/isolation.hook.js
+  s_466e0209935d86::t_e3cc5c391b0705 6,10-12,17-18,31-34,40-41,48-51,56-57,62-68,80-83,170-311,345,347,350,420,425-464,469,475-477,484-495,497,538,542-545,554-569
+  s_466e0209935d86::t_ccb7cca8418008 346
+  s_466e0209935d86::t_7441ff19f1f8cc 348
+crates/gencore-plugin-pty/src/modules/session/session_api.rs
+  s_466e0209935d86::t_cafeb2b326decf 45-48,50-55
+  s_466e0209935d86::t_6b93c3dc94fc75 80,83
+apps/terminal/tests/unit/isolation.hook.test.ts
+  s_466e0209935d86::t_62674e696a27ef 518-549,551-556,558-602,604-607,609-700
+  s_466e0209935d86::t_ccb7cca8418008 550,557,603,608
+  s_466e0209935d86::t_9f4a6ffafab3a8 9
+  s_466e0209935d86::t_99f85813fc5534 231-232,239-242
+  s_466e0209935d86::t_a3d85ad71974de 38-45,51-53,56
+apps/terminal/src/modules/ipc/ipc.pinned.ts
+  s_466e0209935d86::t_d181071c43d4db 1-16
+crates/gencore-plugin-pty/src/modules/io/io_api.rs
+  s_466e0209935d86::t_1cee7276d1cf74 39-40,43
+AGENTS.md
+  s_466e0209935d86::t_71b5750213ed03 7
+crates/gencore-plugin-pty/src/modules/resize/resize_api.rs
+  s_466e0209935d86::t_52200cf0674300 46-48,51-53
+apps/terminal/src-tauri/capabilities/main.json
+  s_466e0209935d86::t_d9bcd7f4a235da 4,13-14,21-24
+crates/AGENTS.md
+  s_466e0209935d86::t_12733e8c3a5359 3-4,13
+apps/terminal/tests/unit/ipc.pty.test.ts
+  s_466e0209935d86::t_675381fdfda188 1-103
+apps/terminal/src/modules/ipc/ipc.pty.ts
+  s_466e0209935d86::t_89abf73997e5f6 1-42
+apps/terminal/AGENTS.md
+  s_466e0209935d86::t_d9b922397d23a9 3,7,11-12,14,16
+apps/terminal/src/modules/ipc/ipc.types.ts
+  s_466e0209935d86::t_41996c2f03bfb3 36-60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "137d6ba258d9d7778d2331ebb310ce4a09e46b6e",
+  "prompts": {},
+  "sessions": {
+    "s_466e0209935d86": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "5e76508d-4454-401d-8503-fb9b4469c0d6",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
