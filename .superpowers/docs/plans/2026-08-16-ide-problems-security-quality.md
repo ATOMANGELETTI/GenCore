@@ -18,7 +18,7 @@
 - Folder-per-module naming; tests only under each unitâ€™s `tests/`
 - Latest stable only; no major version bumps; no new dependencies unless a Must Fix requires one
 - Do not implement a real PTY or file manager
-- Superpowers artifacts only under [docs/superpowers/plans/2026-08-16-ide-problems-security-quality.md](docs/superpowers/plans/2026-08-16-ide-problems-security-quality.md) and [.superpowers/sdd/ide-problems-security-quality/](.superpowers/sdd/ide-problems-security-quality/). Do not create `docs/plans` or `docs/specs`. Do not dump new briefs at `.superpowers/sdd/task-*`. Do not copy this Cursor `.plan.md` into `docs/superpowers/` as a second file.
+- Superpowers artifacts only under [.superpowers/docs/plans/2026-08-16-ide-problems-security-quality.md](.superpowers/docs/plans/2026-08-16-ide-problems-security-quality.md) and [.superpowers/sdd/ide-problems-security-quality/](.superpowers/sdd/ide-problems-security-quality/). Do not create `docs/plans` or `docs/specs`. Do not dump new briefs at `.superpowers/sdd/task-*`. Do not copy this Cursor `.plan.md` into `.superpowers/docs/` as a second file.
 - No commits unless the user asks; conventional commits if they later do
 - Orchestration: Grok 4.6 extra high for implementers and reviewers. Use Kimi K3 or GLM 5.2 only if Grok cannot do the task. Elevate to Opus 5 / Sonnet 5 / GPT 5.6 only if those fail. After each task: `tauri-reviewer` for Tauri/capability diffs, `ui-kit-reviewer` for ui-kit diffs. Final pass: Bugbot + Security Review + requesting-code-review
 
@@ -81,7 +81,7 @@ flowchart TD
 
 ## File map (expected)
 
-- Create: `docs/superpowers/plans/2026-08-16-ide-problems-security-quality.md` (one dated plan; no matching spec unless a design decision appears)
+- Create: `.superpowers/docs/plans/2026-08-16-ide-problems-security-quality.md` (one dated plan; no matching spec unless a design decision appears)
 - Create: `.superpowers/sdd/ide-problems-security-quality/` (briefs, reports, inventory, review diffs)
 - Modify: `.superpowers/sdd/progress.md` â€” add a feature block for this work; fix the leftover MIT mention there
 - Modify: `biome.json` â€” `ignoreUnknown: true`; exclude `**/*.{rs,toml,yml,yaml,md,ttf,png,ico,ps1}` from processing if needed
@@ -170,7 +170,7 @@ flowchart TD
 
 ### Task 7: Superpowers hygiene
 
-- [ ] Write the long-form plan to `docs/superpowers/plans/2026-08-16-ide-problems-security-quality.md` only. Do not add a spec unless a new design decision appears. Do not create `docs/plans` or `docs/specs`.
+- [ ] Write the long-form plan to `.superpowers/docs/plans/2026-08-16-ide-problems-security-quality.md` only. Do not add a spec unless a new design decision appears. Do not create `docs/plans` or `docs/specs`.
 - [ ] Keep all new briefs/reports/inventory under `.superpowers/sdd/ide-problems-security-quality/` and append a feature block to `.superpowers/sdd/progress.md`.
 - [ ] Move loose SDD-root leftovers (`task-*.md` and `review-*.diff` that are not inside a named feature folder) into `.superpowers/sdd/archive/bootstrap/`. Leave organized complete folders as-is: `terminess-font/`, `context-menus/`, `side-panel-resize/`, `side-panel/`, `dev-live-reload/`, `gilded-version-badge/`.
 
