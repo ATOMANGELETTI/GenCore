@@ -154,6 +154,16 @@ fn resolve_oh_my_posh_uses_absolute_theme_json() {
     let polar = resolve_oh_my_posh(Some(&dir), Some("polar-night")).expect("polar-night");
     assert!(polar.theme.is_absolute());
     assert!(polar.prompt_script.is_absolute());
+    assert!(
+        !polar.theme.to_string_lossy().starts_with(r"\\?\"),
+        "theme must not be a Windows verbatim path: {}",
+        polar.theme.display()
+    );
+    assert!(
+        !polar.prompt_script.to_string_lossy().starts_with(r"\\?\"),
+        "prompt_script must not be a Windows verbatim path: {}",
+        polar.prompt_script.display()
+    );
     assert!(polar.theme.ends_with("gencore-polar-night.omp.json"));
     assert!(polar.prompt_script.ends_with("gencore-prompt.ps1"));
 

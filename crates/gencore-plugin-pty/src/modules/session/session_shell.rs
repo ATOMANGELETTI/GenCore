@@ -33,8 +33,8 @@ pub fn resolve_oh_my_posh(
     }
     Some(OhMyPoshSpawn {
         dir: dir.clone(),
-        theme: absolute(theme_path),
-        prompt_script: absolute(dir.join("gencore-prompt.ps1")),
+        theme: theme_path,
+        prompt_script: dir.join("gencore-prompt.ps1"),
     })
 }
 
@@ -68,10 +68,6 @@ fn oh_my_posh_dir(resource_dir: &Path) -> Option<PathBuf> {
         }
     }
     None
-}
-
-fn absolute(path: PathBuf) -> PathBuf {
-    path.canonicalize().unwrap_or(path)
 }
 
 fn find_on_path(name: &str) -> Option<PathBuf> {
