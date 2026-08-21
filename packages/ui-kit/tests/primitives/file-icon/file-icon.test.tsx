@@ -171,6 +171,32 @@ describe("FileIcon", () => {
     expect(container.querySelector("svg")).toHaveAttribute("data-kind", kind);
   });
 
+  it("strokes with inherited currentColor", () => {
+    const { container } = render(<FileIcon nodeKind="file" extension="ts" />);
+    const svg = container.querySelector("svg");
+
+    expect(svg).toHaveAttribute("fill", "none");
+    expect(svg).toHaveAttribute("stroke", "currentColor");
+    expect(svg).toHaveAttribute("stroke-width", "1.3");
+    expect(svg).toHaveAttribute("stroke-linecap", "round");
+    expect(svg).toHaveAttribute("stroke-linejoin", "round");
+  });
+
+  it("does not paint glyphs with Nord variables", () => {
+    for (const props of Object.values(KIND_INPUT)) {
+      const { container, unmount } = render(<FileIcon {...props} />);
+      const svg = container.querySelector("svg");
+      expect(svg).not.toBeNull();
+
+      for (const value of paintValues(svg as Element)) {
+        expect(value.includes("--nord"), value).toBe(false);
+        expect(value === "none" || value === "currentColor", value).toBe(true);
+      }
+
+      unmount();
+    }
+  });
+
   it("renders a distinct path geometry for each kind", () => {
     const geometries = new Map<string, FileIconKindId>();
 
@@ -200,15 +226,33 @@ function serializeGlyphGeometry(svg: Element | null): string {
     return "";
   }
 
+  const keys = ["d", "fill-rule", "cx", "cy", "r", "x", "y", "width", "height", "rx", "ry"];
+
   return [...svg.children]
     .map((node) => {
       const tag = node.tagName.toLowerCase();
-      const d = node.getAttribute("d") ?? "";
-      const rule = node.getAttribute("fill-rule") ?? "";
-      const cx = node.getAttribute("cx") ?? "";
-      const cy = node.getAttribute("cy") ?? "";
-      const r = node.getAttribute("r") ?? "";
-      return `${tag}:${d}:${rule}:${cx}:${cy}:${r}`;
+      const bits = keys.map((key) => node.getAttribute(key) ?? "");
+      return [tag, ...bits].join(":");
     })
     .join("|");
+}
+
+function paintValues(root: Element): string[] {
+  const values: string[] = [];
+
+  const visit = (el: Element) => {
+    for (const name of ["fill", "stroke"] as const) {
+      const value = el.getAttribute(name);
+      if (value) {
+        values.push(value);
+      }
+    }
+
+    for (const child of el.children) {
+      visit(child);
+    }
+  };
+
+  visit(root);
+  return values;
 }
