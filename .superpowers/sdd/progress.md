@@ -202,6 +202,19 @@ Controller session. SDD + writing-plans. Work in place on `main` (running `tauri
 - Whole-branch review: complete (8310462..d7730b0). Code review Ready to merge: Yes. ui-kit-reviewer Approved. No Critical/Important. Minors left: `js` is a bare circle; `pdf` is a dog-eared sheet; `video`/`sh` both use a play triangle. Controller verify: file-icon 78/78.
 - Finish: already on `main` (in-place commit). Local merge is a no-op. No worktree to clean up. Not pushed (`main` ahead of origin). Spec/plan still untracked under `.superpowers/docs/`.
 
+## Feature: Antigravity `.agents/` (2026-08-20)
+
+Controller session. SDD + writing-plans. Work in place on `main`. Commits allowed (user chose SDD). Implementers stage only task files. Do not stage `.cursor/hooks/state/continual-learning.json`.
+
+- Spec: `.superpowers/docs/specs/2026-08-20-antigravity-agents-design.md` (Task 1 writes)
+- Plan: `.superpowers/docs/plans/2026-08-20-antigravity-agents.md` (Task 1 copies from Cursor plan)
+- Source plan: `C:/Users/DUSTI/.cursor/plans/antigravity_agents_folder_672ae988.plan.md`
+- Briefs: `.superpowers/sdd/`
+- Model: implementers and task reviewers `cursor-grok-4.6-xhigh-fast` unless blocked
+- BASE before Task 1: `fc4f2d90ef1058945ebf9049881800233521cd65`
+- Task 1: complete (commits fc4f2d9..90e194b, review clean)
+- Task 2: complete (commits 90e194b..941b575, review clean). Minor: dual import/re-export of parseFrontmatter in sync-agents.mjs.
+
 ## Follow-ups (not blocking)
 
 - `pnpm approve-builds` may be required before production `vite` / `tauri` build (esbuild)

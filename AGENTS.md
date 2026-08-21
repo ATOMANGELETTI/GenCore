@@ -70,15 +70,17 @@ Do not create commits or push unless the user explicitly asks. Conventional comm
 ## Learned User Preferences
 
 - For Superpowers and multi-agent Task dispatches, default to Grok 4.6 extra high (Fast Mode). Prefer Kimi K3, GLM 5.2, and other cheap enabled models when a different cheap model is needed. Elevate to Sonnet 5 or Opus 5 when planning or orchestration decides a stronger model is needed, or when a cheaper subagent is stuck / cannot finish. Always pass `model` explicitly; never inherit. GPT 5.6 is allowed if enabled but is not a default. Pick the specialized agent best suited to each task.
-- Do not show the app version in the statusbar; it already appears in the titlebar. The titlebar version chip uses a Nord gilded hover and opens the GitHub repo in the system browser on click.
+- Do not show the app version in the statusbar; it already appears in the titlebar. The titlebar version chip uses a Nord gilded outline and text (not a solid gold fill) and opens the GitHub repo in the system browser on click.
 - Reviewer skills (code-reviewer, security-reviewer, performance-reviewer) are read-only: propose a plan, ask which changes to apply, and do not edit unless asked.
 - Shared fonts belong in `@gencore/ui-kit` (`packages/ui-kit/src/assets/fonts/`) and may be used in the app shell (Terminess Nerd Font); do not copy font files into apps.
 - Keep all Superpowers files under `.superpowers/`: specs in `.superpowers/docs/specs/`, plans in `.superpowers/docs/plans/`, reviews in `.superpowers/docs/reviews/`. Do not write `docs/superpowers/`, `docs/plans/`, or `docs/specs/`. Track `.superpowers/docs/`; gitignore only `.superpowers/brainstorm/` and `.superpowers/sdd/`. Do not leave leftover plan or spec clutter in the repo.
 - Shell and chrome UI text is not selectable; keep the content area copyable. The statusbar has no right-click context menu.
 - Do not bump major versions without asking first; use minor and patch only while apps stay on 0.x.
 - Never add Cursor or AI attribution to commits or PRs (`Co-authored-by: Cursor`, `Made-with: Cursor`, Copilot/ChatGPT/Claude trailers, or similar). Human co-authors are fine. The Husky `commit-msg` hook strips AI trailers if they still appear.
-- Keep Files-tab toolbar actions and the side-panel Files/Agent/Settings tabs compact; oversized chrome looks unprofessional.
+- Keep Files-tab toolbar actions, side-panel Files/Agent/Settings tabs, and settings/config rows compact; oversized chrome looks unprofessional.
 - Prefer `portable-pty` for the terminal PTY backend unless a clearly better option is identified.
+- File and folder icons should share one theme-inherited color (the row text color) with distinct outline shapes per type; do not use rainbow per-type fills. They must stay legible on Polar Night and Snow Storm.
+- When implementing an approved spec, use Superpowers subagent-driven development with TDD unless asked otherwise.
 
 ## Learned Workspace Facts
 
@@ -88,4 +90,6 @@ Do not create commits or push unless the user explicitly asks. Conventional comm
 - The project license is GPL-3.0-or-later.
 - The terminal left panel has Files, Agent, and Settings tabs; Agent is a planned tab that should interact with the terminal, file tree, settings, and the app.
 - Tauri plugin builds cache absolute permission-file paths under `target/`; after relocating the repo, run `cargo clean` before `tauri:dev`.
+- Apps follow OS appearance: dark → Polar Night, light → Snow Storm; Polar Night if theme IPC fails or returns null.
+- `.cursor/` is the source of truth for Cursor agent config; `.agents/` is generated for Antigravity (`agy`) and should not be edited by hand.
 
