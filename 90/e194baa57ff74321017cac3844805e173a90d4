@@ -1,0 +1,21 @@
+.superpowers/docs/specs/2026-08-20-antigravity-agents-design.md
+  s_682b777febef66::t_b51d9c96848fa7 1-93
+.superpowers/docs/plans/2026-08-20-antigravity-agents.md
+  s_682b777febef66::t_b51d9c96848fa7 1-2019
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "90e194baa57ff74321017cac3844805e173a90d4",
+  "prompts": {},
+  "sessions": {
+    "s_682b777febef66": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "9824c145-6578-4d16-9155-dfc790a0e62a",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
