@@ -1,0 +1,23 @@
+AGENTS.md
+  s_8b7b8b2fddcf82::t_10ad4023ed98f0 76
+.cursor/rules/superpowers.mdc
+  s_8b7b8b2fddcf82::t_b0d7e27ddd6915 1-27
+.gitignore
+  s_8b7b8b2fddcf82::t_1e32c8e8a44d1d 13-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "2ef62d0a5399c3155effa6297a2c8d8e6033d55f",
+  "prompts": {},
+  "sessions": {
+    "s_8b7b8b2fddcf82": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "c212cac6-8f47-4e55-acd2-7a123b61645e",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
