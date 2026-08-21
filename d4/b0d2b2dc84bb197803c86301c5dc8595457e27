@@ -1,0 +1,29 @@
+apps/terminal/src/modules/config/config.component.tsx
+  s_7e706376241a18::t_10721cebfaf1f4 1-124
+apps/terminal/tests/unit/config.component.test.tsx
+  s_9c3d866055f7b2::t_f2c75218dae545 1-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "d4b0d2b2dc84bb197803c86301c5dc8595457e27",
+  "prompts": {},
+  "sessions": {
+    "s_7e706376241a18": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "97dc0f18-1664-4e47-a322-6038d42b7e48",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_9c3d866055f7b2": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "d258f2f6-3ca3-4ee6-aa88-387aa4bfe5bd",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
