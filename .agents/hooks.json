@@ -1,0 +1,45 @@
+{
+  "gencore-repo-map-and-reminders": {
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "node .agents/hooks/pre-invocation.mjs",
+        "timeout": 30
+      }
+    ]
+  },
+  "gencore-force-push-guard": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .agents/hooks/pre-tool-use.mjs"
+          }
+        ]
+      }
+    ]
+  },
+  "gencore-edit-tracker": {
+    "PostToolUse": [
+      {
+        "matcher": "write_to_file|replace_file_content|multi_replace_file_content",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .agents/hooks/post-tool-use.mjs"
+          }
+        ]
+      }
+    ]
+  },
+  "gencore-stop": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "node .agents/hooks/stop.mjs"
+      }
+    ]
+  }
+}
