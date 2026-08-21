@@ -1,0 +1,24 @@
+.superpowers/docs/plans/2026-08-16-ide-problems-security-quality.md
+  s_8b7b8b2fddcf82::t_fac29760f92076 21-173
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "f6e7e881fc8bc5f3016c5fbcd625877840d97b82",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_8b7b8b2fddcf82": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "c212cac6-8f47-4e55-acd2-7a123b61645e",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
