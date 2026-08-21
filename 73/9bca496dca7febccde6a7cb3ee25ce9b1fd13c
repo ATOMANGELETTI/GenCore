@@ -1,0 +1,28 @@
+package.json
+  s_6a732186d84ad9::t_74bf001b7d775d 20
+  s_6a732186d84ad9::t_081ca58f04c23c 21
+AGENTS.md
+  s_6a732186d84ad9::t_2e0366ba77f223 3
+  s_6a732186d84ad9::t_ff2151ff25987a 70-79
+  s_6a732186d84ad9::t_6ecd90a1ee68ce 35
+.gitignore
+  s_6a732186d84ad9::t_f72b7f3b2478f7 17-19
+.github/workflows/reusable-js.yml
+  s_6a732186d84ad9::t_ba1889c049f1d4 47-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "739bca496dca7febccde6a7cb3ee25ce9b1fd13c",
+  "prompts": {},
+  "sessions": {
+    "s_6a732186d84ad9": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "4812376f-204a-4ad8-a28b-256551e8181c",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
