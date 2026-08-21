@@ -1,0 +1,33 @@
+.cursor/hooks/after-file-edit.mjs
+  s_a421051d2cd71e::t_8a14674794f8b3 14
+.cursor/hooks/stop.mjs
+  s_a421051d2cd71e::t_3ff69bcb5ee298 8
+  s_a421051d2cd71e::t_fc47043dc25016 44,48,53
+.cursor/hooks/session-start.mjs
+  s_a421051d2cd71e::t_a109d8d9e80df4 2
+.cursor/hooks/before-shell-execution.mjs
+  s_a421051d2cd71e::t_d27063d66b7091 2,12
+.cursor/hooks/before-submit-prompt.mjs
+  s_a421051d2cd71e::t_8b7c8f426fe2b8 5
+  s_a421051d2cd71e::t_e8e56235a74c37 14
+.cursor/hooks/policy.mjs
+  s_a421051d2cd71e::t_865911e052005d 1-142
+scripts/tests/hook-policy.test.mjs
+  s_a421051d2cd71e::t_9f7d52fe591b95 1-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "a996e925afd6351414bd839c36c9cfd050003e5b",
+  "prompts": {},
+  "sessions": {
+    "s_a421051d2cd71e": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "9ecb4870-7f36-4aa5-99b6-4c165834ab35",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
