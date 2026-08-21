@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, Weak};
 use std::thread::JoinHandle;
 
 use base64::Engine;
@@ -128,11 +128,17 @@ pub fn spawn_session(
     let killer = child.clone_killer();
     let session_id = Uuid::new_v4().to_string();
     let session_id_for_reader = session_id.clone();
+    let session_id_for_waiter = session_id.clone();
+    let map_for_waiter = Arc::downgrade(map);
 
-    let handle = match std::thread::Builder::new()
-        .name(format!("gencore-pty-{session_id}"))
+    // Hold the map lock across spawn+insert so a shell that dies immediately
+    // cannot reap its entry before the entry exists.
+    let mut sessions = map.lock().expect("session map mutex");
+
+    let reader_handle = match std::thread::Builder::new()
+        .name(format!("gencore-pty-read-{session_id}"))
         .spawn(move || {
-            read_output(reader, session_id_for_reader, child, on_data, on_exit);
+            read_output(reader, session_id_for_reader, on_data);
         }) {
         Ok(handle) => handle,
         Err(err) => {
@@ -141,15 +147,27 @@ pub fn spawn_session(
         }
     };
 
-    map.lock().expect("session map mutex").insert(
+    if let Err(err) = std::thread::Builder::new()
+        .name(format!("gencore-pty-wait-{session_id}"))
+        .spawn(move || {
+            wait_child(child, session_id_for_waiter, map_for_waiter, on_exit);
+        })
+    {
+        // Killing the child closes the pty, which ends the reader thread too.
+        let _ = fallback_killer.kill();
+        return Err(SessionError::SpawnFailed(err.to_string()));
+    }
+
+    sessions.insert(
         session_id.clone(),
         PtySession {
             writer: Mutex::new(writer),
             master: pair.master,
             killer: Mutex::new(killer),
-            reader: Mutex::new(Some(handle)),
+            reader: Mutex::new(Some(reader_handle)),
         },
     );
+    drop(sessions);
 
     Ok(session_id)
 }
@@ -190,12 +208,25 @@ fn resolve_cwd(cwd: Option<&str>) -> Result<Option<PathBuf>, SessionError> {
     }
 }
 
+/// Removes a session from the map and hands back its reader thread handle.
+///
+/// Dropping the entry also drops the master pty, which is what closes the
+/// pseudoconsole and finally unblocks that reader thread.
+fn reap_session(map: &Weak<Mutex<SessionMap>>, session_id: &str) -> Option<JoinHandle<()>> {
+    let map = map.upgrade()?;
+    let session = {
+        let mut sessions = map.lock().ok()?;
+        sessions.remove(session_id)?
+    };
+    let reader = session.take_reader();
+    drop(session);
+    reader
+}
+
 fn read_output(
     mut reader: Box<dyn Read + Send>,
     session_id: String,
-    mut child: Box<dyn Child + Send + Sync>,
     on_data: impl Fn(PtyDataPayload),
-    on_exit: impl Fn(PtyExitPayload),
 ) {
     let mut buf = [0u8; 8192];
     loop {
@@ -210,7 +241,25 @@ fn read_output(
             Err(_) => break,
         }
     }
-    drop(reader);
+}
+
+/// Waits for the shell to exit, reaps its session, then reports the exit code.
+///
+/// This runs on its own thread because ConPTY keeps the output pipe open for as
+/// long as the pseudoconsole lives: a shell that exits on its own never gives
+/// the reader EOF, so without this the session would sit in the map forever.
+/// Reaping here drops the master, which ends the reader thread; joining it
+/// before `on_exit` keeps the shell's final bytes ahead of the exit event.
+fn wait_child(
+    mut child: Box<dyn Child + Send + Sync>,
+    session_id: String,
+    map: Weak<Mutex<SessionMap>>,
+    on_exit: impl Fn(PtyExitPayload),
+) {
     let code = child.wait().ok().map(|status| status.exit_code() as i32);
+    drop(child);
+    if let Some(reader) = reap_session(&map, &session_id) {
+        let _ = reader.join();
+    }
     on_exit(PtyExitPayload { session_id, code });
 }

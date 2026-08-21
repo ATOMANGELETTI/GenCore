@@ -2,10 +2,16 @@ use std::sync::mpsc;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
+use base64::Engine;
+use base64::engine::general_purpose::STANDARD;
 use gencore_pty::{
     IoError, OpenArgs, SessionError, SessionMap, kill_session, resolve_oh_my_posh, spawn_session,
     write_session,
 };
+
+/// DSR cursor-position request ConPTY emits at startup; the terminal must answer.
+#[cfg(windows)]
+const CURSOR_POSITION_REQUEST: &str = "\u{1b}[6n";
 
 #[test]
 fn open_args_default_theme_and_cwd_are_optional() {
@@ -123,6 +129,73 @@ fn open_echo_and_close() {
 
     kill_session(&map, &session_id).expect("kill_session");
     assert!(got_output, "expected ConPTY output within 3s");
+}
+
+#[cfg(windows)]
+#[test]
+fn exited_shell_is_reaped_from_the_session_map() {
+    let map = Arc::new(Mutex::new(SessionMap::new()));
+    let (data_tx, data_rx) = mpsc::channel();
+    let (exit_tx, exit_rx) = mpsc::channel();
+
+    let session_id = spawn_session(
+        &map,
+        OpenArgs {
+            cols: 80,
+            rows: 24,
+            cwd: None,
+            theme: None,
+        },
+        None,
+        move |payload| {
+            let _ = data_tx.send(payload);
+        },
+        move |payload| {
+            let _ = exit_tx.send(payload);
+        },
+    )
+    .expect("spawn_session");
+    let _guard = KillOnDrop {
+        map: Arc::clone(&map),
+        session_id: session_id.clone(),
+    };
+
+    let deadline = Instant::now() + Duration::from_secs(30);
+    let mut next_exit_attempt = Instant::now() + Duration::from_millis(500);
+    let mut text = String::new();
+    while Instant::now() < deadline {
+        while let Ok(payload) = data_rx.try_recv() {
+            let raw = STANDARD.decode(&payload.data).unwrap_or_default();
+            text.push_str(&String::from_utf8_lossy(&raw));
+        }
+        // ConPTY asks the terminal for the cursor position on startup and the
+        // shell does not reach a prompt until something answers. xterm.js does
+        // this in the app; here the test has to play terminal.
+        if text.contains(CURSOR_POSITION_REQUEST) {
+            text = text.replace(CURSOR_POSITION_REQUEST, "");
+            let _ = write_session(&map, &session_id, "\u{1b}[1;1R");
+        }
+        if Instant::now() >= next_exit_attempt {
+            // Bare CR: LF would open a PSReadLine continuation prompt instead.
+            let _ = write_session(&map, &session_id, "exit\r");
+            next_exit_attempt = Instant::now() + Duration::from_secs(2);
+        }
+        if let Ok(payload) = exit_rx.try_recv() {
+            assert_eq!(payload.session_id, session_id);
+            assert!(
+                map.lock().expect("session map mutex").is_empty(),
+                "the exited session must be reaped before the exit event fires"
+            );
+            assert!(matches!(
+                kill_session(&map, &session_id),
+                Err(SessionError::SessionNotFound)
+            ));
+            return;
+        }
+        std::thread::sleep(Duration::from_millis(50));
+    }
+
+    panic!("no pty exit event within 30s; shell output so far: {text:?}");
 }
 
 #[test]

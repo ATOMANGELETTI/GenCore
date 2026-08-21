@@ -1,8 +1,9 @@
 //! GenCore Terminal desktop shell.
 //!
-//! Registers `gencore-core` (app metadata), `gencore-pty` (session stub), and
-//! `gencore-fs` (Files-tab tree). Capabilities grant `get_app_info` and the
-//! six file-tree `gencore-fs` commands; pty stubs stay ungranted.
+//! Registers `gencore-core` (app metadata), `gencore-pty` (ConPTY sessions),
+//! and `gencore-fs` (Files-tab tree). Capabilities grant `get_app_info`, the
+//! pinned-tab load/save pair, the six file-tree `gencore-fs` commands, and the
+//! four `gencore-pty` commands the terminal invokes.
 
 mod modules;
 
