@@ -33,3 +33,28 @@ export interface DriveEntry {
 export interface ListResult {
   readonly entries: readonly FsEntry[];
 }
+
+/** Arguments for `plugin:gencore-pty|open`. */
+export interface OpenPtyArgs {
+  readonly cols: number;
+  readonly rows: number;
+  readonly cwd?: string;
+  readonly theme?: "polar-night" | "snow-storm";
+}
+
+/** Mirrors `gencore_pty::OpenResult`. */
+export interface OpenPtyResult {
+  readonly session_id: string;
+}
+
+/** Mirrors `gencore_pty::PtyDataPayload`. */
+export interface PtyDataPayload {
+  readonly session_id: string;
+  readonly data: string;
+}
+
+/** Mirrors `gencore_pty::PtyExitPayload`. */
+export interface PtyExitPayload {
+  readonly session_id: string;
+  readonly code: number | null;
+}

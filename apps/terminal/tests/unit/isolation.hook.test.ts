@@ -6,6 +6,7 @@ import { GENCORE_REPO_URL } from "../../src/modules/ipc/ipc.opener";
 
 const EMPTY_ARG_COMMANDS = [
   "plugin:gencore-core|get_app_info",
+  "plugin:gencore-core|load_pinned_tabs",
   "plugin:window|close",
   "plugin:window|minimize",
   "plugin:window|toggle_maximize",
@@ -34,14 +35,25 @@ const FS_PATH_COMMANDS = [
 ] as const;
 const FS_ALLOWED_COMMANDS = [FS_LIST_DRIVES_CMD, ...FS_PATH_COMMANDS, FS_WATCH_CMD] as const;
 
+const PTY_OPEN_CMD = "plugin:gencore-pty|open";
+const PTY_WRITE_CMD = "plugin:gencore-pty|write";
+const PTY_RESIZE_CMD = "plugin:gencore-pty|resize";
+const PTY_CLOSE_CMD = "plugin:gencore-pty|close";
+const PTY_ALLOWED_COMMANDS = [PTY_OPEN_CMD, PTY_WRITE_CMD, PTY_RESIZE_CMD, PTY_CLOSE_CMD] as const;
+const LOAD_PINNED_CMD = "plugin:gencore-core|load_pinned_tabs";
+const SAVE_PINNED_CMD = "plugin:gencore-core|save_pinned_tabs";
+
 const EVENT_LISTEN_CMD = "plugin:event|listen";
 const EVENT_UNLISTEN_CMD = "plugin:event|unlisten";
 const EVENT_EMIT_CMD = "plugin:event|emit";
 const ENTRY_CHANGED_EVENT = "gencore-fs://entry-changed";
 const THEME_CHANGED_EVENT = "tauri://theme-changed";
+const PTY_DATA_EVENT = "gencore-pty://data";
+const PTY_EXIT_EVENT = "gencore-pty://exit";
+const PTY_LISTEN_EVENTS = [PTY_DATA_EVENT, PTY_EXIT_EVENT] as const;
 
 const FORBIDDEN_TOKENS = [
-  "gencore-pty",
+  "gencore-pty:default",
   "core:default",
   "opener:default",
   "core:event:default",
@@ -216,12 +228,18 @@ describe("terminal isolation hook", () => {
       "core:window:allow-start-dragging",
       "core:window:allow-theme",
       "gencore-core:allow-get-app-info",
+      "gencore-core:allow-load-pinned-tabs",
+      "gencore-core:allow-save-pinned-tabs",
       "gencore-fs:allow-list",
       "gencore-fs:allow-list-drives",
       "gencore-fs:allow-create-file",
       "gencore-fs:allow-create-dir",
       "gencore-fs:allow-watch",
       "gencore-fs:allow-unwatch",
+      "gencore-pty:allow-open",
+      "gencore-pty:allow-write",
+      "gencore-pty:allow-resize",
+      "gencore-pty:allow-close",
       "core:event:allow-listen",
       "core:event:allow-unlisten",
       {
@@ -495,6 +513,189 @@ describe("terminal isolation hook", () => {
   it("does not grant gencore-fs stat in capabilities", () => {
     expect(capabilitySource).not.toContain("gencore-fs:allow-stat");
     expect(capabilitySource).not.toContain("gencore-fs:allow-read");
+  });
+
+  it("allowlists the four gencore-pty commands used by the terminal and not spawn", () => {
+    for (const cmd of PTY_ALLOWED_COMMANDS) {
+      expect(hookSource).toContain(`"${cmd}",`);
+    }
+    expect(hookSource).not.toContain("plugin:gencore-pty|spawn");
+  });
+
+  it("allowlists pinned-tab load and save commands", () => {
+    expect(hookSource).toContain(`"${LOAD_PINNED_CMD}",`);
+    expect(hookSource).toContain(`"${SAVE_PINNED_CMD}",`);
+  });
+
+  it.each([undefined, null] as const)(
+    "allows load_pinned_tabs when payload args are %s",
+    (payload) => {
+      const hook = getHook();
+      const input = envelope(LOAD_PINNED_CMD, payload);
+      const result = hook(input);
+      expect(result).not.toBe(input);
+      expect(result.cmd).toBe(LOAD_PINNED_CMD);
+    },
+  );
+
+  it("throws for load_pinned_tabs with extra args or a window label", () => {
+    const hook = getHook();
+    expect(() => hook(envelope(LOAD_PINNED_CMD, { unexpected: true }))).toThrow();
+    expect(() => hook(envelope(LOAD_PINNED_CMD, { label: "main" }))).toThrow();
+    expect(() => hook(envelope(LOAD_PINNED_CMD, { json: "{}" }))).toThrow();
+  });
+
+  it("reconstructs save_pinned_tabs as a json-only payload", () => {
+    const hook = getHook();
+    const inner = { json: '{"version":1}' };
+    const input = envelope(SAVE_PINNED_CMD, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.cmd).toBe(SAVE_PINNED_CMD);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({ json: '{"version":1}' });
+    expect(Object.keys(result.payload as object)).toEqual(["json"]);
+  });
+
+  it("throws when save json exceeds 8 MiB", () => {
+    const hook = getHook();
+    expect(() => hook(envelope(SAVE_PINNED_CMD, { json: "a".repeat(8388609) }))).toThrow();
+  });
+
+  it("throws for save_pinned_tabs with extra keys or a non-string json", () => {
+    const hook = getHook();
+    expect(() => hook(envelope(SAVE_PINNED_CMD, { json: "{}", extra: true }))).toThrow();
+    expect(() => hook(envelope(SAVE_PINNED_CMD, { json: 12 }))).toThrow();
+    expect(() => hook(envelope(SAVE_PINNED_CMD, {}))).toThrow();
+  });
+
+  it("reconstructs open as cols and rows only", () => {
+    const hook = getHook();
+    const inner = { cols: 80, rows: 24 };
+    const input = envelope(PTY_OPEN_CMD, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.cmd).toBe(PTY_OPEN_CMD);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({ cols: 80, rows: 24 });
+    expect(Object.keys(result.payload as object)).toEqual(["cols", "rows"]);
+  });
+
+  it("reconstructs open with cwd as cols, rows, and cwd", () => {
+    const hook = getHook();
+    const inner = { cols: 80, rows: 24, cwd: "C:\\work" };
+    const result = hook(envelope(PTY_OPEN_CMD, inner));
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({ cols: 80, rows: 24, cwd: "C:\\work" });
+  });
+
+  it("keeps open theme snow-storm", () => {
+    const hook = getHook();
+    const inner = { cols: 80, rows: 24, theme: "snow-storm" };
+    const result = hook(envelope(PTY_OPEN_CMD, inner));
+    expect(result.payload).toEqual({ cols: 80, rows: 24, theme: "snow-storm" });
+  });
+
+  it("throws for open with theme nord", () => {
+    const hook = getHook();
+    expect(() => hook(envelope(PTY_OPEN_CMD, { cols: 80, rows: 24, theme: "nord" }))).toThrow();
+  });
+
+  it("throws for open with a shell key", () => {
+    const hook = getHook();
+    expect(() => hook(envelope(PTY_OPEN_CMD, { cols: 80, rows: 24, shell: "cmd.exe" }))).toThrow();
+  });
+
+  it("reconstructs write as session_id and data", () => {
+    const hook = getHook();
+    const inner = { session_id: "session-1", data: "hi" };
+    const result = hook(envelope(PTY_WRITE_CMD, inner));
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({ session_id: "session-1", data: "hi" });
+  });
+
+  it("throws when write data exceeds 64 KiB", () => {
+    const hook = getHook();
+    expect(() =>
+      hook(envelope(PTY_WRITE_CMD, { session_id: "session-1", data: "a".repeat(65537) })),
+    ).toThrow();
+  });
+
+  it("reconstructs resize as session_id, cols, and rows", () => {
+    const hook = getHook();
+    const inner = { session_id: "session-1", cols: 100, rows: 40 };
+    const result = hook(envelope(PTY_RESIZE_CMD, inner));
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({ session_id: "session-1", cols: 100, rows: 40 });
+  });
+
+  it("reconstructs close as session_id only", () => {
+    const hook = getHook();
+    const inner = { session_id: "session-1" };
+    const result = hook(envelope(PTY_CLOSE_CMD, inner));
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({ session_id: "session-1" });
+    expect(Object.keys(result.payload as object)).toEqual(["session_id"]);
+  });
+
+  it.each(PTY_LISTEN_EVENTS)("reconstructs listen for %s with Any target", (event) => {
+    const hook = getHook();
+    const inner = {
+      event,
+      target: { kind: "Any" },
+      handler: 7,
+    };
+    const input = envelope(EVENT_LISTEN_CMD, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.cmd).toBe(EVENT_LISTEN_CMD);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({
+      event,
+      target: { kind: "Any" },
+      handler: 7,
+    });
+    expect((result.payload as { target: unknown }).target).not.toBe(inner.target);
+  });
+
+  it.each(PTY_LISTEN_EVENTS)("throws for %s listen with a Window target", (event) => {
+    const hook = getHook();
+    expect(() =>
+      hook(
+        envelope(EVENT_LISTEN_CMD, {
+          event,
+          target: { kind: "Window", label: "main" },
+          handler: 7,
+        }),
+      ),
+    ).toThrow();
+  });
+
+  it.each(PTY_LISTEN_EVENTS)("reconstructs unlisten for %s", (event) => {
+    const hook = getHook();
+    const inner = { event, eventId: 3 };
+    const input = envelope(EVENT_UNLISTEN_CMD, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({ event, eventId: 3 });
+  });
+
+  it("throws for listen to gencore-pty://pwn", () => {
+    const hook = getHook();
+    expect(() =>
+      hook(
+        envelope(EVENT_LISTEN_CMD, {
+          event: "gencore-pty://pwn",
+          target: { kind: "Any" },
+          handler: 7,
+        }),
+      ),
+    ).toThrow();
   });
 
   it("loads the isolation script from head", () => {

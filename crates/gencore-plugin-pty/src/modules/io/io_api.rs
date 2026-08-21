@@ -36,10 +36,11 @@ pub fn write_session(
 #[tauri::command]
 pub async fn write(
     state: State<'_, Arc<Mutex<SessionMap>>>,
-    args: WriteArgs,
+    session_id: String,
+    data: String,
 ) -> Result<(), IoError> {
     let map = Arc::clone(state.inner());
-    tauri::async_runtime::spawn_blocking(move || write_session(&map, &args.session_id, &args.data))
+    tauri::async_runtime::spawn_blocking(move || write_session(&map, &session_id, &data))
         .await
         .map_err(|err| IoError::Io(err.to_string()))?
 }

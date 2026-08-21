@@ -43,12 +43,12 @@ pub fn resize_session(
 #[tauri::command]
 pub async fn resize(
     state: State<'_, Arc<Mutex<SessionMap>>>,
-    args: ResizeArgs,
+    session_id: String,
+    cols: u16,
+    rows: u16,
 ) -> Result<(), ResizeError> {
     let map = Arc::clone(state.inner());
-    tauri::async_runtime::spawn_blocking(move || {
-        resize_session(&map, &args.session_id, args.cols, args.rows)
-    })
-    .await
-    .map_err(|err| ResizeError::Io(err.to_string()))?
+    tauri::async_runtime::spawn_blocking(move || resize_session(&map, &session_id, cols, rows))
+        .await
+        .map_err(|err| ResizeError::Io(err.to_string()))?
 }

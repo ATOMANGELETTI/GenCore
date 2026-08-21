@@ -42,8 +42,17 @@ pub struct CloseArgs {
 pub async fn open<R: Runtime>(
     app: AppHandle<R>,
     state: State<'_, Arc<Mutex<SessionMap>>>,
-    args: OpenArgs,
+    cols: u16,
+    rows: u16,
+    cwd: Option<String>,
+    theme: Option<String>,
 ) -> Result<OpenResult, SessionError> {
+    let args = OpenArgs {
+        cols,
+        rows,
+        cwd,
+        theme,
+    };
     let map = Arc::clone(state.inner());
     let app_data = app.clone();
     let app_exit = app.clone();
@@ -68,10 +77,10 @@ pub async fn open<R: Runtime>(
 #[tauri::command]
 pub async fn close(
     state: State<'_, Arc<Mutex<SessionMap>>>,
-    args: CloseArgs,
+    session_id: String,
 ) -> Result<(), SessionError> {
     let map = Arc::clone(state.inner());
-    tauri::async_runtime::spawn_blocking(move || kill_session(&map, &args.session_id))
+    tauri::async_runtime::spawn_blocking(move || kill_session(&map, &session_id))
         .await
         .map_err(|err| SessionError::Io(err.to_string()))?
 }
