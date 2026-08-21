@@ -98,7 +98,7 @@ The plugin is not vendored. GenCore’s always-on Superpowers rule (artifact pat
 - The public GitHub repository is https://github.com/ATOMANGELETTI/GenCore.
 - `TAURI_DEV_HOST` HMR is unsupported; Vite live reload uses `devCsp.connect-src` localhost websockets only.
 - The project license is GPL-3.0-or-later.
-- The terminal left panel has Files, Agent, and Settings tabs; Agent is a planned tab that should interact with the terminal, file tree, settings, and the app.
+- The terminal left panel has Files, Assistant, and Config tabs; Assistant is a planned tab that should interact with the terminal, file tree, config, and the app.
 - Tauri plugin builds cache absolute permission-file paths under `target/`; after relocating the repo, run `cargo clean` before `tauri:dev`.
 - Apps follow OS appearance: dark → Polar Night, light → Snow Storm; Polar Night if theme IPC fails or returns null.
 - `.cursor/` is the source of truth for Cursor agent config; `.agents/` is generated for Antigravity (`agy`) and should not be edited by hand.

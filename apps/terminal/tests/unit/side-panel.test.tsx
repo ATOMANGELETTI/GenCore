@@ -14,15 +14,18 @@ vi.mock("../../src/modules/ipc/ipc.fs", () => ({
   subscribeFsChanges: vi.fn(() => Promise.resolve(() => {})),
 }));
 
+import { ConfigProvider } from "../../src/modules/config/config.hook";
 import { SidePanel } from "../../src/modules/side-panel/side-panel.component";
 
-function getTabpanel(id: "files" | "assistant" | "settings") {
+restoreJsdomLocalStorage();
+
+function getTabpanel(id: "files" | "assistant" | "config") {
   const panel = document.getElementById(`side-panel-${id}`);
   expect(panel).toBeTruthy();
   return panel as HTMLElement;
 }
 
-function expectPanelHiddenState(id: "files" | "assistant" | "settings", isHidden: boolean) {
+function expectPanelHiddenState(id: "files" | "assistant" | "config", isHidden: boolean) {
   const panel = getTabpanel(id);
   if (isHidden) {
     expect(panel).toHaveAttribute("hidden");
@@ -33,7 +36,11 @@ function expectPanelHiddenState(id: "files" | "assistant" | "settings", isHidden
 }
 
 async function renderSidePanel() {
-  const view = render(<SidePanel />);
+  const view = render(
+    <ConfigProvider>
+      <SidePanel />
+    </ConfigProvider>,
+  );
   expect(await screen.findByText("FILES")).toBeVisible();
   expect(await screen.findByRole("treeitem", { name: "C:" })).toBeVisible();
   return view;
@@ -51,10 +58,10 @@ describe("SidePanel", () => {
     expect(screen.getByRole("tree")).toBeVisible();
     expect(screen.queryByText("Tab 1")).toBeNull();
     expect(screen.getByText("Tab 2")).not.toBeVisible();
-    expect(screen.getByText("Tab 3")).not.toBeVisible();
+    expect(screen.queryByText("Tab 3")).toBeNull();
     expectPanelHiddenState("files", false);
     expectPanelHiddenState("assistant", true);
-    expectPanelHiddenState("settings", true);
+    expectPanelHiddenState("config", true);
   });
 
   it("shows Tab 2 when the Assistant tab is clicked", async () => {
@@ -65,27 +72,28 @@ describe("SidePanel", () => {
 
     expect(screen.getByText("Tab 2")).toBeVisible();
     expect(screen.queryByText("Tab 1")).toBeNull();
-    expect(screen.getByText("Tab 3")).not.toBeVisible();
+    expect(screen.queryByText("Tab 3")).toBeNull();
     expectPanelHiddenState("assistant", false);
     expectPanelHiddenState("files", true);
-    expectPanelHiddenState("settings", true);
+    expectPanelHiddenState("config", true);
   });
 
-  it("shows Tab 3 when the Settings tab is clicked", async () => {
+  it("shows CONFIG when the Config tab is clicked", async () => {
     const user = userEvent.setup();
     await renderSidePanel();
 
-    await user.click(screen.getByRole("tab", { name: "Settings" }));
+    await user.click(screen.getByRole("tab", { name: "Config" }));
 
-    expect(screen.getByText("Tab 3")).toBeVisible();
-    expect(screen.queryByText("Tab 1")).toBeNull();
+    expect(screen.getByText("CONFIG")).toBeVisible();
+    expect(screen.getByRole("radiogroup", { name: "Theme" })).toBeVisible();
+    expect(screen.queryByText("Tab 3")).toBeNull();
     expect(screen.getByText("Tab 2")).not.toBeVisible();
-    expectPanelHiddenState("settings", false);
+    expectPanelHiddenState("config", false);
     expectPanelHiddenState("files", true);
     expectPanelHiddenState("assistant", true);
   });
 
-  it("exposes a Side panel tablist with Files, Assistant, and Settings tabs", async () => {
+  it("exposes a Side panel tablist with Files, Assistant, and Config tabs", async () => {
     await renderSidePanel();
 
     const tablist = screen.getByRole("tablist", { name: "Side panel" });
@@ -93,9 +101,10 @@ describe("SidePanel", () => {
     expect(tablist).toHaveClass("h-6");
     expect(screen.getByRole("tab", { name: "Files" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Assistant" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Settings" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Config" })).toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "Settings" })).toBeNull();
 
-    for (const name of ["Files", "Assistant", "Settings"] as const) {
+    for (const name of ["Files", "Assistant", "Config"] as const) {
       const icon = screen.getByRole("tab", { name }).querySelector("svg");
       expect(icon).toHaveClass("size-3");
     }
@@ -166,3 +175,16 @@ describe("SidePanel", () => {
     expect(screen.getByRole("complementary")).toHaveStyle({ width: `${max}px` });
   });
 });
+
+function restoreJsdomLocalStorage(): void {
+  const jsdomStorage = (window as unknown as { _localStorage?: Storage })._localStorage;
+  if (!jsdomStorage) {
+    return;
+  }
+
+  Object.defineProperty(window, "localStorage", {
+    configurable: true,
+    enumerable: true,
+    get: () => jsdomStorage,
+  });
+}

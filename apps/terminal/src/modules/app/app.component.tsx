@@ -1,5 +1,6 @@
 import { AppShell, ThemeProvider } from "@gencore/ui-kit";
 import * as React from "react";
+import { ConfigProvider, useConfig } from "../config/config.hook";
 import { ContentContextMenu } from "../context-menu/context-menu.content";
 import { TitlebarContextMenu } from "../context-menu/context-menu.titlebar";
 import { getAppInfo } from "../ipc/ipc.app-info";
@@ -7,14 +8,21 @@ import { openRepoInBrowser } from "../ipc/ipc.opener";
 import type { AppInfo } from "../ipc/ipc.types";
 import { closeWindow, minimizeWindow, toggleMaximizeWindow } from "../ipc/ipc.window";
 import { SidePanel } from "../side-panel/side-panel.component";
-import { useOsTheme } from "./app.hook";
 import "./app.theme.css";
 
 /** Exact product copy for this template app; also fed into the titlebar via `version`. */
 export const APP_TITLE = "Tauri Terminal Template";
 
 export function App() {
-  const osTheme = useOsTheme();
+  return (
+    <ConfigProvider>
+      <AppShellTree />
+    </ConfigProvider>
+  );
+}
+
+function AppShellTree() {
+  const { resolvedTheme } = useConfig();
   const [appInfo, setAppInfo] = React.useState<AppInfo | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -41,7 +49,7 @@ export function App() {
   const version = appInfo?.version;
 
   return (
-    <ThemeProvider theme={osTheme}>
+    <ThemeProvider theme={resolvedTheme}>
       <AppShell
         title={APP_TITLE}
         version={version}

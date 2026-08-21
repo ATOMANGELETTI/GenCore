@@ -1,7 +1,7 @@
 # Terminal Config tab (appearance)
 
 Date: 2026-08-20
-Status: draft
+Status: approved
 Packages: `@gencore/terminal`
 
 ## Problem

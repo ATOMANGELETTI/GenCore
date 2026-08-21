@@ -2,6 +2,7 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { APP_TITLE, App } from "../../src/modules/app/app.component";
+import { CONFIG_STORAGE_KEY } from "../../src/modules/config/config.storage";
 import { getAppInfo } from "../../src/modules/ipc/ipc.app-info";
 import type { AppInfo } from "../../src/modules/ipc/ipc.types";
 import { getWindowTheme, subscribeWindowTheme } from "../../src/modules/ipc/ipc.window";
@@ -48,9 +49,12 @@ vi.mock("../../src/modules/ipc/ipc.fs", () => ({
   subscribeFsChanges: vi.fn(async () => () => {}),
 }));
 
+restoreJsdomLocalStorage();
+
 describe("App", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
     vi.mocked(getWindowTheme).mockResolvedValue("dark");
     vi.mocked(subscribeWindowTheme).mockResolvedValue(() => undefined);
   });
@@ -149,4 +153,31 @@ describe("App", () => {
       expect(wrapper).toHaveClass("theme-snow-storm", "light");
     });
   });
+
+  it("applies Snow Storm from stored preference even when the OS window theme is dark", async () => {
+    localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify({ version: 1, theme: "snow-storm" }));
+    vi.mocked(getWindowTheme).mockResolvedValue("dark");
+
+    render(<App />);
+
+    await waitFor(() => {
+      const wrapper = document.querySelector('[data-slot="theme-provider"]');
+      expect(wrapper).toHaveAttribute("data-theme", "snow-storm");
+      expect(wrapper).toHaveClass("theme-snow-storm", "light");
+    });
+    expect(subscribeWindowTheme).not.toHaveBeenCalled();
+  });
 });
+
+function restoreJsdomLocalStorage(): void {
+  const jsdomStorage = (window as unknown as { _localStorage?: Storage })._localStorage;
+  if (!jsdomStorage) {
+    return;
+  }
+
+  Object.defineProperty(window, "localStorage", {
+    configurable: true,
+    enumerable: true,
+    get: () => jsdomStorage,
+  });
+}

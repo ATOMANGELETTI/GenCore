@@ -1,1 +1,1 @@
-export type SidePanelTabId = "files" | "assistant" | "settings";
+export type SidePanelTabId = "files" | "assistant" | "config";
