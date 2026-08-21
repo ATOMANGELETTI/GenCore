@@ -10,3 +10,7 @@ target
 !.env.example
 **/src-tauri/gen/
 artifacts/
+
+# Superpowers generated scratch — keep .superpowers/docs/ tracked
+.superpowers/brainstorm/
+.superpowers/sdd/

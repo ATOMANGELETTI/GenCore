@@ -73,7 +73,7 @@ Do not create commits or push unless the user explicitly asks. Conventional comm
 - Do not show the app version in the statusbar; it already appears in the titlebar. The titlebar version chip uses a Nord gilded hover and opens the GitHub repo in the system browser on click.
 - Reviewer skills (code-reviewer, security-reviewer, performance-reviewer) are read-only: propose a plan, ask which changes to apply, and do not edit unless asked.
 - Shared fonts belong in `@gencore/ui-kit` (`packages/ui-kit/src/assets/fonts/`) and may be used in the app shell (Terminess Nerd Font); do not copy font files into apps.
-- Keep Superpowers-generated folders (`docs/superpowers/`, plans, specs, `.superpowers/`) clean and organized; do not leave leftover plan or spec clutter in the repo.
+- Keep all Superpowers files under `.superpowers/`: specs in `.superpowers/docs/specs/`, plans in `.superpowers/docs/plans/`, reviews in `.superpowers/docs/reviews/`. Do not write `docs/superpowers/`, `docs/plans/`, or `docs/specs/`. Track `.superpowers/docs/`; gitignore only `.superpowers/brainstorm/` and `.superpowers/sdd/`. Do not leave leftover plan or spec clutter in the repo.
 - Shell and chrome UI text is not selectable; keep the content area copyable. The statusbar has no right-click context menu.
 - Do not bump major versions without asking first; use minor and patch only while apps stay on 0.x.
 - Never add Cursor or AI attribution to commits or PRs (`Co-authored-by: Cursor`, `Made-with: Cursor`, Copilot/ChatGPT/Claude trailers, or similar). Human co-authors are fine. The Husky `commit-msg` hook strips AI trailers if they still appear.
