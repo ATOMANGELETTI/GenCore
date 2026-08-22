@@ -3,6 +3,7 @@ const COMMANDS: &[&str] = &[
     "load_pinned_tabs",
     "save_pinned_tabs",
     "tray_action",
+    "get_system_telemetry",
 ];
 
 fn main() {
