@@ -49,6 +49,17 @@ vi.mock("../../src/modules/ipc/ipc.fs", () => ({
   subscribeFsChanges: vi.fn(async () => () => {}),
 }));
 
+vi.mock("../../src/modules/ipc/ipc.telemetry", () => ({
+  getSystemTelemetry: vi.fn(() =>
+    Promise.resolve({
+      cpu: { brand: "CPU", overallUsage: 10, coreCount: 1, coreUsages: [10], frequencyMhz: 1000 },
+      gpus: [],
+      network: { rxBytesPerSec: 0, txBytesPerSec: 0, totalRxBytes: 0, totalTxBytes: 0 },
+      memory: { usedBytes: 1, totalBytes: 2, usagePercent: 50 },
+    }),
+  ),
+}));
+
 vi.mock("../../src/modules/ipc/ipc.pty", () => ({
   openPty: vi.fn(async () => ({ session_id: "session-test" })),
   writePty: vi.fn(async () => undefined),
@@ -209,6 +220,29 @@ describe("App", () => {
       expect(wrapper).toHaveClass("theme-snow-storm", "light");
     });
     expect(subscribeWindowTheme).not.toHaveBeenCalled();
+  });
+
+  it("does not show shell size in the statusbar", async () => {
+    render(<App />);
+    await waitFor(() => {
+      expect(screen.getByRole("banner")).toHaveTextContent(APP_TITLE);
+    });
+    expect(screen.getByRole("contentinfo")).not.toHaveTextContent("pwsh");
+    expect(screen.getByRole("contentinfo")).not.toHaveTextContent("×");
+  });
+
+  it("toggles the side panel with the statusbar button and Ctrl+B", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const toggle = await screen.findByRole("button", { name: /Collapse side panel/i });
+    expect(screen.getByRole("complementary")).not.toHaveAttribute("aria-hidden", "true");
+    await user.click(toggle);
+    expect(screen.getByRole("complementary", { hidden: true })).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+    await user.keyboard("{Control>}b{/Control}");
+    expect(screen.getByRole("complementary")).not.toHaveAttribute("aria-hidden", "true");
   });
 });
 
