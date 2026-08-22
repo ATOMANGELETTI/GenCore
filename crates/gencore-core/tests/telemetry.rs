@@ -1,6 +1,7 @@
 use gencore_core::{
     CpuTelemetry, GpuCandidate, GpuKind, GpuTelemetry, MemoryTelemetry, NetworkTelemetry,
-    SystemTelemetry, TelemetryError, classify_gpu, pick_gpus,
+    PdhEngineSample, SystemTelemetry, TelemetryError, apply_pdh_utilization, classify_gpu,
+    pick_gpus,
 };
 
 #[test]
@@ -164,6 +165,36 @@ fn pick_gpus_keeps_one_integrated_and_largest_dedicated() {
     assert_eq!(picked.len(), 2);
     assert_eq!(picked[0].id, "igpu-a");
     assert_eq!(picked[1].id, "dgpu-big");
+}
+
+#[test]
+fn unmatched_pdh_fallback_targets_kept_dedicated_gpu() {
+    let mut gpus = vec![
+        gpu("dgpu-small", GpuKind::Dedicated, 4_000),
+        gpu("dgpu-big", GpuKind::Dedicated, 12_000),
+    ];
+    gpus[0].utilization = 0.0;
+    gpus[1].utilization = 0.0;
+
+    apply_pdh_utilization(
+        &mut gpus,
+        &[(1, 1), (2, 2)],
+        &[
+            PdhEngineSample {
+                luid: None,
+                value: 40.0,
+            },
+            PdhEngineSample {
+                luid: None,
+                value: 60.0,
+            },
+        ],
+    );
+
+    let picked = pick_gpus(gpus);
+    assert_eq!(picked.len(), 1);
+    assert_eq!(picked[0].id, "dgpu-big");
+    assert_eq!(picked[0].utilization, 50.0);
 }
 
 #[test]

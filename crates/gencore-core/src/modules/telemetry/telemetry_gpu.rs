@@ -1,9 +1,8 @@
 #[cfg(windows)]
 use super::telemetry_classify::{classify_gpu, pick_gpus};
-#[cfg(not(windows))]
-use super::telemetry_types::GpuTelemetry;
 #[cfg(windows)]
-use super::telemetry_types::{GpuCandidate, GpuKind, GpuTelemetry};
+use super::telemetry_types::GpuCandidate;
+use super::telemetry_types::{GpuKind, GpuTelemetry};
 
 #[cfg(not(windows))]
 pub fn collect_gpus() -> Vec<GpuTelemetry> {
@@ -71,18 +70,42 @@ fn collect_gpus_windows() -> Result<Vec<GpuTelemetry>, super::telemetry_error::T
     Ok(found)
 }
 
-#[cfg(windows)]
-fn overlay_pdh_utilization(gpus: &mut [GpuTelemetry], luids: &[(i32, u32)]) {
-    // Best-effort: if PDH counters are missing, leave utilization at 0.0 on real adapters.
-    // Do not invent extra GPU entries here.
-    if gpus.is_empty() {
-        return;
-    }
+/// PDH engine sample used to overlay utilization onto DXGI adapters.
+#[derive(Debug, Clone, PartialEq)]
+pub struct PdhEngineSample {
+    pub luid: Option<(i32, u32)>,
+    pub value: f32,
+}
 
-    let Some(samples) = collect_pdh_engine_samples() else {
-        return;
-    };
-    if samples.is_empty() {
+/// Same target `pick_gpus` keeps for "the" dedicated GPU: largest dedicated VRAM,
+/// else the first integrated adapter.
+fn fallback_gpu_index(gpus: &[GpuTelemetry]) -> Option<usize> {
+    let mut dedicated_idx = None;
+    let mut dedicated_vram = 0_u64;
+    let mut integrated_idx = None;
+    for (idx, gpu) in gpus.iter().enumerate() {
+        match gpu.kind {
+            GpuKind::Dedicated => {
+                if dedicated_idx.is_none() || gpu.memory_total_bytes > dedicated_vram {
+                    dedicated_idx = Some(idx);
+                    dedicated_vram = gpu.memory_total_bytes;
+                }
+            }
+            GpuKind::Integrated if integrated_idx.is_none() => integrated_idx = Some(idx),
+            GpuKind::Integrated => {}
+        }
+    }
+    dedicated_idx.or(integrated_idx)
+}
+
+/// Match PDH engine samples onto adapters by LUID. If nothing matches, assign the
+/// mean engine utilization to the GPU `pick_gpus` would keep.
+pub fn apply_pdh_utilization(
+    gpus: &mut [GpuTelemetry],
+    luids: &[(i32, u32)],
+    samples: &[PdhEngineSample],
+) {
+    if gpus.is_empty() || samples.is_empty() {
         return;
     }
 
@@ -90,7 +113,7 @@ fn overlay_pdh_utilization(gpus: &mut [GpuTelemetry], luids: &[(i32, u32)]) {
     for (gpu, &(high, low)) in gpus.iter_mut().zip(luids.iter()) {
         let mut sum = 0.0_f32;
         let mut count = 0_u32;
-        for sample in &samples {
+        for sample in samples {
             if sample.luid == Some((high, low)) {
                 sum += sample.value;
                 count += 1;
@@ -104,20 +127,24 @@ fn overlay_pdh_utilization(gpus: &mut [GpuTelemetry], luids: &[(i32, u32)]) {
 
     if !matched_any {
         let mean = samples.iter().map(|sample| sample.value).sum::<f32>() / samples.len() as f32;
-        let target_idx = gpus
-            .iter()
-            .position(|gpu| gpu.kind == GpuKind::Dedicated)
-            .or_else(|| gpus.iter().position(|gpu| gpu.kind == GpuKind::Integrated));
-        if let Some(idx) = target_idx {
+        if let Some(idx) = fallback_gpu_index(gpus) {
             gpus[idx].utilization = mean.clamp(0.0, 100.0);
         }
     }
 }
 
 #[cfg(windows)]
-struct PdhEngineSample {
-    luid: Option<(i32, u32)>,
-    value: f32,
+fn overlay_pdh_utilization(gpus: &mut [GpuTelemetry], luids: &[(i32, u32)]) {
+    // Best-effort: if PDH counters are missing, leave utilization at 0.0 on real adapters.
+    // Do not invent extra GPU entries here.
+    if gpus.is_empty() {
+        return;
+    }
+
+    let Some(samples) = collect_pdh_engine_samples() else {
+        return;
+    };
+    apply_pdh_utilization(gpus, luids, &samples);
 }
 
 #[cfg(windows)]

@@ -15,7 +15,8 @@ pub use modules::pinned_store::{
 };
 pub use modules::telemetry::{
     CpuTelemetry, GpuCandidate, GpuKind, GpuTelemetry, MemoryTelemetry, NetworkTelemetry,
-    SystemTelemetry, TelemetryError, TelemetryState, classify_gpu, get_system_telemetry, pick_gpus,
+    PdhEngineSample, SystemTelemetry, TelemetryError, TelemetryState, apply_pdh_utilization,
+    classify_gpu, get_system_telemetry, pick_gpus,
 };
 pub use modules::tray::{
     PxRect, PxSize, TrayAction, TrayActionArgs, TrayError, tray_action, tray_menu_origin,
