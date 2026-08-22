@@ -1,0 +1,28 @@
+crates/gencore-core/tests/telemetry.rs
+  s_a20bbba5c28702::t_511bc7b66dbd1e 3-4
+  s_a20bbba5c28702::t_4eac5e79f20e82 171-199
+  s_a20bbba5c28702::t_fbe74f5099b4db 170
+crates/gencore-core/src/modules/telemetry/mod.rs
+  s_a20bbba5c28702::t_ddd5f615ee4649 10
+crates/gencore-core/src/modules/telemetry/telemetry_gpu.rs
+  s_a20bbba5c28702::t_1ecccdc9f1ba5c 73-96,98-99,101-108,116,130,137-147
+  s_a20bbba5c28702::t_93dbd28c0765e9 4-5
+crates/gencore-core/src/lib.rs
+  s_a20bbba5c28702::t_56c96c6efb1de2 18-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "3109474cfc900934f8b14a370d8530042a90fcf7",
+  "prompts": {},
+  "sessions": {
+    "s_a20bbba5c28702": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "78942035-429e-4af4-949b-317626b3ddb1",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
