@@ -16,5 +16,8 @@ apps/terminal/src-tauri/resources/oh-my-posh/oh-my-posh.exe
 .superpowers/brainstorm/
 .superpowers/sdd/
 
+# Local git worktrees
+.worktrees/
+
 # Antigravity / Cursor hook runtime state
 .agents/hooks/state/
