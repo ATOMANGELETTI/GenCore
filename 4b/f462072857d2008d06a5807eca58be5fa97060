@@ -1,0 +1,27 @@
+.changeset/rich-tooltip.md
+  s_06538f2df415de::t_483570ea1e4c3a 1-5
+packages/ui-kit/src/primitives/tooltip/tooltip.types.ts
+  s_06538f2df415de::t_1ecdadebf89949 1,4,11-12
+packages/ui-kit/tests/primitives/tooltip/tooltip.variants.test.ts
+  s_06538f2df415de::t_394f6ede893220 8-24
+packages/ui-kit/src/primitives/tooltip/tooltip.variants.ts
+  s_06538f2df415de::t_b62cc9b7a890ce 4-21
+packages/ui-kit/src/primitives/tooltip/tooltip.component.tsx
+  s_06538f2df415de::t_005633ed4c3e6a 34,42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "4bf462072857d2008d06a5807eca58be5fa97060",
+  "prompts": {},
+  "sessions": {
+    "s_06538f2df415de": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "059c16de-c4e4-49cb-b017-7df287a1a7ed",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
