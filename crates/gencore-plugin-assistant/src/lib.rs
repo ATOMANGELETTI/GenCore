@@ -2,6 +2,7 @@
 
 mod modules;
 
+pub use modules::agent::{ConfirmOutcome, confirm_tool, reject_tool};
 pub use modules::error::AssistantError;
 pub use modules::gemini::{
     GeminiContent, GeminiError, GeminiEvent, GeminiPart, GeminiRequest, function_declarations,
@@ -17,6 +18,7 @@ pub use modules::store::{
     AssistantStore, Conversation, Message, Snapshot, StoreError, ToolCall, resolve_data_dir,
     seed_app_facts, sqlite_path,
 };
+pub use modules::tools::UiAction;
 
 use tauri::{
     Runtime,
