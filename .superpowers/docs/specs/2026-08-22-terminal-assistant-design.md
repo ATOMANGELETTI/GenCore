@@ -1,7 +1,7 @@
 # Terminal Assistant (Gemini agent)
 
 Date: 2026-08-22
-Status: draft (awaiting user review)
+Status: approved
 Packages: `@gencore/terminal`, `gencore-assistant` (new plugin crate)
 
 ## Problem
