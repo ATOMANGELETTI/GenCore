@@ -112,6 +112,24 @@ fn classify_gpu_intel_and_nvidia() {
     );
     assert_eq!(
         classify_gpu(&GpuCandidate {
+            name: "Intel Arc Graphics".into(),
+            dedicated_memory_bytes: 128 * 1024 * 1024,
+            vendor_id: 0x8086,
+            is_software: false,
+        }),
+        Some(GpuKind::Integrated)
+    );
+    assert_eq!(
+        classify_gpu(&GpuCandidate {
+            name: "Intel Arc B580".into(),
+            dedicated_memory_bytes: 12 * 1024 * 1024 * 1024,
+            vendor_id: 0x8086,
+            is_software: false,
+        }),
+        Some(GpuKind::Dedicated)
+    );
+    assert_eq!(
+        classify_gpu(&GpuCandidate {
             name: "NVIDIA GeForce RTX 4070".into(),
             dedicated_memory_bytes: 12 * 1024 * 1024 * 1024,
             vendor_id: 0x10DE,
@@ -183,10 +201,12 @@ fn unmatched_pdh_fallback_targets_kept_dedicated_gpu() {
             PdhEngineSample {
                 luid: None,
                 value: 40.0,
+                engine: "3D".into(),
             },
             PdhEngineSample {
                 luid: None,
                 value: 60.0,
+                engine: "Copy".into(),
             },
         ],
     );
@@ -195,6 +215,33 @@ fn unmatched_pdh_fallback_targets_kept_dedicated_gpu() {
     assert_eq!(picked.len(), 1);
     assert_eq!(picked[0].id, "dgpu-big");
     assert_eq!(picked[0].utilization, 50.0);
+}
+
+#[test]
+fn pdh_matched_luid_uses_max_engine_sum_not_mean() {
+    let mut gpus = vec![gpu("dgpu", GpuKind::Dedicated, 12_000)];
+    gpus[0].utilization = 0.0;
+
+    let mut samples = vec![PdhEngineSample {
+        luid: Some((1, 1)),
+        value: 80.0,
+        engine: "3D".into(),
+    }];
+    for i in 0..20 {
+        let engine = match i % 3 {
+            0 => "Copy",
+            1 => "Encode",
+            _ => "unknown",
+        };
+        samples.push(PdhEngineSample {
+            luid: Some((1, 1)),
+            value: 0.0,
+            engine: engine.into(),
+        });
+    }
+
+    apply_pdh_utilization(&mut gpus, &[(1, 1)], &samples);
+    assert_eq!(gpus[0].utilization, 80.0);
 }
 
 #[test]

@@ -53,12 +53,13 @@ fn collect_gpus_windows() -> Result<Vec<GpuTelemetry>, super::telemetry_error::T
             is_software,
         };
         if let Some(kind) = classify_gpu(&candidate) {
+            let memory_used_bytes = query_local_video_memory_used(&adapter);
             found.push(GpuTelemetry {
                 id: format!("gpu-{index}"),
                 name,
                 kind,
                 utilization: 0.0,
-                memory_used_bytes: 0,
+                memory_used_bytes,
                 memory_total_bytes: desc.DedicatedVideoMemory as u64,
             });
             luids.push((desc.AdapterLuid.HighPart, desc.AdapterLuid.LowPart));
@@ -70,11 +71,29 @@ fn collect_gpus_windows() -> Result<Vec<GpuTelemetry>, super::telemetry_error::T
     Ok(found)
 }
 
+#[cfg(windows)]
+fn query_local_video_memory_used(adapter: &windows::Win32::Graphics::Dxgi::IDXGIAdapter1) -> u64 {
+    use windows::Win32::Graphics::Dxgi::{
+        DXGI_MEMORY_SEGMENT_GROUP_LOCAL, DXGI_QUERY_VIDEO_MEMORY_INFO, IDXGIAdapter3,
+    };
+    use windows::core::Interface;
+
+    let Ok(adapter3) = adapter.cast::<IDXGIAdapter3>() else {
+        return 0;
+    };
+    let mut info = DXGI_QUERY_VIDEO_MEMORY_INFO::default();
+    match unsafe { adapter3.QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &mut info) } {
+        Ok(()) => info.CurrentUsage,
+        Err(_) => 0,
+    }
+}
+
 /// PDH engine sample used to overlay utilization onto DXGI adapters.
 #[derive(Debug, Clone, PartialEq)]
 pub struct PdhEngineSample {
     pub luid: Option<(i32, u32)>,
     pub value: f32,
+    pub engine: String,
 }
 
 /// Same target `pick_gpus` keeps for "the" dedicated GPU: largest dedicated VRAM,
@@ -98,8 +117,9 @@ fn fallback_gpu_index(gpus: &[GpuTelemetry]) -> Option<usize> {
     dedicated_idx.or(integrated_idx)
 }
 
-/// Match PDH engine samples onto adapters by LUID. If nothing matches, assign the
-/// mean engine utilization to the GPU `pick_gpus` would keep.
+/// Match PDH engine samples onto adapters by LUID. Matched adapters use the max
+/// of per-engine sums (across PIDs). If nothing matches, assign the mean of all
+/// samples to the GPU `pick_gpus` would keep.
 pub fn apply_pdh_utilization(
     gpus: &mut [GpuTelemetry],
     luids: &[(i32, u32)],
@@ -109,18 +129,18 @@ pub fn apply_pdh_utilization(
         return;
     }
 
+    use std::collections::HashMap;
+
     let mut matched_any = false;
     for (gpu, &(high, low)) in gpus.iter_mut().zip(luids.iter()) {
-        let mut sum = 0.0_f32;
-        let mut count = 0_u32;
+        let mut engine_sums: HashMap<&str, f32> = HashMap::new();
         for sample in samples {
             if sample.luid == Some((high, low)) {
-                sum += sample.value;
-                count += 1;
+                *engine_sums.entry(sample.engine.as_str()).or_insert(0.0) += sample.value;
             }
         }
-        if count > 0 {
-            gpu.utilization = (sum / count as f32).clamp(0.0, 100.0);
+        if let Some(max_sum) = engine_sums.values().copied().reduce(f32::max) {
+            gpu.utilization = max_sum.clamp(0.0, 100.0);
             matched_any = true;
         }
     }
@@ -245,6 +265,7 @@ fn collect_pdh_engine_samples() -> Option<Vec<PdhEngineSample>> {
             samples.push(PdhEngineSample {
                 luid: parse_adapter_luid(&name),
                 value,
+                engine: parse_engine_type(&name),
             });
         }
     }
@@ -285,4 +306,14 @@ fn parse_adapter_luid(instance: &str) -> Option<(i32, u32)> {
     let low_hex = low_token.strip_prefix("0x")?;
     let low = u32::from_str_radix(low_hex, 16).ok()?;
     Some((high, low))
+}
+
+#[cfg(windows)]
+fn parse_engine_type(instance: &str) -> String {
+    instance
+        .split("engtype_")
+        .nth(1)
+        .filter(|rest| !rest.is_empty())
+        .unwrap_or("unknown")
+        .to_string()
 }

@@ -10,7 +10,7 @@ pub fn classify_gpu(candidate: &GpuCandidate) -> Option<GpuKind> {
     }
     match candidate.vendor_id {
         0x8086 => {
-            if name.contains("arc") {
+            if name.contains("arc a") || name.contains("arc b") || name.contains("arc pro") {
                 Some(GpuKind::Dedicated)
             } else {
                 Some(GpuKind::Integrated)
