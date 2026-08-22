@@ -1,0 +1,22 @@
+crates/gencore-core/src/modules/telemetry/telemetry_classify.rs
+  s_6fa8008f1dc644::t_aff6a5e0d84c9c 3-8,10-12,17
+  s_6fa8008f1dc644::t_a1833a3aefdcc8 9
+crates/gencore-core/tests/telemetry.rs
+  s_6fa8008f1dc644::t_72fbd64c2f66f3 131-157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "68b9f0faf75361a990da8a338c6948194f7ae105",
+  "prompts": {},
+  "sessions": {
+    "s_6fa8008f1dc644": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "37e77264-fcfe-4348-bf06-e33e0e40777d",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
