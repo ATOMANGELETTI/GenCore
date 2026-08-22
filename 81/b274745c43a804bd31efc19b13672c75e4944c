@@ -1,0 +1,19 @@
+.gitignore
+  s_1b3b6c57f9b800::t_2801f82fef4417 19-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "81b274745c43a804bd31efc19b13672c75e4944c",
+  "prompts": {},
+  "sessions": {
+    "s_1b3b6c57f9b800": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "649a0163-382e-4dde-a02b-d516c7fef4fb",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
