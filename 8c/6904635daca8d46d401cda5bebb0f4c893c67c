@@ -1,0 +1,34 @@
+crates/gencore-core/tests/telemetry.rs
+  s_78df5947509393::t_547ae75b385e7d 204,209
+  s_78df5947509393::t_f6918f15932b89 221-246
+  s_78df5947509393::t_d2fed9da3e2610 113-130
+  s_78df5947509393::t_de50cff3479dd6 220
+crates/gencore-core/src/modules/telemetry/telemetry_classify.rs
+  s_78df5947509393::t_efc717bb0a23bd 13
+crates/gencore-core/src/modules/telemetry/telemetry_gpu.rs
+  s_78df5947509393::t_2f66ddc7b23f8c 74-90
+  s_78df5947509393::t_54940bbe240c28 56,62
+  s_78df5947509393::t_3bbc8209c9b311 120-122
+  s_78df5947509393::t_2d4f18bc7c32aa 132-133,136
+  s_78df5947509393::t_95a3008ef28215 311
+  s_78df5947509393::t_39e78c58dcafe6 268
+  s_78df5947509393::t_806dbb2427926d 96
+  s_78df5947509393::t_ef136588ea35fb 310,312-319
+  s_78df5947509393::t_8c76bae9b279da 139,142-143
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "8c6904635daca8d46d401cda5bebb0f4c893c67c",
+  "prompts": {},
+  "sessions": {
+    "s_78df5947509393": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "08b08425-bafc-4d3b-af7d-9eebc1de8bea",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
