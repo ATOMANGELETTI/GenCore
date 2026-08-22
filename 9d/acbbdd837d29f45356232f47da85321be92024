@@ -1,0 +1,20 @@
+crates/gencore-plugin-assistant/tests/store.rs
+  s_1480d51b5b9234::t_56953853fc8bb3 25
+  s_1480d51b5b9234::t_4b0dd1e9a8f80b 19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "9dacbbdd837d29f45356232f47da85321be92024",
+  "prompts": {},
+  "sessions": {
+    "s_1480d51b5b9234": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "7c393446-5c63-41b6-a409-565ad7d44a74",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
