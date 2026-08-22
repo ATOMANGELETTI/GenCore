@@ -99,6 +99,9 @@ The plugin is not vendored. GenCore’s always-on Superpowers rule (artifact pat
 - `TAURI_DEV_HOST` HMR is unsupported; Vite live reload uses `devCsp.connect-src` localhost websockets only.
 - The project license is GPL-3.0-or-later.
 - The terminal left panel has Files, Assistant, and Config tabs; Assistant is a planned tab that should interact with the terminal, file tree, config, and the app.
+- The Terminal right panel is xterm.js + portable-pty. Tabs can be created, closed, renamed, and pinned; pinned tabs persist custom name and history across restarts. Bundle portable Oh My Posh under `apps/terminal/src-tauri/resources/oh-my-posh/` (`oh-my-posh.exe` is gitignored; fetch with `scripts/fetch-oh-my-posh.ps1`) for a theme-aware 2-line Powerline prompt with Nerd Font icons; frost `❯` fallback if the exe is missing. Never pass Windows `\\?\` verbatim paths into PowerShell.
+- App icons are a Nord suite (Polar Night rounded tile + Frost glyph): Terminal is a filled `>` chevron plus block cursor; Explorer is a left-tabbed folder. Tray icons are glyph-only and distinct from the window icon. Each app has a Nord-styled tray right-click menu on its own window/capability, not `main`.
+- `@xterm/xterm@6.0.0` needs `patches/@xterm__xterm@6.0.0.patch` while `freezePrototype: true` is on (xterm assigns `toString` and the WebView stays blank). Do not disable `freezePrototype` to drop the patch; remove the patch only after a newer stable xterm no longer needs it.
 - Tauri plugin builds cache absolute permission-file paths under `target/`; after relocating the repo, run `cargo clean` before `tauri:dev`.
 - Apps follow OS appearance: dark → Polar Night, light → Snow Storm; Polar Night if theme IPC fails or returns null.
 - `.cursor/` is the source of truth for Cursor agent config; `.agents/` is generated for Antigravity (`agy`) and should not be edited by hand.

@@ -24,7 +24,6 @@ export function TerminalView() {
   const [editingId, setEditingId] = React.useState<string | null>(null);
   const hostsRef = React.useRef(new Map<string, XtermHost>());
   const viewportRef = React.useRef<HTMLDivElement | null>(null);
-  const stripRef = React.useRef<HTMLDivElement | null>(null);
 
   React.useEffect(() => {
     return session.registerClipboard({
@@ -145,18 +144,6 @@ export function TerminalView() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [session]);
 
-  React.useEffect(() => {
-    const strip = stripRef.current;
-    if (!strip) {
-      return;
-    }
-    const stop = (event: Event) => {
-      event.stopPropagation();
-    };
-    strip.addEventListener("contextmenu", stop);
-    return () => strip.removeEventListener("contextmenu", stop);
-  }, []);
-
   function registerHost(tabId: string, host: XtermHost | null) {
     if (host) {
       hostsRef.current.set(tabId, host);
@@ -168,8 +155,9 @@ export function TerminalView() {
   return (
     <TooltipProvider>
       <div data-slot="terminal-view" className="flex h-full min-h-0 flex-col">
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: stop the strip contextmenu from reaching the content-area menu */}
         <div
-          ref={stripRef}
+          onContextMenu={(event) => event.stopPropagation()}
           className="flex h-7 shrink-0 items-center gap-1 border-b border-border bg-card px-1 select-none"
         >
           <div

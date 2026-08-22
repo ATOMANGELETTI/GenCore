@@ -14,10 +14,25 @@ pub struct OhMyPoshSpawn {
 }
 
 /// Resolves `pwsh` on `PATH` (honoring `PATHEXT` on Windows), else `powershell.exe`.
+///
+/// Non-functional stub executables (for example uninstalled Windows App Execution
+/// Aliases that exist as 0-byte reparse points) are skipped.
 pub fn resolve_shell() -> PathBuf {
     find_on_path("pwsh")
         .or_else(|| find_on_path("pwsh.exe"))
         .unwrap_or_else(|| PathBuf::from("powershell.exe"))
+}
+
+/// True when `path` is a regular file with a non-zero size.
+///
+/// Windows App Execution Alias placeholders are 0-byte reparse points; `is_file`
+/// returns true for those stubs, so callers that spawn a shell must use this
+/// instead of a bare existence check.
+pub fn is_real_executable(path: &Path) -> bool {
+    match path.metadata() {
+        Ok(meta) => meta.is_file() && meta.len() > 0,
+        Err(_) => false,
+    }
 }
 
 /// Locates bundled Oh My Posh when both the exe and prompt script exist.
@@ -75,7 +90,7 @@ fn find_on_path(name: &str) -> Option<PathBuf> {
     let extensions = path_extensions(name);
     for dir in env::split_paths(&path) {
         for candidate in candidates(&dir, name, &extensions) {
-            if candidate.is_file() {
+            if is_real_executable(&candidate) {
                 return Some(candidate);
             }
         }

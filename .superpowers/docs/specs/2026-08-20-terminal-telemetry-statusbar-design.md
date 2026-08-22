@@ -1,7 +1,7 @@
 # Terminal Telemetry Statusbar and Side Panel Toggle
 
 Date: 2026-08-20
-Status: approved
+Status: superseded by [2026-08-21-terminal-telemetry-statusbar-design.md](./2026-08-21-terminal-telemetry-statusbar-design.md)
 Packages: `@gencore/terminal`
 
 ## Problem

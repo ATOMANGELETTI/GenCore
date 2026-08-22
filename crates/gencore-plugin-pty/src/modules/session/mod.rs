@@ -9,4 +9,4 @@ pub use session_map::{
     PTY_DATA_EVENT, PTY_EXIT_EVENT, PtyDataPayload, PtyExitPayload, SessionMap, kill_session,
     spawn_session,
 };
-pub use session_shell::{OhMyPoshSpawn, resolve_oh_my_posh, resolve_shell};
+pub use session_shell::{OhMyPoshSpawn, is_real_executable, resolve_oh_my_posh, resolve_shell};

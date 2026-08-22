@@ -5,8 +5,8 @@ use std::time::{Duration, Instant};
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 use gencore_pty::{
-    IoError, OpenArgs, SessionError, SessionMap, kill_session, resolve_oh_my_posh, spawn_session,
-    write_session,
+    IoError, OpenArgs, SessionError, SessionMap, is_real_executable, kill_session,
+    resolve_oh_my_posh, spawn_session, write_session,
 };
 
 /// DSR cursor-position request ConPTY emits at startup; the terminal must answer.
@@ -262,4 +262,40 @@ fn resolve_oh_my_posh_accepts_resources_subdirectory() {
     assert!(resolved.theme.ends_with("gencore-polar-night.omp.json"));
 
     let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn is_real_executable_rejects_zero_byte_file() {
+    let dir = std::env::temp_dir().join(format!("gencore-pty-exec-zero-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let stub = dir.join("pwsh.exe");
+    std::fs::write(&stub, []).unwrap();
+    assert!(
+        !is_real_executable(&stub),
+        "zero-byte App Execution Alias stubs must be rejected"
+    );
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn is_real_executable_accepts_non_empty_file() {
+    let dir = std::env::temp_dir().join(format!("gencore-pty-exec-ok-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let exe = dir.join("pwsh.exe");
+    std::fs::write(&exe, b"MZ").unwrap();
+    assert!(
+        is_real_executable(&exe),
+        "non-empty files must be treated as real executables"
+    );
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn is_real_executable_rejects_nonexistent_path() {
+    let dir = std::env::temp_dir().join(format!("gencore-pty-exec-missing-{}", std::process::id()));
+    let missing = dir.join("pwsh.exe");
+    assert!(
+        !is_real_executable(&missing),
+        "missing paths must be rejected"
+    );
 }

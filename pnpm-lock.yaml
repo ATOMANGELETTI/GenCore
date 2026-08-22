@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@xterm/xterm@6.0.0': 9edfae4e0c07ac9825b5805b1575160bb3657aa425f8ef2819cd54399fccdb1f
+
 importers:
 
   .:
@@ -110,7 +113,7 @@ importers:
         version: 0.14.0
       '@xterm/xterm':
         specifier: 6.0.0
-        version: 6.0.0
+        version: 6.0.0(patch_hash=9edfae4e0c07ac9825b5805b1575160bb3657aa425f8ef2819cd54399fccdb1f)
       lucide-react:
         specifier: 1.31.0
         version: 1.31.0(react@19.2.8)
@@ -4677,7 +4680,7 @@ snapshots:
 
   '@xterm/addon-serialize@0.14.0': {}
 
-  '@xterm/xterm@6.0.0': {}
+  '@xterm/xterm@6.0.0(patch_hash=9edfae4e0c07ac9825b5805b1575160bb3657aa425f8ef2819cd54399fccdb1f)': {}
 
   ajv@8.20.0:
     dependencies:

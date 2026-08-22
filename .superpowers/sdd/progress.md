@@ -275,5 +275,8 @@ Controller session. SDD + writing-plans. Work in place on `main`. No git commits
 - Task 2: complete (working tree, review approved). Minors: 16px tiled app icon is tight; folder heavier than chevron; explorer path uses 441.9/462.1. Tray `<g scale>` accepted (shared `d` + 16–32px fill).
 - Task 3: complete (working tree, review approved). Minor: cleanup contract (no icns leftovers) is untested.
 - Task 4: complete (working tree, review approved after transparent overlay CSS fix). Minors deferred: ConfigProvider storage listener, ipc.tray.ts constant drift, Hide/Quit IPC tests.
-- Task 5: in progress
+- Task 5: complete (working tree, review approved after theme Isolation + blur latch). Minor: Terminal Isolation union lets tray-menu listen to PTY events; ACL still blocks PTY commands.
+- Task 6: complete (working tree). scripts 28/28; ui-kit tray-menu 4/4; terminal 98/98; explorer 50/50; gencore-core 18/18; clippy clean after collapsible_match fix.
+- Whole-branch review: Ready to merge Yes. ui-kit-reviewer Approved. tauri-reviewer: no blocking; Important residual is Terminal Isolation-union PTY listen on tray-menu (XSS in overlay required; ACL still blocks PTY commands). Spec locked unscoped allow-listen for theme-changed — left as documented residual.
+- Commit: none (user has not asked).
 

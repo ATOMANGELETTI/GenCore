@@ -1,5 +1,7 @@
 # Terminal Telemetry Statusbar and Side Panel Toggle Implementation Plan
 
+> **Superseded.** Do not implement this plan. Use [2026-08-21-terminal-telemetry-statusbar-design.md](../specs/2026-08-21-terminal-telemetry-statusbar-design.md) and a new plan written from that spec.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add real-time system hardware telemetry (CPU load & per-core meter, integrated GPU and discrete/external GPU usage & VRAM, and network download/upload throughput) with rich Nord hover tooltips to the Terminal statusbar, alongside a persistent left side-panel toggle button and `Ctrl+B` keyboard shortcut.

@@ -265,5 +265,24 @@
   "0d09029f-4853-4ef2-9e41-43ef8bdb84bf": [
     "apps/terminal",
     "apps/explorer"
+  ],
+  "fec143e1-a19b-4185-9301-8165a1168146": [
+    "crates/gencore-core",
+    "apps/terminal",
+    "apps/explorer"
+  ],
+  "ee0d4dde-8d98-474c-a916-c6dfb0e3f907": [
+    "apps/explorer",
+    "apps/terminal"
+  ],
+  "639bbf2d-9024-46f0-9a1f-a3d238aa6fe3": [
+    "apps/terminal",
+    "apps/explorer"
+  ],
+  "030f9da6-c6a3-4643-83eb-66683fdcfadc": [
+    "crates/gencore-plugin-pty"
+  ],
+  "d091c49e-bee8-4ea1-bbd9-4d403ef1e94e": [
+    "apps/terminal"
   ]
 }
