@@ -13,6 +13,49 @@ pub struct OhMyPoshSpawn {
     pub prompt_script: PathBuf,
 }
 
+/// Resolved PowerShell program, args, and optional Oh My Posh PATH/theme.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ShellLaunch {
+    pub program: PathBuf,
+    pub args: Vec<OsString>,
+    pub path: Option<OsString>,
+    pub posh_theme: Option<PathBuf>,
+}
+
+pub fn strip_verbatim_prefix(path: &Path) -> PathBuf {
+    let text = path.to_string_lossy();
+    match text.strip_prefix(r"\\?\") {
+        Some(rest) => PathBuf::from(rest),
+        None => path.to_path_buf(),
+    }
+}
+
+pub fn shell_launch(omp: Option<&OhMyPoshSpawn>) -> ShellLaunch {
+    let program = resolve_shell();
+    match omp {
+        None => ShellLaunch {
+            program,
+            args: vec![OsString::from("-NoLogo")],
+            path: None,
+            posh_theme: None,
+        },
+        Some(omp) => ShellLaunch {
+            program,
+            args: vec![
+                OsString::from("-NoLogo"),
+                OsString::from("-NoProfile"),
+                OsString::from("-NoExit"),
+                OsString::from("-ExecutionPolicy"),
+                OsString::from("Bypass"),
+                OsString::from("-File"),
+                strip_verbatim_prefix(&omp.prompt_script).into_os_string(),
+            ],
+            path: Some(prepend_path(&omp.dir)),
+            posh_theme: Some(strip_verbatim_prefix(&omp.theme)),
+        },
+    }
+}
+
 /// Resolves `pwsh` on `PATH` (honoring `PATHEXT` on Windows), else `powershell.exe`.
 ///
 /// Non-functional stub executables (for example uninstalled Windows App Execution
@@ -78,7 +121,7 @@ fn oh_my_posh_dir(resource_dir: &Path) -> Option<PathBuf> {
         let dir = resource_dir.join(rel);
         let exe = dir.join("oh-my-posh.exe");
         let ps1 = dir.join("gencore-prompt.ps1");
-        if exe.is_file() && ps1.is_file() {
+        if is_real_executable(&exe) && ps1.is_file() {
             return Some(dir);
         }
     }

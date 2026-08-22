@@ -12,7 +12,7 @@ use uuid::Uuid;
 
 use super::session_api::OpenArgs;
 use super::session_error::SessionError;
-use super::session_shell::{prepend_path, resolve_oh_my_posh, resolve_shell};
+use super::session_shell::{resolve_oh_my_posh, shell_launch};
 
 /// Event name for raw pty output chunks (standard base64).
 pub const PTY_DATA_EVENT: &str = "gencore-pty://data";
@@ -87,16 +87,17 @@ pub fn spawn_session(
         })
         .map_err(|err| SessionError::SpawnFailed(err.to_string()))?;
 
-    let mut cmd = CommandBuilder::new(resolve_shell());
-    cmd.arg("-NoLogo");
-    if let Some(omp) = resolve_oh_my_posh(resource_dir.as_deref(), args.theme.as_deref()) {
-        cmd.arg("-NoProfile");
-        cmd.arg("-ExecutionPolicy");
-        cmd.arg("Bypass");
-        cmd.arg("-File");
-        cmd.arg(&omp.prompt_script);
-        cmd.env("POSH_THEME", &omp.theme);
-        cmd.env("PATH", prepend_path(&omp.dir));
+    let omp = resolve_oh_my_posh(resource_dir.as_deref(), args.theme.as_deref());
+    let launch = shell_launch(omp.as_ref());
+    let mut cmd = CommandBuilder::new(&launch.program);
+    for arg in &launch.args {
+        cmd.arg(arg);
+    }
+    if let Some(path) = &launch.path {
+        cmd.env("PATH", path);
+    }
+    if let Some(theme) = &launch.posh_theme {
+        cmd.env("POSH_THEME", theme);
     }
     if let Some(cwd) = cwd {
         cmd.cwd(cwd);

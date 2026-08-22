@@ -309,6 +309,8 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
   const sizeRef = React.useRef({ cols, rows });
   const writersRef = React.useRef(new Map<string, (data: Uint8Array) => void>());
   const queuesRef = React.useRef(new Map<string, Uint8Array[]>());
+  const orphansRef = React.useRef(new Map<string, Uint8Array[]>());
+  const pendingInputRef = React.useRef(new Map<string, string[]>());
   const clipboardRef = React.useRef<TerminalClipboardApi>(NOOP_CLIPBOARD);
   const spawnGenRef = React.useRef(new Map<string, number>());
   const serializersRef = React.useRef(new Map<string, () => string>());
@@ -350,6 +352,45 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       }
     },
     [markExited],
+  );
+
+  const deliverBytes = React.useCallback((tabId: string, bytes: Uint8Array) => {
+    const write = writersRef.current.get(tabId);
+    if (write) {
+      write(bytes);
+      return;
+    }
+    const queue = queuesRef.current.get(tabId) ?? [];
+    queue.push(bytes);
+    queuesRef.current.set(tabId, queue);
+  }, []);
+
+  const flushOrphans = React.useCallback(
+    (sessionId: string, tabId: string) => {
+      const parked = orphansRef.current.get(sessionId);
+      if (!parked) {
+        return;
+      }
+      orphansRef.current.delete(sessionId);
+      for (const chunk of parked) {
+        deliverBytes(tabId, chunk);
+      }
+    },
+    [deliverBytes],
+  );
+
+  const flushPendingInput = React.useCallback(
+    (tabId: string, sessionId: string) => {
+      const pending = pendingInputRef.current.get(tabId);
+      if (!pending) {
+        return;
+      }
+      pendingInputRef.current.delete(tabId);
+      for (const data of pending) {
+        void writeSession(tabId, sessionId, data);
+      }
+    },
+    [writeSession],
   );
 
   const themeReadyRef = React.useRef(false);
@@ -437,6 +478,11 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
   }, [allowPersist, flushSave]);
 
   const dropTabRuntime = React.useCallback((id: string) => {
+    const tab = tabsRef.current.find((item) => item.id === id);
+    if (tab?.sessionId) {
+      orphansRef.current.delete(tab.sessionId);
+    }
+    pendingInputRef.current.delete(id);
     writersRef.current.delete(id);
     queuesRef.current.delete(id);
     serializersRef.current.delete(id);
@@ -461,6 +507,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
           }
         }
         if (spawnGenRef.current.get(tabId) !== generation) {
+          orphansRef.current.delete(sessionId);
           try {
             await closePty(sessionId);
           } catch {
@@ -469,14 +516,17 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
           return;
         }
         updateTab(tabId, { sessionId, status: "live" });
+        flushOrphans(sessionId, tabId);
+        flushPendingInput(tabId, sessionId);
       } catch {
         if (spawnGenRef.current.get(tabId) !== generation) {
           return;
         }
+        pendingInputRef.current.delete(tabId);
         updateTab(tabId, { sessionId: null, status: "exited" });
       }
     },
-    [bumpSpawn, updateTab],
+    [bumpSpawn, flushOrphans, flushPendingInput, updateTab],
   );
 
   const killSession = React.useCallback(async (sessionId: string | null) => {
@@ -512,10 +562,16 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       const remaining = current.filter((tab) => tab.id !== id);
       if (remaining.length === 0) {
         const fresh = createEmptyTab();
+        const spawnGuard = spawnGenRef.current.get(fresh.id) ?? 0;
         tabsRef.current = [fresh];
         setTabs([fresh]);
         setActiveId(fresh.id);
-        void spawnSession(fresh.id);
+        queueMicrotask(() => {
+          if ((spawnGenRef.current.get(fresh.id) ?? 0) !== spawnGuard) {
+            return;
+          }
+          void spawnSession(fresh.id);
+        });
         allowPersist();
         void flushSave();
         return;
@@ -598,10 +654,16 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
     const remaining = current.filter((tab) => tab.pinned);
     if (remaining.length === 0) {
       const fresh = createEmptyTab();
+      const spawnGuard = spawnGenRef.current.get(fresh.id) ?? 0;
       tabsRef.current = [fresh];
       setTabs([fresh]);
       setActiveId(fresh.id);
-      void spawnSession(fresh.id);
+      queueMicrotask(() => {
+        if ((spawnGenRef.current.get(fresh.id) ?? 0) !== spawnGuard) {
+          return;
+        }
+        void spawnSession(fresh.id);
+      });
       allowPersist();
       void flushSave();
       return;
@@ -702,6 +764,9 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       if (!tab.sessionId) {
+        const pending = pendingInputRef.current.get(tabId) ?? [];
+        pending.push(data);
+        pendingInputRef.current.set(tabId, pending);
         return;
       }
       void writeSession(tabId, tab.sessionId, data);
@@ -753,61 +818,59 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    void restorePinned();
-
-    void subscribePtyData((payload) => {
-      let bytes: Uint8Array;
-      let text: string;
+    void (async () => {
       try {
-        const decoded = decodePtyBase64(payload.data);
-        bytes = decoded.bytes;
-        text = decoded.text;
+        const stopData = await subscribePtyData((payload) => {
+          let bytes: Uint8Array;
+          let text: string;
+          try {
+            const decoded = decodePtyBase64(payload.data);
+            bytes = decoded.bytes;
+            text = decoded.text;
+          } catch {
+            return;
+          }
+          const tab = tabsRef.current.find((item) => item.sessionId === payload.session_id);
+          if (!tab) {
+            const parked = orphansRef.current.get(payload.session_id) ?? [];
+            parked.push(bytes);
+            orphansRef.current.set(payload.session_id, parked);
+            return;
+          }
+          const cwd = scanOsc7(text);
+          if (cwd && cwd !== tab.cwd) {
+            updateTab(tab.id, { cwd });
+          }
+          deliverBytes(tab.id, bytes);
+          if (tab.pinned) {
+            scheduleSave();
+          }
+        });
+        unlistenData = stopData;
+        const stopExit = await subscribePtyExit((payload) => {
+          // Rust reaps the map entry on the reader-exit path; this is the belt to
+          // that brace, so a dropped exit event can never strand a ConPTY session.
+          orphansRef.current.delete(payload.session_id);
+          void killSession(payload.session_id);
+          const tab = tabsRef.current.find((item) => item.sessionId === payload.session_id);
+          if (!tab) {
+            return;
+          }
+          updateTab(tab.id, { status: "exited", sessionId: null });
+        });
+        if (cancelled) {
+          stopData();
+          stopExit();
+          return;
+        }
+        unlistenExit = stopExit;
+        await restorePinned();
       } catch {
-        return;
+        if (!cancelled) {
+          await restorePinned();
+        }
       }
-      const tab = tabsRef.current.find((item) => item.sessionId === payload.session_id);
-      if (!tab) {
-        return;
-      }
-      const cwd = scanOsc7(text);
-      if (cwd && cwd !== tab.cwd) {
-        updateTab(tab.id, { cwd });
-      }
-      const write = writersRef.current.get(tab.id);
-      if (write) {
-        write(bytes);
-      } else {
-        const queue = queuesRef.current.get(tab.id) ?? [];
-        queue.push(bytes);
-        queuesRef.current.set(tab.id, queue);
-      }
-      if (tab.pinned) {
-        scheduleSave();
-      }
-    }).then((stop) => {
-      if (cancelled) {
-        stop();
-        return;
-      }
-      unlistenData = stop;
-    });
-
-    void subscribePtyExit((payload) => {
-      // Rust reaps the map entry on the reader-exit path; this is the belt to
-      // that brace, so a dropped exit event can never strand a ConPTY session.
-      void killSession(payload.session_id);
-      const tab = tabsRef.current.find((item) => item.sessionId === payload.session_id);
-      if (!tab) {
-        return;
-      }
-      updateTab(tab.id, { status: "exited", sessionId: null });
-    }).then((stop) => {
-      if (cancelled) {
-        stop();
-        return;
-      }
-      unlistenExit = stop;
-    });
+    })();
 
     function onPageHide() {
       void flushSave();
@@ -832,7 +895,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
         void killSession(tab.sessionId);
       }
     };
-  }, [bumpSpawn, flushSave, killSession, scheduleSave, spawnSession, updateTab]);
+  }, [bumpSpawn, deliverBytes, flushSave, killSession, scheduleSave, spawnSession, updateTab]);
 
   const clipboard: TerminalClipboardApi = React.useMemo(
     () => ({

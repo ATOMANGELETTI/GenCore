@@ -280,3 +280,43 @@ Controller session. SDD + writing-plans. Work in place on `main`. No git commits
 - Whole-branch review: Ready to merge Yes. ui-kit-reviewer Approved. tauri-reviewer: no blocking; Important residual is Terminal Isolation-union PTY listen on tray-menu (XSS in overlay required; ACL still blocks PTY commands). Spec locked unscoped allow-listen for theme-changed — left as documented residual.
 - Commit: none (user has not asked).
 
+## Feature: Terminal telemetry statusbar (2026-08-21)
+
+Controller session. SDD. Isolated worktree `.worktrees/feat-terminal-telemetry-statusbar` on `feat/terminal-telemetry-statusbar`. Commits allowed (user chose SDD + worktree). Implementers stage only task files. Do not stage `.husky/_`.
+
+- Spec: `.superpowers/docs/specs/2026-08-21-terminal-telemetry-statusbar-design.md`
+- Plan: `.superpowers/docs/plans/2026-08-21-terminal-telemetry-statusbar.md`
+- Briefs: `.worktrees/feat-terminal-telemetry-statusbar/.superpowers/sdd/`
+- Model: implementers and task reviewers `cursor-grok-4.6-xhigh-fast` unless blocked
+- BASE before Task 1: `81b274745c43a804bd31efc19b13672c75e4944c`
+- Worktree baseline: `cargo test -p gencore-core` 18/18
+- Task 1: complete (commits 81b2747..0ccdb91, review clean). Minors for final review: PDH `Vec<u8>` buffer alignment; no tests for LUID parse / PDH fail-soft / collector-on-GPU-failure; Mutex held across sysinfo+DXGI+PDH; `TelemetryState::new()` also runs in Explorer (no grant leak); DXGI factory recreated every collect(); crate-root PDH test helpers are public; stale crate description. Accepted: `Cargo.lock` staged after `cargo add`; `windows` 0.62.2.
+- Task 2: complete (commits 0ccdb91..36cfd4a, review clean). Minors for final review: stale Isolation header comment omits telemetry; AGENTS least-privilege bullet still says `allow-get-app-info` only; AGENTS IPC wrapper list omits `ipc.telemetry.ts`.
+- Task 3: complete (commits 36cfd4a..5a9af3c, review clean). Minors for final review: later-failure test does not assert call count/`error`; `isPaused` not seeded from current visibility; `enabled`/`refresh`/first-failure untested.
+- Task 4: complete (commits 5a9af3c..4bf4620, review clean). Minor for final review: no TooltipContent render coverage for `size="rich"`.
+- Task 5: complete (commits 4bf4620..3295def, review clean). Minors for final review: GPU omit-kind test never omits a kind; meter/`+N`/VRAM-omit untested; `CHIP_CLASS` copied 3×; span triggers hover-only (no tabIndex); `floor(value/25)` leaves 1–24% fully muted.
+- Task 6: complete (commits 3295def..3c178a8, review clean). Minors for final review: collapsed panel stays in tab order (no `inert`); no xterm-handler test that Ctrl/Cmd+B is swallowed; held Ctrl+B key-repeat flickers the panel. Turbo lint fail on pre-existing Explorer CRLF is environment, not a task defect.
+- Whole-branch review: first pass With fixes (PDH mean-of-engines; VRAM used=0; Intel Arc iGPU as dGPU). Tauri Approved. ui-kit Approved.
+- Fixes: `8c69046` PDH max-of-engine-sums + DXGI VRAM used; `68b9f0f` strip (R)/(TM) before Arc classify.
+- Re-review: Ready to merge Yes. Residual: process-local DXGI CurrentUsage (accepted); rustdoc; multi-PID sum test; Arc Pro fixture; `parse_engine_type` untested.
+- HEAD: `68b9f0faf75361a990da8a338c6948194f7ae105` on `feat/terminal-telemetry-statusbar`
+
+## Feature: Terminal PTY session alive (2026-08-21)
+
+Controller session. SDD + writing-plans. Work in place on `main`. No git commits unless the user asks. Implementers stage only task files. Do not stage `.cursor/hooks/state/**` or the telemetry worktree.
+
+- Spec: `.superpowers/docs/specs/2026-08-21-terminal-pty-session-alive-design.md`
+- Plan: `.superpowers/docs/plans/2026-08-21-terminal-pty-session-alive.md`
+- Briefs: `.superpowers/sdd/pty-session-alive/`
+- Model: implementers and task reviewers `cursor-grok-4.6-xhigh-fast` unless blocked
+- BASE before Task 1: `81b274745c43a804bd31efc19b13672c75e4944c`
+- Task 1: complete (working tree, review clean). Minors for final review: OMP launch test does not lock full argv (`-ExecutionPolicy Bypass` / prompt path); `resolve_oh_my_posh` rustdoc still says exe “exists”.
+- Task 2: complete (working tree, review clean). ⚠️ DSR-not-in-reader and `-NoExit` sourced from Task 1 `shell_launch` — controller confirmed.
+- Task 3: complete (working tree, review clean). Minors: unused `dataHandler` until Task 4; catch-path data unlisten leak if exit subscribe throws (brief-mandated try/catch).
+- Task 4: complete (working tree, review clean). Minors: drop test does not assert `closePty("session-1")`; last-tab spawn uses `queueMicrotask` so the shared `resolveOpen` mock stays on the cancelled generation.
+- Task 5: complete (controller). `cargo test -p gencore-pty` 19+5 passed including `omp_file_spawn_stays_alive_and_echoes`. Provider tests 11/11. Manual `tauri:dev` not run here (check locally if 5173 is free).
+- Whole-branch review: complete (working tree vs `81b2747`). Code review Ready to merge: Yes. No Critical/Important. Minors deferred: OMP launch argv not fully locked; rustdoc “exists”; drop test omits `closePty("session-1")`; `queueMicrotask` last-tab spawn; unmatched exit not parked; parked chunks skip OSC 7.
+- Controller re-verify after review: `cargo test -p gencore-pty` 19+5 passed; provider tests 11/11. Manual `tauri:dev` still not run.
+- Commit: none (user has not asked). Finish: already on `main` (dirty tree). Local merge is a no-op. No worktree to clean up. Not pushed.
+
+

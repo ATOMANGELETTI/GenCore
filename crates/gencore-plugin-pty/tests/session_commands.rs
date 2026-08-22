@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use std::sync::mpsc;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
@@ -6,7 +7,7 @@ use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 use gencore_pty::{
     IoError, OpenArgs, SessionError, SessionMap, is_real_executable, kill_session,
-    resolve_oh_my_posh, spawn_session, write_session,
+    resolve_oh_my_posh, shell_launch, spawn_session, strip_verbatim_prefix, write_session,
 };
 
 /// DSR cursor-position request ConPTY emits at startup; the terminal must answer.
@@ -219,7 +220,7 @@ fn resolve_oh_my_posh_uses_absolute_theme_json() {
     let dir = std::env::temp_dir().join(format!("gencore-pty-omp-ok-{}", std::process::id()));
     let omp = dir.join("oh-my-posh");
     std::fs::create_dir_all(&omp).unwrap();
-    std::fs::write(omp.join("oh-my-posh.exe"), []).unwrap();
+    std::fs::write(omp.join("oh-my-posh.exe"), b"MZ").unwrap();
     std::fs::write(omp.join("gencore-prompt.ps1"), "#").unwrap();
     std::fs::write(omp.join("gencore-polar-night.omp.json"), "{}").unwrap();
     std::fs::write(omp.join("gencore-snow-storm.omp.json"), "{}").unwrap();
@@ -254,7 +255,7 @@ fn resolve_oh_my_posh_accepts_resources_subdirectory() {
     let dir = std::env::temp_dir().join(format!("gencore-pty-omp-nested-{}", std::process::id()));
     let nested = dir.join("resources").join("oh-my-posh");
     std::fs::create_dir_all(&nested).unwrap();
-    std::fs::write(nested.join("oh-my-posh.exe"), []).unwrap();
+    std::fs::write(nested.join("oh-my-posh.exe"), b"MZ").unwrap();
     std::fs::write(nested.join("gencore-prompt.ps1"), "#").unwrap();
     std::fs::write(nested.join("gencore-polar-night.omp.json"), "{}").unwrap();
 
@@ -298,4 +299,134 @@ fn is_real_executable_rejects_nonexistent_path() {
         !is_real_executable(&missing),
         "missing paths must be rejected"
     );
+}
+
+#[test]
+fn resolve_oh_my_posh_none_when_exe_is_zero_bytes() {
+    let dir = std::env::temp_dir().join(format!("gencore-pty-omp-zero-{}", std::process::id()));
+    let omp = dir.join("oh-my-posh");
+    std::fs::create_dir_all(&omp).unwrap();
+    std::fs::write(omp.join("oh-my-posh.exe"), []).unwrap();
+    std::fs::write(omp.join("gencore-prompt.ps1"), "#").unwrap();
+    std::fs::write(omp.join("gencore-polar-night.omp.json"), "{}").unwrap();
+    assert!(resolve_oh_my_posh(Some(&dir), None).is_none());
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn strip_verbatim_prefix_removes_windows_extended_path() {
+    let verbatim = PathBuf::from(r"\\?\C:\theme.json");
+    let stripped = strip_verbatim_prefix(&verbatim);
+    assert_eq!(stripped, PathBuf::from(r"C:\theme.json"));
+    assert_eq!(
+        strip_verbatim_prefix(&PathBuf::from(r"C:\theme.json")),
+        PathBuf::from(r"C:\theme.json")
+    );
+}
+
+#[test]
+fn shell_launch_plain_is_nologo_only() {
+    let launch = shell_launch(None);
+    let args: Vec<String> = launch
+        .args
+        .iter()
+        .map(|a| a.to_string_lossy().into_owned())
+        .collect();
+    assert_eq!(args, vec!["-NoLogo"]);
+    assert!(launch.path.is_none());
+    assert!(launch.posh_theme.is_none());
+}
+
+#[test]
+fn shell_launch_omp_includes_noexit_and_file() {
+    let dir = std::env::temp_dir().join(format!("gencore-pty-launch-{}", std::process::id()));
+    let omp_dir = dir.join("oh-my-posh");
+    std::fs::create_dir_all(&omp_dir).unwrap();
+    std::fs::write(omp_dir.join("oh-my-posh.exe"), b"MZ").unwrap();
+    std::fs::write(omp_dir.join("gencore-prompt.ps1"), "#").unwrap();
+    std::fs::write(omp_dir.join("gencore-polar-night.omp.json"), "{}").unwrap();
+    let omp = resolve_oh_my_posh(Some(&dir), None).expect("omp");
+    let launch = shell_launch(Some(&omp));
+    let args: Vec<String> = launch
+        .args
+        .iter()
+        .map(|a| a.to_string_lossy().into_owned())
+        .collect();
+    assert!(args.contains(&"-NoLogo".into()));
+    assert!(args.contains(&"-NoProfile".into()));
+    assert!(args.contains(&"-NoExit".into()));
+    assert!(args.contains(&"-File".into()));
+    assert!(!args.iter().any(|a| a.starts_with(r"\\?\")));
+    let theme = launch.posh_theme.expect("theme");
+    assert!(!theme.to_string_lossy().starts_with(r"\\?\"));
+    assert!(launch.path.is_some());
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[cfg(windows)]
+#[test]
+fn omp_file_spawn_stays_alive_and_echoes() {
+    let dir = std::env::temp_dir().join(format!("gencore-pty-omp-live-{}", std::process::id()));
+    let omp = dir.join("oh-my-posh");
+    std::fs::create_dir_all(&omp).unwrap();
+    std::fs::write(omp.join("oh-my-posh.exe"), b"MZ").unwrap();
+    std::fs::write(omp.join("gencore-prompt.ps1"), "# noop\r\n").unwrap();
+    std::fs::write(omp.join("gencore-polar-night.omp.json"), "{}").unwrap();
+
+    let map = Arc::new(Mutex::new(SessionMap::new()));
+    let (data_tx, data_rx) = mpsc::channel();
+    let (exit_tx, exit_rx) = mpsc::channel();
+    let session_id = spawn_session(
+        &map,
+        OpenArgs {
+            cols: 80,
+            rows: 24,
+            cwd: None,
+            theme: None,
+        },
+        Some(dir.clone()),
+        move |payload| {
+            let _ = data_tx.send(payload);
+        },
+        move |payload| {
+            let _ = exit_tx.send(payload);
+        },
+    )
+    .expect("spawn_session");
+    let _guard = KillOnDrop {
+        map: Arc::clone(&map),
+        session_id: session_id.clone(),
+    };
+
+    let deadline = Instant::now() + Duration::from_secs(15);
+    let mut text = String::new();
+    let mut wrote_echo = false;
+    while Instant::now() < deadline {
+        if exit_rx.try_recv().is_ok() {
+            panic!("shell exited; -NoExit missing. output so far: {text:?}");
+        }
+        while let Ok(payload) = data_rx.try_recv() {
+            let raw = STANDARD.decode(&payload.data).unwrap_or_default();
+            text.push_str(&String::from_utf8_lossy(&raw));
+        }
+        if text.contains(CURSOR_POSITION_REQUEST) {
+            text = text.replace(CURSOR_POSITION_REQUEST, "");
+            let _ = write_session(&map, &session_id, "\u{1b}[1;1R");
+        }
+        if !wrote_echo && Instant::now() > deadline - Duration::from_secs(12) {
+            let _ = write_session(&map, &session_id, "echo gencore-alive\r");
+            wrote_echo = true;
+        }
+        if text.contains("gencore-alive") {
+            assert!(
+                map.lock().expect("map").contains_key(&session_id),
+                "session must remain in the map after echo"
+            );
+            let _ = std::fs::remove_dir_all(&dir);
+            return;
+        }
+        std::thread::sleep(Duration::from_millis(50));
+    }
+    let _ = std::fs::remove_dir_all(&dir);
+    panic!("no echo within 15s; output so far: {text:?}");
 }

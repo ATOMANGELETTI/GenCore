@@ -251,16 +251,16 @@ function TerminalHostPane({
     if (restore) {
       restoreSerializedBuffer(host.terminal, restore.scrollback, seamLine(restore.cols));
     }
-    onRegisterRef.current(tab.id, host);
+    const dataSub = host.terminal.onData((data) => {
+      sessionRef.current.onTerminalInput(tab.id, data);
+    });
     const unreg = sessionRef.current.registerWriter(tab.id, (data) => {
       host.terminal.write(data);
     });
     const unregSerialize = sessionRef.current.registerSerializer(tab.id, () =>
       host.serialize.serialize(),
     );
-    const dataSub = host.terminal.onData((data) => {
-      sessionRef.current.onTerminalInput(tab.id, data);
-    });
+    onRegisterRef.current(tab.id, host);
     host.terminal.attachCustomKeyEventHandler((event) => {
       if (event.type !== "keydown") {
         return true;
@@ -312,9 +312,9 @@ function TerminalHostPane({
       }
     });
     return () => {
+      dataSub.dispose();
       unreg();
       unregSerialize();
-      dataSub.dispose();
       onRegisterRef.current(tab.id, null);
       host.dispose();
     };

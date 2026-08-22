@@ -1,6 +1,6 @@
 import { render, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { PtyExitPayload } from "../../src/modules/ipc/ipc.types";
+import type { PtyDataPayload, PtyExitPayload } from "../../src/modules/ipc/ipc.types";
 import {
   MAX_PTY_WRITE_CHARS,
   TerminalProvider,
@@ -13,14 +13,25 @@ const writePty = vi.fn(() => Promise.resolve());
 const resizePty = vi.fn(() => Promise.resolve());
 const closePty = vi.fn(() => Promise.resolve());
 
+let dataHandler: ((payload: PtyDataPayload) => void) | null = null;
 let exitHandler: ((payload: PtyExitPayload) => void) | null = null;
+let holdDataListen = false;
+let releaseDataListen: (() => void) | null = null;
 
 vi.mock("../../src/modules/ipc/ipc.pty", () => ({
   openPty: (...args: unknown[]) => openPty(...(args as [])),
   writePty: (...args: unknown[]) => writePty(...(args as [])),
   resizePty: (...args: unknown[]) => resizePty(...(args as [])),
   closePty: (...args: unknown[]) => closePty(...(args as [])),
-  subscribePtyData: () => Promise.resolve(() => undefined),
+  subscribePtyData: (handler: (payload: PtyDataPayload) => void) => {
+    dataHandler = handler;
+    if (holdDataListen) {
+      return new Promise<() => void>((resolve) => {
+        releaseDataListen = () => resolve(() => undefined);
+      });
+    }
+    return Promise.resolve(() => undefined);
+  },
   subscribePtyExit: (handler: (payload: PtyExitPayload) => void) => {
     exitHandler = handler;
     return Promise.resolve(() => undefined);
@@ -63,6 +74,9 @@ async function liveTab(): Promise<{ id: string; sessionId: string }> {
 }
 
 beforeEach(() => {
+  holdDataListen = false;
+  dataHandler = null;
+  releaseDataListen = null;
   exitHandler = null;
   session = null;
   openPty.mockClear();
@@ -76,6 +90,21 @@ afterEach(() => {
 });
 
 describe("TerminalProvider session lifecycle", () => {
+  it("does not open a pty until data listen resolves", async () => {
+    holdDataListen = true;
+    renderProvider();
+
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(openPty).not.toHaveBeenCalled();
+
+    releaseDataListen?.();
+
+    await waitFor(() => {
+      expect(openPty).toHaveBeenCalled();
+    });
+  });
+
   it("closes the pty session reported by the exit payload", async () => {
     renderProvider();
     const tab = await liveTab();
@@ -178,5 +207,84 @@ describe("TerminalProvider session lifecycle", () => {
       expect(resizePty).toHaveBeenCalled();
     });
     expect(session?.tabs[0]?.status).toBe("live");
+  });
+
+  it("delivers data parked by session id after open assigns it", async () => {
+    let resolveOpen: ((value: { session_id: string }) => void) | undefined;
+    openPty.mockImplementation(
+      () =>
+        new Promise<{ session_id: string }>((resolve) => {
+          resolveOpen = resolve;
+        }),
+    );
+    renderProvider();
+    await waitFor(() => {
+      expect(session?.tabs[0]?.id).toBeTruthy();
+    });
+    const tabId = session?.tabs[0]?.id ?? "";
+    const writer = vi.fn();
+    session?.registerWriter(tabId, writer);
+
+    const dsr = btoa("\u001b[6n");
+    dataHandler?.({ session_id: "session-1", data: dsr });
+    expect(writer).not.toHaveBeenCalled();
+
+    resolveOpen?.({ session_id: "session-1" });
+
+    await waitFor(() => {
+      expect(writer).toHaveBeenCalled();
+    });
+    const written = writer.mock.calls[0]?.[0] as Uint8Array;
+    expect(new TextDecoder().decode(written)).toContain("\u001b[6n");
+  });
+
+  it("writes onTerminalInput after open resolves", async () => {
+    let resolveOpen: ((value: { session_id: string }) => void) | undefined;
+    openPty.mockImplementation(
+      () =>
+        new Promise<{ session_id: string }>((resolve) => {
+          resolveOpen = resolve;
+        }),
+    );
+    renderProvider();
+    await waitFor(() => {
+      expect(session?.tabs[0]?.id).toBeTruthy();
+    });
+    const tabId = session?.tabs[0]?.id ?? "";
+    session?.onTerminalInput(tabId, "\u001b[1;1R");
+    expect(writePty).not.toHaveBeenCalled();
+
+    resolveOpen?.({ session_id: "session-1" });
+
+    await waitFor(() => {
+      expect(writePty).toHaveBeenCalledWith("session-1", "\u001b[1;1R");
+    });
+  });
+
+  it("drops orphan data when the tab is closed before open assigns the id", async () => {
+    let resolveOpen: ((value: { session_id: string }) => void) | undefined;
+    openPty.mockImplementation(
+      () =>
+        new Promise<{ session_id: string }>((resolve) => {
+          resolveOpen = resolve;
+        }),
+    );
+    renderProvider();
+    await waitFor(() => {
+      expect(session?.tabs[0]?.id).toBeTruthy();
+    });
+    const firstId = session?.tabs[0]?.id ?? "";
+    dataHandler?.({ session_id: "session-1", data: btoa("stale") });
+    session?.closeTab(firstId);
+
+    openPty.mockImplementation(() => Promise.resolve({ session_id: "session-2" }));
+    resolveOpen?.({ session_id: "session-1" });
+
+    await waitFor(() => {
+      expect(session?.tabs[0]?.sessionId).toBe("session-2");
+    });
+    const writer = vi.fn();
+    session?.registerWriter(session?.tabs[0]?.id ?? "", writer);
+    expect(writer).not.toHaveBeenCalled();
   });
 });
