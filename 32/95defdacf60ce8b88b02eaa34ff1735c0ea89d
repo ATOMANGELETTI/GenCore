@@ -1,0 +1,39 @@
+apps/terminal/src/modules/telemetry/telemetry-meter.component.tsx
+  s_c4c76799c26949::t_4918529b919726 1-33
+apps/terminal/tests/unit/telemetry-widgets.test.tsx
+  s_c4c76799c26949::t_2bff1656228167 47-51,57-61,69-73
+  s_c4c76799c26949::t_9efd90e51c055d 2-46,52-56,62-68,74-96
+  s_c4c76799c26949::t_a4a581ff5c7b58 1
+  s_c4c76799c26949::t_8b67f95de01e00 97-101
+apps/terminal/src/modules/telemetry/gpu-widget.component.tsx
+  s_c4c76799c26949::t_7638e5375d03d3 1-22,24,26-41,43-53
+  s_c4c76799c26949::t_06e27860d1be67 23,25
+  s_c4c76799c26949::t_e20820f3c8b126 42
+  s_c4c76799c26949::t_a1f2302e70bd5f 54
+apps/terminal/src/modules/telemetry/cpu-widget.component.tsx
+  s_c4c76799c26949::t_f1dcb69a04bc00 36-37
+  s_c4c76799c26949::t_f7333534127727 10-13
+  s_c4c76799c26949::t_002ee3ac27fc8d 1-9,14-19,21,23-35,38-51
+  s_c4c76799c26949::t_228af126652296 20,22
+apps/terminal/src/modules/telemetry/network-widget.component.tsx
+  s_c4c76799c26949::t_4f7a39f426bf4e 33
+  s_c4c76799c26949::t_1cad580fe36fad 1-32,34-39
+apps/terminal/src/modules/telemetry/telemetry-bar.component.tsx
+  s_c4c76799c26949::t_a87516ab79ef95 1-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "3295defdacf60ce8b88b02eaa34ff1735c0ea89d",
+  "prompts": {},
+  "sessions": {
+    "s_c4c76799c26949": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "f1d60ef5-5f65-488c-a24e-35896e023ae7",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
