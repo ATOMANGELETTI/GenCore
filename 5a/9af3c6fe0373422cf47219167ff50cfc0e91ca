@@ -1,0 +1,25 @@
+apps/terminal/tests/unit/telemetry.format.test.ts
+  s_cf4e5b75e5f4eb::t_08c53ff40d6d95 1-36
+apps/terminal/tests/unit/telemetry.hook.test.tsx
+  s_cf4e5b75e5f4eb::t_494e58b032479c 1-86
+apps/terminal/src/modules/telemetry/telemetry.hook.ts
+  s_cf4e5b75e5f4eb::t_e94566c28b7049 1-52
+apps/terminal/src/modules/telemetry/telemetry.format.ts
+  s_cf4e5b75e5f4eb::t_771085efc21da9 1-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "5a9af3c6fe0373422cf47219167ff50cfc0e91ca",
+  "prompts": {},
+  "sessions": {
+    "s_cf4e5b75e5f4eb": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "8b6d1bec-31e4-487c-a5ef-b5dd8e566d31",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
