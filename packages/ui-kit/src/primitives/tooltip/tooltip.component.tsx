@@ -31,6 +31,7 @@ export function TooltipContent({
   sideOffset = 6,
   withArrow = false,
   children,
+  size,
   ...props
 }: TooltipContentProps) {
   return (
@@ -38,7 +39,7 @@ export function TooltipContent({
       <TooltipPrimitive.Content
         data-slot="tooltip-content"
         sideOffset={sideOffset}
-        className={cn(tooltipContentVariants(), className)}
+        className={cn(tooltipContentVariants({ size }), className)}
         {...props}
       >
         {children}
