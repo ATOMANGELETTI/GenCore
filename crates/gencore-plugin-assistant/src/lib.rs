@@ -3,6 +3,10 @@
 mod modules;
 
 pub use modules::error::AssistantError;
+pub use modules::gemini::{
+    GeminiContent, GeminiError, GeminiEvent, GeminiPart, GeminiRequest, function_declarations,
+    parse_sse_data,
+};
 #[cfg(windows)]
 pub use modules::secrets::DpapiProtector;
 pub use modules::secrets::{
