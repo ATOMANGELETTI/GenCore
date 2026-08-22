@@ -28,25 +28,28 @@ describe("nordXtermTheme", () => {
     expect(nordXtermTheme("snow-storm").cursor).toBe("#88C0D0");
   });
 
-  it("maps ANSI 0–15 to nord0–nord15 in order", () => {
-    const ansi = Object.values(nord);
-    const theme = nordXtermTheme("polar-night");
-    expect(theme.black).toBe(ansi[0]);
-    expect(theme.red).toBe(ansi[1]);
-    expect(theme.green).toBe(ansi[2]);
-    expect(theme.yellow).toBe(ansi[3]);
-    expect(theme.blue).toBe(ansi[4]);
-    expect(theme.magenta).toBe(ansi[5]);
-    expect(theme.cyan).toBe(ansi[6]);
-    expect(theme.white).toBe(ansi[7]);
-    expect(theme.brightBlack).toBe(ansi[8]);
-    expect(theme.brightRed).toBe(ansi[9]);
-    expect(theme.brightGreen).toBe(ansi[10]);
-    expect(theme.brightYellow).toBe(ansi[11]);
-    expect(theme.brightBlue).toBe(ansi[12]);
-    expect(theme.brightMagenta).toBe(ansi[13]);
-    expect(theme.brightCyan).toBe(ansi[14]);
-    expect(theme.brightWhite).toBe(ansi[15]);
+  it("maps ANSI colors to official Nord terminal ports", () => {
+    for (const name of ["polar-night", "snow-storm"] as const) {
+      const theme = nordXtermTheme(name);
+      expect(theme.black).toBe(nord["polar-1"]);
+      expect(theme.red).toBe("#BF616A");
+      expect(theme.green).toBe(nord["aurora-14"]);
+      expect(theme.yellow).toBe(nord["aurora-13"]);
+      expect(theme.blue).toBe(nord["frost-9"]);
+      expect(theme.magenta).toBe(nord["aurora-15"]);
+      expect(theme.cyan).toBe(nord["frost-8"]);
+      expect(theme.white).toBe(nord["snow-5"]);
+      expect(theme.brightBlack).toBe(nord["polar-3"]);
+      expect(theme.brightRed).toBe("#BF616A");
+      expect(theme.brightGreen).toBe(nord["aurora-14"]);
+      expect(theme.brightYellow).toBe(nord["aurora-13"]);
+      expect(theme.brightBlue).toBe(nord["frost-9"]);
+      expect(theme.brightMagenta).toBe(nord["aurora-15"]);
+      expect(theme.brightCyan).toBe(nord["frost-7"]);
+      expect(theme.brightWhite).toBe(nord["snow-6"]);
+      expect(theme.red).not.toBe(theme.background);
+      expect(theme.brightRed).not.toBe(theme.background);
+    }
   });
 
   it("uses only official Nord hex for every theme color", () => {

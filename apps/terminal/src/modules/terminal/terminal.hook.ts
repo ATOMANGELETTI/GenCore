@@ -31,6 +31,14 @@ export const SAVE_DEBOUNCE_MS = 2000;
 const SEAM_MAX_COLS = 80;
 /** Mirrors the Isolation hook's `WRITE_DATA_MAX_LENGTH` cap on `write` payloads. */
 export const MAX_PTY_WRITE_CHARS = 65536;
+/**
+ * Bytes buffered per tab so a replacement writer (e.g. a React StrictMode
+ * dev-mode remount disposing the first xterm instance before it finishes
+ * parsing) can replay the ConPTY handshake preamble (`ESC [6n` DSR) instead
+ * of losing it with the disposed terminal. Capped well below real scrollback
+ * so this never becomes a second, unbounded output buffer.
+ */
+export const MAX_STARTUP_REPLAY_BYTES = 4096;
 
 export function clampPtyDim(value: number): number {
   if (!Number.isFinite(value)) {
@@ -265,6 +273,7 @@ function recordToTab(record: PinnedTabRecord): TerminalTab {
     cwd: record.cwd,
     sessionId: null,
     status: "live",
+    error: null,
     restore: {
       scrollback: record.scrollback,
       cols: record.cols,
@@ -281,6 +290,15 @@ function createEmptyTab(): TerminalTab {
     cwd: null,
     sessionId: null,
     status: "live",
+    error: null,
+  };
+}
+
+function failListenTab(error: unknown): TerminalTab {
+  return {
+    ...createEmptyTab(),
+    status: "exited",
+    error: errorText(error) || "PTY events failed to subscribe",
   };
 }
 
@@ -310,6 +328,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
   const writersRef = React.useRef(new Map<string, (data: Uint8Array) => void>());
   const queuesRef = React.useRef(new Map<string, Uint8Array[]>());
   const orphansRef = React.useRef(new Map<string, Uint8Array[]>());
+  const startupBytesRef = React.useRef(new Map<string, { chunks: Uint8Array[]; total: number }>());
   const pendingInputRef = React.useRef(new Map<string, string[]>());
   const clipboardRef = React.useRef<TerminalClipboardApi>(NOOP_CLIPBOARD);
   const spawnGenRef = React.useRef(new Map<string, number>());
@@ -335,7 +354,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
   const markExited = React.useCallback(
     (tabId: string, error: unknown) => {
       if (isSessionNotFound(error)) {
-        updateTab(tabId, { status: "exited", sessionId: null });
+        updateTab(tabId, { status: "exited", sessionId: null, error: null });
       }
     },
     [updateTab],
@@ -354,16 +373,37 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
     [markExited],
   );
 
-  const deliverBytes = React.useCallback((tabId: string, bytes: Uint8Array) => {
-    const write = writersRef.current.get(tabId);
-    if (write) {
-      write(bytes);
+  /**
+   * Remembers bytes handed straight to a live writer (not queued) so a
+   * replacement writer can replay them if the original terminal instance
+   * disposes before it finishes parsing them. Bounded by
+   * `MAX_STARTUP_REPLAY_BYTES`; only the earliest bytes of a session matter
+   * for the ConPTY handshake, so recording stops once the cap is hit.
+   */
+  const recordStartupBytes = React.useCallback((tabId: string, bytes: Uint8Array) => {
+    const entry = startupBytesRef.current.get(tabId) ?? { chunks: [], total: 0 };
+    if (entry.total >= MAX_STARTUP_REPLAY_BYTES) {
       return;
     }
-    const queue = queuesRef.current.get(tabId) ?? [];
-    queue.push(bytes);
-    queuesRef.current.set(tabId, queue);
+    entry.chunks.push(bytes);
+    entry.total += bytes.byteLength;
+    startupBytesRef.current.set(tabId, entry);
   }, []);
+
+  const deliverBytes = React.useCallback(
+    (tabId: string, bytes: Uint8Array) => {
+      const write = writersRef.current.get(tabId);
+      if (write) {
+        recordStartupBytes(tabId, bytes);
+        write(bytes);
+        return;
+      }
+      const queue = queuesRef.current.get(tabId) ?? [];
+      queue.push(bytes);
+      queuesRef.current.set(tabId, queue);
+    },
+    [recordStartupBytes],
+  );
 
   const flushOrphans = React.useCallback(
     (sessionId: string, tabId: string) => {
@@ -485,6 +525,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
     pendingInputRef.current.delete(id);
     writersRef.current.delete(id);
     queuesRef.current.delete(id);
+    startupBytesRef.current.delete(id);
     serializersRef.current.delete(id);
     scrollbackCacheRef.current.delete(id);
   }, []);
@@ -515,15 +556,19 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
           }
           return;
         }
-        updateTab(tabId, { sessionId, status: "live" });
+        updateTab(tabId, { sessionId, status: "live", error: null });
         flushOrphans(sessionId, tabId);
         flushPendingInput(tabId, sessionId);
-      } catch {
+      } catch (error) {
         if (spawnGenRef.current.get(tabId) !== generation) {
           return;
         }
         pendingInputRef.current.delete(tabId);
-        updateTab(tabId, { sessionId: null, status: "exited" });
+        updateTab(tabId, {
+          sessionId: null,
+          status: "exited",
+          error: errorText(error) || "PTY failed to start",
+        });
       }
     },
     [bumpSpawn, flushOrphans, flushPendingInput, updateTab],
@@ -684,8 +729,9 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       bumpSpawn(id);
+      startupBytesRef.current.delete(id);
       void killSession(tab.sessionId);
-      updateTab(id, { sessionId: null, status: "live" });
+      updateTab(id, { sessionId: null, status: "live", error: null });
       void spawnSession(id, tab.cwd);
     },
     [bumpSpawn, killSession, spawnSession, updateTab],
@@ -720,6 +766,24 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
         queuesRef.current.delete(tabId);
       }
       const tab = tabsRef.current.find((item) => item.id === tabId);
+      if (tab?.sessionId) {
+        // No-op when empty; catches bytes orphaned by the narrow window
+        // between updateTab assigning sessionId and tabsRef reflecting it.
+        flushOrphans(tab.sessionId, tabId);
+      }
+      // Replays the ConPTY handshake preamble to a replacement writer. If a
+      // prior writer for this tab (e.g. a disposed StrictMode dev remount)
+      // was handed these bytes directly but never finished parsing them
+      // before disposal, xterm's own DSR handling never ran and the shell
+      // stays blocked waiting for the CPR reply. Replaying is safe: this
+      // only re-runs when a *new* writer attaches for a tab that already
+      // had one, which does not happen during normal single-mount use.
+      const startup = startupBytesRef.current.get(tabId);
+      if (startup) {
+        for (const chunk of startup.chunks) {
+          write(chunk);
+        }
+      }
       if (tab?.restore && !tab.sessionId && tab.status === "live") {
         void spawnSession(tabId, tab.cwd, {
           cols: tab.restore.cols,
@@ -730,7 +794,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
         writersRef.current.delete(tabId);
       };
     },
-    [spawnSession],
+    [flushOrphans, spawnSession],
   );
 
   const registerSerializer = React.useCallback((tabId: string, serialize: () => string) => {
@@ -856,7 +920,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
           if (!tab) {
             return;
           }
-          updateTab(tab.id, { status: "exited", sessionId: null });
+          updateTab(tab.id, { status: "exited", sessionId: null, error: null });
         });
         if (cancelled) {
           stopData();
@@ -865,9 +929,13 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
         }
         unlistenExit = stopExit;
         await restorePinned();
-      } catch {
+      } catch (error) {
         if (!cancelled) {
-          await restorePinned();
+          const failed = failListenTab(error);
+          tabsRef.current = [failed];
+          activeIdRef.current = failed.id;
+          setTabs([failed]);
+          setActiveId(failed.id);
         }
       }
     })();

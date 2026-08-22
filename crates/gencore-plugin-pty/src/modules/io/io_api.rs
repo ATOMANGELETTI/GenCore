@@ -33,7 +33,13 @@ pub fn write_session(
 }
 
 /// Writes data to an existing pty session.
-#[tauri::command]
+///
+/// `rename_all = "snake_case"` matches the literal `session_id` key the JS
+/// IPC wrapper (`ipc.pty.ts`) sends; without it, Tauri's command macro
+/// defaults to camelCase (`sessionId`) and every call fails argument
+/// deserialization silently, including xterm's automatic ConPTY `ESC[6n`
+/// DSR reply, permanently blocking the shell at the handshake.
+#[tauri::command(rename_all = "snake_case")]
 pub async fn write(
     state: State<'_, Arc<Mutex<SessionMap>>>,
     session_id: String,

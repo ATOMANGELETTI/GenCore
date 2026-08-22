@@ -328,5 +328,18 @@ Controller session. SDD + writing-plans. Work in place on `main`. No git commits
 - Briefs: `.superpowers/sdd/blank-pane/`
 - Model: Tasks 1–2 implementer `cursor-grok-4.6-xhigh-fast`; Tasks 3–6 implementer `claude-sonnet-5-thinking-xhigh`; reviews `claude-sonnet-5-thinking-xhigh`. Opus only per spec last-resort rules.
 - BASE before Task 1: `53d76f8bf357c33c9010cc5d987fb752542f43b6`
+- Task 1: complete (working tree + user commit `82d35fd`, review Approved). Production seams still dirty (`terminal.types.ts` / `.hook.ts` / `.component.tsx`). Provider tests landed in `82d35fd` (user/hook commit also scooped `.cursor/hooks/state` + spec/plan — not an implementer commit). Minors: `__gencoreXterm` on outer host pane; `data-has-output` on any non-empty write; cleanup `delete` not DEV-gated.
+- HEAD now: `82d35fd3ef9fff0cd33d92c1a3d1d1ec2a5c2fd1`
+- Task 2: complete (working tree, review Approved). Wrapper `scripts/tauri-dev-terminal.mjs` + `tauri:dev` script. Minors: `test:visual` deferred to Task 5; no spawn `error` listener; tests are string containment.
+- Task 3: complete (probe.md, review Approved). Layer: **handshake**. Surface is DOM xterm (no canvas, cursor painted). Session live + UUID. Transport `has-output=true`. Buffer empty / echo swallowed. Minors: no raw `ESC[6n` hex dump; CDP via throwaway Node WS not Playwright. Note for Task 5: do not require a `<canvas>`.
+- Task 4: complete (working tree, review Approved after controller ratification + lock test). Root cause: Tauri command args defaulted to camelCase; JS sends `session_id`; CPR writes failed. Fix: `rename_all = "snake_case"` on write/resize/close. Also JS orphan re-flush + startup replay. Lock: `crates/gencore-plugin-pty/tests/command_snake_case_lock.rs`. Live CDP: `PS C:\Users\DUSTI>` + echo works.
+- Task 5: complete (working tree, review Approved). `test:visual` 1/1 PASS on WebView2 CDP. Shell: powershell.exe (5.1). Minors: unscoped host if multiple tabs; `pages[0]` fallback; `toContain(MARKER)` can match the typed line.
+- Task 6: complete (working tree, review Approved after assertion tighten). Fetched `oh-my-posh.exe` (gitignored). Visual 2/2: Powerline `\uE0B6`/`\uE0B4` before echo + marker. Fallback 5.1 prompt when exe missing. Wrapper deletes `CURSOR_AGENT` so agent-started `tauri:dev` still gets OMP.
+- Whole-branch review: Ready to merge With fixes. Important (pinned overwrite on listen-fail + last-tab close) fixed: subscribe catch does not set `hydratedRef`. Re-review Approved.
+- Controller verify: vitest provider + wrapper 20/20; `cargo test -p gencore-pty` 25; visual 2/2 earlier on live WebView2.
+- Finish: user chose merge locally. Already on `main` (dirty tree, ahead of origin by 13). Local merge is a no-op. No worktree to clean up. Not committed. Not pushed.
+
+
+
 
 

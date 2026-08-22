@@ -79,7 +79,7 @@ The plugin is not vendored. GenCore’s always-on Superpowers rule (artifact pat
 
 ## Learned User Preferences
 
-- For Superpowers and multi-agent Task dispatches, default to Grok 4.6 extra high (Fast Mode). Prefer Kimi K3, GLM 5.2, and other cheap enabled models when a different cheap model is needed. Elevate to Sonnet 5 or Opus 5 when planning or orchestration decides a stronger model is needed, or when a cheaper subagent is stuck / cannot finish. Always pass `model` explicitly; never inherit. GPT 5.6 is allowed if enabled but is not a default. Pick the specialized agent best suited to each task.
+- For Superpowers and multi-agent Task dispatches, default to Grok 4.6 extra high (Fast Mode). Prefer Kimi K3, GLM 5.2, and other cheap enabled models when a different cheap model is needed. Elevate to Sonnet 5 or Opus 5 when planning or orchestration decides a stronger model is needed, or when a cheaper subagent is stuck / cannot finish. Use Opus 5 only as a last resort after Sonnet 5 is stuck — it is expensive. Always pass `model` explicitly; never inherit. GPT 5.6 is allowed if enabled but is not a default. Pick the specialized agent best suited to each task.
 - Do not show the app version in the statusbar; it already appears in the titlebar. The titlebar version chip uses a Nord gilded outline and text (not a solid gold fill) and opens the GitHub repo in the system browser on click.
 - Reviewer skills (code-reviewer, security-reviewer, performance-reviewer) are read-only: propose a plan, ask which changes to apply, and do not edit unless asked.
 - Shared fonts belong in `@gencore/ui-kit` (`packages/ui-kit/src/assets/fonts/`) and may be used in the app shell (Terminess Nerd Font); do not copy font files into apps.
@@ -90,7 +90,7 @@ The plugin is not vendored. GenCore’s always-on Superpowers rule (artifact pat
 - Keep Files-tab toolbar actions, side-panel Files/Agent/Settings tabs, and settings/config rows compact; oversized chrome looks unprofessional.
 - Prefer `portable-pty` for the terminal PTY backend unless a clearly better option is identified.
 - File and folder icons should share one theme-inherited color (the row text color) with distinct outline shapes per type; do not use rainbow per-type fills. They must stay legible on Polar Night and Snow Storm.
-- When implementing an approved spec, use Superpowers subagent-driven development with TDD unless asked otherwise.
+- When implementing an approved spec, use Superpowers subagent-driven development with TDD unless asked otherwise. Terminal pane work is not done until a real WebView2 visual check (Playwright/CDP) shows a cursor and prompt; jsdom and `http://localhost:5173` have no Tauri IPC and do not count.
 
 ## Learned Workspace Facts
 
@@ -98,11 +98,12 @@ The plugin is not vendored. GenCore’s always-on Superpowers rule (artifact pat
 - The public GitHub repository is https://github.com/ATOMANGELETTI/GenCore.
 - `TAURI_DEV_HOST` HMR is unsupported; Vite live reload uses `devCsp.connect-src` localhost websockets only.
 - The project license is GPL-3.0-or-later.
-- The terminal left panel has Files, Assistant, and Config tabs; Assistant is a planned tab that should interact with the terminal, file tree, config, and the app.
+- The terminal left panel has Files, Assistant, and Config tabs; Assistant is a planned tab that should interact with the terminal, file tree, config, and the app. The statusbar far-left button and Ctrl+B/Cmd+B toggle that panel even when xterm is focused (the chord is not sent to the shell). Terminal-only telemetry chips (CPU, iGPU, dGPU, network) live on the statusbar with Nord rich tooltips; do not add Explorer telemetry unless asked.
 - The Terminal right panel is xterm.js + portable-pty. Tabs can be created, closed, renamed, and pinned; pinned tabs persist custom name and history across restarts. Bundle portable Oh My Posh under `apps/terminal/src-tauri/resources/oh-my-posh/` (`oh-my-posh.exe` is gitignored; fetch with `scripts/fetch-oh-my-posh.ps1`) for a theme-aware 2-line Powerline prompt with Nerd Font icons; frost `❯` fallback if the exe is missing or zero-byte. PowerShell Oh My Posh `-File` launch must include `-NoExit` so the tab stays interactive. Never pass Windows `\\?\` verbatim paths into PowerShell. Reject zero-byte App Execution Alias stubs when resolving the PTY shell.
 - App icons are a Nord suite (Polar Night rounded tile + Frost glyph): Terminal is a filled `>` chevron plus block cursor; Explorer is a left-tabbed folder. Tray icons are glyph-only and distinct from the window icon. Each app has a Nord-styled tray right-click menu on its own window/capability, not `main`.
 - `@xterm/xterm@6.0.0` needs `patches/@xterm__xterm@6.0.0.patch` while `freezePrototype: true` is on (xterm assigns `toString` and the WebView stays blank). Do not disable `freezePrototype` to drop the patch; remove the patch only after a newer stable xterm no longer needs it.
 - Tauri plugin builds cache absolute permission-file paths under `target/`; after relocating the repo, run `cargo clean` before `tauri:dev`.
 - Apps follow OS appearance: dark → Polar Night, light → Snow Storm; Polar Night if theme IPC fails or returns null.
 - `.cursor/` is the source of truth for Cursor agent config; `.agents/` is generated for Antigravity (`agy`) and should not be edited by hand.
+- `gencore-pty` IPC arguments are snake_case (`session_id`, not `sessionId`); a camelCase mismatch drops CPR/write/resize and leaves a blank pane. `scripts/tauri-dev-terminal.mjs` launches Terminal `tauri:dev` with WebView2 `--remote-debugging-port=9223` and deletes `CURSOR_AGENT` (Oh My Posh `init` prints nothing when that env is set). Playwright visual tests attach to that WebView2, never to a normal `http://localhost:5173` tab.
 

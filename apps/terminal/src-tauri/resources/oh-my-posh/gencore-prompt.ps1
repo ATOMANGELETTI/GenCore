@@ -1,6 +1,10 @@
-$ErrorActionPreference = 'SilentlyContinue'
 if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
-  oh-my-posh init pwsh --config $env:POSH_THEME | Invoke-Expression
+  try {
+    $ErrorActionPreference = 'SilentlyContinue'
+    oh-my-posh init pwsh --config $env:POSH_THEME | Invoke-Expression
+  } finally {
+    $ErrorActionPreference = 'Continue'
+  }
   $gencoreInner = $function:Prompt
   function Global:Prompt {
     $cwd = (Get-Location).Path

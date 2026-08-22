@@ -12,6 +12,7 @@ const openPty = vi.fn(() => Promise.resolve({ session_id: "session-1" }));
 const writePty = vi.fn(() => Promise.resolve());
 const resizePty = vi.fn(() => Promise.resolve());
 const closePty = vi.fn(() => Promise.resolve());
+const savePinnedTabs = vi.fn(() => Promise.resolve());
 
 let dataHandler: ((payload: PtyDataPayload) => void) | null = null;
 let exitHandler: ((payload: PtyExitPayload) => void) | null = null;
@@ -48,7 +49,7 @@ vi.mock("../../src/modules/ipc/ipc.pty", () => ({
 
 vi.mock("../../src/modules/ipc/ipc.pinned", () => ({
   loadPinnedTabs: () => Promise.reject(new Error("no pinned file")),
-  savePinnedTabs: () => Promise.resolve(),
+  savePinnedTabs: (...args: unknown[]) => savePinnedTabs(...(args as [])),
 }));
 
 vi.mock("@gencore/ui-kit", () => ({
@@ -90,9 +91,15 @@ beforeEach(() => {
   exitHandler = null;
   session = null;
   openPty.mockClear();
+  // A few tests below override this with `mockImplementation` and never
+  // restore it; re-apply the default here so later tests are not left
+  // depending on run order to see "session-1".
+  openPty.mockImplementation(() => Promise.resolve({ session_id: "session-1" }));
   writePty.mockClear();
   resizePty.mockClear();
   closePty.mockClear();
+  savePinnedTabs.mockClear();
+  savePinnedTabs.mockImplementation(() => Promise.resolve());
 });
 
 afterEach(() => {
@@ -123,6 +130,22 @@ describe("TerminalProvider session lifecycle", () => {
     expect(openPty).not.toHaveBeenCalled();
     expect(session?.tabs[0]?.status).toBe("exited");
     expect(session?.tabs[0]?.error).toContain("exit listen failed");
+  });
+
+  it("does not save pinned tabs when closing a subscribe-failure tab", async () => {
+    rejectDataListen = new Error("IPC command is not allowlisted by the isolation hook");
+    renderProvider();
+
+    await waitFor(() => {
+      expect(session?.tabs).toHaveLength(1);
+      expect(session?.tabs[0]?.status).toBe("exited");
+    });
+    const tabId = session?.tabs[0]?.id ?? "";
+    savePinnedTabs.mockClear();
+
+    session?.closeTab(tabId);
+
+    expect(savePinnedTabs).not.toHaveBeenCalled();
   });
 
   it("does not open a pty until data listen resolves", async () => {
@@ -321,5 +344,61 @@ describe("TerminalProvider session lifecycle", () => {
     const writer = vi.fn();
     session?.registerWriter(session?.tabs[0]?.id ?? "", writer);
     expect(writer).not.toHaveBeenCalled();
+  });
+
+  it("flushes orphans parked while the writer was missing after session id exists", async () => {
+    renderProvider();
+    const tab = await liveTab();
+    const dsr = btoa("\u001b[6n");
+    dataHandler?.({ session_id: tab.sessionId, data: dsr });
+    const writer = vi.fn();
+    session?.registerWriter(tab.id, writer);
+    expect(writer).toHaveBeenCalled();
+    const written = writer.mock.calls[0]?.[0] as Uint8Array;
+    expect(new TextDecoder().decode(written)).toContain("\u001b[6n");
+  });
+
+  it("replays startup bytes to a replacement writer after the first writer is disposed", async () => {
+    renderProvider();
+    const tab = await liveTab();
+    const writer1 = vi.fn();
+    const unregisterWriter1 = session?.registerWriter(tab.id, writer1);
+
+    const dsr = btoa("\u001b[6n");
+    dataHandler?.({ session_id: tab.sessionId, data: dsr });
+    expect(writer1).toHaveBeenCalled();
+
+    // Simulates a React StrictMode dev-mode remount disposing the first
+    // xterm instance (and its writer) before it finishes parsing the DSR
+    // it was handed directly.
+    unregisterWriter1?.();
+    const writer2 = vi.fn();
+    session?.registerWriter(tab.id, writer2);
+
+    expect(writer2).toHaveBeenCalled();
+    const written = writer2.mock.calls[0]?.[0] as Uint8Array;
+    expect(new TextDecoder().decode(written)).toContain("\u001b[6n");
+  });
+
+  it("does not replay the previous session's startup bytes after restart", async () => {
+    renderProvider();
+    const tab = await liveTab();
+    const writer1 = vi.fn();
+    session?.registerWriter(tab.id, writer1);
+
+    const dsr = btoa("\u001b[6n");
+    dataHandler?.({ session_id: tab.sessionId, data: dsr });
+    expect(writer1).toHaveBeenCalled();
+
+    openPty.mockResolvedValueOnce({ session_id: "session-2" });
+    session?.restartTab(tab.id);
+
+    await waitFor(() => {
+      expect(session?.tabs[0]?.sessionId).toBe("session-2");
+    });
+
+    const writer2 = vi.fn();
+    session?.registerWriter(tab.id, writer2);
+    expect(writer2).not.toHaveBeenCalled();
   });
 });

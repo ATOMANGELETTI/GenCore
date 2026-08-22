@@ -28,6 +28,7 @@ export interface TerminalTab {
   cwd: string | null;
   sessionId: string | null;
   status: TerminalTabStatus;
+  error: string | null;
   restore?: {
     scrollback: string;
     cols: number;

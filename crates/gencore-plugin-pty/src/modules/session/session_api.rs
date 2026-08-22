@@ -76,7 +76,11 @@ pub async fn open<R: Runtime>(
 }
 
 /// Closes an existing pty session.
-#[tauri::command]
+///
+/// `rename_all = "snake_case"` matches the literal `session_id` key the JS
+/// IPC wrapper (`ipc.pty.ts`) sends; see `io_api::write` for why the default
+/// camelCase mapping breaks this command.
+#[tauri::command(rename_all = "snake_case")]
 pub async fn close(
     state: State<'_, Arc<Mutex<SessionMap>>>,
     session_id: String,

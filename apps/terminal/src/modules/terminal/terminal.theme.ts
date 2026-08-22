@@ -7,25 +7,23 @@ import {
 } from "@gencore/ui-kit";
 import type { ITheme } from "@xterm/xterm";
 
-const ansi = Object.values(nord);
-
 const ansiTheme = {
-  black: ansi[0],
-  red: ansi[1],
-  green: ansi[2],
-  yellow: ansi[3],
-  blue: ansi[4],
-  magenta: ansi[5],
-  cyan: ansi[6],
-  white: ansi[7],
-  brightBlack: ansi[8],
-  brightRed: ansi[9],
-  brightGreen: ansi[10],
-  brightYellow: ansi[11],
-  brightBlue: ansi[12],
-  brightMagenta: ansi[13],
-  brightCyan: ansi[14],
-  brightWhite: ansi[15],
+  black: nord["polar-1"],
+  red: nord["aurora-11"],
+  green: nord["aurora-14"],
+  yellow: nord["aurora-13"],
+  blue: nord["frost-9"],
+  magenta: nord["aurora-15"],
+  cyan: nord["frost-8"],
+  white: nord["snow-5"],
+  brightBlack: nord["polar-3"],
+  brightRed: nord["aurora-11"],
+  brightGreen: nord["aurora-14"],
+  brightYellow: nord["aurora-13"],
+  brightBlue: nord["frost-9"],
+  brightMagenta: nord["aurora-15"],
+  brightCyan: nord["frost-7"],
+  brightWhite: nord["snow-6"],
 } as const satisfies ITheme;
 
 export function nordXtermTheme(theme: ThemeName): ITheme {

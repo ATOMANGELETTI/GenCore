@@ -18,6 +18,8 @@ import { nordXtermTheme } from "./terminal.theme";
 import type { TerminalTab } from "./terminal.types";
 import { createXterm, restoreSerializedBuffer, type XtermHost } from "./terminal.xterm";
 
+type GencoreXtermHost = HTMLDivElement & { __gencoreXterm?: import("@xterm/xterm").Terminal };
+
 export function TerminalView() {
   const session = useTerminalSession();
   const { theme } = useTheme();
@@ -229,6 +231,8 @@ function TerminalHostPane({
 }) {
   const session = useTerminalSession();
   const { theme } = useTheme();
+  const [hasOutput, setHasOutput] = React.useState(false);
+  const paneRef = React.useRef<HTMLDivElement | null>(null);
   const nodeRef = React.useRef<HTMLDivElement | null>(null);
   const sessionRef = React.useRef(session);
   const themeRef = React.useRef(theme);
@@ -247,6 +251,10 @@ function TerminalHostPane({
       return;
     }
     const host = createXterm(node, themeRef.current);
+    const hostNode = (paneRef.current ?? node) as GencoreXtermHost;
+    if (import.meta.env.DEV) {
+      hostNode.__gencoreXterm = host.terminal;
+    }
     const restore = restoreRef.current;
     if (restore) {
       restoreSerializedBuffer(host.terminal, restore.scrollback, seamLine(restore.cols));
@@ -255,6 +263,9 @@ function TerminalHostPane({
       sessionRef.current.onTerminalInput(tab.id, data);
     });
     const unreg = sessionRef.current.registerWriter(tab.id, (data) => {
+      if (data.length > 0) {
+        setHasOutput(true);
+      }
       host.terminal.write(data);
     });
     const unregSerialize = sessionRef.current.registerSerializer(tab.id, () =>
@@ -316,7 +327,22 @@ function TerminalHostPane({
         host.terminal.focus();
       }
     });
+    const observer =
+      typeof ResizeObserver === "undefined"
+        ? null
+        : new ResizeObserver(() => {
+            if (node.clientWidth >= 8 && node.clientHeight >= 8) {
+              try {
+                host.fit.fit();
+              } catch {
+                // Container may not be measurable yet.
+              }
+            }
+          });
+    observer?.observe(node);
     return () => {
+      observer?.disconnect();
+      delete hostNode.__gencoreXterm;
       dataSub.dispose();
       unreg();
       unregSerialize();
@@ -327,6 +353,13 @@ function TerminalHostPane({
 
   return (
     <div
+      ref={paneRef}
+      data-slot="terminal-host"
+      data-status={tab.status}
+      data-cols={String(session.cols)}
+      data-rows={String(session.rows)}
+      data-has-output={hasOutput ? "true" : "false"}
+      {...(tab.sessionId ? { "data-session-id": tab.sessionId } : {})}
       className={cn(
         "absolute inset-0 flex flex-col",
         active ? undefined : "pointer-events-none invisible",
@@ -335,7 +368,7 @@ function TerminalHostPane({
     >
       {tab.status === "exited" ? (
         <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border bg-card px-2 py-1 text-xs text-muted-foreground">
-          <span>Exited</span>
+          <span>{tab.error ? `Exited: ${tab.error}` : "Exited"}</span>
           <Button variant="ghost" size="sm" onClick={onRestart}>
             Restart
           </Button>

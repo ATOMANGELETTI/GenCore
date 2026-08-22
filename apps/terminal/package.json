@@ -9,9 +9,10 @@
     "dev": "vite",
     "build": "tsc -p tsconfig.json --noEmit && vite build",
     "tauri": "tauri",
-    "tauri:dev": "tauri dev",
+    "tauri:dev": "node ../../scripts/tauri-dev-terminal.mjs",
     "tauri:build": "tauri build --no-bundle",
     "test": "vitest run",
+    "test:visual": "playwright test",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "biome check ."
   },
@@ -29,6 +30,7 @@
   "devDependencies": {
     "@gencore/config-typescript": "workspace:*",
     "@gencore/config-vite": "workspace:*",
+    "@playwright/test": "1.62.1",
     "@tauri-apps/cli": "2.11.4",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.2",

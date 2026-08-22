@@ -326,5 +326,35 @@
   ],
   "cb87c402-d3d6-4c7e-84ab-15d1a8b630a2": [
     "apps/terminal"
+  ],
+  "6807eee6-e334-42ab-9a8e-42efaccea71c": [
+    "apps/terminal"
+  ],
+  "44a4947e-34de-4b35-b9a2-d86c945eb4f5": [
+    "apps/terminal",
+    "crates/gencore-plugin-pty"
+  ],
+  "f444229c-b69b-4ac9-b193-a6d46e6983a8": [
+    "crates/gencore-plugin-pty",
+    "apps/terminal"
+  ],
+  "519e30a6-6473-49e4-ac84-cc905f7dd4c8": [
+    "apps/terminal"
+  ],
+  "22b06171-cf08-4d61-910e-55c13c0f32c1": [
+    "apps/terminal",
+    "crates/gencore-plugin-pty"
+  ],
+  "eca78caa-e57a-4287-bf7b-0e2fc4f7c236": [
+    "apps/terminal"
+  ],
+  "9987da87-5990-4072-9a7d-9841ee6617a7": [
+    "apps/terminal"
+  ],
+  "5eaa6f47-ab47-4b11-a959-6a3700fe78d5": [
+    "apps/terminal"
+  ],
+  "a4777a1d-e505-459d-ad6c-32020ec1fa85": [
+    "apps/terminal"
   ]
 }
