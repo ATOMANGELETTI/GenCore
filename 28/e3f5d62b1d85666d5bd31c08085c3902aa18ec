@@ -1,0 +1,37 @@
+crates/gencore-plugin-assistant/tests/store.rs
+  s_e85f4fc9b58610::t_3ce4373f6bb8ee 60-100,105-114,116-118
+  s_e85f4fc9b58610::t_d9cffb78f53277 5
+  s_e85f4fc9b58610::t_e19a6ae4e9ee25 101-104
+  s_e85f4fc9b58610::t_8f5bb23b957ba0 115
+  s_e85f4fc9b58610::t_67608c98a25c10 28-59
+crates/gencore-plugin-assistant/src/modules/store/store_api.rs
+  s_e85f4fc9b58610::t_d0302e7b0b3b4f 121-136
+  s_e85f4fc9b58610::t_02c2fd5e68f051 1-120,137-154,156-295,298-306,315-319,328-414
+  s_e85f4fc9b58610::t_855adfe347c59a 155
+  s_e85f4fc9b58610::t_48acd1b510048b 296-297,307-314,320-327
+crates/gencore-plugin-assistant/src/modules/store/store_schema.rs
+  s_e85f4fc9b58610::t_6121dad9d54418 1-75
+crates/gencore-plugin-assistant/src/modules/store/mod.rs
+  s_e85f4fc9b58610::t_f2fad63da8162d 1,4
+  s_e85f4fc9b58610::t_8f5bb23b957ba0 6
+crates/gencore-plugin-assistant/src/lib.rs
+  s_e85f4fc9b58610::t_01380d131dec01 5-8
+crates/gencore-plugin-assistant/src/modules/store/store_error.rs
+  s_e85f4fc9b58610::t_4341213615f6c8 9-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "28e3f5d62b1d85666d5bd31c08085c3902aa18ec",
+  "prompts": {},
+  "sessions": {
+    "s_e85f4fc9b58610": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e8f298ad-858f-4450-aee3-e2c61c68453e",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
