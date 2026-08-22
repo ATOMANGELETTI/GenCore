@@ -17,6 +17,8 @@ let dataHandler: ((payload: PtyDataPayload) => void) | null = null;
 let exitHandler: ((payload: PtyExitPayload) => void) | null = null;
 let holdDataListen = false;
 let releaseDataListen: (() => void) | null = null;
+let rejectDataListen: Error | null = null;
+let rejectExitListen: Error | null = null;
 
 vi.mock("../../src/modules/ipc/ipc.pty", () => ({
   openPty: (...args: unknown[]) => openPty(...(args as [])),
@@ -25,6 +27,9 @@ vi.mock("../../src/modules/ipc/ipc.pty", () => ({
   closePty: (...args: unknown[]) => closePty(...(args as [])),
   subscribePtyData: (handler: (payload: PtyDataPayload) => void) => {
     dataHandler = handler;
+    if (rejectDataListen) {
+      return Promise.reject(rejectDataListen);
+    }
     if (holdDataListen) {
       return new Promise<() => void>((resolve) => {
         releaseDataListen = () => resolve(() => undefined);
@@ -34,6 +39,9 @@ vi.mock("../../src/modules/ipc/ipc.pty", () => ({
   },
   subscribePtyExit: (handler: (payload: PtyExitPayload) => void) => {
     exitHandler = handler;
+    if (rejectExitListen) {
+      return Promise.reject(rejectExitListen);
+    }
     return Promise.resolve(() => undefined);
   },
 }));
@@ -75,6 +83,8 @@ async function liveTab(): Promise<{ id: string; sessionId: string }> {
 
 beforeEach(() => {
   holdDataListen = false;
+  rejectDataListen = null;
+  rejectExitListen = null;
   dataHandler = null;
   releaseDataListen = null;
   exitHandler = null;
@@ -90,6 +100,31 @@ afterEach(() => {
 });
 
 describe("TerminalProvider session lifecycle", () => {
+  it("does not spawn when subscribePtyData rejects", async () => {
+    rejectDataListen = new Error("IPC command is not allowlisted by the isolation hook");
+    renderProvider();
+
+    await waitFor(() => {
+      expect(session?.tabs).toHaveLength(1);
+    });
+    expect(openPty).not.toHaveBeenCalled();
+    expect(session?.tabs[0]?.status).toBe("exited");
+    expect(session?.tabs[0]?.sessionId).toBeNull();
+    expect(session?.tabs[0]?.error).toContain("not allowlisted");
+  });
+
+  it("does not spawn when subscribePtyExit rejects after data listen", async () => {
+    rejectExitListen = new Error("exit listen failed");
+    renderProvider();
+
+    await waitFor(() => {
+      expect(session?.tabs).toHaveLength(1);
+    });
+    expect(openPty).not.toHaveBeenCalled();
+    expect(session?.tabs[0]?.status).toBe("exited");
+    expect(session?.tabs[0]?.error).toContain("exit listen failed");
+  });
+
   it("does not open a pty until data listen resolves", async () => {
     holdDataListen = true;
     renderProvider();

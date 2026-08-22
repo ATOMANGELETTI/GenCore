@@ -323,5 +323,8 @@
   ],
   "37e77264-fcfe-4348-bf06-e33e0e40777d": [
     "crates/gencore-core"
+  ],
+  "cb87c402-d3d6-4c7e-84ab-15d1a8b630a2": [
+    "apps/terminal"
   ]
 }

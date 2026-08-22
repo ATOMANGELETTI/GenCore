@@ -319,4 +319,14 @@ Controller session. SDD + writing-plans. Work in place on `main`. No git commits
 - Controller re-verify after review: `cargo test -p gencore-pty` 19+5 passed; provider tests 11/11. Manual `tauri:dev` still not run.
 - Commit: none (user has not asked). Finish: already on `main` (dirty tree). Local merge is a no-op. No worktree to clean up. Not pushed.
 
+## Feature: Terminal blank pane visual proof (2026-08-21)
+
+Controller session. SDD + writing-plans. Work in place on `main`. No git commits unless the user asks. Implementers stage only task files. Do not stage `.cursor/hooks/state/**` or the telemetry worktree.
+
+- Spec: `.superpowers/docs/specs/2026-08-21-terminal-blank-pane-design.md`
+- Plan: `.superpowers/docs/plans/2026-08-21-terminal-blank-pane.md`
+- Briefs: `.superpowers/sdd/blank-pane/`
+- Model: Tasks 1–2 implementer `cursor-grok-4.6-xhigh-fast`; Tasks 3–6 implementer `claude-sonnet-5-thinking-xhigh`; reviews `claude-sonnet-5-thinking-xhigh`. Opus only per spec last-resort rules.
+- BASE before Task 1: `53d76f8bf357c33c9010cc5d987fb752542f43b6`
+
 
