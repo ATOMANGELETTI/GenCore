@@ -16,17 +16,11 @@ fn data_dir_prefers_gencore_data_dir_env() {
 fn data_dir_falls_back_to_exe_parent_data() {
     unsafe { std::env::remove_var("GENCORE_DATA_DIR") };
     let exe_parent = PathBuf::from(r"C:\GenCore");
-    assert_eq!(
-        resolve_data_dir(&exe_parent),
-        PathBuf::from(r"C:\GenCore\data")
-    );
+    assert_eq!(resolve_data_dir(&exe_parent), exe_parent.join("data"));
 }
 
 #[test]
 fn sqlite_file_name_is_gencore_assistant() {
     let dir = PathBuf::from(r"C:\GenCore\data");
-    assert_eq!(
-        sqlite_path(&dir),
-        PathBuf::from(r"C:\GenCore\data\gencore-assistant.sqlite")
-    );
+    assert_eq!(sqlite_path(&dir), dir.join("gencore-assistant.sqlite"));
 }
