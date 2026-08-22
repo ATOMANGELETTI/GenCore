@@ -2,6 +2,13 @@
 
 mod modules;
 
+pub use modules::error::AssistantError;
+#[cfg(windows)]
+pub use modules::secrets::DpapiProtector;
+pub use modules::secrets::{
+    ALLOWED_MODELS, DEFAULT_CONTEXT_LINES, DEFAULT_MODEL, IdentityProtector, SecretProtector,
+    SecretsError, clamp_context_lines, parse_model,
+};
 pub use modules::store::{
     AssistantStore, Conversation, Message, Snapshot, StoreError, ToolCall, resolve_data_dir,
     seed_app_facts, sqlite_path,

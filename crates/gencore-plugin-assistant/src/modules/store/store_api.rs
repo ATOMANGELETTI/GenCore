@@ -372,6 +372,39 @@ impl AssistantStore {
         Ok(())
     }
 
+    pub fn put_secret(&self, key: &str, blob: &[u8]) -> Result<(), StoreError> {
+        let now = unix_now();
+        self.conn.execute(
+            "INSERT INTO secrets (key, dpapi_blob, updated_at) VALUES (?1, ?2, ?3)
+             ON CONFLICT(key) DO UPDATE SET
+                dpapi_blob = excluded.dpapi_blob,
+                updated_at = excluded.updated_at",
+            params![key, blob, now],
+        )?;
+        Ok(())
+    }
+
+    pub fn get_secret(&self, key: &str) -> Result<Option<Vec<u8>>, StoreError> {
+        self.conn
+            .query_row(
+                "SELECT dpapi_blob FROM secrets WHERE key = ?1",
+                [key],
+                |row| row.get(0),
+            )
+            .optional()
+            .map_err(Into::into)
+    }
+
+    pub fn has_secret(&self, key: &str) -> Result<bool, StoreError> {
+        Ok(self.get_secret(key)?.is_some())
+    }
+
+    pub fn clear_secret(&self, key: &str) -> Result<(), StoreError> {
+        self.conn
+            .execute("DELETE FROM secrets WHERE key = ?1", [key])?;
+        Ok(())
+    }
+
     fn get_kv(&self, table: &str, key: &str) -> Result<Option<String>, StoreError> {
         let sql = match table {
             "app_facts" => "SELECT value FROM app_facts WHERE key = ?1",
