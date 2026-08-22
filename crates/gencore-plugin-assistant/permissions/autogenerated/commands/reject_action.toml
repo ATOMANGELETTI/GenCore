@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-reject-action"
+description = "Enables the reject_action command without any pre-configured scope."
+commands.allow = ["reject_action"]
+
+[[permission]]
+identifier = "deny-reject-action"
+description = "Denies the reject_action command without any pre-configured scope."
+commands.deny = ["reject_action"]

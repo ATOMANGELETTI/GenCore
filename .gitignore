@@ -23,3 +23,6 @@ apps/terminal/src-tauri/resources/oh-my-posh/oh-my-posh.exe
 
 # Antigravity / Cursor hook runtime state
 .agents/hooks/state/
+
+.data/
+
