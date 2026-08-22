@@ -1,0 +1,109 @@
+pnpm-workspace.yaml
+  s_6d8a2971d7c3a1::t_ab394988db39f2 6-7
+.cursor/hooks/state/edited-files.json
+  s_6d8a2971d7c3a1::t_187b864c955b2b 268-272
+  s_6d8a2971d7c3a1::t_59ecfb1dbc7a79 273-276
+  s_10f43593814ed3::t_88be212c8e3b75 277-286
+crates/gencore-plugin-pty/src/lib.rs
+  s_10f43593814ed3::t_0fc59f8f30f86a 13-14
+.changeset/terminal-tab-menu-and-shell.md
+  s_7b01bbde3892dc::t_7caa9e9494fdc1 1-5
+crates/gencore-plugin-pty/src/modules/session/mod.rs
+  s_10f43593814ed3::t_20891d876b9cbb 12
+.superpowers/docs/specs/2026-08-21-terminal-telemetry-statusbar-design.md
+  s_1b3b6c57f9b800::t_1b6d9c85919c94 1-86,88-105,107-150
+  s_1b3b6c57f9b800::t_fdf3ec0a3cb2e5 106
+  s_1b3b6c57f9b800::t_6a788925a11b1f 87
+.superpowers/docs/plans/2026-08-21-terminal-telemetry-statusbar.md
+  s_1b3b6c57f9b800::t_4ac104a4a498c3 1-1507,1509-1768
+  s_1b3b6c57f9b800::t_15747b59d40983 1508
+.superpowers/docs/specs/2026-08-20-terminal-telemetry-statusbar-design.md
+  s_1b3b6c57f9b800::t_e19820029e8328 4
+.superpowers/docs/plans/2026-08-20-terminal-telemetry-statusbar.md
+  s_1b3b6c57f9b800::t_1953ae6b887646 3-4
+apps/terminal/src/modules/terminal/terminal.component.tsx
+  s_9b2ede30bdc629::t_ff6acbd6eb874b 160
+  s_9b2ede30bdc629::t_8dcbc231f703e5 158
+patches/@xterm__xterm@6.0.0.patch
+  s_6d8a2971d7c3a1::t_ab394988db39f2 1-22
+crates/gencore-plugin-pty/tests/session_commands.rs
+  s_10f43593814ed3::t_2b0b119912e79a 266-301
+  s_10f43593814ed3::t_e048f4cd2a0b5b 8-9
+.superpowers/sdd/progress.md
+  s_6aae74eaa66f85::t_1a29e08cb5947b 279-281
+  s_6aae74eaa66f85::t_c5f36842ec006b 278
+crates/gencore-plugin-pty/src/modules/session/session_shell.rs
+  s_10f43593814ed3::t_a778a2b686ac0a 93
+  s_10f43593814ed3::t_dcc8b8a47b070d 17-19,26-35
+  s_9b2ede30bdc629::t_da58d474ab9bff 36-37
+AGENTS.md
+  s_988c1f71011bd7::t_ebe5211a69a486 102-104
+.cursor/hooks/state/continual-learning-index.json
+  s_988c1f71011bd7::t_d490745627ace8 5-28,30-54,57-69,74-118,122-145,156,159-195,269-328,330-354,362-364,366-387
+pnpm-lock.yaml
+  s_6d8a2971d7c3a1::t_6f921e639cfeba 7-9,116,4683
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "e567e043ceb8bf446b142d39fc44258e58ca169a",
+  "prompts": {},
+  "sessions": {
+    "s_10f43593814ed3": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "030f9da6-c6a3-4643-83eb-66683fdcfadc",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_1b3b6c57f9b800": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "649a0163-382e-4dde-a02b-d516c7fef4fb",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_6aae74eaa66f85": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e32a620a-da74-4127-aacb-040db332e830",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_6d8a2971d7c3a1": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "97616a77-4797-48d6-8c92-7a25b8c055c9",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_7b01bbde3892dc": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "b0ccc162-c17a-4f8a-af68-11bcb2f97e24",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_988c1f71011bd7": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "891e4d94-92fe-4dca-a9ee-24e648071e9c",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_9b2ede30bdc629": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "d091c49e-bee8-4ea1-bbd9-4d403ef1e94e",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
