@@ -1,0 +1,38 @@
+crates/gencore-plugin-assistant/src/modules/gemini/gemini_models.rs
+  s_e8059f62afadbb::t_c504a5de71a8a5 1-91
+crates/gencore-plugin-assistant/src/modules/gemini/gemini_parse.rs
+  s_e8059f62afadbb::t_d43b9dba27aafc 1-78
+crates/gencore-plugin-assistant/src/modules/gemini/gemini_api.rs
+  s_e8059f62afadbb::t_2d65350d93cb4b 1-25
+crates/gencore-plugin-assistant/src/modules/gemini/mod.rs
+  s_e8059f62afadbb::t_3ab04552f74419 1-8
+crates/gencore-plugin-assistant/src/lib.rs
+  s_e8059f62afadbb::t_815355e042d728 6-9
+crates/gencore-plugin-assistant/tests/gemini.rs
+  s_e8059f62afadbb::t_d13d39fec2a9a0 1-31
+crates/gencore-plugin-assistant/src/modules/gemini/gemini_error.rs
+  s_e8059f62afadbb::t_ec02ef9c62c8c6 1-21
+crates/gencore-plugin-assistant/src/modules/mod.rs
+  s_e8059f62afadbb::t_498758b2d34793 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "ee09d50db52866851544effd85360296eda5b27a",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_e8059f62afadbb": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "584f5a38-4fe4-473e-b948-d80409f4e34a",
+        "model": "claude-sonnet-5-thinking-xhigh"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
