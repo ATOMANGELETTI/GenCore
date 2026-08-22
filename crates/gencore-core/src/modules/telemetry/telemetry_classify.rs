@@ -1,10 +1,20 @@
 use super::telemetry_types::{GpuCandidate, GpuKind, GpuTelemetry};
 
+fn normalize_gpu_name(name: &str) -> String {
+    let lowered = name.to_ascii_lowercase();
+    let stripped = lowered
+        .replace("(r)", " ")
+        .replace("(tm)", " ")
+        .replace("(c)", " ")
+        .replace(['®', '™', '©'], " ");
+    stripped.split_whitespace().collect::<Vec<_>>().join(" ")
+}
+
 pub fn classify_gpu(candidate: &GpuCandidate) -> Option<GpuKind> {
     if candidate.is_software {
         return None;
     }
-    let name = candidate.name.to_ascii_lowercase();
+    let name = normalize_gpu_name(&candidate.name);
     if name.contains("basic render") || name.contains("microsoft basic") {
         return None;
     }

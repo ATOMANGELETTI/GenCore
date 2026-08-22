@@ -130,6 +130,33 @@ fn classify_gpu_intel_and_nvidia() {
     );
     assert_eq!(
         classify_gpu(&GpuCandidate {
+            name: "Intel(R) Arc(TM) A770 Graphics".into(),
+            dedicated_memory_bytes: 16 * 1024 * 1024 * 1024,
+            vendor_id: 0x8086,
+            is_software: false,
+        }),
+        Some(GpuKind::Dedicated)
+    );
+    assert_eq!(
+        classify_gpu(&GpuCandidate {
+            name: "Intel(R) Arc(TM) Graphics".into(),
+            dedicated_memory_bytes: 128 * 1024 * 1024,
+            vendor_id: 0x8086,
+            is_software: false,
+        }),
+        Some(GpuKind::Integrated)
+    );
+    assert_eq!(
+        classify_gpu(&GpuCandidate {
+            name: "Intel(R) Arc(TM) B580 Graphics".into(),
+            dedicated_memory_bytes: 12 * 1024 * 1024 * 1024,
+            vendor_id: 0x8086,
+            is_software: false,
+        }),
+        Some(GpuKind::Dedicated)
+    );
+    assert_eq!(
+        classify_gpu(&GpuCandidate {
             name: "NVIDIA GeForce RTX 4070".into(),
             dedicated_memory_bytes: 12 * 1024 * 1024 * 1024,
             vendor_id: 0x10DE,
