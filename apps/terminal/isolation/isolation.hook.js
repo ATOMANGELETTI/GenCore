@@ -14,6 +14,7 @@
 (() => {
   const ALLOWED_COMMANDS = [
     "plugin:gencore-core|get_app_info",
+    "plugin:gencore-core|get_system_telemetry",
     "plugin:gencore-core|load_pinned_tabs",
     "plugin:gencore-core|save_pinned_tabs",
     "plugin:gencore-core|tray_action",
@@ -38,6 +39,7 @@
   ];
   const OPEN_URL_CMD = "plugin:opener|open_url";
   const GET_APP_INFO_CMD = "plugin:gencore-core|get_app_info";
+  const GET_SYSTEM_TELEMETRY_CMD = "plugin:gencore-core|get_system_telemetry";
   const LOAD_PINNED_CMD = "plugin:gencore-core|load_pinned_tabs";
   const SAVE_PINNED_CMD = "plugin:gencore-core|save_pinned_tabs";
   const TRAY_ACTION_CMD = "plugin:gencore-core|tray_action";
@@ -82,7 +84,12 @@
   }
 
   function isEmptyArgCommand(cmd) {
-    return cmd === GET_APP_INFO_CMD || cmd === LIST_DRIVES_CMD || cmd === LOAD_PINNED_CMD;
+    return (
+      cmd === GET_APP_INFO_CMD ||
+      cmd === GET_SYSTEM_TELEMETRY_CMD ||
+      cmd === LIST_DRIVES_CMD ||
+      cmd === LOAD_PINNED_CMD
+    );
   }
 
   function isMainWindowArgs(args) {

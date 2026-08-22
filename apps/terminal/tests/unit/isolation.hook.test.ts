@@ -6,6 +6,7 @@ import { GENCORE_REPO_URL } from "../../src/modules/ipc/ipc.opener";
 
 const EMPTY_ARG_COMMANDS = [
   "plugin:gencore-core|get_app_info",
+  "plugin:gencore-core|get_system_telemetry",
   "plugin:gencore-core|load_pinned_tabs",
   "plugin:window|close",
   "plugin:window|minimize",
@@ -199,6 +200,13 @@ describe("terminal isolation hook", () => {
     ).toThrow();
   });
 
+  it("throws for get_system_telemetry with extra args", () => {
+    const hook = getHook();
+    expect(() =>
+      hook(envelope("plugin:gencore-core|get_system_telemetry", { unexpected: true })),
+    ).toThrow();
+  });
+
   it.each(WINDOW_COMMANDS)("throws for %s with extra args", (cmd) => {
     const hook = getHook();
     expect(() => hook(envelope(cmd, { unexpected: true }))).toThrow();
@@ -254,6 +262,7 @@ describe("terminal isolation hook", () => {
       "core:window:allow-start-dragging",
       "core:window:allow-theme",
       "gencore-core:allow-get-app-info",
+      "gencore-core:allow-get-system-telemetry",
       "gencore-core:allow-load-pinned-tabs",
       "gencore-core:allow-save-pinned-tabs",
       "gencore-fs:allow-list",
