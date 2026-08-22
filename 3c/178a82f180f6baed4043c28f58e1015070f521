@@ -1,0 +1,39 @@
+apps/terminal/tests/unit/app.component.test.tsx
+  s_c9c373ac87f105::t_9000d388950864 52-62,244-246
+  s_c9c373ac87f105::t_518baa291d79f0 224-243
+apps/terminal/tests/unit/side-panel.test.tsx
+  s_c9c373ac87f105::t_b78c22c7166fac 177-188
+apps/terminal/src/modules/side-panel/side-panel.types.ts
+  s_c9c373ac87f105::t_6d80bce24bdd8a 2-5
+apps/terminal/src/modules/side-panel/side-panel.component.tsx
+  s_c9c373ac87f105::t_fa8e68fd992451 20
+  s_c9c373ac87f105::t_a6e6db8d060e62 37
+  s_c9c373ac87f105::t_f073468fb2a0cf 146-151
+apps/terminal/src/modules/terminal/terminal.component.tsx
+  s_c9c373ac87f105::t_6f5ef77c494849 294-295,300-302
+apps/terminal/src/modules/app/app.component.tsx
+  s_c9c373ac87f105::t_00dd2691641af8 123-125
+  s_c9c373ac87f105::t_05c5dd1b07fb09 11-13,69,90-91,121,126,128
+  s_c9c373ac87f105::t_d378cac319d857 65-68,74-89
+apps/terminal/tests/unit/side-panel-toggle.test.tsx
+  s_c9c373ac87f105::t_04e69bc0627c80 1-21
+  s_c9c373ac87f105::t_a2cbb80b37a0f2 22-25
+apps/terminal/src/modules/side-panel/side-panel-toggle.component.tsx
+  s_c9c373ac87f105::t_968ea6d75dbcdc 1-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "3c178a82f180f6baed4043c28f58e1015070f521",
+  "prompts": {},
+  "sessions": {
+    "s_c9c373ac87f105": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "2d16a9e7-5d4a-4470-895e-93fb17879b0c",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
