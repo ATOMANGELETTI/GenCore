@@ -291,8 +291,13 @@ function TerminalHostPane({
           event.key === "w" ||
           event.key === "W" ||
           event.key === "Tab" ||
+          event.key === "b" ||
+          event.key === "B" ||
           (event.key >= "1" && event.key <= "9"))
       ) {
+        return false;
+      }
+      if (event.metaKey && !event.altKey && (event.key === "b" || event.key === "B")) {
         return false;
       }
       return true;

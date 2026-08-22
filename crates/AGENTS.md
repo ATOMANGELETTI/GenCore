@@ -1,6 +1,6 @@
 # Shared crates
 
-- `gencore-core` — `get_app_info`, pinned-tab load/save, and shared error types. Used by both apps
+- `gencore-core` — `get_app_info`, pinned-tab load/save, tray actions, and `get_system_telemetry` (Terminal grants the telemetry command; Explorer does not).
 - `crates/gencore-plugin-pty` — package and plugin id **`gencore-pty`**. Real ConPTY sessions via `portable-pty`. Terminal Isolation grants `open` / `write` / `resize` / `close`. Explorer still has no PTY
 - `crates/gencore-plugin-fs` — package and plugin id **`gencore-fs`**. Real `list` / `list_drives` / `create_file` / `create_dir` / `watch` / `unwatch` for Terminal. `stat` still returns typed `NotImplemented`
 

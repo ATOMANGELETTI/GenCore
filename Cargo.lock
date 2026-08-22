@@ -1345,9 +1345,11 @@ version = "0.1.0"
 dependencies = [
  "serde",
  "serde_json",
+ "sysinfo",
  "tauri",
  "tauri-plugin",
  "thiserror 2.0.20",
+ "windows 0.62.2",
 ]
 
 [[package]]
@@ -2425,6 +2427,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "42b8cfee0e339a0337359f3c88165702ac6e600dc01c0cc9579a92d62b08477a"
 dependencies = [
  "bitflags 2.13.1",
+]
+
+[[package]]
+name = "ntapi"
+version = "0.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c3b335231dfd352ffb0f8017f3b6027a4917f7df785ea2143d8af2adc66980ae"
+dependencies = [
+ "winapi",
 ]
 
 [[package]]
@@ -3718,6 +3729,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2071df9448915b71c4fe6d25deaf1c22f12bd234f01540b77312bb8e41361e6"
 dependencies = [
  "libc",
+ "memchr",
+ "ntapi",
  "objc2-core-foundation",
  "objc2-io-kit",
  "windows 0.62.2",

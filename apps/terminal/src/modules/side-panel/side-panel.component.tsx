@@ -17,7 +17,7 @@ import {
   maxSidePanelWidth,
   SIDE_PANEL_WIDTH_STEP,
 } from "./side-panel.resize";
-import type { SidePanelTabId } from "./side-panel.types";
+import type { SidePanelProps, SidePanelTabId } from "./side-panel.types";
 
 const TABS: readonly {
   id: SidePanelTabId;
@@ -34,7 +34,7 @@ function panelId(id: SidePanelTabId): string {
   return `side-panel-${id}`;
 }
 
-export function SidePanel() {
+export function SidePanel({ open = true }: SidePanelProps) {
   const [selected, setSelected] = React.useState<SidePanelTabId>("files");
   const [width, setWidth] = React.useState(DEFAULT_SIDE_PANEL_WIDTH);
   const [containerWidth, setContainerWidth] = React.useState(0);
@@ -143,8 +143,12 @@ export function SidePanel() {
     <aside
       ref={rootRef}
       data-slot="side-panel"
-      className="relative flex h-full shrink-0 flex-col border-r border-border bg-card"
-      style={{ width }}
+      aria-hidden={open ? undefined : true}
+      className={cn(
+        "relative flex h-full shrink-0 flex-col border-r border-border bg-card",
+        !open && "overflow-hidden border-r-0",
+      )}
+      style={{ width: open ? width : 0 }}
     >
       <div className="min-h-0 flex-1 overflow-hidden">
         {TABS.map((tab) => (

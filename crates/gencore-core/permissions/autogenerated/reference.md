@@ -44,6 +44,32 @@ Denies the get_app_info command without any pre-configured scope.
 <tr>
 <td>
 
+`gencore-core:allow-get-system-telemetry`
+
+</td>
+<td>
+
+Enables the get_system_telemetry command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`gencore-core:deny-get-system-telemetry`
+
+</td>
+<td>
+
+Denies the get_system_telemetry command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 `gencore-core:allow-load-pinned-tabs`
 
 </td>

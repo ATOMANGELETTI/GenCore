@@ -2,6 +2,7 @@ use thiserror::Error;
 
 use crate::modules::app_info::AppInfoError;
 use crate::modules::pinned_store::PinnedStoreError;
+use crate::modules::telemetry::TelemetryError;
 use crate::modules::tray::TrayError;
 
 /// Aggregated, typed error surfaced by `gencore-core` plugin commands.
@@ -19,6 +20,9 @@ pub enum CoreError {
     /// An error occurred while applying a tray action.
     #[error(transparent)]
     Tray(#[from] TrayError),
+    /// An error occurred while sampling system telemetry.
+    #[error(transparent)]
+    Telemetry(#[from] TelemetryError),
 }
 
 impl serde::Serialize for CoreError {

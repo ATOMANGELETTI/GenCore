@@ -1,8 +1,7 @@
 //! Shared core types, typed errors, and diagnostics for GenCore Tauri plugins.
 //!
 //! This crate is itself a small Tauri plugin (`gencore-core`) that exposes
-//! `get_app_info` plus pinned-tab persistence. Other GenCore crates depend on
-//! it for the [`CoreError`] type and the [`init_logging`] hook.
+//! `get_app_info`, pinned-tab persistence, tray actions, and system telemetry.
 
 mod modules;
 
@@ -14,26 +13,34 @@ pub use modules::pinned_store::{
     SavePinnedTabsArgs, load_pinned_tabs, pinned_tabs_path, read_pinned_tabs_file,
     save_pinned_tabs, write_pinned_tabs_file,
 };
+pub use modules::telemetry::{
+    CpuTelemetry, GpuCandidate, GpuKind, GpuTelemetry, MemoryTelemetry, NetworkTelemetry,
+    PdhEngineSample, SystemTelemetry, TelemetryError, TelemetryState, apply_pdh_utilization,
+    classify_gpu, get_system_telemetry, pick_gpus,
+};
 pub use modules::tray::{
     PxRect, PxSize, TrayAction, TrayActionArgs, TrayError, tray_action, tray_menu_origin,
 };
 
 use tauri::{
-    Runtime,
+    Manager, Runtime,
     plugin::{Builder, TauriPlugin},
 };
 
-/// Identifier this plugin is registered under with [`tauri::Builder::plugin`].
 pub const PLUGIN_ID: &str = "gencore-core";
 
-/// Initializes the `gencore-core` plugin.
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     Builder::new(PLUGIN_ID)
         .invoke_handler(tauri::generate_handler![
             get_app_info,
             load_pinned_tabs,
             save_pinned_tabs,
-            tray_action
+            tray_action,
+            get_system_telemetry
         ])
+        .setup(|app, _api| {
+            app.manage(TelemetryState::new());
+            Ok(())
+        })
         .build()
 }

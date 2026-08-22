@@ -174,6 +174,18 @@ describe("SidePanel", () => {
     expect(handle).toHaveAttribute("aria-valuenow", max);
     expect(screen.getByRole("complementary")).toHaveStyle({ width: `${max}px` });
   });
+
+  it("collapses to zero width when open is false and stays mounted", async () => {
+    render(
+      <ConfigProvider>
+        <SidePanel open={false} />
+      </ConfigProvider>,
+    );
+    const aside = await screen.findByRole("complementary", { hidden: true });
+    expect(aside).toHaveAttribute("data-slot", "side-panel");
+    expect(aside).toHaveAttribute("aria-hidden", "true");
+    expect(aside.style.width).toBe("0px");
+  });
 });
 
 function restoreJsdomLocalStorage(): void {

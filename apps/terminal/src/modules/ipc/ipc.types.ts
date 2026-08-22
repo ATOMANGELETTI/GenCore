@@ -58,3 +58,12 @@ export interface PtyExitPayload {
   readonly session_id: string;
   readonly code: number | null;
 }
+
+export type {
+  CpuTelemetry,
+  GpuKind,
+  GpuTelemetry,
+  MemoryTelemetry,
+  NetworkTelemetry,
+  SystemTelemetry,
+} from "../telemetry/telemetry.types";

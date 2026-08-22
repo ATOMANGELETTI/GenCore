@@ -8,6 +8,9 @@ import { openRepoInBrowser } from "../ipc/ipc.opener";
 import type { AppInfo } from "../ipc/ipc.types";
 import { closeWindow, minimizeWindow, toggleMaximizeWindow } from "../ipc/ipc.window";
 import { SidePanel } from "../side-panel/side-panel.component";
+import { SidePanelToggle } from "../side-panel/side-panel-toggle.component";
+import { useSystemTelemetry } from "../telemetry/telemetry.hook";
+import { TelemetryBar } from "../telemetry/telemetry-bar.component";
 import { TerminalView } from "../terminal/terminal.component";
 import { TerminalProvider, useTerminalSession } from "../terminal/terminal.hook";
 import { TerminalErrorBoundary } from "./app.error-boundary";
@@ -59,9 +62,32 @@ function AppShellTree() {
 
 function AppShellFrame({ title, version }: { title: string; version: string | undefined }) {
   const session = useTerminalSession();
+  const { telemetry } = useSystemTelemetry();
+  const [sidePanelOpen, setSidePanelOpen] = React.useState(true);
+  const toggleSidePanel = React.useCallback(() => {
+    setSidePanelOpen((open) => !open);
+  }, []);
   const active = session.tabs.find((tab) => tab.id === session.activeId);
   const cwd = active?.cwd;
   const { flushPinnedSave } = session;
+
+  React.useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.isComposing) {
+        return;
+      }
+      if (!(event.ctrlKey || event.metaKey) || event.altKey || event.shiftKey) {
+        return;
+      }
+      if (event.key !== "b" && event.key !== "B") {
+        return;
+      }
+      event.preventDefault();
+      toggleSidePanel();
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [toggleSidePanel]);
 
   // The window tears the WebView down as soon as it closes, so the pinned-tab
   // write has to complete before `close()` is issued.
@@ -92,19 +118,14 @@ function AppShellFrame({ title, version }: { title: string; version: string | un
       }
       contentContextMenu={<TerminalContextMenu />}
       contentProps={{ centered: false, padded: false, className: "min-h-0 overflow-hidden" }}
-      sidebar={<SidePanel />}
+      sidebar={<SidePanel open={sidePanelOpen} />}
       statusbarStart={
-        cwd ? (
-          <span className="truncate text-muted-foreground">{cwd}</span>
-        ) : (
-          <span className="truncate text-muted-foreground" />
-        )
+        <div className="flex min-w-0 items-center gap-2">
+          <SidePanelToggle isOpen={sidePanelOpen} onToggle={toggleSidePanel} />
+          <span className="truncate text-muted-foreground">{cwd ?? ""}</span>
+        </div>
       }
-      statusbarEnd={
-        <span className="tabular-nums">
-          {session.shellName} · {session.cols}×{session.rows}
-        </span>
-      }
+      statusbarEnd={<TelemetryBar telemetry={telemetry} />}
     >
       <TerminalErrorBoundary>
         <TerminalView />
