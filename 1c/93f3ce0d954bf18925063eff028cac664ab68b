@@ -1,0 +1,20 @@
+.superpowers/docs/specs/2026-08-22-terminal-assistant-design.md
+  s_5bed3f8a4cd774::t_28e64778d23407 1-203,205-261
+  s_5bed3f8a4cd774::t_e9695d7e3e30e4 204
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "1c93f3ce0d954bf18925063eff028cac664ab68b",
+  "prompts": {},
+  "sessions": {
+    "s_5bed3f8a4cd774": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "258f2b5b-8031-4236-90e0-cd5af54d5adf",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
