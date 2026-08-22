@@ -1,0 +1,48 @@
+.superpowers/sdd/progress.md
+  s_f8ee0fb9da0675::t_254269c010a051 322-331
+.superpowers/docs/specs/2026-08-21-terminal-blank-pane-design.md
+  s_f8ee0fb9da0675::t_df9acef87ccd53 98
+  s_f8ee0fb9da0675::t_9d5c1768fe8260 67-75
+  s_f8ee0fb9da0675::t_db64b04d72fe96 1-66,76-81,83-97,99-103,106-142,144-170,172
+  s_f8ee0fb9da0675::t_2d52242f1e120f 82
+  s_f8ee0fb9da0675::t_d0ef8f3301ad21 143
+  s_f8ee0fb9da0675::t_7d7f0e4b889e0d 171
+  s_f8ee0fb9da0675::t_3ae0f4fe304d27 104-105
+.superpowers/docs/plans/2026-08-21-terminal-blank-pane.md
+  s_f8ee0fb9da0675::t_1967e92872cf0e 111,113-120
+  s_f8ee0fb9da0675::t_dd56a11ed514e9 639,643-645,650-651
+  s_f8ee0fb9da0675::t_f3429b585f0d0e 96,100
+  s_f8ee0fb9da0675::t_7c2516b623f08b 1-95,97-99,101-110,112,121-638,640-642,646-649,652-1010
+apps/terminal/tests/unit/terminal.provider.test.tsx
+  s_3dc688d80d9cb6::t_d975b0af521648 20-21
+  s_3dc688d80d9cb6::t_0642ae5b926b9c 42-44
+  s_3dc688d80d9cb6::t_fc53f091e6ec60 86-87
+  s_3dc688d80d9cb6::t_ed55eb329751bc 103-127
+  s_3dc688d80d9cb6::t_12af604df55026 30-32
+.cursor/hooks/state/continual-learning.json
+  s_f8ee0fb9da0675::t_9f1603967c2ab2 4,6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "82d35fd3ef9fff0cd33d92c1a3d1d1ec2a5c2fd1",
+  "prompts": {},
+  "sessions": {
+    "s_3dc688d80d9cb6": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "cb87c402-d3d6-4c7e-84ab-15d1a8b630a2",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_f8ee0fb9da0675": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "1d69b742-af02-4e84-ae82-41d788a17395",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
