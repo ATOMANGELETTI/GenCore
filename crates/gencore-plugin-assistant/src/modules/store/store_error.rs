@@ -6,6 +6,14 @@ pub enum StoreError {
     DataDir,
     #[error("{0}")]
     Sqlite(String),
+    #[error("unknown conversation")]
+    UnknownConversation,
+}
+
+impl From<rusqlite::Error> for StoreError {
+    fn from(err: rusqlite::Error) -> Self {
+        Self::Sqlite(err.to_string())
+    }
 }
 
 impl serde::Serialize for StoreError {

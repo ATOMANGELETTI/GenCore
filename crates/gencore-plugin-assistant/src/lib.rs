@@ -2,7 +2,10 @@
 
 mod modules;
 
-pub use modules::store::{StoreError, resolve_data_dir, sqlite_path};
+pub use modules::store::{
+    AssistantStore, Conversation, Message, Snapshot, StoreError, ToolCall, resolve_data_dir,
+    seed_app_facts, sqlite_path,
+};
 
 use tauri::{
     Runtime,
