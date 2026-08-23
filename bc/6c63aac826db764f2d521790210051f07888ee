@@ -1,0 +1,32 @@
+apps/terminal/src/modules/assistant/assistant.hook.ts
+  s_1fef457739efa5::t_78f136111f182e 110-120
+  s_1fef457739efa5::t_792f21d830da0a 249-250,266
+apps/terminal/src/modules/assistant/assistant.types.ts
+  s_1fef457739efa5::t_b7ad26a83923c9 1
+apps/terminal/tests/unit/assistant.hook.test.tsx
+  s_1fef457739efa5::t_2704b2f8925707 3
+  s_1fef457739efa5::t_a1437aebbc2468 639-653,659-688
+  s_1fef457739efa5::t_ff934e9cf47bef 654-657
+  s_1fef457739efa5::t_01efa1ef4b53f9 658
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "bc6c63aac826db764f2d521790210051f07888ee",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_1fef457739efa5": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "aa1bc390-49f8-4946-b5a0-3b9444b5fb15",
+        "model": "claude-sonnet-5-thinking-xhigh"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
