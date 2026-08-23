@@ -1,5 +1,32 @@
 # GenCore SDD progress ledger
 
+## Feature: Terminal Assistant (2026-08-22)
+
+Plan: `.superpowers/docs/plans/2026-08-22-terminal-assistant.md`
+Spec: `.superpowers/docs/specs/2026-08-22-terminal-assistant-design.md`
+Branch: `main` (work in place; no worktree). Implementers commit per plan.
+BASE before Task 1: `26ca6f5`
+
+- Task 1: complete (commits 26ca6f5..9dacbbd, review clean). User chose portable Path::join expects. Minors for final review: process-global GENCORE_DATA_DIR mutation; crate-graph docs wait for Task 11. Versions: rusqlite 0.40.2, reqwest 0.13.4 feature `rustls` (not `rustls-tls`).
+- Task 2: complete (commits 9dacbbd..28e3f5d, review clean). `insert_snapshot(&Snapshot)` + `Snapshot::for_conversation` (clippy too-many-arguments). Extra seed keys `pty.prompt`, `ui.theme`. Minors for final review: conversation `updated_at` only on messages; unknown tool call is stringly `Sqlite`; list_messages/latest_snapshot skip require_conversation; apply_schema always forces user_version=1.
+- Task 3: complete (commits 28e3f5d..f03510e, review clean). Secrets never write settings. Minors for final review: has_secret loads full blob; weak leak assertion in unprotect test; DPAPI plaintext not zeroed.
+- Task 4: complete (commits f03510e..ee09d50, review clean). `pty_write` has `data` only. Minors for final review: FunctionCall rustdoc overclaims args strip; Gemini error JSON parses as Ok([]); GeminiRequest fields public; no GeminiRequest::new allowlist test.
+- Task 5: complete (commits ee09d50..e08aa5e, review clean). Session stamped from snapshot. Minors for final review: no non-pending existing-row test; pty_write success→ran untested (no stub writer); fail() can drop original error; whitespace session id; extra Pty/Store variants.
+- Task 6: complete (commits e08aa5e..db5e728, review clean). `GeminiTransport`/`ScriptedTransport` + `send_turn`/`resume_turn`. Minors for final review: snapshot not in model prompt; resume_turn skips key check; title rewrite no-ops if get_conversation None; Gemini(String) vs GeminiHttp/Stream; tool results flattened to user text.
+- Task 7: complete (commits db5e728..e2bd3c1, review clean). Persist-before-accept via `continue_turn`. Minors for final review: Isolation test title vs toThrow; source-lock persist tests; message+snapshot not one transaction; token event is post-hoc dump not stream; stale send_message rustdoc; cancel_turn cooperative-only; Task 6 created_at flake. 12 commands wired through Isolation (explicit `reconstructListen` branches, no `entry-changed` fallback), capabilities, `ReqwestTransport`, `ipc.assistant.ts`. Tests: isolation+tauri.conf 149/149, ipc.assistant 17/17, full terminal suite 350/350, `cargo test -p gencore-assistant` 56/56 (clean run), clippy clean. Minors for final review: `cancel_turn` is cooperative-only (doesn't abort the in-flight HTTP call or roll back persisted rows, just suppresses events); pre-existing Task 6 flake in `tests/agent.rs::send_turn_persists_user_message_and_stamps_snapshot_conversation_id` (~50% flake, second-granularity `created_at` tie-broken by random UUID `id` — not touched, out of Task 7 file scope).
+- Task 7 review fix: complete. Important finding fixed — `send_message` now `run_blocking`s `insert_message`+`insert_snapshot` and awaits it *before* spawning the Gemini turn / returning `{ accepted: true }`, so an unknown-conversation or store error fails the command itself. Split `agent_api::send_turn` into `send_turn` (persist + delegate, kept for tests) and new `continue_turn` (no persist); the spawned turn now calls `continue_turn`, never re-inserting the user message. See `.superpowers/sdd/task-7-report.md` Fix section. Tests: `cargo test -p gencore-assistant --test agent --test assistant` 16+20 passed (clean run; the pre-existing flake above reproduced once, reran clean), full crate 60/60, clippy clean.
+- Task 8: complete (commits e2bd3c1..7441084, review clean). Ledger + conversation-keyed pending/streaming/transcripts. Minors for final review: render-time ref overwrite; send skips You-row append after History switch; shared composer; History/New omit Files tooltips. User routed Tasks 9–11 to Sonnet 5.
+- Task 9: complete (commits 7441084..9b6c3dc, review clean). Minors for final review: saveKey clears draft before IPC resolves; replaceKey flips shared hasApiKey with no cancel; setModel/setContextLines comments overclaim refetch. `AgentSettingsProvider`/`useAgentSettings()` in `config.agent.ts` (IPC-backed, optimistic writes, best-effort error swallow). Config gained Assistant (key row + 4-model radiogroup, default `gemini-3.7-flash`) and Context (Terminal lines 20–200) sections after Appearance. `assistant.hook.ts` re-exports the real hook and keeps a test-only `AgentSettingsStubProvider` sharing the same context so Task 8 specs stay green untouched. Tests: `config.agent.test.tsx` (9, new) + `config.component.test.tsx` (Assistant/Context added) pass; `assistant.component.test.tsx`/`assistant.hook.test.tsx`/`side-panel.test.tsx` still pass; full suite 39 files/385 tests, `tsc --noEmit` clean. Concern: whole-repo `pnpm turbo run lint` still shows ~24 pre-existing format errors in files this task never touched (confirmed via `git show HEAD` predating this task); all touched/created files pass `biome check` individually.
+- Task 10: complete (commits 9b6c3dc..bc6c63a, review clean). Subscribe-once ui-action. Minors for final review: subscribe-once test does not assert latest handlers; drive→dir untested; revealPath only mocked.
+- Task 11: complete (commits bc6c63a..f083d3f, review clean). Minors for final review: Superpowers sentence added in AGENTS.md; crates/AGENTS conventions line still says pty/fs only.
+- Whole-branch review: With fixes (1 Critical, 11 Important). Report: `.superpowers/sdd/whole-branch-review.md`.
+- Whole-branch fix: complete (commits f083d3f..f4ad79c). Report: `.superpowers/sdd/whole-branch-fix-report.md`.
+- Whole-branch re-review: original 1 Critical + 11 Important closed. New Important: Cancel left the chat streaming. Report: `.superpowers/sdd/whole-branch-rereview.md`.
+- Cancel fix: complete (`3cede29`). Re-review found two races (begin_turn after prepare; stale empty turn). Follow-up committed.
+- Cancel generation follow-up: complete. Whole-branch SDD ready for finishing options.
+
+## Prior sessions
+
 Controller session. No git commits unless the user asks.
 
 ## Versions locked 2026-08-15
@@ -339,7 +366,16 @@ Controller session. SDD + writing-plans. Work in place on `main`. No git commits
 - Controller verify: vitest provider + wrapper 20/20; `cargo test -p gencore-pty` 25; visual 2/2 earlier on live WebView2.
 - Finish: user chose merge locally. Already on `main` (dirty tree, ahead of origin by 13). Local merge is a no-op. No worktree to clean up. Not committed. Not pushed.
 
+## Feature: Terminal error output (2026-08-22)
 
+Controller session. User approved the design and ordered implementation (no second writing-plans file). Work in place. No git commits unless the user asks.
 
+- Spec: `.superpowers/docs/specs/2026-08-22-terminal-error-output-design.md` (written + self-reviewed; user already approved)
+- Plan: `C:/Users/DUSTI/.cursor/plans/terminal_error_output_191843e0.plan.md` (Cursor-owned; not copied)
+- Task 1 ANSI map: complete (working tree). `red` / `brightRed` = `#BF616A`. Unit theme tests lock official Nord ports.
+- Task 2 prompt preference: complete (working tree). Last `$ErrorActionPreference` is `Continue`; `SilentlyContinue` only on `Get-Command oh-my-posh`.
+- Task 3 visual gate: complete. Playwright 3/3 on WebView2 CDP `127.0.0.1:9223`. Error phrase present for `gencore-pty-nosuch`.
+- Controller verify: `pnpm --filter @gencore/terminal test` 35 files / 284 passed; `test:visual` 3/3.
+- Commit: none (user has not asked).
 
 

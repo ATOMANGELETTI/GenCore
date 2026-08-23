@@ -356,5 +356,61 @@
   ],
   "a4777a1d-e505-459d-ad6c-32020ec1fa85": [
     "apps/terminal"
+  ],
+  "968ecd49-1522-4515-aa7a-65174f4340e9": [
+    "crates/gencore-plugin-assistant"
+  ],
+  "7c393446-5c63-41b6-a409-565ad7d44a74": [
+    "crates/gencore-plugin-assistant"
+  ],
+  "e8f298ad-858f-4450-aee3-e2c61c68453e": [
+    "crates/gencore-plugin-assistant"
+  ],
+  "ff55194b-7a17-4c94-890a-95fb04918e14": [
+    "crates/gencore-plugin-assistant"
+  ],
+  "584f5a38-4fe4-473e-b948-d80409f4e34a": [
+    "crates/gencore-plugin-assistant"
+  ],
+  "dd80c68f-1d49-4c32-9007-70906f3c7e95": [
+    "crates/gencore-plugin-assistant"
+  ],
+  "8302ba8d-0712-40f9-8cca-6313d168d20a": [
+    "crates/gencore-plugin-assistant"
+  ],
+  "25e764fe-44fc-4d97-b2d8-7bb93a40a0b2": [
+    "apps/terminal",
+    "crates/gencore-plugin-assistant"
+  ],
+  "53b744be-cb40-4caa-afdc-543be8c2840c": [
+    "crates/gencore-plugin-assistant"
+  ],
+  "d1162902-620f-4f93-8663-386abba25823": [
+    "apps/terminal"
+  ],
+  "66c47368-afff-45eb-a09f-7eac34cb63b9": [
+    "apps/terminal"
+  ],
+  "1c19e2c3-22f4-4042-8247-c6718c0feba6": [
+    "apps/terminal"
+  ],
+  "ec08dfdc-8bd3-4cb2-b3b1-88342a265266": [
+    "apps/terminal"
+  ],
+  "3ab7f493-10b8-476b-8966-c9de90c6e9ad": [
+    "apps/terminal"
+  ],
+  "e756c07a-fd06-4700-be5e-52e34267055a": [
+    "apps/terminal"
+  ],
+  "aa1bc390-49f8-4946-b5a0-3b9444b5fb15": [
+    "apps/terminal"
+  ],
+  "6aa3af23-8aef-4aa1-9d10-dff59df4a8c6": [
+    "apps/terminal"
+  ],
+  "5319e3aa-4c09-4c8d-82a0-3ca43114c4f6": [
+    "crates/gencore-plugin-assistant",
+    "apps/terminal"
   ]
 }

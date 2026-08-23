@@ -12,6 +12,7 @@ All Superpowers files live under `.superpowers/`:
 
 - Specs: `.superpowers/docs/specs/YYYY-MM-DD-<topic>-design.md`
 - Plans: `.superpowers/docs/plans/YYYY-MM-DD-<feature-name>.md`
+- Tasks: `.superpowers/docs/tasks/YYYY-MM-DD-<feature-name>.md`
 - Reviews: `.superpowers/docs/reviews/`
 - Visual companion: `.superpowers/brainstorm/` (plugin default)
 - SDD scratch: `.superpowers/sdd/` (plugin default)
