@@ -1,5 +1,6 @@
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -138,11 +139,7 @@ export function Assistant() {
               <React.Fragment key={message.id}>
                 {index > 0 ? <Separator /> : null}
                 <div className="px-2 py-1.5">
-                  <p
-                    className={
-                      message.role === "assistant" ? `${KICKER_CLASS} text-primary` : KICKER_CLASS
-                    }
-                  >
+                  <p className={cn(KICKER_CLASS, message.role === "assistant" && "text-primary")}>
                     {message.role === "user" ? "You" : "Assistant"}
                   </p>
                   <p className="select-text text-xs">{message.content}</p>

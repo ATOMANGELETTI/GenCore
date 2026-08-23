@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Conversation } from "../../src/modules/ipc/ipc.types";
+import type { AssistantToolCall, Conversation } from "../../src/modules/ipc/ipc.types";
 
 const {
   listConversations,
@@ -55,6 +55,13 @@ const CONVERSATION: Conversation = {
   updated_at: 1,
 };
 
+const OTHER_CONVERSATION: Conversation = {
+  id: "c2",
+  title: "Other",
+  created_at: 2,
+  updated_at: 2,
+};
+
 function Probe() {
   const assistant = useAssistant();
   return (
@@ -62,6 +69,14 @@ function Probe() {
       <span data-testid="has-key">{String(assistant.hasApiKey)}</span>
       <span data-testid="streaming">{String(assistant.streaming)}</span>
       <span data-testid="pending-count">{assistant.pending.length}</span>
+      <span data-testid="conversation-id">{assistant.conversationId ?? ""}</span>
+      <ul data-testid="messages">
+        {assistant.messages.map((message) => (
+          <li key={message.id} data-role={message.role}>
+            {message.content}
+          </li>
+        ))}
+      </ul>
       <input
         aria-label="composer"
         value={assistant.composer}
@@ -75,6 +90,17 @@ function Probe() {
       <button type="button" onClick={() => void assistant.newChat()}>
         new
       </button>
+      {assistant.conversations.map((conversation) => (
+        <button
+          key={conversation.id}
+          type="button"
+          onClick={() => {
+            assistant.selectConversation(conversation.id);
+          }}
+        >
+          {`select-${conversation.id}`}
+        </button>
+      ))}
       <button
         type="button"
         onClick={() => {
@@ -211,5 +237,88 @@ describe("useAssistant", () => {
     await waitFor(() => {
       expect(rejectAction).toHaveBeenCalledWith("tool-1");
     });
+  });
+
+  it("keeps pending after selecting another conversation and returning", async () => {
+    const user = userEvent.setup();
+    listConversations.mockResolvedValue([CONVERSATION, OTHER_CONVERSATION]);
+    let onTurn:
+      | ((payload: {
+          conversation_id: string;
+          assistant_text: string;
+          pending: Pick<AssistantToolCall, "id" | "status">[];
+        }) => void)
+      | undefined;
+    subscribeAssistantTurn.mockImplementation(async (handler) => {
+      onTurn = handler;
+      return () => {};
+    });
+
+    renderHookProbe(true);
+    await waitFor(() => {
+      expect(screen.getByTestId("conversation-id")).toHaveTextContent("c1");
+      expect(onTurn).toBeTypeOf("function");
+    });
+
+    onTurn?.({
+      conversation_id: "c1",
+      assistant_text: "ok",
+      pending: [{ id: "tool-1", status: "pending" }],
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId("pending-count")).toHaveTextContent("1");
+    });
+
+    await user.click(screen.getByText("select-c2"));
+    await waitFor(() => {
+      expect(screen.getByTestId("conversation-id")).toHaveTextContent("c2");
+      expect(screen.getByTestId("pending-count")).toHaveTextContent("0");
+    });
+
+    await user.click(screen.getByText("select-c1"));
+    await waitFor(() => {
+      expect(screen.getByTestId("conversation-id")).toHaveTextContent("c1");
+      expect(screen.getByTestId("pending-count")).toHaveTextContent("1");
+    });
+  });
+
+  it("appends the user turn after send accepts", async () => {
+    const user = userEvent.setup();
+    listConversations.mockResolvedValue([CONVERSATION]);
+    renderHookProbe(true);
+
+    await waitFor(() => {
+      expect(listConversations).toHaveBeenCalledTimes(1);
+    });
+
+    await user.type(screen.getByLabelText("composer"), "hello");
+    await user.click(screen.getByText("send"));
+
+    await waitFor(() => {
+      expect(sendMessage).toHaveBeenCalledWith("c1", "hello", STUB_ASSISTANT_SNAPSHOT);
+    });
+    const userTurn = screen.getByTestId("messages").querySelector("[data-role='user']");
+    expect(userTurn).toHaveTextContent("hello");
+    expect(screen.getByLabelText("composer")).toHaveValue("");
+  });
+
+  it("restores the composer when send fails", async () => {
+    const user = userEvent.setup();
+    listConversations.mockResolvedValue([CONVERSATION]);
+    sendMessage.mockRejectedValue(new Error("offline"));
+    renderHookProbe(true);
+
+    await waitFor(() => {
+      expect(listConversations).toHaveBeenCalledTimes(1);
+    });
+
+    await user.type(screen.getByLabelText("composer"), "keep this draft");
+    await user.click(screen.getByText("send"));
+
+    await waitFor(() => {
+      expect(sendMessage).toHaveBeenCalled();
+    });
+    expect(screen.getByLabelText("composer")).toHaveValue("keep this draft");
+    expect(screen.getByTestId("messages")).toBeEmptyDOMElement();
   });
 });

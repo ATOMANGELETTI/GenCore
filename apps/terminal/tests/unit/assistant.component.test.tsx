@@ -1,4 +1,5 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type {
   AssistantMessage,
@@ -9,6 +10,7 @@ import type {
 const {
   listConversations,
   listMessages,
+  sendMessage,
   subscribeAssistantToken,
   subscribeAssistantTurn,
   subscribeAssistantError,
@@ -16,6 +18,7 @@ const {
 } = vi.hoisted(() => ({
   listConversations: vi.fn(),
   listMessages: vi.fn(),
+  sendMessage: vi.fn(),
   subscribeAssistantToken: vi.fn(),
   subscribeAssistantTurn: vi.fn(),
   subscribeAssistantError: vi.fn(),
@@ -27,7 +30,7 @@ vi.mock("../../src/modules/ipc/ipc.assistant", () => ({
   createConversation: vi.fn(),
   deleteConversation: vi.fn(),
   listMessages,
-  sendMessage: vi.fn(),
+  sendMessage,
   cancelTurn: vi.fn(),
   confirmAction: vi.fn(),
   rejectAction: vi.fn(),
@@ -45,6 +48,13 @@ const CONVERSATION: Conversation = {
   title: "Hello",
   created_at: 1,
   updated_at: 1,
+};
+
+const OTHER_CONVERSATION: Conversation = {
+  id: "c2",
+  title: "Other",
+  created_at: 2,
+  updated_at: 2,
 };
 
 const USER_MESSAGE: AssistantMessage = {
@@ -78,6 +88,7 @@ const PENDING_WRITE: AssistantToolCall = {
 function mockIdleIpc() {
   listConversations.mockResolvedValue([]);
   listMessages.mockResolvedValue([]);
+  sendMessage.mockResolvedValue({ accepted: true });
   subscribeAssistantToken.mockResolvedValue(() => {});
   subscribeAssistantTurn.mockResolvedValue(() => {});
   subscribeAssistantError.mockResolvedValue(() => {});
@@ -127,9 +138,9 @@ describe("Assistant", () => {
       "font-semibold",
       "uppercase",
       "tracking-wide",
-      "text-muted-foreground",
       "text-primary",
     );
+    expect(assistant).not.toHaveClass("text-muted-foreground");
     expect(screen.getByText("List the files")).toHaveClass("select-text");
     expect(screen.getByText("I can list them after you approve.")).toHaveClass("select-text");
   });
@@ -191,5 +202,83 @@ describe("Assistant", () => {
       "border-border",
       "px-2",
     );
+  });
+
+  it("keeps pending Approve and Reject after switching History and back", async () => {
+    const user = userEvent.setup();
+    listConversations.mockResolvedValue([CONVERSATION, OTHER_CONVERSATION]);
+    listMessages.mockImplementation(async (id: string) =>
+      id === "c1" ? [USER_MESSAGE, ASSISTANT_MESSAGE] : [],
+    );
+    let onTurn:
+      | ((payload: {
+          conversation_id: string;
+          assistant_text: string;
+          pending: AssistantToolCall[];
+        }) => void)
+      | undefined;
+    subscribeAssistantTurn.mockImplementation(async (handler) => {
+      onTurn = handler;
+      return () => {};
+    });
+
+    renderAssistant(true);
+    await screen.findByText("You");
+    await waitFor(() => {
+      expect(onTurn).toBeTypeOf("function");
+    });
+    act(() => {
+      onTurn?.({
+        conversation_id: "c1",
+        assistant_text: ASSISTANT_MESSAGE.content,
+        pending: [PENDING_WRITE],
+      });
+    });
+    expect(screen.getByRole("button", { name: "Approve" })).toBeVisible();
+
+    await user.click(screen.getByRole("button", { name: "History" }));
+    await user.click(await screen.findByRole("menuitem", { name: "Other" }));
+    await waitFor(() => {
+      expect(screen.queryByRole("button", { name: "Approve" })).toBeNull();
+    });
+
+    await user.click(screen.getByRole("button", { name: "History" }));
+    await user.click(await screen.findByRole("menuitem", { name: "Hello" }));
+
+    expect(await screen.findByRole("button", { name: "Approve" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Reject" })).toBeVisible();
+  });
+
+  it("shows the You kicker as soon as send accepts", async () => {
+    const user = userEvent.setup();
+    listConversations.mockResolvedValue([CONVERSATION]);
+    listMessages.mockResolvedValue([]);
+    sendMessage.mockResolvedValue({ accepted: true });
+
+    renderAssistant(true);
+    const composer = await screen.findByRole("textbox", { name: "Message" });
+    await user.type(composer, "List the files");
+    await user.keyboard("{Enter}");
+
+    expect(await screen.findByText("You")).toBeVisible();
+    expect(screen.getByText("List the files")).toHaveClass("select-text");
+    expect(screen.queryByText("Assistant")).toBeNull();
+  });
+
+  it("restores the composer when send fails", async () => {
+    const user = userEvent.setup();
+    listConversations.mockResolvedValue([CONVERSATION]);
+    sendMessage.mockRejectedValue(new Error("offline"));
+
+    renderAssistant(true);
+    const composer = await screen.findByRole("textbox", { name: "Message" });
+    await user.type(composer, "keep this draft");
+    await user.keyboard("{Enter}");
+
+    await waitFor(() => {
+      expect(sendMessage).toHaveBeenCalled();
+    });
+    expect(composer).toHaveValue("keep this draft");
+    expect(screen.queryByText("You")).toBeNull();
   });
 });

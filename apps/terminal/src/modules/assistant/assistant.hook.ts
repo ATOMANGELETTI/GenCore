@@ -36,7 +36,9 @@ export function useAssistant(): AssistantApi {
   const [conversations, setConversations] = React.useState<Conversation[]>([]);
   const [conversationId, setConversationId] = React.useState<string | null>(null);
   const [messages, setMessages] = React.useState<AssistantMessage[]>([]);
-  const [pending, setPending] = React.useState<AssistantToolCall[]>([]);
+  const [pendingByConversation, setPendingByConversation] = React.useState<
+    Record<string, AssistantToolCall[]>
+  >({});
   const [streaming, setStreaming] = React.useState(false);
   const [streamText, setStreamText] = React.useState("");
   const [composer, setComposer] = React.useState("");
@@ -100,12 +102,15 @@ export function useAssistant(): AssistantApi {
       .catch(() => undefined);
 
     void subscribeAssistantTurn((payload) => {
+      setPendingByConversation((current) => ({
+        ...current,
+        [payload.conversation_id]: payload.pending.filter((call) => call.status === "pending"),
+      }));
       if (payload.conversation_id !== conversationIdRef.current) {
         return;
       }
       setStreaming(false);
       setStreamText("");
-      setPending(payload.pending.filter((call) => call.status === "pending"));
       void listMessages(payload.conversation_id)
         .then(setMessages)
         .catch(() => undefined);
@@ -146,10 +151,24 @@ export function useAssistant(): AssistantApi {
         setConversationId(created.id);
         setConversations((current) => [created, ...current.filter((row) => row.id !== created.id)]);
       }
-      setComposer("");
       setStreaming(true);
       setStreamText("");
-      await sendMessage(id, text, STUB_ASSISTANT_SNAPSHOT);
+      const result = await sendMessage(id, text, STUB_ASSISTANT_SNAPSHOT);
+      if (!result.accepted) {
+        setStreaming(false);
+        return;
+      }
+      setComposer("");
+      setMessages((current) => [
+        ...current,
+        {
+          id: `local-user-${Date.now()}`,
+          conversation_id: id,
+          role: "user",
+          content: text,
+          created_at: Date.now(),
+        },
+      ]);
     } catch {
       setStreaming(false);
     }
@@ -161,7 +180,10 @@ export function useAssistant(): AssistantApi {
       setConversationId(created.id);
       setConversations((current) => [created, ...current.filter((row) => row.id !== created.id)]);
       setMessages([]);
-      setPending([]);
+      setPendingByConversation((current) => ({
+        ...current,
+        [created.id]: [],
+      }));
       setStreamText("");
       setStreaming(false);
     } catch {
@@ -171,7 +193,6 @@ export function useAssistant(): AssistantApi {
 
   const selectConversation = React.useCallback((id: string) => {
     setConversationId(id);
-    setPending([]);
     setStreamText("");
     setStreaming(false);
   }, []);
@@ -196,7 +217,7 @@ export function useAssistant(): AssistantApi {
     conversations,
     conversationId,
     messages,
-    pending,
+    pending: conversationId ? (pendingByConversation[conversationId] ?? []) : [],
     streaming,
     streamText,
     composer,
