@@ -24,6 +24,14 @@ pub enum AssistantError {
     /// The pty session exists but the write itself failed.
     #[error("pty write failed: {0}")]
     Pty(String),
+    /// No usable Gemini API key is stored (missing, or the DPAPI blob no
+    /// longer unprotects for this user) — `send_turn` cannot call Gemini.
+    #[error("no Gemini API key configured")]
+    NoApiKey,
+    /// The Gemini transport call itself failed (network, non-2xx, or a
+    /// stream Gemini's API would never emit).
+    #[error("Gemini request failed: {0}")]
+    Gemini(String),
     /// The underlying store operation failed.
     #[error(transparent)]
     Store(#[from] StoreError),

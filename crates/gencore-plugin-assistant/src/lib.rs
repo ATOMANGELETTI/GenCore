@@ -2,11 +2,13 @@
 
 mod modules;
 
-pub use modules::agent::{ConfirmOutcome, confirm_tool, reject_tool};
+pub use modules::agent::{
+    ConfirmOutcome, TurnResult, confirm_tool, reject_tool, resume_turn, send_turn,
+};
 pub use modules::error::AssistantError;
 pub use modules::gemini::{
-    GeminiContent, GeminiError, GeminiEvent, GeminiPart, GeminiRequest, function_declarations,
-    parse_sse_data,
+    GeminiContent, GeminiError, GeminiEvent, GeminiPart, GeminiRequest, GeminiTransport,
+    ScriptedTransport, function_declarations, parse_sse_data,
 };
 #[cfg(windows)]
 pub use modules::secrets::DpapiProtector;

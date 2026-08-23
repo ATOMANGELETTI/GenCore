@@ -189,6 +189,27 @@ impl AssistantStore {
         rows.collect::<Result<Vec<_>, _>>().map_err(Into::into)
     }
 
+    pub fn get_conversation(&self, id: &str) -> Result<Option<Conversation>, StoreError> {
+        self.conn
+            .query_row(
+                "SELECT id, title, created_at, updated_at FROM conversations WHERE id = ?1",
+                [id],
+                Conversation::from_row,
+            )
+            .optional()
+            .map_err(Into::into)
+    }
+
+    pub fn set_conversation_title(&self, id: &str, title: &str) -> Result<(), StoreError> {
+        self.require_conversation(id)?;
+        let now = unix_now();
+        self.conn.execute(
+            "UPDATE conversations SET title = ?1, updated_at = ?2 WHERE id = ?3",
+            params![title, now, id],
+        )?;
+        Ok(())
+    }
+
     pub fn delete_conversation(&self, id: &str) -> Result<(), StoreError> {
         self.require_conversation(id)?;
         let tx = self.conn.unchecked_transaction()?;
@@ -347,6 +368,15 @@ impl AssistantStore {
 
     pub fn get_fact(&self, key: &str) -> Result<Option<String>, StoreError> {
         self.get_kv("app_facts", key)
+    }
+
+    /// All seeded/learned facts, ordered by key, for the turn loop's system prompt.
+    pub fn list_facts(&self) -> Result<Vec<(String, String)>, StoreError> {
+        let mut stmt = self
+            .conn
+            .prepare("SELECT key, value FROM app_facts ORDER BY key ASC")?;
+        let rows = stmt.query_map([], |row| Ok((row.get(0)?, row.get(1)?)))?;
+        rows.collect::<Result<Vec<_>, _>>().map_err(Into::into)
     }
 
     pub fn set_fact(&self, key: &str, value: &str) -> Result<(), StoreError> {
