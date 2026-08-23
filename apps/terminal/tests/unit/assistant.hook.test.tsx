@@ -448,4 +448,38 @@ describe("useAssistant", () => {
     expect(screen.getByLabelText("composer")).toHaveValue("draft for c2");
     expect(screen.getByTestId("messages")).toBeEmptyDOMElement();
   });
+
+  it("does not leave chat A's transcript on screen after History-selecting chat B, even when B's fetch fails", async () => {
+    const user = userEvent.setup();
+    listConversations.mockResolvedValue([CONVERSATION, OTHER_CONVERSATION]);
+    listMessages.mockImplementation((id: string) =>
+      id === "c2" ? Promise.reject(new Error("network down")) : Promise.resolve([]),
+    );
+
+    renderHookProbe(true);
+    await waitFor(() => {
+      expect(screen.getByTestId("conversation-id")).toHaveTextContent("c1");
+    });
+
+    await user.type(screen.getByLabelText("composer"), "hello from c1");
+    await user.click(screen.getByText("send"));
+    await waitFor(() => {
+      const userTurn = screen.getByTestId("messages").querySelector("[data-role='user']");
+      expect(userTurn).toHaveTextContent("hello from c1");
+    });
+
+    await user.click(screen.getByText("select-c2"));
+    await waitFor(() => {
+      expect(screen.getByTestId("conversation-id")).toHaveTextContent("c2");
+    });
+    await waitFor(() => {
+      expect(listMessages).toHaveBeenCalledWith("c2");
+    });
+    // Let the rejected listMessages("c2") settle; its .catch must not leave
+    // chat A's rows on screen under chat B's id.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(screen.getByTestId("messages").querySelector("[data-role='user']")).toBeNull();
+    expect(screen.getByTestId("messages")).toBeEmptyDOMElement();
+  });
 });

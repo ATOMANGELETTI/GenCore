@@ -35,7 +35,9 @@ export function useAssistant(): AssistantApi {
   const { hasApiKey } = useAgentSettings();
   const [conversations, setConversations] = React.useState<Conversation[]>([]);
   const [conversationId, setConversationId] = React.useState<string | null>(null);
-  const [messages, setMessages] = React.useState<AssistantMessage[]>([]);
+  const [messagesByConversation, setMessagesByConversation] = React.useState<
+    Record<string, AssistantMessage[]>
+  >({});
   const [pendingByConversation, setPendingByConversation] = React.useState<
     Record<string, AssistantToolCall[]>
   >({});
@@ -51,25 +53,28 @@ export function useAssistant(): AssistantApi {
 
   // A fetched message list only ever lands if its conversation is still active,
   // and any optimistic `local-user-*` row for that conversation survives unless
-  // the fetch already carries the persisted copy (matched by content).
+  // the fetch already carries the persisted copy (matched by content). Storing
+  // the ledger keyed by conversation id (like pending/streaming) means a
+  // History switch can never paint one chat's turns under another chat's id,
+  // and a failed fetch for the newly selected id just leaves it unset instead
+  // of falling back to whatever was previously on screen.
   const applyFetchedMessages = React.useCallback(
     (requestedId: string, list: readonly AssistantMessage[]) => {
       if (conversationIdRef.current !== requestedId) {
         return;
       }
-      setMessages((current) => {
-        const localRows = current.filter(
-          (message) =>
-            message.conversation_id === requestedId && message.id.startsWith("local-user-"),
+      setMessagesByConversation((current) => {
+        const localRows = (current[requestedId] ?? []).filter((message) =>
+          message.id.startsWith("local-user-"),
         );
         if (localRows.length === 0) {
-          return [...list];
+          return { ...current, [requestedId]: [...list] };
         }
         const fetchedUserContent = new Set(
           list.filter((message) => message.role === "user").map((message) => message.content),
         );
         const survivingLocal = localRows.filter((row) => !fetchedUserContent.has(row.content));
-        return [...list, ...survivingLocal];
+        return { ...current, [requestedId]: [...list, ...survivingLocal] };
       });
     },
     [],
@@ -97,7 +102,6 @@ export function useAssistant(): AssistantApi {
 
   React.useEffect(() => {
     if (!conversationId) {
-      setMessages([]);
       return;
     }
     let cancelled = false;
@@ -204,16 +208,19 @@ export function useAssistant(): AssistantApi {
         return;
       }
       setComposer("");
-      setMessages((current) => [
+      setMessagesByConversation((current) => ({
         ...current,
-        {
-          id: `local-user-${Date.now()}`,
-          conversation_id: sendingId,
-          role: "user",
-          content: text,
-          created_at: Date.now(),
-        },
-      ]);
+        [sendingId]: [
+          ...(current[sendingId] ?? []),
+          {
+            id: `local-user-${Date.now()}`,
+            conversation_id: sendingId,
+            role: "user",
+            content: text,
+            created_at: Date.now(),
+          },
+        ],
+      }));
     } catch {
       if (id) {
         const failedId = id;
@@ -228,7 +235,7 @@ export function useAssistant(): AssistantApi {
       conversationIdRef.current = created.id;
       setConversationId(created.id);
       setConversations((current) => [created, ...current.filter((row) => row.id !== created.id)]);
-      setMessages([]);
+      setMessagesByConversation((current) => ({ ...current, [created.id]: [] }));
       setPendingByConversation((current) => ({
         ...current,
         [created.id]: [],
@@ -264,7 +271,7 @@ export function useAssistant(): AssistantApi {
   return {
     conversations,
     conversationId,
-    messages,
+    messages: conversationId ? (messagesByConversation[conversationId] ?? []) : [],
     pending: conversationId ? (pendingByConversation[conversationId] ?? []) : [],
     streaming: conversationId ? (streamingByConversation[conversationId] ?? false) : false,
     streamText: conversationId ? (streamTextByConversation[conversationId] ?? "") : "",
