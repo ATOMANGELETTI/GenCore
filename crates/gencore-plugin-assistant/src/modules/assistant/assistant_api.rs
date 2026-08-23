@@ -3,11 +3,15 @@
 //!
 //! Every command opens a fresh [`AssistantStore`] connection inside
 //! `tauri::async_runtime::spawn_blocking` — SQLite I/O never runs on an
-//! async runtime worker thread. `send_message` additionally hands the
-//! Gemini turn off to a detached background task so the command itself
-//! returns as soon as that task is spawned; the network call and the
+//! async runtime worker thread. `send_message`, `confirm_action`, and
+//! `reject_action` additionally hand the Gemini turn off to a detached
+//! background task so the command itself returns as soon as the gate
+//! (persist, or confirm/reject) succeeds; the network call and the
 //! resulting `gencore-assistant://token` / `://turn` / `://error` events
-//! happen after the command has already resolved.
+//! happen after the command has already resolved. That background task
+//! never holds the command's own store connection: it opens its own via
+//! [`prepare_turn`] / [`prepare_resume`] + [`finish_turn`], dropping the
+//! connection for the (up to 120s) HTTP call in between (Important 5).
 
 use std::collections::HashSet;
 use std::sync::{Arc, LazyLock, Mutex};
@@ -18,9 +22,11 @@ use tauri::{AppHandle, Emitter, Runtime, State};
 
 use gencore_pty::SessionMap;
 
-use crate::modules::agent::{ConfirmOutcome, confirm_tool, continue_turn, reject_tool};
+use crate::modules::agent::{
+    ConfirmOutcome, confirm_tool, finish_turn, prepare_resume, prepare_turn, reject_tool,
+};
 use crate::modules::error::AssistantError;
-use crate::modules::gemini::ReqwestTransport;
+use crate::modules::gemini::{GeminiEvent, GeminiTransport, ReqwestTransport};
 #[cfg(windows)]
 use crate::modules::secrets::DpapiProtector;
 #[cfg(not(windows))]
@@ -129,6 +135,16 @@ pub struct SendMessageResult {
     pub accepted: bool,
 }
 
+/// Result of [`list_messages`]: every persisted message, plus any tool
+/// calls still awaiting confirm/reject — the same shape a `turn` event
+/// carries, so a conversation reloaded from SQLite (e.g. after an app
+/// restart) hydrates its Approve/Reject ledger without a 13th command.
+#[derive(Debug, Clone, Serialize)]
+pub struct ListMessagesResult {
+    pub messages: Vec<Message>,
+    pub pending: Vec<ToolCall>,
+}
+
 /// Payload for [`ASSISTANT_TOKEN_EVENT`].
 #[derive(Debug, Clone, Serialize)]
 pub struct AssistantTokenPayload {
@@ -144,11 +160,15 @@ pub struct AssistantTurnPayload {
     pub pending: Vec<ToolCall>,
 }
 
-/// Payload for [`ASSISTANT_ERROR_EVENT`].
+/// Payload for [`ASSISTANT_ERROR_EVENT`]. `code` is the failing
+/// [`AssistantError::code`] variant name (`NoApiKey`, `Gemini`,
+/// `PtySessionGone`, …); `message` is `err.to_string()`. Neither field ever
+/// carries key material.
 #[derive(Debug, Clone, Serialize)]
 pub struct AssistantErrorPayload {
     pub conversation_id: String,
-    pub error: String,
+    pub code: String,
+    pub message: String,
 }
 
 /// Payload for [`ASSISTANT_UI_ACTION_EVENT`].
@@ -161,10 +181,11 @@ pub struct AssistantUiActionPayload {
 
 /// Conversation ids with a `cancel_turn` call pending consumption.
 ///
-/// Best-effort only: nothing here can abort an in-flight blocking HTTP call
-/// or roll back what `send_turn` already persisted. Setting the flag only
-/// suppresses the `token` / `turn` / `error` events the background task
-/// would otherwise emit once that call returns.
+/// Set by `cancel_turn`. Polled (without clearing) by the transport's
+/// `is_cancelled` hook while a stream is being read, and consumed once (via
+/// [`take_cancelled`]) after `generate` returns, to suppress the `token` /
+/// `turn` / `error` events a background task would otherwise emit for a
+/// turn that was in fact cancelled.
 static CANCELLED_TURNS: LazyLock<Mutex<HashSet<String>>> =
     LazyLock::new(|| Mutex::new(HashSet::new()));
 
@@ -172,6 +193,16 @@ fn mark_cancelled(conversation_id: &str) {
     if let Ok(mut cancelled) = CANCELLED_TURNS.lock() {
         cancelled.insert(conversation_id.to_string());
     }
+}
+
+/// Non-consuming check used as the transport's `is_cancelled` hook — called
+/// repeatedly while a stream is being read, so it must not clear the flag
+/// (that happens once, afterwards, via [`take_cancelled`]).
+fn is_turn_cancelled(conversation_id: &str) -> bool {
+    CANCELLED_TURNS
+        .lock()
+        .map(|cancelled| cancelled.contains(conversation_id))
+        .unwrap_or(false)
 }
 
 /// Consumes a pending cancellation flag for `conversation_id`, if any.
@@ -245,6 +276,115 @@ where
         .map_err(|err| AssistantError::TaskJoin(err.to_string()))?
 }
 
+/// Runs one Gemini turn to completion: opens a store, calls `prepare` for
+/// the next [`crate::modules::gemini::GeminiRequest`], drops that store
+/// connection, calls the real [`ReqwestTransport`] with no store reference
+/// held (Important 5), then reopens a store for [`finish_turn`].
+///
+/// `prepare` returns the owning conversation id alongside the request — for
+/// `send_message` that is always `conversation_id` unchanged; for
+/// `confirm_action` / `reject_action` it is looked up from the tool call
+/// being resumed. `on_event`/`is_cancelled` stream `://token` events and
+/// poll [`is_turn_cancelled`] while the SSE body is read.
+fn run_gemini_turn<R, P>(
+    app: &AppHandle<R>,
+    prepare: P,
+) -> Result<crate::modules::agent::TurnResult, AssistantError>
+where
+    R: Runtime,
+    P: FnOnce(
+            &AssistantStore,
+            &dyn SecretProtector,
+        ) -> Result<(String, crate::modules::gemini::GeminiRequest), AssistantError>
+        + Send
+        + 'static,
+{
+    let store = open_store()?;
+    let secret_protector = protector();
+    let api_key = load_api_key(&store)?;
+    let (conversation_id, request) = prepare(&store, &secret_protector)?;
+    drop(store);
+
+    let app_for_events = app.clone();
+    let conversation_id_for_events = conversation_id.clone();
+    let on_event = move |event: &GeminiEvent| {
+        if let GeminiEvent::Text(text) = event {
+            let _ = app_for_events.emit(
+                ASSISTANT_TOKEN_EVENT,
+                AssistantTokenPayload {
+                    conversation_id: conversation_id_for_events.clone(),
+                    text: text.clone(),
+                },
+            );
+        }
+    };
+    let conversation_id_for_cancel = conversation_id.clone();
+    let is_cancelled = move || is_turn_cancelled(&conversation_id_for_cancel);
+    let transport = ReqwestTransport {
+        api_key,
+        on_event: &on_event,
+        is_cancelled: &is_cancelled,
+    };
+
+    let events = transport.generate(request).map_err(map_gemini_error)?;
+
+    let store = open_store()?;
+    finish_turn(&store, &conversation_id, events)
+}
+
+fn map_gemini_error(err: crate::modules::gemini::GeminiError) -> AssistantError {
+    match err {
+        crate::modules::gemini::GeminiError::Cancelled => AssistantError::Cancelled,
+        other => AssistantError::Gemini(other.to_string()),
+    }
+}
+
+/// Emits `token` + `turn` on success, or `error` on failure — unless
+/// `conversation_id` was cancelled (cooperative flag, or `turn` itself
+/// resolved to [`AssistantError::Cancelled`]), in which case nothing is
+/// emitted at all. Shared tail of every background turn task
+/// (`send_message`, `confirm_action`, `reject_action`).
+fn emit_turn_result<R: Runtime>(
+    app: &AppHandle<R>,
+    conversation_id: &str,
+    turn: Result<crate::modules::agent::TurnResult, AssistantError>,
+) {
+    let was_cancelled = take_cancelled(conversation_id);
+    if was_cancelled || matches!(turn, Err(AssistantError::Cancelled)) {
+        return;
+    }
+
+    match turn {
+        Ok(turn) => {
+            let _ = app.emit(
+                ASSISTANT_TOKEN_EVENT,
+                AssistantTokenPayload {
+                    conversation_id: conversation_id.to_string(),
+                    text: turn.assistant_text.clone(),
+                },
+            );
+            let _ = app.emit(
+                ASSISTANT_TURN_EVENT,
+                AssistantTurnPayload {
+                    conversation_id: conversation_id.to_string(),
+                    assistant_text: turn.assistant_text,
+                    pending: turn.pending,
+                },
+            );
+        }
+        Err(err) => {
+            let _ = app.emit(
+                ASSISTANT_ERROR_EVENT,
+                AssistantErrorPayload {
+                    conversation_id: conversation_id.to_string(),
+                    code: err.code().to_string(),
+                    message: err.to_string(),
+                },
+            );
+        }
+    }
+}
+
 impl SnapshotArgs {
     /// Converts the IPC snapshot shape into the store's row shape, JSON-encoding
     /// `tabs` and `files_selection` exactly as read back by the agent turn loop.
@@ -310,11 +450,18 @@ pub async fn delete_conversation(conversation_id: String) -> Result<(), Assistan
     run_blocking(move || Ok(open_store()?.delete_conversation(&args.conversation_id)?)).await
 }
 
-/// Lists every message in a conversation, oldest first.
+/// Lists every message in a conversation, oldest first, plus any tool calls
+/// still `pending` — see [`ListMessagesResult`].
 #[tauri::command(rename_all = "snake_case")]
-pub async fn list_messages(conversation_id: String) -> Result<Vec<Message>, AssistantError> {
+pub async fn list_messages(conversation_id: String) -> Result<ListMessagesResult, AssistantError> {
     let args = ConversationIdArgs { conversation_id };
-    run_blocking(move || Ok(open_store()?.list_messages(&args.conversation_id)?)).await
+    run_blocking(move || {
+        let store = open_store()?;
+        let messages = store.list_messages(&args.conversation_id)?;
+        let pending = store.list_pending_tool_calls(&args.conversation_id)?;
+        Ok(ListMessagesResult { messages, pending })
+    })
+    .await
 }
 
 /// Persists the user's message and snapshot, then hands the Gemini turn to
@@ -324,11 +471,11 @@ pub async fn list_messages(conversation_id: String) -> Result<Vec<Message>, Assi
 /// Persist happens synchronously, on the blocking pool, *before* this
 /// command returns — an unknown `conversation_id` or a store error fails
 /// the command itself (`Err`), never a later-only event. The background
-/// task then calls [`continue_turn`], which checks the API key, rewrites
-/// the title, and calls Gemini; it never re-inserts the message/snapshot
-/// this command already persisted. It emits `token` / `turn` / `error` —
-/// unless `cancel_turn` marked this conversation cancelled first, per
-/// [`take_cancelled`].
+/// task then calls [`run_gemini_turn`] with [`prepare_turn`], which checks
+/// the API key, rewrites the title, and calls Gemini; it never re-inserts
+/// the message/snapshot this command already persisted. It emits
+/// `token` / `turn` / `error` via [`emit_turn_result`] — unless
+/// `cancel_turn` marked this conversation cancelled first.
 #[tauri::command(rename_all = "snake_case")]
 pub async fn send_message<R: Runtime>(
     app: AppHandle<R>,
@@ -349,63 +496,29 @@ pub async fn send_message<R: Runtime>(
     let text_for_persist = text.clone();
     run_blocking(move || {
         let store = open_store()?;
-        store.insert_message(&conversation_id_for_persist, "user", &text_for_persist)?;
-        let mut snapshot = store_snapshot;
-        snapshot.conversation_id = conversation_id_for_persist;
-        store.insert_snapshot(&snapshot)?;
+        store.insert_user_turn(
+            &conversation_id_for_persist,
+            &text_for_persist,
+            store_snapshot,
+        )?;
         Ok(())
     })
     .await?;
 
     tauri::async_runtime::spawn(async move {
-        let conversation_id_for_turn = conversation_id.clone();
-        let turn = run_blocking(move || {
-            let store = open_store()?;
-            let api_key = load_api_key(&store)?;
-            let transport = ReqwestTransport { api_key };
-            let protector = protector();
-            continue_turn(
-                &store,
-                &transport,
-                &protector,
-                &conversation_id_for_turn,
-                &text,
-            )
+        let turn = run_blocking({
+            let app = app.clone();
+            let conversation_id = conversation_id.clone();
+            move || {
+                run_gemini_turn(&app, move |store, protector| {
+                    let request = prepare_turn(store, protector, &conversation_id, &text)?;
+                    Ok((conversation_id.clone(), request))
+                })
+            }
         })
         .await;
 
-        if take_cancelled(&conversation_id) {
-            return;
-        }
-
-        match turn {
-            Ok(turn) => {
-                let _ = app.emit(
-                    ASSISTANT_TOKEN_EVENT,
-                    AssistantTokenPayload {
-                        conversation_id: conversation_id.clone(),
-                        text: turn.assistant_text.clone(),
-                    },
-                );
-                let _ = app.emit(
-                    ASSISTANT_TURN_EVENT,
-                    AssistantTurnPayload {
-                        conversation_id,
-                        assistant_text: turn.assistant_text,
-                        pending: turn.pending,
-                    },
-                );
-            }
-            Err(err) => {
-                let _ = app.emit(
-                    ASSISTANT_ERROR_EVENT,
-                    AssistantErrorPayload {
-                        conversation_id,
-                        error: err.to_string(),
-                    },
-                );
-            }
-        }
+        emit_turn_result(&app, &conversation_id, turn);
     });
 
     Ok(SendMessageResult { accepted: true })
@@ -418,8 +531,15 @@ pub async fn cancel_turn(conversation_id: String) -> Result<(), AssistantError> 
     Ok(())
 }
 
-/// Approves a pending tool call. Emits `ui-action` when the resolved tool
-/// was a UI-only action (`switch_tab` / `reveal_in_files`).
+/// Approves a pending tool call, runs it, then (once the gate itself
+/// succeeds) resumes the Gemini turn in a detached background task —
+/// mirroring [`send_message`]'s split so the command returns without
+/// waiting on the Gemini round trip. Emits `ui-action` when the resolved
+/// tool was a UI-only action (`switch_tab` / `reveal_in_files`), always
+/// *before* the resume task is spawned.
+///
+/// A failed gate (not pending, `PtySessionGone`, …) fails the command
+/// itself and never spawns a resume task.
 #[tauri::command]
 pub async fn confirm_action<R: Runtime>(
     app: AppHandle<R>,
@@ -429,28 +549,79 @@ pub async fn confirm_action<R: Runtime>(
     let pty_sessions = Arc::clone(pty_sessions.inner());
     let args = ActionIdArgs { id };
     let action_id = args.id.clone();
-    let outcome =
-        run_blocking(move || confirm_tool(&open_store()?, &args.id, Some(&pty_sessions))).await?;
+    let (outcome, conversation_id) = run_blocking(move || {
+        let store = open_store()?;
+        let conversation_id = store
+            .get_tool_call(&args.id)?
+            .ok_or(AssistantError::ActionNotPending)?
+            .conversation_id;
+        let outcome = confirm_tool(&store, &args.id, Some(&pty_sessions))?;
+        Ok((outcome, conversation_id))
+    })
+    .await?;
 
     if let Some(ui_action) = &outcome.ui_action {
         let _ = app.emit(
             ASSISTANT_UI_ACTION_EVENT,
             AssistantUiActionPayload {
-                id: action_id,
+                id: action_id.clone(),
                 name: ui_action.name.clone(),
                 args: ui_action.args.clone(),
             },
         );
     }
 
+    spawn_resume_turn(app, conversation_id, action_id);
+
     Ok(outcome)
 }
 
-/// Rejects a pending tool call. Never touches the pty or emits an event.
+/// Rejects a pending tool call, then (once the gate succeeds) resumes the
+/// Gemini turn in a detached background task, exactly like
+/// [`confirm_action`]. Never touches the pty or emits a `ui-action` event.
 #[tauri::command]
-pub async fn reject_action(id: String) -> Result<(), AssistantError> {
+pub async fn reject_action<R: Runtime>(
+    app: AppHandle<R>,
+    id: String,
+) -> Result<(), AssistantError> {
     let args = ActionIdArgs { id };
-    run_blocking(move || reject_tool(&open_store()?, &args.id)).await
+    let action_id = args.id.clone();
+    let conversation_id = run_blocking(move || {
+        let store = open_store()?;
+        let conversation_id = store
+            .get_tool_call(&args.id)?
+            .ok_or(AssistantError::ActionNotPending)?
+            .conversation_id;
+        reject_tool(&store, &args.id)?;
+        Ok(conversation_id)
+    })
+    .await?;
+
+    spawn_resume_turn(app, conversation_id, action_id);
+
+    Ok(())
+}
+
+/// Spawns the background task that resumes Gemini after a tool call was
+/// just confirmed or rejected — mirrors [`send_message`]'s spawn, using
+/// [`prepare_resume`] instead of [`prepare_turn`]. `conversation_id` is
+/// already known from the gate that just ran, so a `NoApiKey` (or any
+/// other) failure inside the task can still be attributed to the right
+/// conversation and reach the ledger via [`emit_turn_result`].
+fn spawn_resume_turn<R: Runtime>(app: AppHandle<R>, conversation_id: String, tool_call_id: String) {
+    tauri::async_runtime::spawn(async move {
+        let turn = run_blocking({
+            let app = app.clone();
+            move || {
+                run_gemini_turn(&app, move |store, protector| {
+                    prepare_resume(store, protector, &tool_call_id)
+                })
+            }
+        })
+        .await;
+
+        emit_turn_result(&app, &conversation_id, turn);
+    });
 }
 
 /// Returns the current model, context-line budget, and whether a key is stored.

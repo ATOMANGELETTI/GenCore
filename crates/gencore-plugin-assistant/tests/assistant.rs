@@ -12,8 +12,8 @@ use std::path::PathBuf;
 
 use gencore_assistant::{
     ASSISTANT_ERROR_EVENT, ASSISTANT_TOKEN_EVENT, ASSISTANT_TURN_EVENT, ASSISTANT_UI_ACTION_EVENT,
-    ActionIdArgs, ConversationIdArgs, FilesSelectionArgs, SendMessageArgs, SetAgentSettingsArgs,
-    SetApiKeyArgs, SnapshotTabArgs,
+    ActionIdArgs, AssistantErrorPayload, ConversationIdArgs, FilesSelectionArgs,
+    ListMessagesResult, SendMessageArgs, SetAgentSettingsArgs, SetApiKeyArgs, SnapshotTabArgs,
 };
 
 fn valid_snapshot_json() -> serde_json::Value {
@@ -206,11 +206,12 @@ fn multi_word_param_commands_use_snake_case_rename() {
     }
 }
 
-/// `send_message` must persist the user message before spawning the Gemini
-/// turn and returning `{ accepted: true }` — a persist failure (unknown
+/// `send_message` must persist the user message (and snapshot, in one
+/// transaction — Important 6) before spawning the Gemini turn and
+/// returning `{ accepted: true }` — a persist failure (unknown
 /// conversation, store error) has to fail the command itself, not surface
 /// later as a `token`/`turn`/`error` event after `accepted: true` already
-/// went out. Source-locks the ordering: `insert_message` appears before
+/// went out. Source-locks the ordering: `insert_user_turn` appears before
 /// both `tauri::async_runtime::spawn` and the final `Ok(SendMessageResult`.
 #[test]
 fn send_message_persists_before_spawning_the_turn_and_returning_accepted() {
@@ -220,8 +221,8 @@ fn send_message_persists_before_spawning_the_turn_and_returning_accepted() {
         .expect("missing `send_message`");
     let body = &source[fn_start..];
     let insert_at = body
-        .find("insert_message")
-        .expect("send_message must call insert_message directly, before spawning the turn");
+        .find("insert_user_turn")
+        .expect("send_message must call insert_user_turn directly, before spawning the turn");
     let spawn_at = body
         .find("tauri::async_runtime::spawn")
         .expect("send_message must spawn the Gemini turn in the background");
@@ -240,10 +241,11 @@ fn send_message_persists_before_spawning_the_turn_and_returning_accepted() {
 
 /// The spawned background turn must not persist the user message a second
 /// time — that job belongs to `send_message`'s synchronous persist step.
-/// `continue_turn` (not `send_turn`, which would re-insert) is what the
-/// spawned closure calls.
+/// `prepare_turn` (not `send_turn`, which would re-insert, and not a second
+/// `insert_user_turn`/`insert_message` call) is what the spawned closure
+/// calls to build the next request (Important 5's split-lifetime turn).
 #[test]
-fn send_message_spawned_turn_calls_continue_turn_not_send_turn() {
+fn send_message_spawned_turn_calls_prepare_turn_not_send_turn() {
     let source = read_src("src/modules/assistant/assistant_api.rs");
     let fn_start = source
         .find("pub async fn send_message")
@@ -254,12 +256,108 @@ fn send_message_spawned_turn_calls_continue_turn_not_send_turn() {
         .expect("send_message must spawn the Gemini turn in the background");
     let after_spawn = &body[spawn_at..];
     assert!(
-        after_spawn.contains("continue_turn("),
-        "the spawned turn must call continue_turn, which does not re-persist"
+        after_spawn.contains("prepare_turn("),
+        "the spawned turn must call prepare_turn, which does not re-persist"
     );
     assert!(
         !after_spawn.contains("send_turn("),
         "the spawned turn must not call send_turn, which would insert the user message twice"
+    );
+}
+
+/// Important 2: `list_messages` must return both `messages` and `pending`
+/// (no new IPC command — the JS side hydrates the Approve/Reject ledger
+/// from this one shape) instead of a bare `Vec<Message>`.
+#[test]
+fn list_messages_result_serializes_messages_and_pending_fields() {
+    let result = ListMessagesResult {
+        messages: vec![],
+        pending: vec![],
+    };
+    let json = serde_json::to_value(&result).unwrap();
+    assert!(json.get("messages").is_some());
+    assert!(json.get("pending").is_some());
+}
+
+/// Important 3: the error event payload is `{ conversation_id, code,
+/// message }` — `code` is the typed variant name so the WebView can branch
+/// without parsing `message`, which never carries key material.
+#[test]
+fn assistant_error_payload_has_conversation_id_code_and_message_fields() {
+    let payload = AssistantErrorPayload {
+        conversation_id: "c1".to_string(),
+        code: "NoApiKey".to_string(),
+        message: "no Gemini API key configured".to_string(),
+    };
+    let json = serde_json::to_value(&payload).unwrap();
+    assert_eq!(json["conversation_id"], "c1");
+    assert_eq!(json["code"], "NoApiKey");
+    assert_eq!(json["message"], "no Gemini API key configured");
+    assert!(
+        json.get("error").is_none(),
+        "the old flat `error` field must be gone"
+    );
+}
+
+/// Critical 1: after the confirm gate succeeds, `confirm_action` must spawn
+/// a background task that resumes Gemini via `prepare_resume` — mirroring
+/// `send_message`'s split. Source-locks that the resume spawn is reachable
+/// only after `confirm_tool` succeeded (i.e. after the `?`/`.await?` on its
+/// result), never unconditionally.
+#[test]
+fn confirm_action_spawns_resume_after_confirm_tool_succeeds() {
+    let source = read_src("src/modules/assistant/assistant_api.rs");
+    let fn_start = source
+        .find("pub async fn confirm_action")
+        .expect("missing `confirm_action`");
+    let next_fn = source[fn_start..]
+        .find("\npub async fn reject_action")
+        .map(|offset| fn_start + offset)
+        .unwrap_or(source.len());
+    let body = &source[fn_start..next_fn];
+    assert!(
+        body.contains("confirm_tool"),
+        "confirm_action must still call confirm_tool to run the gate"
+    );
+    assert!(
+        body.contains("spawn_resume_turn"),
+        "confirm_action must spawn a resume task after the gate succeeds"
+    );
+    let confirm_at = body.find("confirm_tool").unwrap();
+    let spawn_at = body
+        .find("spawn_resume_turn")
+        .expect("confirm_action must call spawn_resume_turn");
+    assert!(
+        confirm_at < spawn_at,
+        "the resume spawn must come after confirm_tool, not before"
+    );
+}
+
+/// Critical 1: same wiring for `reject_action` — it must never write the
+/// pty (already covered by `agent::reject_never_writes_pty`), but it must
+/// still resume Gemini once the reject gate succeeds.
+#[test]
+fn reject_action_spawns_resume_after_reject_tool_succeeds() {
+    let source = read_src("src/modules/assistant/assistant_api.rs");
+    let fn_start = source
+        .find("pub async fn reject_action")
+        .expect("missing `reject_action`");
+    let body = &source[fn_start..];
+    assert!(
+        body.contains("reject_tool"),
+        "reject_action must still call reject_tool to run the gate"
+    );
+    assert!(
+        body.contains("spawn_resume_turn"),
+        "reject_action must spawn a resume task after the gate succeeds"
+    );
+    let reject_at = body.find("reject_tool").unwrap();
+    let spawn_at = body
+        .find("spawn_resume_turn")
+        .expect("reject_action must call spawn_resume_turn");
+    assert!(
+        reject_at < spawn_at,
+        "the resume spawn must come after reject_tool, not before"
     );
 }
 

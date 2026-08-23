@@ -4,9 +4,10 @@ use std::sync::{Arc, Mutex};
 use gencore_assistant::{
     AssistantError, AssistantStore, GeminiError, GeminiEvent, GeminiRequest, GeminiTransport,
     IdentityProtector, ScriptedTransport, SecretProtector, Snapshot, confirm_tool, continue_turn,
-    reject_tool, resume_turn, seed_app_facts, send_turn,
+    finish_turn, prepare_resume, prepare_turn, reject_tool, resume_turn, seed_app_facts, send_turn,
 };
 use gencore_pty::SessionMap;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 fn empty_snapshot() -> Snapshot {
     Snapshot::for_conversation("")
@@ -387,6 +388,7 @@ fn resume_turn_persists_tool_result_and_calls_transport_again() {
         &ScriptedTransport {
             events: vec![GeminiEvent::Text("Okay, skipping that.".into())],
         },
+        &IdentityProtector,
         &pending_id,
     )
     .unwrap();
@@ -411,6 +413,289 @@ fn resume_turn_on_still_pending_call_is_invalid_args() {
         .insert_tool_call(&conv.id, None, "pty_write", r#"{"data":"whoami"}"#)
         .unwrap();
 
-    let err = resume_turn(&store, &ScriptedTransport { events: vec![] }, &id).unwrap_err();
+    let err = resume_turn(
+        &store,
+        &ScriptedTransport { events: vec![] },
+        &IdentityProtector,
+        &id,
+    )
+    .unwrap_err();
     assert!(matches!(err, AssistantError::InvalidArgs));
+}
+
+/// Important 8.1: `resume_turn` must check the API key *before* touching the
+/// transport — a stale/missing key must never spend a network round trip.
+#[test]
+fn resume_turn_without_api_key_is_no_api_key_and_never_calls_transport() {
+    let dir = tempfile::tempdir().unwrap();
+    let store = AssistantStore::open(&dir.path().join("db.sqlite")).unwrap();
+    seed_app_facts(&store).unwrap();
+    let conv = store.create_conversation().unwrap();
+    let id = store
+        .insert_tool_call(&conv.id, None, "pty_write", r#"{"data":"whoami"}"#)
+        .unwrap();
+    reject_tool(&store, &id).unwrap();
+
+    let calls = Arc::new(AtomicUsize::new(0));
+    let transport = CountingTransport {
+        calls: calls.clone(),
+        events: vec![],
+    };
+
+    let err = resume_turn(&store, &transport, &IdentityProtector, &id).unwrap_err();
+    assert!(matches!(err, AssistantError::NoApiKey));
+    assert_eq!(calls.load(Ordering::SeqCst), 0);
+}
+
+/// Counts `generate` calls; used to assert a guard (API key, cancellation)
+/// short-circuits before the transport is ever touched.
+struct CountingTransport {
+    calls: Arc<AtomicUsize>,
+    events: Vec<GeminiEvent>,
+}
+
+impl GeminiTransport for CountingTransport {
+    fn generate(&self, _request: GeminiRequest) -> Result<Vec<GeminiEvent>, GeminiError> {
+        self.calls.fetch_add(1, Ordering::SeqCst);
+        Ok(self.events.clone())
+    }
+}
+
+/// Important 8.2: a resolved tool call must reach Gemini as an official
+/// `functionCall` / `functionResponse` part pair, not only the paraphrased
+/// `tool` ledger text.
+#[test]
+fn resume_turn_sends_function_response_part_not_only_paraphrased_text() {
+    let dir = tempfile::tempdir().unwrap();
+    let store = store_with_key(&dir);
+    let conv = store.create_conversation().unwrap();
+
+    let first = send_turn(
+        &store,
+        &ScriptedTransport {
+            events: vec![GeminiEvent::FunctionCall {
+                name: "pty_write".into(),
+                args_json: r#"{"data":"Get-ChildItem"}"#.into(),
+            }],
+        },
+        &IdentityProtector,
+        &conv.id,
+        "list files",
+        empty_snapshot(),
+    )
+    .unwrap();
+    let pending_id = first.pending[0].id.clone();
+    reject_tool(&store, &pending_id).unwrap();
+
+    let transport = CapturingTransport::new(vec![GeminiEvent::Text("ok".into())]);
+    resume_turn(&store, &transport, &IdentityProtector, &pending_id).unwrap();
+
+    let request = transport.request.borrow().clone().unwrap();
+    let contents = serde_json::to_value(&request.contents).unwrap();
+    let contents_str = contents.to_string();
+
+    assert!(
+        contents_str.contains("functionCall"),
+        "model turn must replay Gemini's own functionCall shape: {contents_str}"
+    );
+    assert!(
+        contents_str.contains("functionResponse"),
+        "resolved call must reach Gemini as a functionResponse part: {contents_str}"
+    );
+    assert!(
+        !contents_str.contains("rejected by the user"),
+        "the flattened `tool` ledger text must not also be sent as a duplicate user line: {contents_str}"
+    );
+}
+
+/// Important 8.2: replaying a `pty_write` call's `args_json` back to Gemini
+/// must never include a `session_id` — the model was never offered that key.
+#[test]
+fn resume_turn_function_call_part_drops_session_id_from_args() {
+    let dir = tempfile::tempdir().unwrap();
+    let store = store_with_key(&dir);
+    let conv = store.create_conversation().unwrap();
+
+    let first = send_turn(
+        &store,
+        &ScriptedTransport {
+            events: vec![GeminiEvent::FunctionCall {
+                name: "pty_write".into(),
+                args_json: r#"{"data":"Get-ChildItem","session_id":"forged"}"#.into(),
+            }],
+        },
+        &IdentityProtector,
+        &conv.id,
+        "list files",
+        empty_snapshot(),
+    )
+    .unwrap();
+    let pending_id = first.pending[0].id.clone();
+    reject_tool(&store, &pending_id).unwrap();
+
+    let transport = CapturingTransport::new(vec![]);
+    resume_turn(&store, &transport, &IdentityProtector, &pending_id).unwrap();
+
+    let request = transport.request.borrow().clone().unwrap();
+    let contents_str = serde_json::to_value(&request.contents).unwrap().to_string();
+    assert!(!contents_str.contains("session_id"));
+    assert!(!contents_str.contains("forged"));
+}
+
+/// Important 1: the system prompt must carry the conversation's current
+/// snapshot (cwd / active tab / output excerpt), not just app facts.
+#[test]
+fn send_turn_system_prompt_contains_snapshot_fields() {
+    let dir = tempfile::tempdir().unwrap();
+    let store = store_with_key(&dir);
+    let conv = store.create_conversation().unwrap();
+    let transport = CapturingTransport::new(vec![]);
+
+    let snapshot = Snapshot {
+        cwd: Some("C:\\Users\\dev".into()),
+        active_tab_id: Some("tab-1".into()),
+        active_session_id: Some("session-1".into()),
+        output_excerpt: "PS C:\\Users\\dev> Get-ChildItem".into(),
+        ..Snapshot::for_conversation(&conv.id)
+    };
+
+    send_turn(
+        &store,
+        &transport,
+        &IdentityProtector,
+        &conv.id,
+        "hi",
+        snapshot,
+    )
+    .unwrap();
+
+    let request = transport.request.borrow().clone().unwrap();
+    assert!(request.system.contains("C:\\Users\\dev"));
+    assert!(request.system.contains("tab-1"));
+    assert!(request.system.contains("Get-ChildItem"));
+}
+
+/// Important 1: with no snapshot yet, the prompt says so explicitly instead
+/// of silently omitting the section (so the model does not invent tabs).
+#[test]
+fn system_prompt_without_snapshot_says_so_explicitly() {
+    let dir = tempfile::tempdir().unwrap();
+    let store = store_with_key(&dir);
+    let conv = store.create_conversation().unwrap();
+    let transport = CapturingTransport::new(vec![]);
+
+    store.insert_message(&conv.id, "user", "hi").unwrap();
+    continue_turn(&store, &transport, &IdentityProtector, &conv.id, "hi").unwrap();
+
+    let request = transport.request.borrow().clone().unwrap();
+    assert!(request.system.contains("no snapshot is available yet"));
+}
+
+/// Important 4 / Important 5: a cancelled `generate` call must never reach
+/// `finish_turn` — no assistant message or pending tool_call for a turn
+/// that never produced any events.
+#[test]
+fn cancelled_generate_persists_no_assistant_message_or_pending() {
+    struct CancellingTransport;
+    impl GeminiTransport for CancellingTransport {
+        fn generate(&self, _request: GeminiRequest) -> Result<Vec<GeminiEvent>, GeminiError> {
+            Err(GeminiError::Cancelled)
+        }
+    }
+
+    let dir = tempfile::tempdir().unwrap();
+    let store = store_with_key(&dir);
+    let conv = store.create_conversation().unwrap();
+    store.insert_message(&conv.id, "user", "hi").unwrap();
+    store
+        .insert_snapshot(&Snapshot::for_conversation(&conv.id))
+        .unwrap();
+
+    let err = continue_turn(
+        &store,
+        &CancellingTransport,
+        &IdentityProtector,
+        &conv.id,
+        "hi",
+    )
+    .unwrap_err();
+    assert!(matches!(err, AssistantError::Cancelled));
+
+    let messages = store.list_messages(&conv.id).unwrap();
+    assert!(messages.iter().all(|message| message.role != "assistant"));
+
+    let pending = store.list_pending_tool_calls(&conv.id).unwrap();
+    assert!(pending.is_empty());
+}
+
+/// Important 5: `prepare_turn` builds the request and returns without ever
+/// touching a transport, so the IPC layer can drop its store connection
+/// before the (up to 120s) Gemini call and reopen a fresh one only for
+/// `finish_turn`.
+#[test]
+fn prepare_turn_then_finish_turn_round_trips_like_continue_turn() {
+    let dir = tempfile::tempdir().unwrap();
+    let store = store_with_key(&dir);
+    let conv = store.create_conversation().unwrap();
+    store.insert_message(&conv.id, "user", "hi").unwrap();
+    store
+        .insert_snapshot(&Snapshot::for_conversation(&conv.id))
+        .unwrap();
+
+    let request = prepare_turn(&store, &IdentityProtector, &conv.id, "hi").unwrap();
+    assert!(request.system.contains("com.gencore.terminal"));
+
+    // No store reference needs to be held here — this simulates the
+    // dropped-connection window around the real HTTP call.
+    let events = vec![GeminiEvent::Text("hello there".into())];
+
+    let result = finish_turn(&store, &conv.id, events).unwrap();
+    assert_eq!(result.assistant_text, "hello there");
+
+    let messages = store.list_messages(&conv.id).unwrap();
+    assert_eq!(messages.last().unwrap().content, "hello there");
+}
+
+/// Important 5 / Important 8: `prepare_resume` persists the `tool` ledger
+/// message and returns the next request without touching a transport.
+#[test]
+fn prepare_resume_then_finish_turn_round_trips_like_resume_turn() {
+    let dir = tempfile::tempdir().unwrap();
+    let store = store_with_key(&dir);
+    let conv = store.create_conversation().unwrap();
+
+    let first = send_turn(
+        &store,
+        &ScriptedTransport {
+            events: vec![GeminiEvent::FunctionCall {
+                name: "pty_write".into(),
+                args_json: r#"{"data":"Get-ChildItem"}"#.into(),
+            }],
+        },
+        &IdentityProtector,
+        &conv.id,
+        "list files",
+        empty_snapshot(),
+    )
+    .unwrap();
+    let pending_id = first.pending[0].id.clone();
+    reject_tool(&store, &pending_id).unwrap();
+
+    let (conversation_id, request) =
+        prepare_resume(&store, &IdentityProtector, &pending_id).unwrap();
+    assert_eq!(conversation_id, conv.id);
+    assert!(
+        serde_json::to_value(&request.contents)
+            .unwrap()
+            .to_string()
+            .contains("functionResponse")
+    );
+
+    let result = finish_turn(
+        &store,
+        &conversation_id,
+        vec![GeminiEvent::Text("done".into())],
+    )
+    .unwrap();
+    assert_eq!(result.assistant_text, "done");
 }

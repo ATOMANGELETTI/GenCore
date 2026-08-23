@@ -16,6 +16,11 @@ pub enum GeminiError {
     /// Never includes the API key.
     #[error("Gemini HTTP request failed: {0}")]
     Http(String),
+    /// `cancel_turn` tripped the cancellation flag while the SSE stream was
+    /// still being read. No assistant message or pending tool call is
+    /// persisted for a turn that ends this way.
+    #[error("Gemini turn was cancelled")]
+    Cancelled,
 }
 
 impl serde::Serialize for GeminiError {

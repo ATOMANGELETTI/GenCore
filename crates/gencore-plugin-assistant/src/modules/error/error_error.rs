@@ -42,6 +42,32 @@ pub enum AssistantError {
     /// A `tauri::async_runtime::spawn_blocking` task panicked or was cancelled.
     #[error("background task failed: {0}")]
     TaskJoin(String),
+    /// `cancel_turn` aborted the in-flight Gemini call before it produced any
+    /// events. No assistant message or pending tool_call is persisted for a
+    /// turn that ends this way — the caller must not call `finish_turn`.
+    #[error("turn was cancelled")]
+    Cancelled,
+}
+
+impl AssistantError {
+    /// The typed variant name, stable across `Display` wording changes —
+    /// this is `AssistantErrorPayload.code`, so the WebView can branch on it
+    /// without parsing `message`.
+    pub fn code(&self) -> &'static str {
+        match self {
+            Self::InvalidModel => "InvalidModel",
+            Self::ActionNotPending => "ActionNotPending",
+            Self::PtySessionGone => "PtySessionGone",
+            Self::InvalidArgs => "InvalidArgs",
+            Self::Pty(_) => "Pty",
+            Self::NoApiKey => "NoApiKey",
+            Self::Gemini(_) => "Gemini",
+            Self::Store(_) => "Store",
+            Self::Secrets(_) => "Secrets",
+            Self::TaskJoin(_) => "TaskJoin",
+            Self::Cancelled => "Cancelled",
+        }
+    }
 }
 
 impl serde::Serialize for AssistantError {

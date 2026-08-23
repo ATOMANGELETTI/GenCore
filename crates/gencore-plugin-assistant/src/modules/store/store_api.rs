@@ -1,5 +1,5 @@
 use std::path::Path;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use rusqlite::{Connection, OptionalExtension, Row, params};
 use serde::Serialize;
@@ -161,6 +161,11 @@ impl AssistantStore {
         }
         let conn = Connection::open(path)?;
         conn.pragma_update(None, "foreign_keys", true)?;
+        // WAL lets readers (list_messages, get_agent_settings, ...) proceed
+        // while a turn's writer connection is open; the busy timeout covers
+        // the brief window two connections still contend for the same lock.
+        conn.pragma_update(None, "journal_mode", "WAL")?;
+        conn.busy_timeout(Duration::from_millis(5000))?;
         apply_schema(&conn)?;
         Ok(Self { conn })
     }
@@ -251,12 +256,69 @@ impl AssistantStore {
         })
     }
 
+    /// Inserts a user message and its snapshot in one transaction, stamping
+    /// `snapshot.message_id` with the new message's id.
+    ///
+    /// A snapshot-insert failure rolls the whole transaction back, so a
+    /// retry after an error never leaves an orphan user row — unlike
+    /// calling [`Self::insert_message`] then [`Self::insert_snapshot`]
+    /// separately, which commits the message on its own first.
+    pub fn insert_user_turn(
+        &self,
+        conversation_id: &str,
+        content: &str,
+        snapshot: Snapshot,
+    ) -> Result<Message, StoreError> {
+        self.require_conversation(conversation_id)?;
+        let message_id = Uuid::new_v4().to_string();
+        let snapshot_id = Uuid::new_v4().to_string();
+        let now = unix_now();
+
+        let tx = self.conn.unchecked_transaction()?;
+        tx.execute(
+            "INSERT INTO messages (id, conversation_id, role, content, created_at)
+             VALUES (?1, ?2, 'user', ?3, ?4)",
+            params![message_id, conversation_id, content, now],
+        )?;
+        tx.execute(
+            "UPDATE conversations SET updated_at = ?1 WHERE id = ?2",
+            params![now, conversation_id],
+        )?;
+        tx.execute(
+            "INSERT INTO snapshots (
+                id, conversation_id, message_id, cwd, active_session_id, active_tab_id,
+                tabs_json, files_selection_json, output_excerpt, created_at
+             ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
+            params![
+                snapshot_id,
+                conversation_id,
+                message_id,
+                snapshot.cwd,
+                snapshot.active_session_id,
+                snapshot.active_tab_id,
+                snapshot.tabs_json,
+                snapshot.files_selection_json,
+                snapshot.output_excerpt,
+                now
+            ],
+        )?;
+        tx.commit()?;
+
+        Ok(Message {
+            id: message_id,
+            conversation_id: conversation_id.to_string(),
+            role: "user".to_string(),
+            content: content.to_string(),
+            created_at: now,
+        })
+    }
+
     pub fn list_messages(&self, conversation_id: &str) -> Result<Vec<Message>, StoreError> {
         let mut stmt = self.conn.prepare(
             "SELECT id, conversation_id, role, content, created_at
              FROM messages
              WHERE conversation_id = ?1
-             ORDER BY created_at ASC, id ASC",
+             ORDER BY created_at ASC, rowid ASC",
         )?;
         let rows = stmt.query_map([conversation_id], Message::from_row)?;
         rows.collect::<Result<Vec<_>, _>>().map_err(Into::into)
@@ -292,6 +354,40 @@ impl AssistantStore {
             )
             .optional()
             .map_err(Into::into)
+    }
+
+    /// Pending tool calls for `conversation_id`, oldest first — used to
+    /// hydrate the Approve/Reject ledger on conversation select or reload,
+    /// since a pending row otherwise only ever arrives via a `turn` event.
+    pub fn list_pending_tool_calls(
+        &self,
+        conversation_id: &str,
+    ) -> Result<Vec<ToolCall>, StoreError> {
+        let mut stmt = self.conn.prepare(
+            "SELECT id, conversation_id, message_id, name, args_json, status, result_json, created_at, resolved_at
+             FROM tool_calls
+             WHERE conversation_id = ?1 AND status = 'pending'
+             ORDER BY created_at ASC, rowid ASC",
+        )?;
+        let rows = stmt.query_map([conversation_id], ToolCall::from_row)?;
+        rows.collect::<Result<Vec<_>, _>>().map_err(Into::into)
+    }
+
+    /// Tool calls proposed alongside a given assistant message, in any
+    /// status — used to rebuild the Gemini `functionCall` / `functionResponse`
+    /// parts for a past turn instead of resending flattened ledger text.
+    pub fn list_tool_calls_for_message(
+        &self,
+        message_id: &str,
+    ) -> Result<Vec<ToolCall>, StoreError> {
+        let mut stmt = self.conn.prepare(
+            "SELECT id, conversation_id, message_id, name, args_json, status, result_json, created_at, resolved_at
+             FROM tool_calls
+             WHERE message_id = ?1
+             ORDER BY created_at ASC, rowid ASC",
+        )?;
+        let rows = stmt.query_map([message_id], ToolCall::from_row)?;
+        rows.collect::<Result<Vec<_>, _>>().map_err(Into::into)
     }
 
     pub fn set_tool_status(
@@ -358,7 +454,7 @@ impl AssistantStore {
                         tabs_json, files_selection_json, output_excerpt, created_at
                  FROM snapshots
                  WHERE conversation_id = ?1
-                 ORDER BY created_at DESC, id DESC
+                 ORDER BY created_at DESC, rowid DESC
                  LIMIT 1",
                 [conversation_id],
                 Snapshot::from_row,
@@ -470,9 +566,14 @@ pub fn seed_app_facts(store: &AssistantStore) -> Result<(), StoreError> {
     Ok(())
 }
 
+/// Milliseconds, not seconds — `send_turn` / a fast `resume_turn` can
+/// persist two rows inside the same second; the ordering tiebreak below
+/// (`, rowid`) still holds even so, but millisecond resolution keeps
+/// same-conversation timestamps meaningfully distinct for anything reading
+/// `created_at` directly.
 fn unix_now() -> i64 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .map(|duration| duration.as_secs() as i64)
+        .map(|duration| duration.as_millis() as i64)
         .unwrap_or(0)
 }

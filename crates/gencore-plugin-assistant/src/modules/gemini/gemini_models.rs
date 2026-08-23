@@ -21,10 +21,66 @@ pub struct GeminiContent {
     pub parts: Vec<GeminiPart>,
 }
 
-/// One part of a [`GeminiContent`] turn. Only text parts are sent upstream.
+/// One part of a [`GeminiContent`] turn: text, a model `functionCall`, or a
+/// `functionResponse` — exactly one field is ever `Some`. Constructed via
+/// [`GeminiPart::text`], [`GeminiPart::function_call`], or
+/// [`GeminiPart::function_response`], never by setting fields directly.
 #[derive(Debug, Clone, Serialize)]
 pub struct GeminiPart {
-    pub text: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub text: Option<String>,
+    #[serde(rename = "functionCall", skip_serializing_if = "Option::is_none")]
+    pub function_call: Option<GeminiFunctionCall>,
+    #[serde(rename = "functionResponse", skip_serializing_if = "Option::is_none")]
+    pub function_response: Option<GeminiFunctionResponse>,
+}
+
+/// A model turn's tool call, replayed from a persisted [`crate::modules::store::ToolCall`]
+/// so a resumed conversation resends Gemini's own shape instead of paraphrased text.
+#[derive(Debug, Clone, Serialize)]
+pub struct GeminiFunctionCall {
+    pub name: String,
+    pub args: Value,
+}
+
+/// The user-turn reply to a [`GeminiFunctionCall`]: the tool's resolved
+/// result (or rejection), addressed back to Gemini by function `name`.
+#[derive(Debug, Clone, Serialize)]
+pub struct GeminiFunctionResponse {
+    pub name: String,
+    pub response: Value,
+}
+
+impl GeminiPart {
+    pub fn text(text: impl Into<String>) -> Self {
+        Self {
+            text: Some(text.into()),
+            function_call: None,
+            function_response: None,
+        }
+    }
+
+    pub fn function_call(name: impl Into<String>, args: Value) -> Self {
+        Self {
+            text: None,
+            function_call: Some(GeminiFunctionCall {
+                name: name.into(),
+                args,
+            }),
+            function_response: None,
+        }
+    }
+
+    pub fn function_response(name: impl Into<String>, response: Value) -> Self {
+        Self {
+            text: None,
+            function_call: None,
+            function_response: Some(GeminiFunctionResponse {
+                name: name.into(),
+                response,
+            }),
+        }
+    }
 }
 
 impl GeminiRequest {
