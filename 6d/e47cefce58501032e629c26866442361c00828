@@ -1,0 +1,95 @@
+crates/gencore-plugin-assistant/src/modules/store/store_api.rs
+  s_97305b5d59048e::t_ca5bef10637bdc 5
+  s_97305b5d59048e::t_ba7fe8db06076d 38,46,55
+crates/gencore-plugin-assistant/src/modules/assistant/assistant_api.rs
+  s_97305b5d59048e::t_c4ff84f0fe1c97 28-30,463-464
+  s_97305b5d59048e::t_9c0bf7337d8332 416-417
+  s_97305b5d59048e::t_33383056845032 1-23,31-415,418-436,438-462,465-493
+  s_97305b5d59048e::t_71d6593034b66a 437
+  s_97305b5d59048e::t_e4e5a265aff00f 24-27
+apps/terminal/isolation/isolation.hook.js
+  s_97305b5d59048e::t_c6c48cc095803d 133-137
+  s_97305b5d59048e::t_1df34be747be05 910-915
+  s_97305b5d59048e::t_17a853c4d21115 1008-1018
+  s_97305b5d59048e::t_a00904bd07227b 790-832
+  s_97305b5d59048e::t_e230338b9b63f4 39-50,645-653,692-700,833-840,850,852-855,860,865-867,916-924,1019-1027
+  s_97305b5d59048e::t_499ac120e6999d 87-116
+  s_97305b5d59048e::t_32981cbb3987f5 392-644
+  s_97305b5d59048e::t_1f80301e40b5c8 841,851,856-858
+crates/gencore-plugin-assistant/src/modules/gemini/gemini_error.rs
+  s_97305b5d59048e::t_094edf668e98c7 15-18
+crates/gencore-plugin-assistant/src/modules/error/error_error.rs
+  s_97305b5d59048e::t_64a143bf24a89f 3
+  s_97305b5d59048e::t_ba7f0b76bf00bb 39-44
+crates/gencore-plugin-assistant/src/modules/mod.rs
+  s_97305b5d59048e::t_4c7041977c9964 2
+crates/gencore-plugin-assistant/tests/assistant.rs
+  s_97305b5d59048e::t_e358f03740fd6d 1-230
+  s_97305b5d59048e::t_c1debfd4991ef5 231
+apps/terminal/tests/unit/ipc.assistant.test.ts
+  s_97305b5d59048e::t_586b8c366c040f 1-263
+crates/gencore-plugin-assistant/src/modules/assistant/mod.rs
+  s_97305b5d59048e::t_45564d81bec4cf 1-11
+scripts/tauri-dev-terminal.mjs
+  s_97305b5d59048e::t_6dbad358a36bb4 6,10
+crates/gencore-plugin-assistant/src/modules/gemini/gemini_api.rs
+  s_97305b5d59048e::t_8ff04b09fd94ef 11-12,15,34-96,98
+  s_97305b5d59048e::t_0e56083ac4d5b8 97
+apps/terminal/src-tauri/src/lib.rs
+  s_97305b5d59048e::t_ed9fbc339f01bd 4-9,20
+apps/terminal/src/modules/ipc/ipc.assistant.ts
+  s_97305b5d59048e::t_edad1fdd22c710 1-126
+apps/terminal/src-tauri/capabilities/main.json
+  s_97305b5d59048e::t_4a8d9df59e1b25 31-43
+  s_97305b5d59048e::t_dbd9dd52664aaf 4
+apps/terminal/src/modules/ipc/ipc.types.ts
+  s_97305b5d59048e::t_5f08c29afdb40d 70-180
+apps/terminal/tests/unit/isolation.hook.test.ts
+  s_97305b5d59048e::t_5772c604145c9b 339-350
+  s_97305b5d59048e::t_bcb58cc497717f 69,72-120
+  s_97305b5d59048e::t_c78cfccc2cb64f 868-1154
+  s_97305b5d59048e::t_ed36b47abb43af 17-20,121,1155-1162
+  s_97305b5d59048e::t_2e6203f451c62a 1163
+crates/gencore-plugin-assistant/src/modules/gemini/mod.rs
+  s_97305b5d59048e::t_241031276485e3 6
+crates/gencore-plugin-assistant/Cargo.toml
+  s_97305b5d59048e::t_547ff8c5128186 18
+crates/gencore-plugin-assistant/src/lib.rs
+  s_97305b5d59048e::t_bc9891e24ef164 8-12,16,20,44-47,49-50,63,65-72
+  s_97305b5d59048e::t_65301956c0aa2b 51-62
+  s_97305b5d59048e::t_4ee0fa6e905d6f 13-15
+  s_97305b5d59048e::t_79ac3eb9fb1f22 64
+apps/terminal/src-tauri/Cargo.toml
+  s_97305b5d59048e::t_33c29681046fe2 24
+Cargo.lock
+  s_3cf455f67ce88e::t_b904271fc03c4b 1244,1497,3454
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "6de47cefce58501032e629c26866442361c00828",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_3cf455f67ce88e": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "0d9c51f8-3d8d-4428-b413-0e97acde4ea9",
+        "model": "claude-sonnet-5-thinking-high"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_97305b5d59048e": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "25e764fe-44fc-4d97-b2d8-7bb93a40a0b2",
+        "model": "claude-sonnet-5-thinking-xhigh"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
