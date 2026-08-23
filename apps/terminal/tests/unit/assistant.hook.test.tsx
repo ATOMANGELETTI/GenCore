@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useMemo, useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { FileTreeApi } from "../../src/modules/file-tree/file-tree.hook";
 import { FileTreeApiStubProvider } from "../../src/modules/file-tree/file-tree.hook";
@@ -634,6 +635,56 @@ describe("useAssistant", () => {
 
     onUiAction?.({ id: "call-2", name: "reveal_in_files", args: { path: "C:\\work\\app.rs" } });
     expect(fileTreeApi.revealPath).toHaveBeenCalledWith("C:\\work\\app.rs");
+  });
+
+  it("subscribes to ui-action once even as the terminal session and file tree objects change identity", async () => {
+    const user = userEvent.setup();
+    let onUiAction: ((payload: AssistantUiActionPayload) => void) | undefined;
+    subscribeAssistantUiAction.mockImplementation(async (handler) => {
+      onUiAction = handler;
+      return () => {};
+    });
+
+    // Mirrors <TerminalProvider>/<FileTreeProvider>, which memoize their
+    // context value off state that changes on nearly every render (tab
+    // output, tree listings, ...), so each bump hands the Assistant a
+    // brand-new object with the same shape.
+    function Wrapper() {
+      const [tick, setTick] = useState(0);
+      const terminalSession = useMemo(
+        () => fakeTerminalSession({ activeId: String(tick) }),
+        [tick],
+      );
+      const fileTreeApi = useMemo(() => fakeFileTreeApi({ selectedId: String(tick) }), [tick]);
+      return (
+        <TerminalSessionStubProvider value={terminalSession}>
+          <FileTreeApiStubProvider value={fileTreeApi}>
+            <AgentSettingsStubProvider hasApiKey={true}>
+              <Probe />
+              <button type="button" onClick={() => setTick((current) => current + 1)}>
+                bump
+              </button>
+            </AgentSettingsStubProvider>
+          </FileTreeApiStubProvider>
+        </TerminalSessionStubProvider>
+      );
+    }
+
+    render(<Wrapper />);
+
+    await waitFor(() => {
+      expect(onUiAction).toBeTypeOf("function");
+    });
+    expect(subscribeAssistantUiAction).toHaveBeenCalledTimes(1);
+
+    await user.click(screen.getByText("bump"));
+    await user.click(screen.getByText("bump"));
+    await user.click(screen.getByText("bump"));
+
+    // Still the same listener registered at mount: no teardown/resubscribe,
+    // so a confirm-triggered event fired mid-bump can never be dropped.
+    expect(subscribeAssistantUiAction).toHaveBeenCalledTimes(1);
+    onUiAction?.({ id: "call-3", name: "switch_tab", args: { tab_id: "tab-9" } });
   });
 });
 

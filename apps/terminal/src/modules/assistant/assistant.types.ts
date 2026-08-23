@@ -1,19 +1,8 @@
-import type {
-  AssistantMessage,
-  AssistantSnapshot,
-  AssistantToolCall,
-  Conversation,
-} from "../ipc/ipc.types";
+import type { AssistantMessage, AssistantToolCall, Conversation } from "../ipc/ipc.types";
 
 export interface AgentSettingsStub {
   readonly hasApiKey: boolean;
 }
-
-export const STUB_ASSISTANT_SNAPSHOT: AssistantSnapshot = {
-  active_tab_id: "stub",
-  output_excerpt: "",
-  tabs: [],
-};
 
 export interface AssistantApi {
   readonly conversations: readonly Conversation[];

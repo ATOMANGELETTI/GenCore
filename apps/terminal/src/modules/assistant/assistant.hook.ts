@@ -107,6 +107,17 @@ export function useAssistant(): AssistantApi {
   const [composer, setComposer] = React.useState("");
   const conversationIdRef = React.useRef<string | null>(null);
   conversationIdRef.current = conversationId;
+  // useFileTree()/TerminalProvider hand back a new object on nearly every
+  // render (tree listings, tab output, etc.). Reading through refs lets the
+  // ui-action subscription below stay mounted for the component's lifetime
+  // instead of tearing down and resubscribing on every such render, which
+  // could otherwise drop a `switch_tab`/`reveal_in_files` event that fires
+  // in the gap between unlisten and the new listener attaching (the Rust
+  // side has already marked the tool call as run by then).
+  const terminalSessionRef = React.useRef(terminalSession);
+  terminalSessionRef.current = terminalSession;
+  const fileTreeApiRef = React.useRef(fileTreeApi);
+  fileTreeApiRef.current = fileTreeApi;
 
   // A fetched message list only ever lands if its conversation is still active,
   // and any optimistic `local-user-*` row for that conversation survives unless
@@ -235,8 +246,8 @@ export function useAssistant(): AssistantApi {
 
     void subscribeAssistantUiAction((payload) => {
       applyAssistantUiAction(payload, {
-        setActive: terminalSession?.setActive,
-        revealPath: fileTreeApi?.revealPath,
+        setActive: terminalSessionRef.current?.setActive,
+        revealPath: fileTreeApiRef.current?.revealPath,
       });
     })
       .then((fn) => {
@@ -252,7 +263,7 @@ export function useAssistant(): AssistantApi {
       cancelled = true;
       unlisten?.();
     };
-  }, [terminalSession, fileTreeApi]);
+  }, []);
 
   const send = React.useCallback(async () => {
     const activeId = conversationId;
