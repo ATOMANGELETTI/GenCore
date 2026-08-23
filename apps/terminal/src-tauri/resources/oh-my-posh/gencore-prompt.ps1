@@ -12,5 +12,5 @@ if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
     & $gencoreInner
   }
 } else {
-  function Global:Prompt { "$([char]0x276F) " }
+  function Global:Prompt { "$([char]0x25B6) " }
 }

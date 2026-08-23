@@ -10,6 +10,7 @@ const resourceDir = resolve(process.cwd(), "src-tauri/resources/oh-my-posh");
 type OmpSegment = {
   type?: string;
   style?: string;
+  powerline_symbol?: string;
   leading_diamond?: string;
   trailing_diamond?: string;
   background?: string;
@@ -56,9 +57,9 @@ function segmentsOf(theme: OmpTheme): OmpSegment[] {
   return theme.blocks?.flatMap((block) => block.segments ?? []) ?? [];
 }
 
-function hasDiamond(theme: OmpTheme): boolean {
+function hasPowerline(theme: OmpTheme): boolean {
   return segmentsOf(theme).some(
-    (segment) => segment.style === "diamond" || typeof segment.leading_diamond === "string",
+    (segment) => segment.style === "powerline" || typeof segment.powerline_symbol === "string",
   );
 }
 
@@ -79,9 +80,9 @@ describe("oh-my-posh Nord themes", () => {
     expect(snow.transient_prompt).toBeDefined();
   });
 
-  it("uses diamond capsule segments", () => {
-    expect(hasDiamond(polar)).toBe(true);
-    expect(hasDiamond(snow)).toBe(true);
+  it("uses powerline chevron segments", () => {
+    expect(hasPowerline(polar)).toBe(true);
+    expect(hasPowerline(snow)).toBe(true);
   });
 
   it("uses Polar Night user fill #88C0D0 and Snow Storm user fill #5E81AC", () => {
