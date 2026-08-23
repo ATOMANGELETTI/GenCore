@@ -45,6 +45,16 @@ const PTY_WRITE_CMD = "plugin:gencore-pty|write";
 const PTY_RESIZE_CMD = "plugin:gencore-pty|resize";
 const PTY_CLOSE_CMD = "plugin:gencore-pty|close";
 const PTY_ALLOWED_COMMANDS = [PTY_OPEN_CMD, PTY_WRITE_CMD, PTY_RESIZE_CMD, PTY_CLOSE_CMD] as const;
+// Mirrors `PoshThemeId` (config.types.ts) and Rust's `validate_posh_theme` (session_map.rs).
+const POSH_THEME_IDS = [
+  "gencore",
+  "bubbles",
+  "iterm2",
+  "wholespace",
+  "wopian",
+  "clean-detailed",
+  "kali",
+] as const;
 const LOAD_PINNED_CMD = "plugin:gencore-core|load_pinned_tabs";
 const SAVE_PINNED_CMD = "plugin:gencore-core|save_pinned_tabs";
 const TRAY_ACTION_CMD = "plugin:gencore-core|tray_action";
@@ -749,6 +759,39 @@ describe("terminal isolation hook", () => {
   it("throws for open with a shell key", () => {
     const hook = getHook();
     expect(() => hook(envelope(PTY_OPEN_CMD, { cols: 80, rows: 24, shell: "cmd.exe" }))).toThrow();
+  });
+
+  it.each(POSH_THEME_IDS)("reconstructs open with posh_theme %s", (poshTheme) => {
+    const hook = getHook();
+    const inner = { cols: 80, rows: 24, posh_theme: poshTheme };
+    const result = hook(envelope(PTY_OPEN_CMD, inner));
+    expect(result.payload).toEqual({ cols: 80, rows: 24, posh_theme: poshTheme });
+  });
+
+  it("reconstructs open with theme and posh_theme together", () => {
+    const hook = getHook();
+    const inner = {
+      cols: 80,
+      rows: 24,
+      cwd: "C:\\work",
+      theme: "snow-storm",
+      posh_theme: "bubbles",
+    };
+    const result = hook(envelope(PTY_OPEN_CMD, inner));
+    expect(result.payload).toEqual({
+      cols: 80,
+      rows: 24,
+      cwd: "C:\\work",
+      theme: "snow-storm",
+      posh_theme: "bubbles",
+    });
+  });
+
+  it("throws for open with an unknown posh_theme value", () => {
+    const hook = getHook();
+    expect(() =>
+      hook(envelope(PTY_OPEN_CMD, { cols: 80, rows: 24, posh_theme: "evil" })),
+    ).toThrow();
   });
 
   it("reconstructs write as session_id and data", () => {

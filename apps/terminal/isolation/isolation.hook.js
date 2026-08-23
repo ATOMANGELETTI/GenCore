@@ -250,6 +250,21 @@
     return value === THEME_POLAR_NIGHT || value === THEME_SNOW_STORM;
   }
 
+  // Mirrors `PoshThemeId` (config.types.ts) and Rust's `validate_posh_theme`
+  // (session_map.rs) so the isolation hook and the Rust command agree on the
+  // exact same set of Oh My Posh prompt theme ids.
+  function isPoshTheme(value) {
+    return (
+      value === "gencore" ||
+      value === "bubbles" ||
+      value === "iterm2" ||
+      value === "wholespace" ||
+      value === "wopian" ||
+      value === "clean-detailed" ||
+      value === "kali"
+    );
+  }
+
   function isPtyOpenArgs(args) {
     if (!isPlainObject(args)) {
       return false;
@@ -259,6 +274,7 @@
     let hasRows = false;
     let hasCwd = false;
     let hasTheme = false;
+    let hasPoshTheme = false;
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
       if (key === "cols") {
@@ -277,6 +293,10 @@
         hasTheme = true;
         continue;
       }
+      if (key === "posh_theme") {
+        hasPoshTheme = true;
+        continue;
+      }
       return false;
     }
     if (!hasCols || !hasRows || !isDimension(args.cols) || !isDimension(args.rows)) {
@@ -286,6 +306,9 @@
       return false;
     }
     if (hasTheme && !isPtyTheme(args.theme)) {
+      return false;
+    }
+    if (hasPoshTheme && !isPoshTheme(args.posh_theme)) {
       return false;
     }
     return true;
@@ -787,6 +810,9 @@
     }
     if (typeof args.theme === "string") {
       payload.theme = args.theme;
+    }
+    if (typeof args.posh_theme === "string") {
+      payload.posh_theme = args.posh_theme;
     }
     return payload;
   }
