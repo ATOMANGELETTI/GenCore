@@ -14,6 +14,21 @@ vi.mock("../../src/modules/ipc/ipc.fs", () => ({
   subscribeFsChanges: vi.fn(() => Promise.resolve(() => {})),
 }));
 
+vi.mock("../../src/modules/ipc/ipc.assistant", () => ({
+  listConversations: vi.fn(() => Promise.resolve([])),
+  createConversation: vi.fn(),
+  deleteConversation: vi.fn(),
+  listMessages: vi.fn(() => Promise.resolve([])),
+  sendMessage: vi.fn(),
+  cancelTurn: vi.fn(),
+  confirmAction: vi.fn(),
+  rejectAction: vi.fn(),
+  subscribeAssistantToken: vi.fn(() => Promise.resolve(() => {})),
+  subscribeAssistantTurn: vi.fn(() => Promise.resolve(() => {})),
+  subscribeAssistantError: vi.fn(() => Promise.resolve(() => {})),
+  subscribeAssistantUiAction: vi.fn(() => Promise.resolve(() => {})),
+}));
+
 import { ConfigProvider } from "../../src/modules/config/config.hook";
 import { SidePanel } from "../../src/modules/side-panel/side-panel.component";
 
@@ -57,20 +72,21 @@ describe("SidePanel", () => {
     expect(screen.getByText("FILES")).toBeVisible();
     expect(screen.getByRole("tree")).toBeVisible();
     expect(screen.queryByText("Tab 1")).toBeNull();
-    expect(screen.getByText("Tab 2")).not.toBeVisible();
+    expect(screen.queryByText("Tab 2")).toBeNull();
     expect(screen.queryByText("Tab 3")).toBeNull();
     expectPanelHiddenState("files", false);
     expectPanelHiddenState("assistant", true);
     expectPanelHiddenState("config", true);
   });
 
-  it("shows Tab 2 when the Assistant tab is clicked", async () => {
+  it("shows ASSISTANT when the Assistant tab is clicked", async () => {
     const user = userEvent.setup();
     await renderSidePanel();
 
     await user.click(screen.getByRole("tab", { name: "Assistant" }));
 
-    expect(screen.getByText("Tab 2")).toBeVisible();
+    expect(screen.getByText("ASSISTANT")).toBeVisible();
+    expect(screen.queryByText("Tab 2")).toBeNull();
     expect(screen.queryByText("Tab 1")).toBeNull();
     expect(screen.queryByText("Tab 3")).toBeNull();
     expectPanelHiddenState("assistant", false);
@@ -87,7 +103,7 @@ describe("SidePanel", () => {
     expect(screen.getByText("CONFIG")).toBeVisible();
     expect(screen.getByRole("radiogroup", { name: "Theme" })).toBeVisible();
     expect(screen.queryByText("Tab 3")).toBeNull();
-    expect(screen.getByText("Tab 2")).not.toBeVisible();
+    expect(screen.queryByText("Tab 2")).toBeNull();
     expectPanelHiddenState("config", false);
     expectPanelHiddenState("files", true);
     expectPanelHiddenState("assistant", true);

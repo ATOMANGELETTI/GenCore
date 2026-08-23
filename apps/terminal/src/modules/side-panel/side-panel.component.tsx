@@ -8,6 +8,7 @@ import {
 } from "@gencore/ui-kit";
 import { Bot, Folder, type LucideIcon, Settings } from "lucide-react";
 import * as React from "react";
+import { Assistant } from "../assistant/assistant.component";
 import { Config } from "../config/config.component";
 import { FileTree } from "../file-tree/file-tree.component";
 import {
@@ -23,10 +24,9 @@ const TABS: readonly {
   id: SidePanelTabId;
   label: string;
   Icon: LucideIcon;
-  placeholder?: string;
 }[] = [
   { id: "files", label: "Files", Icon: Folder },
-  { id: "assistant", label: "Assistant", Icon: Bot, placeholder: "Tab 2" },
+  { id: "assistant", label: "Assistant", Icon: Bot },
   { id: "config", label: "Config", Icon: Settings },
 ];
 
@@ -164,13 +164,11 @@ export function SidePanel({ open = true }: SidePanelProps) {
               <div className="flex h-full min-h-0 flex-col">
                 <FileTree />
               </div>
+            ) : tab.id === "assistant" ? (
+              <Assistant />
             ) : tab.id === "config" ? (
               <Config />
-            ) : (
-              <div className="flex h-full items-center justify-center">
-                <p className="text-sm text-muted-foreground">{tab.placeholder}</p>
-              </div>
-            )}
+            ) : null}
           </div>
         ))}
       </div>
