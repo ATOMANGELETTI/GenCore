@@ -1,0 +1,63 @@
+apps/terminal/src/modules/config/config.component.tsx
+  s_9c3d866055f7b2::t_187d5164ad36f3 2,6,19-68,110,113,127-130,150-168,275-330
+apps/terminal/src/modules/config/config.hook.ts
+  s_82c3c45da76e62::t_a52db17f6cf61c 5,14,16,18,21-35,83,91-94
+apps/terminal/src/modules/config/config.storage.ts
+  s_aa39d75a5afa67::t_c297b5e51e7699 1,5-9,12-20,38-49,52
+apps/terminal/src/modules/config/config.types.ts
+  s_aa39d75a5afa67::t_eb33b3cd217255 5-13,17,24-25
+apps/terminal/tests/unit/config.component.test.tsx
+  s_be9a94e9e9857a::t_2825537d0908ca 8-14,18,20-22,54,61-63,103-150
+apps/terminal/tests/unit/config.hook.test.tsx
+  s_82c3c45da76e62::t_97eb73e9ea83f1 19,24,31-33,109,131-146,150,152-158,167-168
+apps/terminal/tests/unit/tray-menu.test.tsx
+  s_cdec2f1aac53ae::t_ed88814af334fc 25-26,36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "43f26e425a74eb22d8072319954fa10a6a673800",
+  "prompts": {},
+  "sessions": {
+    "s_82c3c45da76e62": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "9eae708d-05cb-436d-88ec-cc331c014bc4",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_9c3d866055f7b2": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "d258f2f6-3ca3-4ee6-aa88-387aa4bfe5bd",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_aa39d75a5afa67": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "b7b137f6-bf1f-4dd5-99f1-bda87eeddfbb",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_be9a94e9e9857a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "ee20711e-e0d6-4f90-a50b-f016a475eb80",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_cdec2f1aac53ae": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "994f3694-b9d9-49ba-93db-b57c580eb597",
+        "model": "claude-opus-5-thinking-high"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
