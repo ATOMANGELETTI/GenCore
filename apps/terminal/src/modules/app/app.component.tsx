@@ -1,5 +1,6 @@
 import { AppShell, ThemeProvider } from "@gencore/ui-kit";
 import * as React from "react";
+import { AgentSettingsProvider } from "../config/config.agent";
 import { ConfigProvider, useConfig } from "../config/config.hook";
 import { TerminalContextMenu } from "../context-menu/context-menu.terminal";
 import { TitlebarContextMenu } from "../context-menu/context-menu.titlebar";
@@ -22,7 +23,9 @@ export const APP_TITLE = "Tauri Terminal Template";
 export function App() {
   return (
     <ConfigProvider>
-      <AppShellTree />
+      <AgentSettingsProvider>
+        <AppShellTree />
+      </AgentSettingsProvider>
     </ConfigProvider>
   );
 }

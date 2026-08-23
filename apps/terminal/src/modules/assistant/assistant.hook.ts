@@ -1,5 +1,10 @@
 import * as React from "react";
 import {
+  AgentSettingsContext,
+  type AgentSettingsValue,
+  useAgentSettings,
+} from "../config/config.agent";
+import {
   confirmAction,
   createConversation,
   listConversations,
@@ -11,11 +16,17 @@ import {
   subscribeAssistantTurn,
 } from "../ipc/ipc.assistant";
 import type { AssistantMessage, AssistantToolCall, Conversation } from "../ipc/ipc.types";
-import type { AgentSettingsStub, AssistantApi } from "./assistant.types";
+import type { AssistantApi } from "./assistant.types";
 import { STUB_ASSISTANT_SNAPSHOT } from "./assistant.types";
 
-const AgentSettingsContext = React.createContext<AgentSettingsStub>({ hasApiKey: false });
+export { useAgentSettings };
 
+/**
+ * Test-only stub for specs that only care about `hasApiKey`. Provides the
+ * same context `useAgentSettings()` (from `config.agent.ts`) reads from, so
+ * `useAssistant()` picks up the stubbed value without a real IPC-backed
+ * `AgentSettingsProvider`.
+ */
 export function AgentSettingsStubProvider({
   hasApiKey = false,
   children,
@@ -23,12 +34,20 @@ export function AgentSettingsStubProvider({
   hasApiKey?: boolean;
   children: React.ReactNode;
 }) {
-  const value = React.useMemo(() => ({ hasApiKey }), [hasApiKey]);
+  const value = React.useMemo<AgentSettingsValue>(
+    () => ({
+      model: "gemini-3.7-flash",
+      contextLines: 80,
+      hasApiKey,
+      setModel: () => undefined,
+      setContextLines: () => undefined,
+      saveKey: async () => undefined,
+      clearKey: async () => undefined,
+      replaceKey: () => undefined,
+    }),
+    [hasApiKey],
+  );
   return React.createElement(AgentSettingsContext.Provider, { value }, children);
-}
-
-export function useAgentSettings(): AgentSettingsStub {
-  return React.useContext(AgentSettingsContext);
 }
 
 export function useAssistant(): AssistantApi {
