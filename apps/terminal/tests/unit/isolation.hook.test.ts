@@ -961,7 +961,7 @@ describe("terminal isolation hook", () => {
     expect(result.payload).toEqual(inner);
   });
 
-  it("strips an injected top-level field from send_message and does not throw", () => {
+  it("rejects an injected top-level field on send_message instead of stripping it", () => {
     const hook = getHook();
     const inner = {
       conversation_id: "conv-1",
@@ -991,6 +991,25 @@ describe("terminal isolation hook", () => {
     expect(() =>
       hook(envelope(SEND_MESSAGE_CMD, { conversation_id: "conv-1", text: "hi" })),
     ).toThrow();
+  });
+
+  it("throws for send_message when text exceeds 65536 characters", () => {
+    const hook = getHook();
+    const inner = {
+      conversation_id: "conv-1",
+      text: "a".repeat(65537),
+      snapshot: validSnapshot(),
+    };
+    expect(() => hook(envelope(SEND_MESSAGE_CMD, inner))).toThrow();
+  });
+
+  it("allows send_message when text is exactly 65536 characters", () => {
+    const hook = getHook();
+    const text = "a".repeat(65536);
+    const result = hook(
+      envelope(SEND_MESSAGE_CMD, { conversation_id: "conv-1", text, snapshot: validSnapshot() }),
+    );
+    expect((result.payload as { text: string }).text).toHaveLength(65536);
   });
 
   it("throws for send_message when output_excerpt exceeds 65536 characters", () => {

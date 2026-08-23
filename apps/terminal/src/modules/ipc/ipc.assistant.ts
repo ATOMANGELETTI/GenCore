@@ -4,13 +4,13 @@ import type {
   AgentSettings,
   AgentSettingsPatch,
   AssistantErrorPayload,
-  AssistantMessage,
   AssistantSnapshot,
   AssistantTokenPayload,
   AssistantTurnPayload,
   AssistantUiActionPayload,
   ConfirmActionResult,
   Conversation,
+  ListMessagesResult,
   SendMessageResult,
 } from "./ipc.types";
 
@@ -49,8 +49,8 @@ export function deleteConversation(conversationId: string): Promise<void> {
   return invoke<void>(DELETE_CONVERSATION_COMMAND, { conversation_id: conversationId });
 }
 
-export function listMessages(conversationId: string): Promise<AssistantMessage[]> {
-  return invoke<AssistantMessage[]>(LIST_MESSAGES_COMMAND, { conversation_id: conversationId });
+export function listMessages(conversationId: string): Promise<ListMessagesResult> {
+  return invoke<ListMessagesResult>(LIST_MESSAGES_COMMAND, { conversation_id: conversationId });
 }
 
 export function sendMessage(

@@ -49,16 +49,16 @@ describe("ipc.assistant", () => {
     });
   });
 
-  it("invokes list_messages with snake_case conversation_id", async () => {
+  it("invokes list_messages with snake_case conversation_id and returns messages plus pending", async () => {
     const { listMessages } = await import("../../src/modules/ipc/ipc.assistant");
-    invokeMock.mockResolvedValueOnce([]);
+    invokeMock.mockResolvedValueOnce({ messages: [], pending: [] });
 
     const result = await listMessages("c1");
 
     expect(invokeMock).toHaveBeenCalledWith("plugin:gencore-assistant|list_messages", {
       conversation_id: "c1",
     });
-    expect(result).toEqual([]);
+    expect(result).toEqual({ messages: [], pending: [] });
   });
 
   it("invokes send_message with snake_case conversation_id and a raw snapshot", async () => {
@@ -232,10 +232,14 @@ describe("ipc.assistant", () => {
     expect(result).toBe(unlisten);
 
     const listenHandler = listenMock.mock.calls[0]?.[1] as (event: {
-      payload: { conversation_id: string; error: string };
+      payload: { conversation_id: string; code: string; message: string };
     }) => void;
-    listenHandler({ payload: { conversation_id: "c1", error: "boom" } });
-    expect(handler).toHaveBeenCalledWith({ conversation_id: "c1", error: "boom" });
+    listenHandler({ payload: { conversation_id: "c1", code: "NoApiKey", message: "boom" } });
+    expect(handler).toHaveBeenCalledWith({
+      conversation_id: "c1",
+      code: "NoApiKey",
+      message: "boom",
+    });
   });
 
   it("subscribes to gencore-assistant://ui-action and returns the unlisten function", async () => {

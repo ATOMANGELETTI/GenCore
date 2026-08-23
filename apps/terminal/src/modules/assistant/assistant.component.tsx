@@ -15,6 +15,17 @@ import { useAssistant } from "./assistant.hook";
 
 const KICKER_CLASS = "text-[10px] font-semibold uppercase tracking-wide text-muted-foreground";
 
+/** Human title for a pending tool call, keyed by the Gemini function name. */
+const PENDING_TITLES: Record<string, string> = {
+  pty_write: "PTY write",
+  switch_tab: "Switch tab",
+  reveal_in_files: "Reveal in Files",
+};
+
+function titleForToolName(name: string): string {
+  return PENDING_TITLES[name] ?? name;
+}
+
 function commandFromArgs(argsJson: string): string {
   try {
     const parsed = JSON.parse(argsJson) as { data?: unknown };
@@ -40,7 +51,7 @@ function PendingGroup({
     <div className="mx-2 mb-2 overflow-hidden rounded-sm border border-border bg-background">
       <div className="flex items-center justify-between gap-2 px-2 py-1.5">
         <div className="min-w-0">
-          <p className="text-xs">PTY write</p>
+          <p className="text-xs">{titleForToolName(call.name)}</p>
           <p className="text-[10px] text-muted-foreground">Tab · pending</p>
         </div>
         <div className="flex shrink-0 items-center">
@@ -139,13 +150,33 @@ export function Assistant() {
               <React.Fragment key={message.id}>
                 {index > 0 ? <Separator /> : null}
                 <div className="px-2 py-1.5">
-                  <p className={cn(KICKER_CLASS, message.role === "assistant" && "text-primary")}>
-                    {message.role === "user" ? "You" : "Assistant"}
-                  </p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className={cn(KICKER_CLASS, message.role === "assistant" && "text-primary")}>
+                      {message.role === "user" ? "You" : "Assistant"}
+                    </p>
+                    {message.id === "__stream__" ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-4 px-1 text-[10px] text-muted-foreground"
+                        onClick={() => {
+                          void assistant.cancel();
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    ) : null}
+                  </div>
                   <p className="select-text text-xs">{message.content}</p>
                 </div>
               </React.Fragment>
             ))}
+            {assistant.error ? (
+              <div className="px-2 py-1.5">
+                <p className={cn(KICKER_CLASS, "text-destructive")}>Error</p>
+                <p className="select-text text-xs text-destructive">{assistant.error.message}</p>
+              </div>
+            ) : null}
             {assistant.pending.map((call) => (
               <PendingGroup
                 key={call.id}

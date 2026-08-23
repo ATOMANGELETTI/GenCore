@@ -18,7 +18,7 @@ vi.mock("../../src/modules/ipc/ipc.assistant", () => ({
   listConversations: vi.fn(() => Promise.resolve([])),
   createConversation: vi.fn(),
   deleteConversation: vi.fn(),
-  listMessages: vi.fn(() => Promise.resolve([])),
+  listMessages: vi.fn(() => Promise.resolve({ messages: [], pending: [] })),
   sendMessage: vi.fn(),
   cancelTurn: vi.fn(),
   confirmAction: vi.fn(),

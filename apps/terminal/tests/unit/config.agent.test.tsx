@@ -141,6 +141,41 @@ describe("useAgentSettings", () => {
     });
   });
 
+  it("saveKey resolves true on success and false when setApiKey rejects", async () => {
+    const user = userEvent.setup();
+    setApiKey.mockRejectedValueOnce(new Error("dpapi failed"));
+    let lastResult: boolean | undefined;
+
+    function ResultProbe() {
+      const agent = useAgentSettings();
+      return (
+        <button
+          type="button"
+          onClick={() => {
+            void agent.saveKey("secret-key").then((result) => {
+              lastResult = result;
+            });
+          }}
+        >
+          save-key-result
+        </button>
+      );
+    }
+
+    render(
+      <AgentSettingsProvider>
+        <ResultProbe />
+      </AgentSettingsProvider>,
+    );
+    await waitFor(() => expect(getAgentSettings).toHaveBeenCalledTimes(1));
+
+    await user.click(screen.getByText("save-key-result"));
+    await waitFor(() => expect(lastResult).toBe(false));
+
+    await user.click(screen.getByText("save-key-result"));
+    await waitFor(() => expect(lastResult).toBe(true));
+  });
+
   it("clearKey calls clearApiKey and flips hasApiKey to false", async () => {
     const user = userEvent.setup();
     getAgentSettings.mockResolvedValue({
@@ -161,7 +196,7 @@ describe("useAgentSettings", () => {
     });
   });
 
-  it("replaceKey flips hasApiKey to false locally without calling clearApiKey", async () => {
+  it("replaceKey does not flip hasApiKey or call any IPC (Config owns the local replacing draft)", async () => {
     const user = userEvent.setup();
     getAgentSettings.mockResolvedValue({
       model: "gemini-3.7-flash",
@@ -173,7 +208,8 @@ describe("useAgentSettings", () => {
 
     await user.click(screen.getByText("replace-key"));
 
-    expect(screen.getByTestId("has-key")).toHaveTextContent("false");
+    expect(screen.getByTestId("has-key")).toHaveTextContent("true");
     expect(clearApiKey).not.toHaveBeenCalled();
+    expect(setApiKey).not.toHaveBeenCalled();
   });
 });

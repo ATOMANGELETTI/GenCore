@@ -6,6 +6,7 @@ import {
 } from "../config/config.agent";
 import { toFilesSelection, useFileTreeApiOptional } from "../file-tree/file-tree.hook";
 import {
+  cancelTurn,
   confirmAction,
   createConversation,
   listConversations,
@@ -25,9 +26,12 @@ import type {
 } from "../ipc/ipc.types";
 import { useTerminalSessionOptional } from "../terminal/terminal.hook";
 import { buildSnapshot } from "./assistant.snapshot";
-import type { AssistantApi } from "./assistant.types";
+import type { AssistantApi, AssistantErrorInfo } from "./assistant.types";
 
 export { useAgentSettings };
+
+/** Composer draft key for the state before any conversation has been selected. */
+const NEW_CHAT_COMPOSER_KEY = "";
 
 /**
  * Applies a `gencore-assistant://ui-action` payload emitted after the user
@@ -57,6 +61,13 @@ export function applyAssistantUiAction(
   }
 }
 
+/** Renders a caught IPC rejection (a plain string/Error, never `{ code, message }`) as an `AssistantErrorInfo`. */
+function describeCaughtError(err: unknown): AssistantErrorInfo {
+  const message =
+    err instanceof Error ? err.message : typeof err === "string" ? err : "Unknown error";
+  return { code: "Error", message };
+}
+
 /**
  * Test-only stub for specs that only care about `hasApiKey`. Provides the
  * same context `useAgentSettings()` (from `config.agent.ts`) reads from, so
@@ -77,7 +88,7 @@ export function AgentSettingsStubProvider({
       hasApiKey,
       setModel: () => undefined,
       setContextLines: () => undefined,
-      saveKey: async () => undefined,
+      saveKey: async () => true,
       clearKey: async () => undefined,
       replaceKey: () => undefined,
     }),
@@ -104,7 +115,12 @@ export function useAssistant(): AssistantApi {
   const [streamTextByConversation, setStreamTextByConversation] = React.useState<
     Record<string, string>
   >({});
-  const [composer, setComposer] = React.useState("");
+  const [errorByConversation, setErrorByConversation] = React.useState<
+    Record<string, AssistantErrorInfo | undefined>
+  >({});
+  const [composerByConversation, setComposerByConversation] = React.useState<
+    Record<string, string>
+  >({});
   const conversationIdRef = React.useRef<string | null>(null);
   conversationIdRef.current = conversationId;
   // useFileTree()/TerminalProvider hand back a new object on nearly every
@@ -118,6 +134,18 @@ export function useAssistant(): AssistantApi {
   terminalSessionRef.current = terminalSession;
   const fileTreeApiRef = React.useRef(fileTreeApi);
   fileTreeApiRef.current = fileTreeApi;
+
+  // Composer drafts are keyed by conversation id (like messages/pending/
+  // streaming) so a History click swaps to that chat's own draft instead of
+  // carrying over whatever was typed for the previous one.
+  const composerKey = conversationId ?? NEW_CHAT_COMPOSER_KEY;
+  const composer = composerByConversation[composerKey] ?? "";
+  const setComposer = React.useCallback(
+    (value: string) => {
+      setComposerByConversation((current) => ({ ...current, [composerKey]: value }));
+    },
+    [composerKey],
+  );
 
   // A fetched message list only ever lands if its conversation is still active,
   // and any optimistic `local-user-*` row for that conversation survives unless
@@ -148,6 +176,20 @@ export function useAssistant(): AssistantApi {
     [],
   );
 
+  // Mirrors `applyFetchedMessages`'s active-conversation guard: `list_messages`
+  // hydrates pending tool calls from SQLite (Important 2) the same way it
+  // hydrates the message history, so a reload or a History click restores an
+  // unresolved Approve/Reject card instead of showing an empty ledger.
+  const applyFetchedPending = React.useCallback(
+    (requestedId: string, pending: readonly AssistantToolCall[]) => {
+      if (conversationIdRef.current !== requestedId) {
+        return;
+      }
+      setPendingByConversation((current) => ({ ...current, [requestedId]: [...pending] }));
+    },
+    [],
+  );
+
   React.useEffect(() => {
     let cancelled = false;
     void listConversations()
@@ -174,16 +216,17 @@ export function useAssistant(): AssistantApi {
     }
     let cancelled = false;
     void listMessages(conversationId)
-      .then((list) => {
+      .then(({ messages, pending }) => {
         if (!cancelled) {
-          applyFetchedMessages(conversationId, list);
+          applyFetchedMessages(conversationId, messages);
+          applyFetchedPending(conversationId, pending);
         }
       })
       .catch(() => undefined);
     return () => {
       cancelled = true;
     };
-  }, [conversationId, applyFetchedMessages]);
+  }, [conversationId, applyFetchedMessages, applyFetchedPending]);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -204,6 +247,7 @@ export function useAssistant(): AssistantApi {
         ...current,
         [id]: `${current[id] ?? ""}${payload.text}`,
       }));
+      setErrorByConversation((current) => ({ ...current, [id]: undefined }));
     })
       .then(keep)
       .catch(() => undefined);
@@ -216,9 +260,11 @@ export function useAssistant(): AssistantApi {
       }));
       setStreamingByConversation((current) => ({ ...current, [id]: false }));
       setStreamTextByConversation((current) => ({ ...current, [id]: "" }));
+      setErrorByConversation((current) => ({ ...current, [id]: undefined }));
       void listMessages(id)
-        .then((list) => {
-          applyFetchedMessages(id, list);
+        .then(({ messages, pending }) => {
+          applyFetchedMessages(id, messages);
+          applyFetchedPending(id, pending);
         })
         .catch(() => undefined);
     })
@@ -228,6 +274,10 @@ export function useAssistant(): AssistantApi {
     void subscribeAssistantError((payload) => {
       const id = payload.conversation_id;
       setStreamingByConversation((current) => ({ ...current, [id]: false }));
+      setErrorByConversation((current) => ({
+        ...current,
+        [id]: { code: payload.code, message: payload.message },
+      }));
     })
       .then(keep)
       .catch(() => undefined);
@@ -238,7 +288,7 @@ export function useAssistant(): AssistantApi {
         stop();
       }
     };
-  }, [applyFetchedMessages]);
+  }, [applyFetchedMessages, applyFetchedPending]);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -289,6 +339,7 @@ export function useAssistant(): AssistantApi {
       const sendingId = id;
       setStreamingByConversation((current) => ({ ...current, [sendingId]: true }));
       setStreamTextByConversation((current) => ({ ...current, [sendingId]: "" }));
+      setErrorByConversation((current) => ({ ...current, [sendingId]: undefined }));
       const snapshot = buildSnapshot({
         tabs: terminalSession?.tabs ?? [],
         activeId: terminalSession?.activeId ?? "",
@@ -305,13 +356,16 @@ export function useAssistant(): AssistantApi {
         setStreamingByConversation((current) => ({ ...current, [sendingId]: false }));
         return;
       }
+      // Clear the draft slot the text was actually typed into (the active
+      // conversation at the time `send` was called) — safe regardless of
+      // which conversation is current now, since drafts are keyed per chat.
+      setComposerByConversation((current) => ({ ...current, [composerKey]: "" }));
       // If History moved to another chat while this send was in flight, leave
-      // that chat's composer and ledger alone; the real message is already
-      // persisted and will arrive through that conversation's own fetch.
+      // that chat's ledger alone; the real message is already persisted and
+      // will arrive through that conversation's own fetch.
       if (conversationIdRef.current !== sendingId) {
         return;
       }
-      setComposer("");
       setMessagesByConversation((current) => ({
         ...current,
         [sendingId]: [
@@ -325,14 +379,16 @@ export function useAssistant(): AssistantApi {
           },
         ],
       }));
-    } catch {
+    } catch (err) {
       if (id) {
         const failedId = id;
         setStreamingByConversation((current) => ({ ...current, [failedId]: false }));
+        setErrorByConversation((current) => ({ ...current, [failedId]: describeCaughtError(err) }));
       }
     }
   }, [
     composer,
+    composerKey,
     conversationId,
     contextLines,
     fileTreeApi,
@@ -354,6 +410,7 @@ export function useAssistant(): AssistantApi {
       }));
       setStreamingByConversation((current) => ({ ...current, [created.id]: false }));
       setStreamTextByConversation((current) => ({ ...current, [created.id]: "" }));
+      setErrorByConversation((current) => ({ ...current, [created.id]: undefined }));
     } catch {
       // Keep the current thread when create fails (no Tauri in some tests).
     }
@@ -364,19 +421,68 @@ export function useAssistant(): AssistantApi {
     setConversationId(id);
   }, []);
 
-  const confirmPending = React.useCallback(async (id: string) => {
-    try {
-      await confirmAction(id);
-    } catch {
-      // Confirm is best-effort in this task; the pending row stays until a turn event.
+  // Drops `id` from the active conversation's pending list and marks it
+  // streaming (a resume-Gemini background task is now in flight on the Rust
+  // side) as soon as the gate itself succeeds — never waiting on the `://turn`
+  // event that eventually follows (Critical 1). A later `://turn` still
+  // replaces pending with its own `payload.pending`, which is the source of
+  // truth once it arrives.
+  const settlePendingAction = React.useCallback((id: string) => {
+    const activeId = conversationIdRef.current;
+    if (!activeId) {
+      return;
     }
+    setPendingByConversation((current) => ({
+      ...current,
+      [activeId]: (current[activeId] ?? []).filter((call) => call.id !== id),
+    }));
+    setStreamingByConversation((current) => ({ ...current, [activeId]: true }));
+    setStreamTextByConversation((current) => ({ ...current, [activeId]: "" }));
+    setErrorByConversation((current) => ({ ...current, [activeId]: undefined }));
   }, []);
 
-  const rejectPending = React.useCallback(async (id: string) => {
+  const recordPendingActionError = React.useCallback((err: unknown) => {
+    const activeId = conversationIdRef.current;
+    if (!activeId) {
+      return;
+    }
+    setErrorByConversation((current) => ({ ...current, [activeId]: describeCaughtError(err) }));
+  }, []);
+
+  const confirmPending = React.useCallback(
+    async (id: string) => {
+      try {
+        await confirmAction(id);
+        settlePendingAction(id);
+      } catch (err) {
+        // Failed confirm/reject keeps the card so the user can retry it.
+        recordPendingActionError(err);
+      }
+    },
+    [settlePendingAction, recordPendingActionError],
+  );
+
+  const rejectPending = React.useCallback(
+    async (id: string) => {
+      try {
+        await rejectAction(id);
+        settlePendingAction(id);
+      } catch (err) {
+        recordPendingActionError(err);
+      }
+    },
+    [settlePendingAction, recordPendingActionError],
+  );
+
+  const cancel = React.useCallback(async () => {
+    const activeId = conversationIdRef.current;
+    if (!activeId) {
+      return;
+    }
     try {
-      await rejectAction(id);
+      await cancelTurn(activeId);
     } catch {
-      // Reject is best-effort in this task; the pending row stays until a turn event.
+      // Best-effort; the stream may finish on its own before cancel lands.
     }
   }, []);
 
@@ -387,6 +493,7 @@ export function useAssistant(): AssistantApi {
     pending: conversationId ? (pendingByConversation[conversationId] ?? []) : [],
     streaming: conversationId ? (streamingByConversation[conversationId] ?? false) : false,
     streamText: conversationId ? (streamTextByConversation[conversationId] ?? "") : "",
+    error: conversationId ? (errorByConversation[conversationId] ?? null) : null,
     composer,
     hasApiKey,
     setComposer,
@@ -395,5 +502,6 @@ export function useAssistant(): AssistantApi {
     selectConversation,
     confirmPending,
     rejectPending,
+    cancel,
   };
 }

@@ -62,6 +62,7 @@ export function Config() {
   const radioRefs = React.useRef<Partial<Record<ThemePreference, HTMLButtonElement | null>>>({});
   const modelRadioRefs = React.useRef<Partial<Record<string, HTMLButtonElement | null>>>({});
   const [keyDraft, setKeyDraft] = React.useState("");
+  const [replacing, setReplacing] = React.useState(false);
   const [contextDraft, setContextDraft] = React.useState(() => String(agent.contextLines));
 
   React.useEffect(() => {
@@ -110,12 +111,28 @@ export function Config() {
     }
   }
 
-  function handleSaveKey() {
+  async function handleSaveKey() {
     const trimmed = keyDraft.trim();
     if (!trimmed) {
       return;
     }
-    void agent.saveKey(trimmed);
+    // Only exit `replacing` and clear the draft once the key is actually
+    // saved — a failed save leaves the draft in place so the user can retry
+    // (Important 9).
+    const saved = await agent.saveKey(trimmed);
+    if (saved) {
+      setKeyDraft("");
+      setReplacing(false);
+    }
+  }
+
+  function handleReplaceKey() {
+    agent.replaceKey();
+    setReplacing(true);
+  }
+
+  function handleCancelReplace() {
+    setReplacing(false);
     setKeyDraft("");
   }
 
@@ -195,20 +212,14 @@ export function Config() {
 
         <p className={SECTION_LABEL_CLASS}>Assistant</p>
         <div className="overflow-hidden rounded-sm border border-border bg-background">
-          {agent.hasApiKey ? (
+          {agent.hasApiKey && !replacing ? (
             <div className="flex items-center justify-between gap-2 px-2 py-1.5">
               <div className="min-w-0">
                 <p className="text-xs text-primary">Gemini API key</p>
                 <p className="text-[10px] text-muted-foreground">Key saved · Windows DPAPI</p>
               </div>
               <div className="flex shrink-0 items-center">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    agent.replaceKey();
-                  }}
-                >
+                <Button variant="ghost" size="sm" onClick={handleReplaceKey}>
                   Replace
                 </Button>
                 <Button
@@ -239,13 +250,24 @@ export function Config() {
                 onKeyDown={(event) => {
                   if (event.key === "Enter") {
                     event.preventDefault();
-                    handleSaveKey();
+                    void handleSaveKey();
                   }
                 }}
               />
-              <Button size="sm" disabled={!keyDraft.trim()} onClick={handleSaveKey}>
+              <Button
+                size="sm"
+                disabled={!keyDraft.trim()}
+                onClick={() => {
+                  void handleSaveKey();
+                }}
+              >
                 Save
               </Button>
+              {replacing ? (
+                <Button variant="ghost" size="sm" onClick={handleCancelReplace}>
+                  Cancel
+                </Button>
+              ) : null}
             </div>
           )}
           <Separator />

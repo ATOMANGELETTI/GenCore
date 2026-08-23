@@ -103,6 +103,9 @@
   const ASSISTANT_ID_MAX_LENGTH = 64;
   const API_KEY_MAX_LENGTH = 4096;
   const OUTPUT_EXCERPT_MAX_LENGTH = 65536;
+  // Same cap as `output_excerpt` — `send_message.text` is free-form user
+  // input with no other length constraint from Rust's `SendMessageArgs`.
+  const SEND_MESSAGE_TEXT_MAX_LENGTH = 65536;
   const SNAPSHOT_TAB_ID_MAX_LENGTH = 256;
   const CONTEXT_LINES_MIN = 20;
   const CONTEXT_LINES_MAX = 200;
@@ -592,6 +595,7 @@
       hasSnapshot &&
       isAssistantId(args.conversation_id) &&
       typeof args.text === "string" &&
+      args.text.length <= SEND_MESSAGE_TEXT_MAX_LENGTH &&
       isAssistantSnapshotArgs(args.snapshot)
     );
   }

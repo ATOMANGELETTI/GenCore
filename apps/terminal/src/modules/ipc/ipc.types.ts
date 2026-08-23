@@ -140,6 +140,15 @@ export interface SendMessageResult {
   readonly accepted: boolean;
 }
 
+/** Mirrors the assistant plugin's `ListMessagesResult` — `list_messages`'s
+ * response shape, carrying any still-`pending` tool calls alongside the
+ * message history so a reloaded conversation hydrates its Approve/Reject
+ * ledger without a dedicated command. */
+export interface ListMessagesResult {
+  readonly messages: readonly AssistantMessage[];
+  readonly pending: readonly AssistantToolCall[];
+}
+
 /** A UI-only tool result the WebView applies after `confirm_action`. */
 export interface AssistantUiAction {
   readonly name: string;
@@ -166,10 +175,14 @@ export interface AssistantTurnPayload {
   readonly pending: readonly AssistantToolCall[];
 }
 
-/** Payload for the `gencore-assistant://error` event. */
+/** Payload for the `gencore-assistant://error` event. `code` is the failing
+ * `AssistantError` variant name (`NoApiKey`, `Gemini`, `PtySessionGone`, …)
+ * so the UI can branch without parsing `message`, which is `err.to_string()`
+ * and never carries key material. */
 export interface AssistantErrorPayload {
   readonly conversation_id: string;
-  readonly error: string;
+  readonly code: string;
+  readonly message: string;
 }
 
 /** Payload for the `gencore-assistant://ui-action` event. */

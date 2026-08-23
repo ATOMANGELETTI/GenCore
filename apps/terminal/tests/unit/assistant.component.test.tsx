@@ -11,6 +11,9 @@ const {
   listConversations,
   listMessages,
   sendMessage,
+  cancelTurn,
+  confirmAction,
+  rejectAction,
   subscribeAssistantToken,
   subscribeAssistantTurn,
   subscribeAssistantError,
@@ -19,6 +22,9 @@ const {
   listConversations: vi.fn(),
   listMessages: vi.fn(),
   sendMessage: vi.fn(),
+  cancelTurn: vi.fn(),
+  confirmAction: vi.fn(),
+  rejectAction: vi.fn(),
   subscribeAssistantToken: vi.fn(),
   subscribeAssistantTurn: vi.fn(),
   subscribeAssistantError: vi.fn(),
@@ -31,9 +37,9 @@ vi.mock("../../src/modules/ipc/ipc.assistant", () => ({
   deleteConversation: vi.fn(),
   listMessages,
   sendMessage,
-  cancelTurn: vi.fn(),
-  confirmAction: vi.fn(),
-  rejectAction: vi.fn(),
+  cancelTurn,
+  confirmAction,
+  rejectAction,
   subscribeAssistantToken,
   subscribeAssistantTurn,
   subscribeAssistantError,
@@ -87,8 +93,11 @@ const PENDING_WRITE: AssistantToolCall = {
 
 function mockIdleIpc() {
   listConversations.mockResolvedValue([]);
-  listMessages.mockResolvedValue([]);
+  listMessages.mockResolvedValue({ messages: [], pending: [] });
   sendMessage.mockResolvedValue({ accepted: true });
+  cancelTurn.mockResolvedValue(undefined);
+  confirmAction.mockResolvedValue({ name: "pty_write", result_json: "{}", ui_action: null });
+  rejectAction.mockResolvedValue(undefined);
   subscribeAssistantToken.mockResolvedValue(() => {});
   subscribeAssistantTurn.mockResolvedValue(() => {});
   subscribeAssistantError.mockResolvedValue(() => {});
@@ -120,7 +129,7 @@ describe("Assistant", () => {
 
   it("renders You and Assistant kickers for ledger messages", async () => {
     listConversations.mockResolvedValue([CONVERSATION]);
-    listMessages.mockResolvedValue([USER_MESSAGE, ASSISTANT_MESSAGE]);
+    listMessages.mockResolvedValue({ messages: [USER_MESSAGE, ASSISTANT_MESSAGE], pending: [] });
 
     renderAssistant(true);
 
@@ -147,7 +156,13 @@ describe("Assistant", () => {
 
   it("shows Approve and Reject for a pending PTY write", async () => {
     listConversations.mockResolvedValue([CONVERSATION]);
-    listMessages.mockResolvedValue([USER_MESSAGE, ASSISTANT_MESSAGE]);
+    // The turn handler refetches `list_messages` after the event below, so
+    // the mock must mirror the persisted pending row too (Important 2), or
+    // the refetch would stomp it back to empty.
+    listMessages.mockResolvedValue({
+      messages: [USER_MESSAGE, ASSISTANT_MESSAGE],
+      pending: [PENDING_WRITE],
+    });
     let onTurn:
       | ((payload: {
           conversation_id: string;
@@ -207,8 +222,13 @@ describe("Assistant", () => {
   it("keeps pending Approve and Reject after switching History and back", async () => {
     const user = userEvent.setup();
     listConversations.mockResolvedValue([CONVERSATION, OTHER_CONVERSATION]);
+    // The turn handler's post-turn refetch and every conversation-select
+    // refetch (Important 2) both read through this mock, so it must mirror
+    // c1's persisted pending row every time it is asked, not just once.
     listMessages.mockImplementation(async (id: string) =>
-      id === "c1" ? [USER_MESSAGE, ASSISTANT_MESSAGE] : [],
+      id === "c1"
+        ? { messages: [USER_MESSAGE, ASSISTANT_MESSAGE], pending: [PENDING_WRITE] }
+        : { messages: [], pending: [] },
     );
     let onTurn:
       | ((payload: {
@@ -252,7 +272,7 @@ describe("Assistant", () => {
   it("shows the You kicker as soon as send accepts", async () => {
     const user = userEvent.setup();
     listConversations.mockResolvedValue([CONVERSATION]);
-    listMessages.mockResolvedValue([]);
+    listMessages.mockResolvedValue({ messages: [], pending: [] });
     sendMessage.mockResolvedValue({ accepted: true });
 
     renderAssistant(true);
@@ -280,5 +300,72 @@ describe("Assistant", () => {
     });
     expect(composer).toHaveValue("keep this draft");
     expect(screen.queryByText("You")).toBeNull();
+  });
+
+  it("titles a pending switch_tab / reveal_in_files card by name instead of always saying PTY write", async () => {
+    listConversations.mockResolvedValue([CONVERSATION]);
+    const pendingSwitchTab: AssistantToolCall = {
+      ...PENDING_WRITE,
+      id: "tool-2",
+      name: "switch_tab",
+      args_json: '{"tab_id":"tab-2"}',
+    };
+    listMessages.mockResolvedValue({ messages: [], pending: [pendingSwitchTab] });
+
+    renderAssistant(true);
+
+    expect(await screen.findByText("Switch tab")).toBeVisible();
+    expect(screen.queryByText("PTY write")).toBeNull();
+  });
+
+  it("renders a compact error row (Nord tokens, no bubbles) after gencore-assistant://error fires (Important 3)", async () => {
+    listConversations.mockResolvedValue([CONVERSATION]);
+    let onError:
+      | ((payload: { conversation_id: string; code: string; message: string }) => void)
+      | undefined;
+    subscribeAssistantError.mockImplementation(async (handler) => {
+      onError = handler;
+      return () => {};
+    });
+
+    renderAssistant(true);
+    await waitFor(() => {
+      expect(onError).toBeTypeOf("function");
+    });
+
+    act(() => {
+      onError?.({ conversation_id: "c1", code: "NoApiKey", message: "no key stored" });
+    });
+
+    expect(await screen.findByText("Error")).toBeVisible();
+    const message = screen.getByText("no key stored");
+    expect(message).toHaveClass("text-destructive");
+    expect(message).not.toHaveClass("rounded-full");
+  });
+
+  it("shows a Cancel control on the streaming row that calls cancelTurn (Important 4)", async () => {
+    const user = userEvent.setup();
+    listConversations.mockResolvedValue([CONVERSATION]);
+    let onToken: ((payload: { conversation_id: string; text: string }) => void) | undefined;
+    subscribeAssistantToken.mockImplementation(async (handler) => {
+      onToken = handler;
+      return () => {};
+    });
+
+    renderAssistant(true);
+    await waitFor(() => {
+      expect(onToken).toBeTypeOf("function");
+    });
+
+    act(() => {
+      onToken?.({ conversation_id: "c1", text: "thinking..." });
+    });
+
+    const cancelButton = await screen.findByRole("button", { name: "Cancel" });
+    await user.click(cancelButton);
+
+    await waitFor(() => {
+      expect(cancelTurn).toHaveBeenCalledWith("c1");
+    });
   });
 });

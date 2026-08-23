@@ -18,6 +18,7 @@ const {
   createConversation,
   listMessages,
   sendMessage,
+  cancelTurn,
   confirmAction,
   rejectAction,
   subscribeAssistantToken,
@@ -29,6 +30,7 @@ const {
   createConversation: vi.fn(),
   listMessages: vi.fn(),
   sendMessage: vi.fn(),
+  cancelTurn: vi.fn(),
   confirmAction: vi.fn(),
   rejectAction: vi.fn(),
   subscribeAssistantToken: vi.fn(),
@@ -43,7 +45,7 @@ vi.mock("../../src/modules/ipc/ipc.assistant", () => ({
   deleteConversation: vi.fn(),
   listMessages,
   sendMessage,
-  cancelTurn: vi.fn(),
+  cancelTurn,
   confirmAction,
   rejectAction,
   subscribeAssistantToken,
@@ -87,6 +89,8 @@ function Probe() {
       <span data-testid="streaming">{String(assistant.streaming)}</span>
       <span data-testid="pending-count">{assistant.pending.length}</span>
       <span data-testid="conversation-id">{assistant.conversationId ?? ""}</span>
+      <span data-testid="error-message">{assistant.error?.message ?? ""}</span>
+      <span data-testid="error-code">{assistant.error?.code ?? ""}</span>
       <ul data-testid="messages">
         {assistant.messages.map((message) => (
           <li key={message.id} data-role={message.role}>
@@ -140,6 +144,9 @@ function Probe() {
       >
         reject
       </button>
+      <button type="button" onClick={() => void assistant.cancel()}>
+        cancel
+      </button>
     </div>
   );
 }
@@ -147,8 +154,9 @@ function Probe() {
 function mockIdleIpc() {
   listConversations.mockResolvedValue([]);
   createConversation.mockResolvedValue(CONVERSATION);
-  listMessages.mockResolvedValue([]);
+  listMessages.mockResolvedValue({ messages: [], pending: [] });
   sendMessage.mockResolvedValue({ accepted: true });
+  cancelTurn.mockResolvedValue(undefined);
   confirmAction.mockResolvedValue({ name: "pty_write", result_json: "{}", ui_action: null });
   rejectAction.mockResolvedValue(undefined);
   subscribeAssistantToken.mockResolvedValue(() => {});
@@ -326,16 +334,36 @@ describe("useAssistant", () => {
     });
   });
 
-  it("confirms and rejects the pending tool id", async () => {
+  const PENDING_TOOL_CALL: AssistantToolCall = {
+    id: "tool-1",
+    conversation_id: "c1",
+    message_id: "m1",
+    name: "pty_write",
+    args_json: "{}",
+    status: "pending",
+    result_json: null,
+    created_at: 1,
+    resolved_at: null,
+  };
+
+  type TurnHandler = (payload: {
+    conversation_id: string;
+    assistant_text: string;
+    pending: { id: string; status: string }[];
+  }) => void;
+
+  async function renderWithOnePending(): Promise<{
+    user: ReturnType<typeof userEvent.setup>;
+    fireTurn: TurnHandler;
+  }> {
     const user = userEvent.setup();
     listConversations.mockResolvedValue([CONVERSATION]);
-    let onTurn:
-      | ((payload: {
-          conversation_id: string;
-          assistant_text: string;
-          pending: { id: string; status: string }[];
-        }) => void)
-      | undefined;
+    // Mirrors what a real `list_messages` would return once the turn below
+    // has persisted this pending tool_call, so the hook's post-turn refetch
+    // (Important 2) does not stomp the optimistic pending state with stale
+    // data — see `confirmPending`/`rejectPending` covering tests below.
+    listMessages.mockResolvedValue({ messages: [], pending: [PENDING_TOOL_CALL] });
+    let onTurn: TurnHandler | undefined;
     subscribeAssistantTurn.mockImplementation(async (handler) => {
       onTurn = handler;
       return () => {};
@@ -350,50 +378,125 @@ describe("useAssistant", () => {
       conversation_id: "c1",
       assistant_text: "ok",
       pending: [{ id: "tool-1", status: "pending" }],
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId("pending-count")).toHaveTextContent("1");
+    });
+
+    return {
+      user,
+      fireTurn: (payload) => onTurn?.(payload),
+    };
+  }
+
+  it("confirmPending drops the pending row and marks the conversation streaming immediately (Critical 1)", async () => {
+    const { user } = await renderWithOnePending();
+
+    await user.click(screen.getByText("approve"));
+
+    await waitFor(() => {
+      expect(confirmAction).toHaveBeenCalledWith("tool-1");
+    });
+    // No `://turn` event fires in this test — the drop and the streaming
+    // flag must come from the confirm call succeeding, not from a turn event.
+    await waitFor(() => {
+      expect(screen.getByTestId("pending-count")).toHaveTextContent("0");
+    });
+    expect(screen.getByTestId("streaming")).toHaveTextContent("true");
+  });
+
+  it("rejectPending drops the pending row and marks the conversation streaming immediately (Critical 1)", async () => {
+    const { user } = await renderWithOnePending();
+
+    await user.click(screen.getByText("reject"));
+
+    await waitFor(() => {
+      expect(rejectAction).toHaveBeenCalledWith("tool-1");
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId("pending-count")).toHaveTextContent("0");
+    });
+    expect(screen.getByTestId("streaming")).toHaveTextContent("true");
+  });
+
+  it("keeps the pending card and records an error when confirmAction rejects", async () => {
+    confirmAction.mockRejectedValue(new Error("PtySessionGone"));
+    const { user } = await renderWithOnePending();
+
+    await user.click(screen.getByText("approve"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("error-message")).toHaveTextContent("PtySessionGone");
+    });
+    expect(screen.getByTestId("pending-count")).toHaveTextContent("1");
+    expect(screen.getByTestId("streaming")).toHaveTextContent("false");
+  });
+
+  it("keeps the pending card and records an error when rejectAction rejects", async () => {
+    rejectAction.mockRejectedValue(new Error("ActionNotPending"));
+    const { user } = await renderWithOnePending();
+
+    await user.click(screen.getByText("reject"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("error-message")).toHaveTextContent("ActionNotPending");
+    });
+    expect(screen.getByTestId("pending-count")).toHaveTextContent("1");
+  });
+
+  it("a later turn event still replaces pending with payload.pending after a confirm", async () => {
+    const { user, fireTurn } = await renderWithOnePending();
+
+    await user.click(screen.getByText("approve"));
+    await waitFor(() => {
+      expect(screen.getByTestId("pending-count")).toHaveTextContent("0");
+    });
+
+    // The refetch this turn triggers must reflect the same persisted state,
+    // or it would stomp `payload.pending` right back out.
+    listMessages.mockResolvedValue({
+      messages: [],
+      pending: [{ ...PENDING_TOOL_CALL, id: "tool-2" }],
+    });
+    fireTurn({
+      conversation_id: "c1",
+      assistant_text: "follow-up",
+      pending: [{ id: "tool-2", status: "pending" }],
     });
 
     await waitFor(() => {
       expect(screen.getByTestId("pending-count")).toHaveTextContent("1");
     });
-
-    await user.click(screen.getByText("approve"));
-    await waitFor(() => {
-      expect(confirmAction).toHaveBeenCalledWith("tool-1");
-    });
-
-    await user.click(screen.getByText("reject"));
-    await waitFor(() => {
-      expect(rejectAction).toHaveBeenCalledWith("tool-1");
-    });
   });
 
-  it("keeps pending after selecting another conversation and returning", async () => {
+  it("hydrates pending tool calls from list_messages when selecting a conversation", async () => {
     const user = userEvent.setup();
     listConversations.mockResolvedValue([CONVERSATION, OTHER_CONVERSATION]);
-    let onTurn:
-      | ((payload: {
-          conversation_id: string;
-          assistant_text: string;
-          pending: Pick<AssistantToolCall, "id" | "status">[];
-        }) => void)
-      | undefined;
-    subscribeAssistantTurn.mockImplementation(async (handler) => {
-      onTurn = handler;
-      return () => {};
-    });
+    listMessages.mockImplementation((id: string) =>
+      Promise.resolve({
+        messages: [],
+        pending:
+          id === "c1"
+            ? [
+                {
+                  id: "tool-1",
+                  conversation_id: "c1",
+                  message_id: "m1",
+                  name: "pty_write",
+                  args_json: "{}",
+                  status: "pending",
+                  result_json: null,
+                  created_at: 1,
+                  resolved_at: null,
+                },
+              ]
+            : [],
+      }),
+    );
 
     renderHookProbe(true);
     await waitFor(() => {
       expect(screen.getByTestId("conversation-id")).toHaveTextContent("c1");
-      expect(onTurn).toBeTypeOf("function");
-    });
-
-    onTurn?.({
-      conversation_id: "c1",
-      assistant_text: "ok",
-      pending: [{ id: "tool-1", status: "pending" }],
-    });
-    await waitFor(() => {
       expect(screen.getByTestId("pending-count")).toHaveTextContent("1");
     });
 
@@ -450,14 +553,14 @@ describe("useAssistant", () => {
     expect(screen.getByTestId("messages")).toBeEmptyDOMElement();
   });
 
-  it("does not let a delayed empty listMessages([]) wipe the You row on a brand-new chat", async () => {
+  it("does not let a delayed empty listMessages result wipe the You row on a brand-new chat", async () => {
     const user = userEvent.setup();
     listConversations.mockResolvedValue([]);
     createConversation.mockResolvedValue(CONVERSATION);
-    let resolveList: ((value: never[]) => void) | undefined;
+    let resolveList: ((value: { messages: never[]; pending: never[] }) => void) | undefined;
     listMessages.mockImplementation(
       () =>
-        new Promise<never[]>((resolve) => {
+        new Promise<{ messages: never[]; pending: never[] }>((resolve) => {
           resolveList = resolve;
         }),
     );
@@ -479,9 +582,9 @@ describe("useAssistant", () => {
       expect(userTurn).toHaveTextContent("hello");
     });
 
-    // The listMessages([]) fired when the new conversation id was set settles
+    // The listMessages() fired when the new conversation id was set settles
     // only now, well after the You row was appended.
-    resolveList?.([]);
+    resolveList?.({ messages: [], pending: [] });
     await waitFor(() => {
       expect(listMessages).toHaveBeenCalledWith("c1");
     });
@@ -515,14 +618,18 @@ describe("useAssistant", () => {
       return () => {};
     });
 
-    const pendingC1Resolvers: Array<(value: AssistantMessage[]) => void> = [];
+    const pendingC1Resolvers: Array<
+      (value: { messages: AssistantMessage[]; pending: AssistantToolCall[] }) => void
+    > = [];
     listMessages.mockImplementation((conversationId: string) => {
       if (conversationId === "c1") {
-        return new Promise<AssistantMessage[]>((resolve) => {
-          pendingC1Resolvers.push(resolve);
-        });
+        return new Promise<{ messages: AssistantMessage[]; pending: AssistantToolCall[] }>(
+          (resolve) => {
+            pendingC1Resolvers.push(resolve);
+          },
+        );
       }
-      return Promise.resolve([]);
+      return Promise.resolve({ messages: [], pending: [] });
     });
 
     renderHookProbe(true);
@@ -564,9 +671,12 @@ describe("useAssistant", () => {
     expect(screen.getByTestId("messages")).toBeEmptyDOMElement();
 
     // The stale turn's listMessages(c1) settles after everything above.
-    pendingC1Resolvers[pendingC1Resolvers.length - 1]?.([
-      { id: "m1", conversation_id: "c1", role: "user", content: "hello from c1", created_at: 1 },
-    ]);
+    pendingC1Resolvers[pendingC1Resolvers.length - 1]?.({
+      messages: [
+        { id: "m1", conversation_id: "c1", role: "user", content: "hello from c1", created_at: 1 },
+      ],
+      pending: [],
+    });
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(screen.getByLabelText("composer")).toHaveValue("draft for c2");
@@ -577,7 +687,9 @@ describe("useAssistant", () => {
     const user = userEvent.setup();
     listConversations.mockResolvedValue([CONVERSATION, OTHER_CONVERSATION]);
     listMessages.mockImplementation((id: string) =>
-      id === "c2" ? Promise.reject(new Error("network down")) : Promise.resolve([]),
+      id === "c2"
+        ? Promise.reject(new Error("network down"))
+        : Promise.resolve({ messages: [], pending: [] }),
     );
 
     renderHookProbe(true);
@@ -605,6 +717,121 @@ describe("useAssistant", () => {
 
     expect(screen.getByTestId("messages").querySelector("[data-role='user']")).toBeNull();
     expect(screen.getByTestId("messages")).toBeEmptyDOMElement();
+  });
+
+  it("records a { code, message } error and clears streaming when gencore-assistant://error fires (Important 3)", async () => {
+    listConversations.mockResolvedValue([CONVERSATION]);
+    let onError:
+      | ((payload: { conversation_id: string; code: string; message: string }) => void)
+      | undefined;
+    subscribeAssistantError.mockImplementation(async (handler) => {
+      onError = handler;
+      return () => {};
+    });
+
+    renderHookProbe(true);
+    await waitFor(() => {
+      expect(onError).toBeTypeOf("function");
+    });
+
+    onError?.({ conversation_id: "c1", code: "NoApiKey", message: "no key stored" });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("error-code")).toHaveTextContent("NoApiKey");
+    });
+    expect(screen.getByTestId("error-message")).toHaveTextContent("no key stored");
+    expect(screen.getByTestId("streaming")).toHaveTextContent("false");
+  });
+
+  it("clears a recorded error once a token or turn event lands for that conversation", async () => {
+    listConversations.mockResolvedValue([CONVERSATION]);
+    let onError:
+      | ((payload: { conversation_id: string; code: string; message: string }) => void)
+      | undefined;
+    subscribeAssistantError.mockImplementation(async (handler) => {
+      onError = handler;
+      return () => {};
+    });
+    let onToken: ((payload: { conversation_id: string; text: string }) => void) | undefined;
+    subscribeAssistantToken.mockImplementation(async (handler) => {
+      onToken = handler;
+      return () => {};
+    });
+
+    renderHookProbe(true);
+    await waitFor(() => {
+      expect(onError).toBeTypeOf("function");
+      expect(onToken).toBeTypeOf("function");
+    });
+
+    onError?.({ conversation_id: "c1", code: "Gemini", message: "boom" });
+    await waitFor(() => {
+      expect(screen.getByTestId("error-message")).toHaveTextContent("boom");
+    });
+
+    onToken?.({ conversation_id: "c1", text: "hi" });
+    await waitFor(() => {
+      expect(screen.getByTestId("error-message")).toHaveTextContent("");
+    });
+  });
+
+  it("records an error when send rejects", async () => {
+    const user = userEvent.setup();
+    listConversations.mockResolvedValue([CONVERSATION]);
+    sendMessage.mockRejectedValue(new Error("network down"));
+    renderHookProbe(true);
+    await waitFor(() => {
+      expect(listConversations).toHaveBeenCalledTimes(1);
+    });
+
+    await user.type(screen.getByLabelText("composer"), "hello");
+    await user.click(screen.getByText("send"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("error-message")).toHaveTextContent("network down");
+    });
+  });
+
+  it("cancel() calls cancelTurn for the active conversation (Important 4)", async () => {
+    const user = userEvent.setup();
+    listConversations.mockResolvedValue([CONVERSATION]);
+    renderHookProbe(true);
+    await waitFor(() => {
+      expect(screen.getByTestId("conversation-id")).toHaveTextContent("c1");
+    });
+
+    await user.click(screen.getByText("cancel"));
+
+    await waitFor(() => {
+      expect(cancelTurn).toHaveBeenCalledWith("c1");
+    });
+  });
+
+  it("keys composer drafts by conversation: switching chats swaps drafts instead of sharing them (Important 10)", async () => {
+    const user = userEvent.setup();
+    listConversations.mockResolvedValue([CONVERSATION, OTHER_CONVERSATION]);
+    renderHookProbe(true);
+    await waitFor(() => {
+      expect(screen.getByTestId("conversation-id")).toHaveTextContent("c1");
+    });
+
+    await user.type(screen.getByLabelText("composer"), "draft for c1");
+    expect(screen.getByLabelText("composer")).toHaveValue("draft for c1");
+
+    await user.click(screen.getByText("select-c2"));
+    await waitFor(() => {
+      expect(screen.getByTestId("conversation-id")).toHaveTextContent("c2");
+    });
+    expect(screen.getByLabelText("composer")).toHaveValue("");
+
+    await user.type(screen.getByLabelText("composer"), "draft for c2");
+    expect(screen.getByLabelText("composer")).toHaveValue("draft for c2");
+
+    await user.click(screen.getByText("select-c1"));
+    await waitFor(() => {
+      expect(screen.getByTestId("conversation-id")).toHaveTextContent("c1");
+    });
+    expect(screen.getByLabelText("composer")).toHaveValue("draft for c1");
   });
 
   it("switches tabs and reveals a path when a ui-action fires after confirm", async () => {

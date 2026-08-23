@@ -13,7 +13,8 @@ export interface AgentSettingsValue {
   readonly hasApiKey: boolean;
   readonly setModel: (model: string) => void;
   readonly setContextLines: (lines: number) => void;
-  readonly saveKey: (key: string) => Promise<void>;
+  /** Resolves `true` once the key is actually saved; `false` on a failed IPC call. */
+  readonly saveKey: (key: string) => Promise<boolean>;
   readonly clearKey: () => Promise<void>;
   readonly replaceKey: () => void;
 }
@@ -24,7 +25,7 @@ const DEFAULT_AGENT_SETTINGS: AgentSettingsValue = {
   hasApiKey: false,
   setModel: () => undefined,
   setContextLines: () => undefined,
-  saveKey: async () => undefined,
+  saveKey: async () => false,
   clearKey: async () => undefined,
   replaceKey: () => undefined,
 };
@@ -74,12 +75,15 @@ export function useAgentSettingsState(): AgentSettingsValue {
     });
   }, []);
 
-  const saveKey = React.useCallback(async (key: string) => {
+  const saveKey = React.useCallback(async (key: string): Promise<boolean> => {
     try {
       await setApiKey(key);
       setHasApiKey(true);
+      return true;
     } catch {
-      // Best-effort; the unsaved-key input stays visible so the user can retry.
+      // The unsaved-key input stays visible (and, for a Replace, `replacing`
+      // stays true) so the user can retry — see Config's `handleSaveKey`.
+      return false;
     }
   }, []);
 
@@ -92,11 +96,11 @@ export function useAgentSettingsState(): AgentSettingsValue {
     }
   }, []);
 
-  // Only flips the local view back to the unsaved-key input; the stored key
-  // is untouched until `saveKey` persists a replacement.
-  const replaceKey = React.useCallback(() => {
-    setHasApiKey(false);
-  }, []);
+  // `hasApiKey` is the stored-key truth and must not flip just because the
+  // user opened the Replace draft — Config keeps its own local `replacing`
+  // state for that. The stored key is untouched until `saveKey` persists a
+  // replacement (Important 9).
+  const replaceKey = React.useCallback(() => undefined, []);
 
   return React.useMemo(
     () => ({

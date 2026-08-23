@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Config } from "../../src/modules/config/config.component";
@@ -44,7 +44,8 @@ describe("Config", () => {
     setPreference.mockClear();
     setModel.mockClear();
     setContextLines.mockClear();
-    saveKey.mockClear();
+    saveKey.mockReset();
+    saveKey.mockResolvedValue(true);
     clearKey.mockClear();
     replaceKey.mockClear();
     agentSettingsState.model = "gemini-3.7-flash";
@@ -128,7 +129,7 @@ describe("Config", () => {
       expect(screen.getByRole("button", { name: "Save" })).toBeInTheDocument();
     });
 
-    it("calls saveKey and clears the draft when Save is clicked", async () => {
+    it("calls saveKey and clears the draft once the save succeeds", async () => {
       const user = userEvent.setup();
       render(<Config />);
 
@@ -136,7 +137,23 @@ describe("Config", () => {
       await user.click(screen.getByRole("button", { name: "Save" }));
 
       expect(saveKey).toHaveBeenCalledWith("secret-key");
-      expect(screen.getByLabelText("Gemini API key")).toHaveValue("");
+      await waitFor(() => {
+        expect(screen.getByLabelText("Gemini API key")).toHaveValue("");
+      });
+    });
+
+    it("keeps the draft when saveKey resolves false (failed save)", async () => {
+      saveKey.mockResolvedValueOnce(false);
+      const user = userEvent.setup();
+      render(<Config />);
+
+      await user.type(screen.getByLabelText("Gemini API key"), "secret-key");
+      await user.click(screen.getByRole("button", { name: "Save" }));
+
+      await waitFor(() => {
+        expect(saveKey).toHaveBeenCalledWith("secret-key");
+      });
+      expect(screen.getByLabelText("Gemini API key")).toHaveValue("secret-key");
     });
 
     it("shows the saved-key copy and never echoes the plaintext key", () => {
@@ -150,16 +167,47 @@ describe("Config", () => {
       expect(screen.getByRole("button", { name: "Clear" })).toBeInTheDocument();
     });
 
-    it("calls replaceKey and clearKey from the saved-key actions", async () => {
+    it("calls clearKey from the saved-key actions", async () => {
+      const user = userEvent.setup();
+      agentSettingsState.hasApiKey = true;
+      render(<Config />);
+
+      await user.click(screen.getByRole("button", { name: "Clear" }));
+      expect(clearKey).toHaveBeenCalledTimes(1);
+    });
+
+    it("Replace shows the draft input without flipping hasApiKey, and Cancel restores the saved-key row", async () => {
       const user = userEvent.setup();
       agentSettingsState.hasApiKey = true;
       render(<Config />);
 
       await user.click(screen.getByRole("button", { name: "Replace" }));
-      expect(replaceKey).toHaveBeenCalledTimes(1);
 
-      await user.click(screen.getByRole("button", { name: "Clear" }));
-      expect(clearKey).toHaveBeenCalledTimes(1);
+      expect(replaceKey).toHaveBeenCalledTimes(1);
+      expect(screen.getByLabelText("Gemini API key")).toBeInTheDocument();
+      expect(screen.queryByText("Key saved · Windows DPAPI")).toBeNull();
+
+      await user.click(screen.getByRole("button", { name: "Cancel" }));
+
+      expect(screen.queryByLabelText("Gemini API key")).toBeNull();
+      expect(screen.getByText("Key saved · Windows DPAPI")).toBeVisible();
+      expect(saveKey).not.toHaveBeenCalled();
+    });
+
+    it("exits the replacing draft once saveKey succeeds", async () => {
+      const user = userEvent.setup();
+      agentSettingsState.hasApiKey = true;
+      render(<Config />);
+
+      await user.click(screen.getByRole("button", { name: "Replace" }));
+      await user.type(screen.getByLabelText("Gemini API key"), "new-secret");
+      await user.click(screen.getByRole("button", { name: "Save" }));
+
+      expect(saveKey).toHaveBeenCalledWith("new-secret");
+      await waitFor(() => {
+        expect(screen.queryByLabelText("Gemini API key")).toBeNull();
+      });
+      expect(screen.getByText("Key saved · Windows DPAPI")).toBeVisible();
     });
   });
 
