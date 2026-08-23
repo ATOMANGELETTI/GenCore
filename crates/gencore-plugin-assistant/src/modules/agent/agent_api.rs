@@ -148,10 +148,16 @@ pub struct TurnResult {
 /// Sends `user_text` as a new user turn.
 ///
 /// Persists the user message and `snapshot` (stamped with `conversation_id`
-/// — the caller-supplied snapshot's own `conversation_id` is ignored),
-/// rewrites a still-default conversation title, then calls `transport` once
-/// under the pending rule described on [`run_turn`]. Never calls
-/// `confirm_tool`, `reject_tool`, or `write_session`.
+/// — the caller-supplied snapshot's own `conversation_id` is ignored), then
+/// calls [`continue_turn`]. Kept for tests and other direct callers that
+/// want a single persist-and-continue call.
+///
+/// `send_message`'s IPC command does **not** call this: it persists the
+/// message/snapshot itself (synchronously, before returning
+/// `{ accepted: true }`, so a persist failure surfaces on the command) and
+/// calls [`continue_turn`] directly from its spawned background task —
+/// calling `send_turn` there would insert the user message and snapshot a
+/// second time.
 pub fn send_turn(
     store: &AssistantStore,
     transport: &dyn GeminiTransport,
@@ -160,13 +166,31 @@ pub fn send_turn(
     user_text: &str,
     snapshot: Snapshot,
 ) -> Result<TurnResult, AssistantError> {
-    require_api_key(store, protector)?;
-
     store.insert_message(conversation_id, "user", user_text)?;
     let mut snapshot = snapshot;
     snapshot.conversation_id = conversation_id.to_string();
     store.insert_snapshot(&snapshot)?;
 
+    continue_turn(store, transport, protector, conversation_id, user_text)
+}
+
+/// Continues a turn whose user message and snapshot are already persisted.
+///
+/// Checks the API key, rewrites a still-default conversation title from
+/// `user_text`, then calls `transport` once under the pending rule
+/// described on [`run_turn`]. Never inserts the user message or a
+/// snapshot, and never calls `confirm_tool`, `reject_tool`, or
+/// `write_session` — the caller must have persisted the user turn already,
+/// or Gemini's context (built from every persisted message in
+/// [`build_request`]) would not include it.
+pub fn continue_turn(
+    store: &AssistantStore,
+    transport: &dyn GeminiTransport,
+    protector: &dyn SecretProtector,
+    conversation_id: &str,
+    user_text: &str,
+) -> Result<TurnResult, AssistantError> {
+    require_api_key(store, protector)?;
     rewrite_new_chat_title(store, conversation_id, user_text)?;
 
     let request = build_request(store, conversation_id)?;

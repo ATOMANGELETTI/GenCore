@@ -3,7 +3,7 @@
 mod modules;
 
 pub use modules::agent::{
-    ConfirmOutcome, TurnResult, confirm_tool, reject_tool, resume_turn, send_turn,
+    ConfirmOutcome, TurnResult, confirm_tool, continue_turn, reject_tool, resume_turn, send_turn,
 };
 pub use modules::assistant::{
     ASSISTANT_ERROR_EVENT, ASSISTANT_TOKEN_EVENT, ASSISTANT_TURN_EVENT, ASSISTANT_UI_ACTION_EVENT,

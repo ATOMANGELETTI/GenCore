@@ -3,8 +3,8 @@ use std::sync::{Arc, Mutex};
 
 use gencore_assistant::{
     AssistantError, AssistantStore, GeminiError, GeminiEvent, GeminiRequest, GeminiTransport,
-    IdentityProtector, ScriptedTransport, SecretProtector, Snapshot, confirm_tool, reject_tool,
-    resume_turn, seed_app_facts, send_turn,
+    IdentityProtector, ScriptedTransport, SecretProtector, Snapshot, confirm_tool, continue_turn,
+    reject_tool, resume_turn, seed_app_facts, send_turn,
 };
 use gencore_pty::SessionMap;
 
@@ -210,6 +210,84 @@ fn send_turn_persists_user_message_and_stamps_snapshot_conversation_id() {
 
     let snapshot = store.latest_snapshot(&conv.id).unwrap().unwrap();
     assert_eq!(snapshot.conversation_id, conv.id);
+}
+
+/// Mirrors `send_message`'s IPC-command split: persist the user message and
+/// snapshot first (as if that step already ran and succeeded, the way the
+/// command does before returning `{ accepted: true }`), then hand off to
+/// `continue_turn` for the Gemini call. `continue_turn` must never insert
+/// its own copy of the user message or snapshot.
+#[test]
+fn continue_turn_after_manual_persist_does_not_double_insert_user_message() {
+    let dir = tempfile::tempdir().unwrap();
+    let store = store_with_key(&dir);
+    let conv = store.create_conversation().unwrap();
+
+    store.insert_message(&conv.id, "user", "hi").unwrap();
+    store
+        .insert_snapshot(&Snapshot::for_conversation(&conv.id))
+        .unwrap();
+
+    let result = continue_turn(
+        &store,
+        &ScriptedTransport {
+            events: vec![GeminiEvent::Text("hello there".into())],
+        },
+        &IdentityProtector,
+        &conv.id,
+        "hi",
+    )
+    .unwrap();
+    assert_eq!(result.assistant_text, "hello there");
+
+    let messages = store.list_messages(&conv.id).unwrap();
+    let user_messages: Vec<_> = messages.iter().filter(|m| m.role == "user").collect();
+    assert_eq!(
+        user_messages.len(),
+        1,
+        "continue_turn must not insert a second copy of the already-persisted user message"
+    );
+    assert_eq!(user_messages[0].content, "hi");
+
+    let assistant_messages: Vec<_> = messages.iter().filter(|m| m.role == "assistant").collect();
+    assert_eq!(assistant_messages.len(), 1);
+    assert_eq!(assistant_messages[0].content, "hello there");
+}
+
+/// `continue_turn` still rewrites a still-default title from `user_text`,
+/// even though it never persists the message itself.
+#[test]
+fn continue_turn_rewrites_new_chat_title_without_persisting_message() {
+    let dir = tempfile::tempdir().unwrap();
+    let store = store_with_key(&dir);
+    let conv = store.create_conversation().unwrap();
+    assert_eq!(conv.title, "New chat");
+
+    store.insert_message(&conv.id, "user", "hi").unwrap();
+    store
+        .insert_snapshot(&Snapshot::for_conversation(&conv.id))
+        .unwrap();
+
+    continue_turn(
+        &store,
+        &ScriptedTransport { events: vec![] },
+        &IdentityProtector,
+        &conv.id,
+        "hi",
+    )
+    .unwrap();
+
+    let updated = store.get_conversation(&conv.id).unwrap().unwrap();
+    assert_eq!(updated.title, "hi");
+    assert_eq!(
+        store
+            .list_messages(&conv.id)
+            .unwrap()
+            .iter()
+            .filter(|m| m.role == "user")
+            .count(),
+        1
+    );
 }
 
 #[test]

@@ -206,6 +206,63 @@ fn multi_word_param_commands_use_snake_case_rename() {
     }
 }
 
+/// `send_message` must persist the user message before spawning the Gemini
+/// turn and returning `{ accepted: true }` — a persist failure (unknown
+/// conversation, store error) has to fail the command itself, not surface
+/// later as a `token`/`turn`/`error` event after `accepted: true` already
+/// went out. Source-locks the ordering: `insert_message` appears before
+/// both `tauri::async_runtime::spawn` and the final `Ok(SendMessageResult`.
+#[test]
+fn send_message_persists_before_spawning_the_turn_and_returning_accepted() {
+    let source = read_src("src/modules/assistant/assistant_api.rs");
+    let fn_start = source
+        .find("pub async fn send_message")
+        .expect("missing `send_message`");
+    let body = &source[fn_start..];
+    let insert_at = body
+        .find("insert_message")
+        .expect("send_message must call insert_message directly, before spawning the turn");
+    let spawn_at = body
+        .find("tauri::async_runtime::spawn")
+        .expect("send_message must spawn the Gemini turn in the background");
+    let accepted_at = body
+        .find("Ok(SendMessageResult")
+        .expect("send_message must return SendMessageResult");
+    assert!(
+        insert_at < spawn_at,
+        "send_message must persist the user message before spawning the background turn"
+    );
+    assert!(
+        spawn_at < accepted_at,
+        "send_message must spawn the background turn before returning accepted: true"
+    );
+}
+
+/// The spawned background turn must not persist the user message a second
+/// time — that job belongs to `send_message`'s synchronous persist step.
+/// `continue_turn` (not `send_turn`, which would re-insert) is what the
+/// spawned closure calls.
+#[test]
+fn send_message_spawned_turn_calls_continue_turn_not_send_turn() {
+    let source = read_src("src/modules/assistant/assistant_api.rs");
+    let fn_start = source
+        .find("pub async fn send_message")
+        .expect("missing `send_message`");
+    let body = &source[fn_start..];
+    let spawn_at = body
+        .find("tauri::async_runtime::spawn")
+        .expect("send_message must spawn the Gemini turn in the background");
+    let after_spawn = &body[spawn_at..];
+    assert!(
+        after_spawn.contains("continue_turn("),
+        "the spawned turn must call continue_turn, which does not re-persist"
+    );
+    assert!(
+        !after_spawn.contains("send_turn("),
+        "the spawned turn must not call send_turn, which would insert the user message twice"
+    );
+}
+
 #[test]
 fn twelve_commands_are_registered_in_the_invoke_handler() {
     let source = read_src("src/lib.rs");

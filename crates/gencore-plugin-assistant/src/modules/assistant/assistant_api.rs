@@ -18,7 +18,7 @@ use tauri::{AppHandle, Emitter, Runtime, State};
 
 use gencore_pty::SessionMap;
 
-use crate::modules::agent::{ConfirmOutcome, confirm_tool, reject_tool, send_turn};
+use crate::modules::agent::{ConfirmOutcome, confirm_tool, continue_turn, reject_tool};
 use crate::modules::error::AssistantError;
 use crate::modules::gemini::ReqwestTransport;
 #[cfg(windows)]
@@ -317,13 +317,18 @@ pub async fn list_messages(conversation_id: String) -> Result<Vec<Message>, Assi
     run_blocking(move || Ok(open_store()?.list_messages(&args.conversation_id)?)).await
 }
 
-/// Persists the user's message, then hands the Gemini turn to a background
-/// task and returns `{ accepted: true }` without waiting for it.
+/// Persists the user's message and snapshot, then hands the Gemini turn to
+/// a background task and returns `{ accepted: true }` without waiting for
+/// it.
 ///
-/// The background task calls the existing [`send_turn`] (which itself
-/// persists the message, the snapshot, and the assistant's reply) and then
-/// emits `token` / `turn` / `error` — unless `cancel_turn` marked this
-/// conversation cancelled first, per [`take_cancelled`].
+/// Persist happens synchronously, on the blocking pool, *before* this
+/// command returns — an unknown `conversation_id` or a store error fails
+/// the command itself (`Err`), never a later-only event. The background
+/// task then calls [`continue_turn`], which checks the API key, rewrites
+/// the title, and calls Gemini; it never re-inserts the message/snapshot
+/// this command already persisted. It emits `token` / `turn` / `error` —
+/// unless `cancel_turn` marked this conversation cancelled first, per
+/// [`take_cancelled`].
 #[tauri::command(rename_all = "snake_case")]
 pub async fn send_message<R: Runtime>(
     app: AppHandle<R>,
@@ -340,6 +345,18 @@ pub async fn send_message<R: Runtime>(
     let conversation_id = args.conversation_id;
     let text = args.text;
 
+    let conversation_id_for_persist = conversation_id.clone();
+    let text_for_persist = text.clone();
+    run_blocking(move || {
+        let store = open_store()?;
+        store.insert_message(&conversation_id_for_persist, "user", &text_for_persist)?;
+        let mut snapshot = store_snapshot;
+        snapshot.conversation_id = conversation_id_for_persist;
+        store.insert_snapshot(&snapshot)?;
+        Ok(())
+    })
+    .await?;
+
     tauri::async_runtime::spawn(async move {
         let conversation_id_for_turn = conversation_id.clone();
         let turn = run_blocking(move || {
@@ -347,13 +364,12 @@ pub async fn send_message<R: Runtime>(
             let api_key = load_api_key(&store)?;
             let transport = ReqwestTransport { api_key };
             let protector = protector();
-            send_turn(
+            continue_turn(
                 &store,
                 &transport,
                 &protector,
                 &conversation_id_for_turn,
                 &text,
-                store_snapshot,
             )
         })
         .await;
