@@ -1,0 +1,22 @@
+.agents/.agents/hooks/state/edited-files.json
+  h_90ad036e211778 1-6
+apps/terminal/src-tauri/resources/oh-my-posh/gencore-polar-night.omp.json
+  h_90ad036e211778 8,15-20,23-24,31-32,39-40,60-65,71
+apps/terminal/src-tauri/resources/oh-my-posh/gencore-prompt.ps1
+  h_90ad036e211778 15
+apps/terminal/src-tauri/resources/oh-my-posh/gencore-snow-storm.omp.json
+  h_90ad036e211778 8,15-20,23-25,31-32,39-40,60-65,71
+apps/terminal/tests/unit/oh-my-posh-theme.test.ts
+  h_90ad036e211778 13,60,62,83-85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "f526d1689a522552a61c3e0955ac62ccfd52f30f",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
