@@ -1,0 +1,48 @@
+apps/terminal/AGENTS.md
+  s_42fac98324a28e::t_895c02de6d2f54 7
+  s_42fac98324a28e::t_ec6f305eeccff3 11-15,17
+.cursor/skills/add-crate-module/SKILL.md
+  s_42fac98324a28e::t_429e5293d1d831 11
+  s_42fac98324a28e::t_4dc44b37dedaa2 32-33
+crates/AGENTS.md
+  s_42fac98324a28e::t_f3991aa892aa87 6
+.agents/skills/add-crate-module/SKILL.md
+  s_42fac98324a28e::t_ad33b5cad1cf88 12,33-34
+.agents/rules/architecture.md
+  s_42fac98324a28e::t_ad33b5cad1cf88 20
+.cursor/rules/architecture.mdc
+  s_42fac98324a28e::t_f42c9aa7a99c6c 17
+AGENTS.md
+  s_42fac98324a28e::t_7f0e01e926d38b 18
+  s_99c71c4fe8a644::t_18a10745977c67 87
+  s_42fac98324a28e::t_fc3254d5fabbd0 102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "f083d3f34dca6084e7fd6134a753291878d6c7d3",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_42fac98324a28e": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "6aa3af23-8aef-4aa1-9d10-dff59df4a8c6",
+        "model": "claude-sonnet-5-thinking-xhigh"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_99c71c4fe8a644": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e756c07a-fd06-4700-be5e-52e34267055a",
+        "model": "claude-sonnet-5-thinking-xhigh"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
