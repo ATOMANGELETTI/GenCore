@@ -350,6 +350,7 @@ describe("useAssistant", () => {
     conversation_id: string;
     assistant_text: string;
     pending: { id: string; status: string }[];
+    generation?: number;
   }) => void;
 
   async function renderWithOnePending(): Promise<{
@@ -864,6 +865,38 @@ describe("useAssistant", () => {
 
     await user.click(screen.getByText("select-c2"));
     expect(screen.getByTestId("streaming")).toHaveTextContent("false");
+  });
+
+  it("ignores a stale cancelled turn after a newer send generation", async () => {
+    const user = userEvent.setup();
+    listConversations.mockResolvedValue([CONVERSATION]);
+    sendMessage.mockResolvedValue({ accepted: true, generation: 2 });
+    let onTurn: TurnHandler | undefined;
+    subscribeAssistantTurn.mockImplementation(async (handler) => {
+      onTurn = handler;
+      return () => {};
+    });
+
+    renderHookProbe(true);
+    await waitFor(() => {
+      expect(onTurn).toBeTypeOf("function");
+    });
+
+    await user.type(screen.getByLabelText("composer"), "retry");
+    await user.click(screen.getByText("send"));
+    await waitFor(() => {
+      expect(sendMessage).toHaveBeenCalled();
+    });
+    expect(screen.getByTestId("streaming")).toHaveTextContent("true");
+
+    onTurn?.({
+      conversation_id: "c1",
+      assistant_text: "",
+      pending: [],
+      generation: 1,
+    });
+
+    expect(screen.getByTestId("streaming")).toHaveTextContent("true");
   });
 
   it("keys composer drafts by conversation: switching chats swaps drafts instead of sharing them (Important 10)", async () => {

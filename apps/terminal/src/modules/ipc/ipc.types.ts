@@ -138,6 +138,7 @@ export interface AgentSettingsPatch {
 /** Mirrors the assistant plugin's `send_message` result. */
 export interface SendMessageResult {
   readonly accepted: boolean;
+  readonly generation?: number;
 }
 
 /** Mirrors the assistant plugin's `ListMessagesResult` — `list_messages`'s
@@ -166,6 +167,7 @@ export interface ConfirmActionResult {
 export interface AssistantTokenPayload {
   readonly conversation_id: string;
   readonly text: string;
+  readonly generation?: number;
 }
 
 /** Payload for the `gencore-assistant://turn` event. */
@@ -173,6 +175,7 @@ export interface AssistantTurnPayload {
   readonly conversation_id: string;
   readonly assistant_text: string;
   readonly pending: readonly AssistantToolCall[];
+  readonly generation?: number;
 }
 
 /** Payload for the `gencore-assistant://error` event. `code` is the failing
@@ -183,6 +186,7 @@ export interface AssistantErrorPayload {
   readonly conversation_id: string;
   readonly code: string;
   readonly message: string;
+  readonly generation?: number;
 }
 
 /** Payload for the `gencore-assistant://ui-action` event. */

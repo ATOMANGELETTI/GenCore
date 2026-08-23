@@ -227,7 +227,7 @@ fn send_message_persists_before_spawning_the_turn_and_returning_accepted() {
         .find("tauri::async_runtime::spawn")
         .expect("send_message must spawn the Gemini turn in the background");
     let accepted_at = body
-        .find("Ok(SendMessageResult")
+        .rfind("Ok(SendMessageResult")
         .expect("send_message must return SendMessageResult");
     assert!(
         insert_at < spawn_at,
@@ -288,6 +288,7 @@ fn assistant_error_payload_has_conversation_id_code_and_message_fields() {
         conversation_id: "c1".to_string(),
         code: "NoApiKey".to_string(),
         message: "no Gemini API key configured".to_string(),
+        generation: 1,
     };
     let json = serde_json::to_value(&payload).unwrap();
     assert_eq!(json["conversation_id"], "c1");

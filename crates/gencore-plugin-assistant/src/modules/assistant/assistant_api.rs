@@ -25,7 +25,7 @@ use crate::modules::agent::{
     ConfirmOutcome, confirm_tool, finish_turn, prepare_resume, prepare_turn, reject_tool,
 };
 use crate::modules::assistant::assistant_cancel::{
-    begin_turn, cancel_active_turn, is_turn_cancelled, take_turn_cancelled,
+    begin_turn, cancel_active_turn, has_newer_generation, is_turn_cancelled, take_turn_cancelled,
 };
 use crate::modules::error::AssistantError;
 use crate::modules::gemini::{GeminiEvent, GeminiTransport, ReqwestTransport};
@@ -135,6 +135,7 @@ pub struct AgentSettingsDto {
 #[derive(Debug, Clone, Serialize)]
 pub struct SendMessageResult {
     pub accepted: bool,
+    pub generation: u64,
 }
 
 /// Result of [`list_messages`]: every persisted message, plus any tool
@@ -152,6 +153,7 @@ pub struct ListMessagesResult {
 pub struct AssistantTokenPayload {
     pub conversation_id: String,
     pub text: String,
+    pub generation: u64,
 }
 
 /// Payload for [`ASSISTANT_TURN_EVENT`].
@@ -160,6 +162,7 @@ pub struct AssistantTurnPayload {
     pub conversation_id: String,
     pub assistant_text: String,
     pub pending: Vec<ToolCall>,
+    pub generation: u64,
 }
 
 /// Payload for [`ASSISTANT_ERROR_EVENT`]. `code` is the failing
@@ -171,6 +174,7 @@ pub struct AssistantErrorPayload {
     pub conversation_id: String,
     pub code: String,
     pub message: String,
+    pub generation: u64,
 }
 
 /// Payload for [`ASSISTANT_UI_ACTION_EVENT`].
@@ -256,6 +260,7 @@ where
 /// poll [`is_turn_cancelled`] while the SSE body is read.
 fn run_gemini_turn<R, P>(
     app: &AppHandle<R>,
+    generation: u64,
     prepare: P,
 ) -> Result<crate::modules::agent::TurnResult, AssistantError>
 where
@@ -273,7 +278,11 @@ where
     let (conversation_id, request) = prepare(&store, &secret_protector)?;
     drop(store);
 
-    let generation = begin_turn(&conversation_id);
+    if is_turn_cancelled(&conversation_id, generation) {
+        let _ = take_turn_cancelled(&conversation_id, generation);
+        return Err(AssistantError::Cancelled);
+    }
+
     let app_for_events = app.clone();
     let conversation_id_for_events = conversation_id.clone();
     let on_event = move |event: &GeminiEvent| {
@@ -283,6 +292,7 @@ where
                 AssistantTokenPayload {
                     conversation_id: conversation_id_for_events.clone(),
                     text: text.clone(),
+                    generation,
                 },
             );
         }
@@ -323,8 +333,13 @@ fn map_gemini_error(err: crate::modules::gemini::GeminiError) -> AssistantError 
 fn emit_turn_result<R: Runtime>(
     app: &AppHandle<R>,
     conversation_id: &str,
+    generation: u64,
     turn: Result<crate::modules::agent::TurnResult, AssistantError>,
 ) {
+    if has_newer_generation(conversation_id, generation) {
+        return;
+    }
+
     match turn {
         Ok(turn) => {
             let _ = app.emit(
@@ -333,6 +348,7 @@ fn emit_turn_result<R: Runtime>(
                     conversation_id: conversation_id.to_string(),
                     assistant_text: turn.assistant_text,
                     pending: turn.pending,
+                    generation,
                 },
             );
         }
@@ -343,6 +359,7 @@ fn emit_turn_result<R: Runtime>(
                     conversation_id: conversation_id.to_string(),
                     assistant_text: String::new(),
                     pending: Vec::new(),
+                    generation,
                 },
             );
         }
@@ -353,6 +370,7 @@ fn emit_turn_result<R: Runtime>(
                     conversation_id: conversation_id.to_string(),
                     code: err.code().to_string(),
                     message: err.to_string(),
+                    generation,
                 },
             );
         }
@@ -467,9 +485,10 @@ pub async fn send_message<R: Runtime>(
     let conversation_id = args.conversation_id;
     let text = args.text;
 
+    let generation = begin_turn(&conversation_id);
     let conversation_id_for_persist = conversation_id.clone();
     let text_for_persist = text.clone();
-    run_blocking(move || {
+    if let Err(err) = run_blocking(move || {
         let store = open_store()?;
         store.insert_user_turn(
             &conversation_id_for_persist,
@@ -478,14 +497,26 @@ pub async fn send_message<R: Runtime>(
         )?;
         Ok(())
     })
-    .await?;
+    .await
+    {
+        let _ = take_turn_cancelled(&conversation_id, generation);
+        return Err(err);
+    }
+
+    if is_turn_cancelled(&conversation_id, generation) {
+        let _ = take_turn_cancelled(&conversation_id, generation);
+        return Ok(SendMessageResult {
+            accepted: true,
+            generation,
+        });
+    }
 
     tauri::async_runtime::spawn(async move {
         let turn = run_blocking({
             let app = app.clone();
             let conversation_id = conversation_id.clone();
             move || {
-                run_gemini_turn(&app, move |store, protector| {
+                run_gemini_turn(&app, generation, move |store, protector| {
                     let request = prepare_turn(store, protector, &conversation_id, &text)?;
                     Ok((conversation_id.clone(), request))
                 })
@@ -493,10 +524,13 @@ pub async fn send_message<R: Runtime>(
         })
         .await;
 
-        emit_turn_result(&app, &conversation_id, turn);
+        emit_turn_result(&app, &conversation_id, generation, turn);
     });
 
-    Ok(SendMessageResult { accepted: true })
+    Ok(SendMessageResult {
+        accepted: true,
+        generation,
+    })
 }
 
 /// Marks `conversation_id`'s in-flight generation cancelled.
@@ -584,18 +618,19 @@ pub async fn reject_action<R: Runtime>(
 /// other) failure inside the task can still be attributed to the right
 /// conversation and reach the ledger via [`emit_turn_result`].
 fn spawn_resume_turn<R: Runtime>(app: AppHandle<R>, conversation_id: String, tool_call_id: String) {
+    let generation = begin_turn(&conversation_id);
     tauri::async_runtime::spawn(async move {
         let turn = run_blocking({
             let app = app.clone();
             move || {
-                run_gemini_turn(&app, move |store, protector| {
+                run_gemini_turn(&app, generation, move |store, protector| {
                     prepare_resume(store, protector, &tool_call_id)
                 })
             }
         })
         .await;
 
-        emit_turn_result(&app, &conversation_id, turn);
+        emit_turn_result(&app, &conversation_id, generation, turn);
     });
 }
 

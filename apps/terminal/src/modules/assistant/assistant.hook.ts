@@ -62,6 +62,18 @@ export function applyAssistantUiAction(
 }
 
 /** Renders a caught IPC rejection (a plain string/Error, never `{ code, message }`) as an `AssistantErrorInfo`. */
+function isStaleGeneration(
+  current: Record<string, number>,
+  conversationId: string,
+  generation?: number,
+): boolean {
+  const active = current[conversationId];
+  if (active === undefined || generation === undefined) {
+    return false;
+  }
+  return generation !== active;
+}
+
 function describeCaughtError(err: unknown): AssistantErrorInfo {
   const message =
     err instanceof Error ? err.message : typeof err === "string" ? err : "Unknown error";
@@ -125,6 +137,7 @@ export function useAssistant(): AssistantApi {
   conversationIdRef.current = conversationId;
   const pendingByConversationRef = React.useRef(pendingByConversation);
   pendingByConversationRef.current = pendingByConversation;
+  const generationByConversationRef = React.useRef<Record<string, number>>({});
   // useFileTree()/TerminalProvider hand back a new object on nearly every
   // render (tree listings, tab output, etc.). Reading through refs lets the
   // ui-action subscription below stay mounted for the component's lifetime
@@ -244,6 +257,9 @@ export function useAssistant(): AssistantApi {
 
     void subscribeAssistantToken((payload) => {
       const id = payload.conversation_id;
+      if (isStaleGeneration(generationByConversationRef.current, id, payload.generation)) {
+        return;
+      }
       setStreamingByConversation((current) => ({ ...current, [id]: true }));
       setStreamTextByConversation((current) => ({
         ...current,
@@ -256,10 +272,16 @@ export function useAssistant(): AssistantApi {
 
     void subscribeAssistantTurn((payload) => {
       const id = payload.conversation_id;
-      setPendingByConversation((current) => ({
-        ...current,
-        [id]: payload.pending.filter((call) => call.status === "pending"),
-      }));
+      if (isStaleGeneration(generationByConversationRef.current, id, payload.generation)) {
+        return;
+      }
+      const isCancelSettle = payload.assistant_text === "" && payload.pending.length === 0;
+      if (!isCancelSettle) {
+        setPendingByConversation((current) => ({
+          ...current,
+          [id]: payload.pending.filter((call) => call.status === "pending"),
+        }));
+      }
       setStreamingByConversation((current) => ({ ...current, [id]: false }));
       setStreamTextByConversation((current) => ({ ...current, [id]: "" }));
       setErrorByConversation((current) => ({ ...current, [id]: undefined }));
@@ -275,6 +297,9 @@ export function useAssistant(): AssistantApi {
 
     void subscribeAssistantError((payload) => {
       const id = payload.conversation_id;
+      if (isStaleGeneration(generationByConversationRef.current, id, payload.generation)) {
+        return;
+      }
       setStreamingByConversation((current) => ({ ...current, [id]: false }));
       setStreamTextByConversation((current) => ({ ...current, [id]: "" }));
       setErrorByConversation((current) => ({
@@ -358,6 +383,9 @@ export function useAssistant(): AssistantApi {
       if (!result.accepted) {
         setStreamingByConversation((current) => ({ ...current, [sendingId]: false }));
         return;
+      }
+      if (result.generation !== undefined) {
+        generationByConversationRef.current[sendingId] = result.generation;
       }
       // Clear the draft slot the text was actually typed into (the active
       // conversation at the time `send` was called) — safe regardless of
@@ -449,13 +477,15 @@ export function useAssistant(): AssistantApi {
     setErrorByConversation((current) => ({ ...current, [conversationIdForCall]: undefined }));
   }, []);
 
-  const recordPendingActionError = React.useCallback((err: unknown) => {
-    const activeId = conversationIdRef.current;
-    if (!activeId) {
-      return;
-    }
-    setErrorByConversation((current) => ({ ...current, [activeId]: describeCaughtError(err) }));
-  }, []);
+  const recordPendingActionError = React.useCallback(
+    (conversationIdForCall: string, err: unknown) => {
+      setErrorByConversation((current) => ({
+        ...current,
+        [conversationIdForCall]: describeCaughtError(err),
+      }));
+    },
+    [],
+  );
 
   const confirmPending = React.useCallback(
     async (id: string) => {
@@ -468,7 +498,7 @@ export function useAssistant(): AssistantApi {
         settlePendingAction(id, conversationIdForCall);
       } catch (err) {
         // Failed confirm/reject keeps the card so the user can retry it.
-        recordPendingActionError(err);
+        recordPendingActionError(conversationIdForCall, err);
       }
     },
     [conversationIdForTool, settlePendingAction, recordPendingActionError],
@@ -484,7 +514,7 @@ export function useAssistant(): AssistantApi {
         await rejectAction(id);
         settlePendingAction(id, conversationIdForCall);
       } catch (err) {
-        recordPendingActionError(err);
+        recordPendingActionError(conversationIdForCall, err);
       }
     },
     [conversationIdForTool, settlePendingAction, recordPendingActionError],

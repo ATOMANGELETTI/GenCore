@@ -52,6 +52,19 @@ pub fn is_turn_cancelled(conversation_id: &str, generation: u64) -> bool {
         .unwrap_or(false)
 }
 
+/// True when a later [`begin_turn`] has replaced `generation` as the active one.
+pub fn has_newer_generation(conversation_id: &str, generation: u64) -> bool {
+    TURN_CANCEL
+        .lock()
+        .map(|state| {
+            state
+                .active
+                .get(conversation_id)
+                .is_some_and(|active| *active > generation)
+        })
+        .unwrap_or(false)
+}
+
 /// Consumes the cancel flag for this generation so a later turn can run.
 pub fn take_turn_cancelled(conversation_id: &str, generation: u64) -> bool {
     let Ok(mut state) = TURN_CANCEL.lock() else {

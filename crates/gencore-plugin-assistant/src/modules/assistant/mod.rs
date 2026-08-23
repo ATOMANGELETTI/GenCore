@@ -11,5 +11,5 @@ pub use assistant_api::{
     send_message, set_agent_settings, set_api_key,
 };
 pub use assistant_cancel::{
-    begin_turn, cancel_active_turn, is_turn_cancelled, take_turn_cancelled,
+    begin_turn, cancel_active_turn, has_newer_generation, is_turn_cancelled, take_turn_cancelled,
 };

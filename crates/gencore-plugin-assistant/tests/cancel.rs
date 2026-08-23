@@ -1,6 +1,8 @@
 //! Generation-scoped cancel flags for in-flight Gemini turns.
 
-use gencore_assistant::{begin_turn, cancel_active_turn, is_turn_cancelled, take_turn_cancelled};
+use gencore_assistant::{
+    begin_turn, cancel_active_turn, has_newer_generation, is_turn_cancelled, take_turn_cancelled,
+};
 
 fn unique_id(label: &str) -> String {
     format!(
@@ -43,6 +45,16 @@ fn take_clears_only_that_generation_so_a_retry_can_run() {
     let second = begin_turn(&id);
     assert!(!is_turn_cancelled(&id, second));
     assert!(!take_turn_cancelled(&id, second));
+}
+
+#[test]
+fn a_later_begin_turn_is_a_newer_generation() {
+    let id = unique_id("cancel-newer");
+    let first = begin_turn(&id);
+    assert!(!has_newer_generation(&id, first));
+    let second = begin_turn(&id);
+    assert!(has_newer_generation(&id, first));
+    assert!(!has_newer_generation(&id, second));
 }
 
 #[test]

@@ -71,10 +71,18 @@ impl GeminiTransport for ReqwestTransport<'_> {
             "tools": request.tools,
         });
 
+        if (self.is_cancelled)() {
+            return Err(GeminiError::Cancelled);
+        }
+
         let client = reqwest::blocking::Client::builder()
             .timeout(REQUEST_TIMEOUT)
             .build()
             .map_err(|err| GeminiError::Http(err.to_string()))?;
+
+        if (self.is_cancelled)() {
+            return Err(GeminiError::Cancelled);
+        }
 
         let response = client
             .post(&url)
