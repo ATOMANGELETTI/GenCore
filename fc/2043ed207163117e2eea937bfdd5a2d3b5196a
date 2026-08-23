@@ -1,0 +1,44 @@
+apps/terminal/src/modules/assistant/assistant.hook.ts
+  s_82b0961020030e::t_ed8ae96b85616d 1-211
+apps/terminal/src/modules/assistant/assistant.component.tsx
+  s_82b0961020030e::t_4543ee97e87c8d 1-12,14-76,80-186
+  s_82b0961020030e::t_3f4a86bfa97822 13
+  s_82b0961020030e::t_b52f6361709214 77-79
+apps/terminal/tests/unit/assistant.component.test.tsx
+  s_82b0961020030e::t_21b3e75b0600c1 1-2,8-139,147-195
+  s_82b0961020030e::t_b52f6361709214 3-7,140-146
+apps/terminal/src/modules/side-panel/side-panel.component.tsx
+  s_82b0961020030e::t_5f0cb6ee820335 29
+  s_82b0961020030e::t_5d1d68809dfaf4 11
+  s_82b0961020030e::t_968f99b76e40f7 167-168,171
+apps/terminal/tests/unit/side-panel.test.tsx
+  s_82b0961020030e::t_3920ef5ff6c61a 82,88-89
+  s_82b0961020030e::t_34435fbf96af61 106
+  s_82b0961020030e::t_35c54718400b75 17-31
+  s_82b0961020030e::t_895a88f5668945 75
+apps/terminal/tests/unit/assistant.hook.test.tsx
+  s_82b0961020030e::t_61ad38a2aea7d9 1-215
+apps/terminal/src/modules/assistant/assistant.types.ts
+  s_82b0961020030e::t_5d2bf12ad860ad 1-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "fc2043ed207163117e2eea937bfdd5a2d3b5196a",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_82b0961020030e": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "d1162902-620f-4f93-8663-386abba25823",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
