@@ -1,0 +1,62 @@
+crates/gencore-plugin-assistant/src/modules/assistant/mod.rs
+  s_5bed3f8a4cd774::t_0baf13ac04e7d1 14
+crates/gencore-plugin-assistant/tests/assistant.rs
+  s_5bed3f8a4cd774::t_3f061aab107da4 291
+  s_5bed3f8a4cd774::t_536d914026a001 230
+crates/gencore-plugin-assistant/src/modules/gemini/gemini_api.rs
+  s_5bed3f8a4cd774::t_0f30e8fd552c89 74-77,83-85
+  s_5bed3f8a4cd774::t_1e031c632d5785 86
+crates/gencore-plugin-assistant/tests/cancel.rs
+  s_5bed3f8a4cd774::t_4d0af2643bb7fc 3-5
+  s_5bed3f8a4cd774::t_2a7042f06dacfa 51-59
+  s_5bed3f8a4cd774::t_7b55f492dd0416 50
+crates/gencore-plugin-assistant/src/modules/assistant/assistant_cancel.rs
+  s_5bed3f8a4cd774::t_8d66c748d90cea 55-67
+apps/terminal/src/modules/ipc/ipc.types.ts
+  s_5bed3f8a4cd774::t_08a30541fa9b73 178
+  s_5bed3f8a4cd774::t_010342ea448d78 141
+  s_5bed3f8a4cd774::t_8fc846d871cf60 170
+  s_5bed3f8a4cd774::t_7ec16ddcbbeaf6 189
+apps/terminal/src/modules/assistant/assistant.hook.ts
+  s_5bed3f8a4cd774::t_c6fbef44856bc0 501,517
+  s_5bed3f8a4cd774::t_d15806f5c5b288 65-75
+  s_5bed3f8a4cd774::t_e505c3557c15c3 480-485
+  s_5bed3f8a4cd774::t_341bfdf3fe3464 140
+  s_5bed3f8a4cd774::t_a6a1b7d9da3fb6 76,260-262,275-284,300-302,387-389,486-488
+apps/terminal/tests/unit/assistant.hook.test.tsx
+  s_5bed3f8a4cd774::t_1d546ff42b901f 870-901
+  s_5bed3f8a4cd774::t_eb821f7b3d294f 353
+crates/gencore-plugin-assistant/src/modules/assistant/assistant_api.rs
+  s_5bed3f8a4cd774::t_1c98f3e8575277 336,339-342,351,362,373
+  s_5bed3f8a4cd774::t_f72e6b1f810523 165
+  s_5bed3f8a4cd774::t_3638c124737bb5 488,491,500-512,519,527,530-533
+  s_5bed3f8a4cd774::t_b395b96cc2b06e 263,281-285,295
+  s_5bed3f8a4cd774::t_d6c9102aa0e5ae 621,626,633
+  s_5bed3f8a4cd774::t_e16ed44d637fb0 177
+  s_5bed3f8a4cd774::t_950d17a25812c8 138
+  s_5bed3f8a4cd774::t_99ae27f5bd5bd8 28
+  s_5bed3f8a4cd774::t_da239e609aaf8b 156
+crates/gencore-plugin-assistant/src/lib.rs
+  s_5bed3f8a4cd774::t_dad0413d4e7a4a 16-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "7cc73344ccd972d0905ebe761fcf6fc762f5d157",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_5bed3f8a4cd774": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "258f2b5b-8031-4236-90e0-cd5af54d5adf",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
