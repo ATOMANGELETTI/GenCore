@@ -1,0 +1,27 @@
+apps/terminal/src/modules/assistant/assistant.hook.ts
+  s_d2d25ef3f1c280::t_ea4f30c262ffe4 38-40,56-60,66-68,71,77,211,213-223,238,274
+apps/terminal/tests/unit/assistant.hook.test.tsx
+  s_d2d25ef3f1c280::t_3efce3e5ab5b5c 451-481,483-484
+  s_d2d25ef3f1c280::t_c0bc74be7ab937 482
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "744108476edcdb3733455c0de96d721679d0994c",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_d2d25ef3f1c280": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "ec08dfdc-8bd3-4cb2-b3b1-88342a265266",
+        "model": "claude-sonnet-5-thinking-xhigh"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
