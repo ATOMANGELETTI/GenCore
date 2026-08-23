@@ -82,10 +82,25 @@ pub fn is_real_executable(path: &Path) -> bool {
 pub fn resolve_oh_my_posh(
     resource_dir: Option<&Path>,
     theme: Option<&str>,
+    posh_theme: Option<&str>,
 ) -> Option<OhMyPoshSpawn> {
     let resource_dir = resource_dir?;
     let dir = oh_my_posh_dir(resource_dir)?;
-    let theme_path = dir.join(theme_file_name(theme));
+    let theme_file = match posh_theme {
+        Some("bubbles") => "bubbles.omp.json",
+        Some("iterm2") => "iterm2.omp.json",
+        Some("wholespace") => "wholespace.omp.json",
+        Some("wopian") => "wopian.omp.json",
+        Some("clean-detailed") => "clean-detailed.omp.json",
+        Some("kali") => "kali.omp.json",
+        _ => theme_file_name(theme),
+    };
+    let theme_path = dir.join(theme_file);
+    let theme_path = if theme_path.is_file() {
+        theme_path
+    } else {
+        dir.join(theme_file_name(theme))
+    };
     if !theme_path.is_file() {
         return None;
     }

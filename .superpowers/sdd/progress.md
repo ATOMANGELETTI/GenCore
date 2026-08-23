@@ -1,5 +1,17 @@
 # GenCore SDD progress ledger
 
+## Feature: Terminal Oh My Posh Themes (2026-08-23)
+
+Plan: `.superpowers/docs/plans/2026-08-23-oh-my-posh-themes.md`
+Spec: `.superpowers/docs/specs/2026-08-23-oh-my-posh-themes-design.md`
+Work in place on `main`. No git commits unless the user asks.
+
+- Task 1: complete (working tree, review clean). 6 official upstream .omp.json theme files created (bubbles, iterm2, wholespace, wopian, clean-detailed, kali). All 14 tests in oh-my-posh-theme.test.ts pass.
+- Task 2: complete (working tree, review clean). PTY OpenArgs, validate_posh_theme, and resolve_oh_my_posh updated to accept and resolve all 7 themes. All 28 cargo tests in gencore-pty and clippy pass.
+- Task 3: complete (working tree, review clean). PoshThemeId and poshTheme integrated into TerminalConfigV1, config.storage, and config.hook. All 15 tests in config.storage.test.ts and config.hook.test.tsx pass.
+- Task 4: complete (working tree, review clean). Terminal prompt mapping, OpenPty IPC, and live POSH_THEME swapping wired across active sessions. All 33 tests in oh-my-posh-theme.test.ts and terminal.provider.test.tsx pass.
+- Task 5: complete (working tree, review clean). Config tab Prompt Theme radiogroup UI with keyboard navigation and preview labels implemented. Full workspace checks (turbo lint/typecheck/test, cargo test, cargo clippy) 100% green.
+
 ## Feature: Terminal Assistant (2026-08-22)
 
 Plan: `.superpowers/docs/plans/2026-08-22-terminal-assistant.md`

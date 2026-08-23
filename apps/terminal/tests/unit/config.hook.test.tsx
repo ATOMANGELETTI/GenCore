@@ -16,16 +16,20 @@ vi.mock("../../src/modules/ipc/ipc.window", () => ({
 }));
 
 function ConfigProbe() {
-  const { preference, resolvedTheme, setPreference } = useTerminalConfig();
+  const { preference, resolvedTheme, setPreference, poshTheme, setPoshTheme } = useTerminalConfig();
   return (
     <div>
       <span data-testid="preference">{preference}</span>
       <span data-testid="resolved">{resolvedTheme}</span>
+      <span data-testid="posh-theme">{poshTheme}</span>
       <button type="button" onClick={() => setPreference("snow-storm")}>
         snow
       </button>
       <button type="button" onClick={() => setPreference("polar-night")}>
         polar
+      </button>
+      <button type="button" onClick={() => setPoshTheme("bubbles")}>
+        bubbles
       </button>
     </div>
   );
@@ -102,6 +106,7 @@ describe("useTerminalConfig", () => {
     expect(JSON.parse(localStorage.getItem(CONFIG_STORAGE_KEY) ?? "")).toEqual({
       version: 1,
       theme: "snow-storm",
+      poshTheme: "gencore",
     });
     await waitFor(() => {
       expect(unlisten).toHaveBeenCalledTimes(1);
@@ -123,13 +128,34 @@ describe("useTerminalConfig", () => {
     expect(screen.getByTestId("preference")).toHaveTextContent("system");
     expect(screen.getByTestId("resolved")).toHaveTextContent("snow-storm");
   });
+
+  it("loads poshTheme and updates it via setPoshTheme", async () => {
+    render(<ConfigProbe />);
+    expect(screen.getByTestId("posh-theme")).toHaveTextContent("gencore");
+
+    act(() => {
+      screen.getByText("bubbles").click();
+    });
+
+    expect(screen.getByTestId("posh-theme")).toHaveTextContent("bubbles");
+    expect(JSON.parse(localStorage.getItem(CONFIG_STORAGE_KEY) ?? "")).toEqual({
+      version: 1,
+      theme: "system",
+      poshTheme: "bubbles",
+    });
+  });
 });
 
 describe("ConfigProvider", () => {
-  it("shares preference through useConfig", () => {
+  it("shares preference and poshTheme through useConfig", () => {
     function Child() {
-      const { preference } = useConfig();
-      return <span data-testid="ctx">{preference}</span>;
+      const { preference, poshTheme } = useConfig();
+      return (
+        <div>
+          <span data-testid="ctx-pref">{preference}</span>
+          <span data-testid="ctx-posh">{poshTheme}</span>
+        </div>
+      );
     }
 
     localStorage.clear();
@@ -138,7 +164,8 @@ describe("ConfigProvider", () => {
         <Child />
       </ConfigProvider>,
     );
-    expect(screen.getByTestId("ctx")).toHaveTextContent("system");
+    expect(screen.getByTestId("ctx-pref")).toHaveTextContent("system");
+    expect(screen.getByTestId("ctx-posh")).toHaveTextContent("gencore");
   });
 });
 

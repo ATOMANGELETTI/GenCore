@@ -5,12 +5,20 @@ if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
   } finally {
     $ErrorActionPreference = 'Continue'
   }
-  $gencoreInner = $function:Prompt
+  $gencoreInner = (Get-Command -Name 'prompt' -CommandType Function -ErrorAction SilentlyContinue).ScriptBlock
   function Global:Prompt {
     $cwd = (Get-Location).Path
     [Console]::Write("$([char]27)]7;file:///$($cwd.Replace('\','/'))$([char]7)")
-    & $gencoreInner
+    if ($null -ne $gencoreInner) {
+      & $gencoreInner
+    } else {
+      "$([char]0x25B6) "
+    }
   }
 } else {
-  function Global:Prompt { "$([char]0x25B6) " }
+  function Global:Prompt {
+    $cwd = (Get-Location).Path
+    [Console]::Write("$([char]27)]7;file:///$($cwd.Replace('\','/'))$([char]7)")
+    "$([char]0x25B6) "
+  }
 }

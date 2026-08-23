@@ -1,4 +1,4 @@
-import { chromium, expect, test, type Page } from "@playwright/test";
+import { chromium, expect, type Page, test } from "@playwright/test";
 
 const CDP = "http://127.0.0.1:9223";
 const MARKER = "gencore-pty-alive";

@@ -10,18 +10,32 @@ import {
 restoreJsdomLocalStorage();
 
 describe("parseConfig", () => {
-  it("returns Match system for missing, empty, invalid, wrong version, or unknown theme", () => {
+  it("returns Match system and gencore prompt theme for missing, empty, invalid, wrong version, or unknown theme", () => {
     expect(parseConfig(null)).toEqual(DEFAULT_CONFIG);
     expect(parseConfig("")).toEqual(DEFAULT_CONFIG);
     expect(parseConfig("{")).toEqual(DEFAULT_CONFIG);
     expect(parseConfig(JSON.stringify({ version: 2, theme: "system" }))).toEqual(DEFAULT_CONFIG);
     expect(parseConfig(JSON.stringify({ version: 1, theme: "nord" }))).toEqual(DEFAULT_CONFIG);
+    expect(
+      parseConfig(JSON.stringify({ version: 1, theme: "system", poshTheme: "invalid" })),
+    ).toEqual(DEFAULT_CONFIG);
   });
 
-  it("accepts a valid v1 blob", () => {
+  it("accepts a valid v1 blob with poshTheme", () => {
+    expect(
+      parseConfig(JSON.stringify({ version: 1, theme: "snow-storm", poshTheme: "bubbles" })),
+    ).toEqual({
+      version: 1,
+      theme: "snow-storm",
+      poshTheme: "bubbles",
+    });
+  });
+
+  it("migrates legacy v1 blob without poshTheme to default gencore", () => {
     expect(parseConfig(JSON.stringify({ version: 1, theme: "snow-storm" }))).toEqual({
       version: 1,
       theme: "snow-storm",
+      poshTheme: "gencore",
     });
   });
 });
@@ -53,18 +67,18 @@ describe("loadConfig / saveConfig", () => {
   });
 
   it("writes a valid blob on saveConfig and loadConfig reads it back", () => {
-    expect(saveConfig({ version: 1, theme: "polar-night" })).toBe(true);
+    expect(saveConfig({ version: 1, theme: "polar-night", poshTheme: "kali" })).toBe(true);
     expect(localStorage.getItem(CONFIG_STORAGE_KEY)).toBe(
-      JSON.stringify({ version: 1, theme: "polar-night" }),
+      JSON.stringify({ version: 1, theme: "polar-night", poshTheme: "kali" }),
     );
-    expect(loadConfig()).toEqual({ version: 1, theme: "polar-night" });
+    expect(loadConfig()).toEqual({ version: 1, theme: "polar-night", poshTheme: "kali" });
   });
 
   it("returns false and skips persistence when setItem throws", () => {
     vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
       throw new Error("quota");
     });
-    expect(saveConfig({ version: 1, theme: "system" })).toBe(false);
+    expect(saveConfig({ version: 1, theme: "system", poshTheme: "gencore" })).toBe(false);
   });
 });
 

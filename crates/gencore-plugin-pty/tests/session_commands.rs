@@ -21,6 +21,16 @@ fn open_args_default_theme_and_cwd_are_optional() {
     assert_eq!(parsed.cols, 80);
     assert!(parsed.cwd.is_none());
     assert!(parsed.theme.is_none());
+    assert!(parsed.posh_theme.is_none());
+}
+
+#[test]
+fn open_args_posh_theme_is_supported() {
+    let parsed: OpenArgs = serde_json::from_value(
+        serde_json::json!({ "cols": 80, "rows": 24, "posh_theme": "bubbles" }),
+    )
+    .unwrap();
+    assert_eq!(parsed.posh_theme.as_deref(), Some("bubbles"));
 }
 
 #[test]
@@ -40,6 +50,26 @@ fn spawn_session_rejects_invalid_theme() {
             rows: 24,
             cwd: None,
             theme: Some("nord".into()),
+            posh_theme: None,
+        },
+        None,
+        |_| {},
+        |_| {},
+    );
+    assert!(matches!(result, Err(SessionError::InvalidTheme)));
+}
+
+#[test]
+fn spawn_session_rejects_invalid_posh_theme() {
+    let map = Arc::new(Mutex::new(SessionMap::new()));
+    let result = spawn_session(
+        &map,
+        OpenArgs {
+            cols: 80,
+            rows: 24,
+            cwd: None,
+            theme: None,
+            posh_theme: Some("not-a-real-theme".into()),
         },
         None,
         |_| {},
@@ -58,6 +88,7 @@ fn spawn_session_rejects_invalid_cwd() {
             rows: 24,
             cwd: Some("C:\\gencore-pty-invalid-cwd-test".into()),
             theme: None,
+            posh_theme: None,
         },
         None,
         |_| {},
@@ -100,6 +131,7 @@ fn open_echo_and_close() {
             rows: 24,
             cwd: None,
             theme: None,
+            posh_theme: None,
         },
         None,
         move |payload| {
@@ -146,6 +178,7 @@ fn exited_shell_is_reaped_from_the_session_map() {
             rows: 24,
             cwd: None,
             theme: None,
+            posh_theme: None,
         },
         None,
         move |payload| {
@@ -201,8 +234,8 @@ fn exited_shell_is_reaped_from_the_session_map() {
 
 #[test]
 fn resolve_oh_my_posh_none_without_resource_dir() {
-    assert!(resolve_oh_my_posh(None, None).is_none());
-    assert!(resolve_oh_my_posh(None, Some("snow-storm")).is_none());
+    assert!(resolve_oh_my_posh(None, None, None).is_none());
+    assert!(resolve_oh_my_posh(None, Some("snow-storm"), None).is_none());
 }
 
 #[test]
@@ -211,7 +244,7 @@ fn resolve_oh_my_posh_none_when_exe_or_script_missing() {
     let omp = dir.join("oh-my-posh");
     std::fs::create_dir_all(&omp).unwrap();
     std::fs::write(omp.join("gencore-prompt.ps1"), "#").unwrap();
-    assert!(resolve_oh_my_posh(Some(&dir), None).is_none());
+    assert!(resolve_oh_my_posh(Some(&dir), None, None).is_none());
     let _ = std::fs::remove_dir_all(&dir);
 }
 
@@ -225,7 +258,7 @@ fn resolve_oh_my_posh_uses_absolute_theme_json() {
     std::fs::write(omp.join("gencore-polar-night.omp.json"), "{}").unwrap();
     std::fs::write(omp.join("gencore-snow-storm.omp.json"), "{}").unwrap();
 
-    let polar = resolve_oh_my_posh(Some(&dir), Some("polar-night")).expect("polar-night");
+    let polar = resolve_oh_my_posh(Some(&dir), Some("polar-night"), None).expect("polar-night");
     assert!(polar.theme.is_absolute());
     assert!(polar.prompt_script.is_absolute());
     assert!(
@@ -241,10 +274,10 @@ fn resolve_oh_my_posh_uses_absolute_theme_json() {
     assert!(polar.theme.ends_with("gencore-polar-night.omp.json"));
     assert!(polar.prompt_script.ends_with("gencore-prompt.ps1"));
 
-    let snow = resolve_oh_my_posh(Some(&dir), Some("snow-storm")).expect("snow-storm");
+    let snow = resolve_oh_my_posh(Some(&dir), Some("snow-storm"), None).expect("snow-storm");
     assert!(snow.theme.ends_with("gencore-snow-storm.omp.json"));
 
-    let omitted = resolve_oh_my_posh(Some(&dir), None).expect("default polar-night");
+    let omitted = resolve_oh_my_posh(Some(&dir), None, None).expect("default polar-night");
     assert!(omitted.theme.ends_with("gencore-polar-night.omp.json"));
 
     let _ = std::fs::remove_dir_all(&dir);
@@ -259,7 +292,7 @@ fn resolve_oh_my_posh_accepts_resources_subdirectory() {
     std::fs::write(nested.join("gencore-prompt.ps1"), "#").unwrap();
     std::fs::write(nested.join("gencore-polar-night.omp.json"), "{}").unwrap();
 
-    let resolved = resolve_oh_my_posh(Some(&dir), None).expect("nested resources");
+    let resolved = resolve_oh_my_posh(Some(&dir), None, None).expect("nested resources");
     assert!(resolved.theme.ends_with("gencore-polar-night.omp.json"));
 
     let _ = std::fs::remove_dir_all(&dir);
@@ -309,7 +342,7 @@ fn resolve_oh_my_posh_none_when_exe_is_zero_bytes() {
     std::fs::write(omp.join("oh-my-posh.exe"), []).unwrap();
     std::fs::write(omp.join("gencore-prompt.ps1"), "#").unwrap();
     std::fs::write(omp.join("gencore-polar-night.omp.json"), "{}").unwrap();
-    assert!(resolve_oh_my_posh(Some(&dir), None).is_none());
+    assert!(resolve_oh_my_posh(Some(&dir), None, None).is_none());
     let _ = std::fs::remove_dir_all(&dir);
 }
 
@@ -345,7 +378,7 @@ fn shell_launch_omp_includes_noexit_and_file() {
     std::fs::write(omp_dir.join("oh-my-posh.exe"), b"MZ").unwrap();
     std::fs::write(omp_dir.join("gencore-prompt.ps1"), "#").unwrap();
     std::fs::write(omp_dir.join("gencore-polar-night.omp.json"), "{}").unwrap();
-    let omp = resolve_oh_my_posh(Some(&dir), None).expect("omp");
+    let omp = resolve_oh_my_posh(Some(&dir), None, None).expect("omp");
     let launch = shell_launch(Some(&omp));
     let args: Vec<String> = launch
         .args
@@ -383,6 +416,7 @@ fn omp_file_spawn_stays_alive_and_echoes() {
             rows: 24,
             cwd: None,
             theme: None,
+            posh_theme: None,
         },
         Some(dir.clone()),
         move |payload| {
@@ -429,4 +463,35 @@ fn omp_file_spawn_stays_alive_and_echoes() {
     }
     let _ = std::fs::remove_dir_all(&dir);
     panic!("no echo within 15s; output so far: {text:?}");
+}
+
+#[test]
+fn resolve_oh_my_posh_resolves_all_theme_variants() {
+    let temp = std::env::temp_dir().join(format!("gencore-pty-theme-test-{}", std::process::id()));
+    let omp = temp.join("resources/oh-my-posh");
+    std::fs::create_dir_all(&omp).unwrap();
+    std::fs::write(omp.join("oh-my-posh.exe"), b"MZ").unwrap();
+    std::fs::write(omp.join("gencore-prompt.ps1"), "# prompt\r\n").unwrap();
+    std::fs::write(omp.join("gencore-polar-night.omp.json"), "{}").unwrap();
+    std::fs::write(omp.join("gencore-snow-storm.omp.json"), "{}").unwrap();
+    std::fs::write(omp.join("bubbles.omp.json"), "{}").unwrap();
+    std::fs::write(omp.join("kali.omp.json"), "{}").unwrap();
+
+    let polar = resolve_oh_my_posh(Some(&temp), Some("polar-night"), Some("gencore")).unwrap();
+    assert_eq!(polar.theme, omp.join("gencore-polar-night.omp.json"));
+
+    let snow = resolve_oh_my_posh(Some(&temp), Some("snow-storm"), None).unwrap();
+    assert_eq!(snow.theme, omp.join("gencore-snow-storm.omp.json"));
+
+    let bubbles = resolve_oh_my_posh(Some(&temp), None, Some("bubbles")).unwrap();
+    assert_eq!(bubbles.theme, omp.join("bubbles.omp.json"));
+
+    let kali = resolve_oh_my_posh(Some(&temp), Some("polar-night"), Some("kali")).unwrap();
+    assert_eq!(kali.theme, omp.join("kali.omp.json"));
+
+    // Fallback if requested theme is missing
+    let missing = resolve_oh_my_posh(Some(&temp), Some("polar-night"), Some("wopian")).unwrap();
+    assert_eq!(missing.theme, omp.join("gencore-polar-night.omp.json"));
+
+    let _ = std::fs::remove_dir_all(&temp);
 }

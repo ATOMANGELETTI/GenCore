@@ -1,9 +1,9 @@
 import { Button, cn, Input, Separator } from "@gencore/ui-kit";
-import { Check, type LucideIcon, Monitor, Moon, Sun } from "lucide-react";
+import { Check, type LucideIcon, Monitor, Moon, Sun, Terminal } from "lucide-react";
 import * as React from "react";
 import { useAgentSettings } from "./config.agent";
 import { useConfig } from "./config.hook";
-import type { ThemePreference } from "./config.types";
+import type { PoshThemeId, ThemePreference } from "./config.types";
 
 const THEME_OPTIONS: readonly {
   id: ThemePreference;
@@ -14,6 +14,56 @@ const THEME_OPTIONS: readonly {
   { id: "polar-night", title: "Polar Night", subtitle: "Dark Nord palette", Icon: Moon },
   { id: "snow-storm", title: "Snow Storm", subtitle: "Light Nord palette", Icon: Sun },
   { id: "system", title: "Match system", subtitle: "Follow Windows light or dark", Icon: Monitor },
+];
+
+const POSH_THEME_OPTIONS: readonly {
+  id: PoshThemeId;
+  title: string;
+  subtitle: string;
+  previewPrompt: string;
+}[] = [
+  {
+    id: "gencore",
+    title: "GenCore",
+    subtitle: "Adaptive Nord 2-line Powerline prompt",
+    previewPrompt: "󰮯 GenCore ❯",
+  },
+  {
+    id: "bubbles",
+    title: "Bubbles",
+    subtitle: "Rounded bubble badges with git status",
+    previewPrompt: " 󰄛   ~/src ",
+  },
+  {
+    id: "iterm2",
+    title: "iTerm2",
+    subtitle: "Classic macOS terminal Powerline chevron",
+    previewPrompt: "user@host  ~ ",
+  },
+  {
+    id: "wholespace",
+    title: "Wholespace",
+    subtitle: "Clean single-line powerline with path segments",
+    previewPrompt: " ~/src  main ❯",
+  },
+  {
+    id: "wopian",
+    title: "Wopian",
+    subtitle: "Minimalist path and duration prompt",
+    previewPrompt: "❯ main ❯",
+  },
+  {
+    id: "clean-detailed",
+    title: "Clean Detailed",
+    subtitle: "Two-line prompt with execution time and git metadata",
+    previewPrompt: "┌─[user]─[~]\n└─❯",
+  },
+  {
+    id: "kali",
+    title: "Kali",
+    subtitle: "Distinctive Kali Linux security style prompt",
+    previewPrompt: "┌──(user㉿gencore)-[~]\n└─$ ",
+  },
 ];
 
 const AGENT_MODELS = [
@@ -57,9 +107,10 @@ function parseContextLines(value: string): number | undefined {
 }
 
 export function Config() {
-  const { preference, setPreference } = useConfig();
+  const { preference, setPreference, poshTheme, setPoshTheme } = useConfig();
   const agent = useAgentSettings();
   const radioRefs = React.useRef<Partial<Record<ThemePreference, HTMLButtonElement | null>>>({});
+  const poshRadioRefs = React.useRef<Partial<Record<PoshThemeId, HTMLButtonElement | null>>>({});
   const modelRadioRefs = React.useRef<Partial<Record<string, HTMLButtonElement | null>>>({});
   const [keyDraft, setKeyDraft] = React.useState("");
   const [replacing, setReplacing] = React.useState(false);
@@ -71,6 +122,10 @@ export function Config() {
 
   function focusPreference(id: ThemePreference) {
     radioRefs.current[id]?.focus();
+  }
+
+  function focusPoshTheme(id: PoshThemeId) {
+    poshRadioRefs.current[id]?.focus();
   }
 
   function onRadioKeyDown(event: React.KeyboardEvent<HTMLButtonElement>, id: ThemePreference) {
@@ -89,6 +144,25 @@ export function Config() {
     if (next) {
       setPreference(next.id);
       focusPreference(next.id);
+    }
+  }
+
+  function onPoshRadioKeyDown(event: React.KeyboardEvent<HTMLButtonElement>, id: PoshThemeId) {
+    const currentIndex = POSH_THEME_OPTIONS.findIndex((option) => option.id === id);
+    if (currentIndex < 0) {
+      return;
+    }
+
+    const nextIndex = nextRadioIndex(event.key, currentIndex, POSH_THEME_OPTIONS.length);
+    if (nextIndex === undefined) {
+      return;
+    }
+
+    event.preventDefault();
+    const next = POSH_THEME_OPTIONS[nextIndex];
+    if (next) {
+      setPoshTheme(next.id);
+      focusPoshTheme(next.id);
     }
   }
 
@@ -190,6 +264,62 @@ export function Config() {
                   }}
                 >
                   <Icon aria-hidden="true" className="size-3 shrink-0" />
+                  <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5 text-left">
+                    <span className="text-xs font-medium">{option.title}</span>
+                    <span
+                      className={cn(
+                        "text-[10px]",
+                        isSelected
+                          ? "text-accent-foreground"
+                          : "text-muted-foreground group-hover:text-accent-foreground",
+                      )}
+                    >
+                      {option.subtitle}
+                    </span>
+                  </span>
+                  {isSelected ? <Check aria-hidden="true" className="size-3 shrink-0" /> : null}
+                </Button>
+              </React.Fragment>
+            );
+          })}
+        </div>
+
+        <p className={SECTION_LABEL_CLASS}>Prompt Theme</p>
+        <div
+          role="radiogroup"
+          aria-label="Prompt Theme"
+          className="overflow-hidden rounded-sm border border-border bg-background"
+        >
+          {POSH_THEME_OPTIONS.map((option, index) => {
+            const isSelected = poshTheme === option.id;
+
+            return (
+              <React.Fragment key={option.id}>
+                {index > 0 ? <Separator /> : null}
+                <Button
+                  ref={(node) => {
+                    poshRadioRefs.current[option.id] = node;
+                  }}
+                  type="button"
+                  role="radio"
+                  variant="ghost"
+                  aria-checked={isSelected}
+                  aria-label={`${option.title}, ${option.subtitle}`}
+                  tabIndex={isSelected ? 0 : -1}
+                  className={cn(
+                    "group h-auto w-full justify-start gap-2 rounded-none px-2 py-1.5",
+                    isSelected
+                      ? "bg-accent text-accent-foreground hover:bg-accent hover:text-accent-foreground"
+                      : "text-foreground hover:bg-accent hover:text-accent-foreground",
+                  )}
+                  onClick={() => {
+                    setPoshTheme(option.id);
+                  }}
+                  onKeyDown={(event) => {
+                    onPoshRadioKeyDown(event, option.id);
+                  }}
+                >
+                  <Terminal aria-hidden="true" className="size-3 shrink-0" />
                   <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5 text-left">
                     <span className="text-xs font-medium">{option.title}</span>
                     <span

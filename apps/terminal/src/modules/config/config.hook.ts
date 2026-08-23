@@ -2,7 +2,7 @@ import type { ThemeName } from "@gencore/ui-kit";
 import * as React from "react";
 import { getWindowTheme, subscribeWindowTheme } from "../ipc/ipc.window";
 import { loadConfig, saveConfig } from "./config.storage";
-import type { ConfigContextValue, ThemePreference } from "./config.types";
+import type { ConfigContextValue, PoshThemeId, ThemePreference } from "./config.types";
 
 const ConfigContext = React.createContext<ConfigContextValue | null>(null);
 
@@ -11,15 +11,28 @@ function mapOsTheme(value: "light" | "dark" | null): ThemeName {
 }
 
 export function useTerminalConfig(): ConfigContextValue {
+  const initialConfig = React.useMemo(() => loadConfig(), []);
   const [preference, setPreferenceState] = React.useState<ThemePreference>(
-    () => loadConfig().theme,
+    () => initialConfig.theme,
   );
+  const [poshTheme, setPoshThemeState] = React.useState<PoshThemeId>(() => initialConfig.poshTheme);
   const [osTheme, setOsTheme] = React.useState<ThemeName>("polar-night");
 
-  const setPreference = React.useCallback((next: ThemePreference) => {
-    setPreferenceState(next);
-    saveConfig({ version: 1, theme: next });
-  }, []);
+  const setPreference = React.useCallback(
+    (next: ThemePreference) => {
+      setPreferenceState(next);
+      saveConfig({ version: 1, theme: next, poshTheme });
+    },
+    [poshTheme],
+  );
+
+  const setPoshTheme = React.useCallback(
+    (next: PoshThemeId) => {
+      setPoshThemeState(next);
+      saveConfig({ version: 1, theme: preference, poshTheme: next });
+    },
+    [preference],
+  );
 
   React.useEffect(() => {
     if (preference !== "system") {
@@ -67,12 +80,16 @@ export function useTerminalConfig(): ConfigContextValue {
 
   const resolvedTheme: ThemeName = preference === "system" ? osTheme : preference;
 
-  return { preference, setPreference, resolvedTheme };
+  return { preference, setPreference, resolvedTheme, poshTheme, setPoshTheme };
 }
 
 export function ConfigProvider({ children }: { children: React.ReactNode }) {
   const value = useTerminalConfig();
   return React.createElement(ConfigContext.Provider, { value }, children);
+}
+
+export function useOptionalConfig(): ConfigContextValue | null {
+  return React.useContext(ConfigContext);
 }
 
 export function useConfig(): ConfigContextValue {

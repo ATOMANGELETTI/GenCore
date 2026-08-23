@@ -14,43 +14,40 @@ fn read_src(rel: &str) -> String {
     fs::read_to_string(&path).unwrap_or_else(|err| panic!("read {}: {err}", path.display()))
 }
 
-fn assert_session_id_command_uses_snake_case(source: &str, path: &str, fn_name: &str) {
-    let sig = format!("pub async fn {fn_name}(");
+fn assert_command_uses_snake_case(source: &str, path: &str, fn_name: &str) {
+    let sig_plain = format!("pub async fn {fn_name}(");
+    let sig_generic = format!("pub async fn {fn_name}<");
     let start = source
-        .find(&sig)
-        .unwrap_or_else(|| panic!("{path}: missing `{sig}`"));
-    let signature_end = source[start..]
-        .find('{')
-        .map(|offset| start + offset)
-        .unwrap_or_else(|| panic!("{path}: `{fn_name}` has no body"));
-    let signature = &source[start..signature_end];
-    assert!(
-        signature.contains("session_id"),
-        "{path}: `{fn_name}` must take `session_id`"
-    );
-
+        .find(&sig_plain)
+        .or_else(|| source.find(&sig_generic))
+        .unwrap_or_else(|| panic!("{path}: missing `pub async fn {fn_name}`"));
     let prelude = &source[start.saturating_sub(512)..start];
     assert!(
         prelude.contains(SNAKE_CASE_COMMAND),
-        "{path}: `{fn_name}` must be annotated with `{SNAKE_CASE_COMMAND}` so IPC accepts the JS `session_id` key"
+        "{path}: `{fn_name}` must be annotated with `{SNAKE_CASE_COMMAND}` so IPC accepts snake_case argument keys"
     );
 }
 
 #[test]
-fn write_resize_close_keep_snake_case_rename_on_session_id() {
-    assert_session_id_command_uses_snake_case(
+fn write_resize_close_open_keep_snake_case_rename() {
+    assert_command_uses_snake_case(
         &read_src("src/modules/io/io_api.rs"),
         "src/modules/io/io_api.rs",
         "write",
     );
-    assert_session_id_command_uses_snake_case(
+    assert_command_uses_snake_case(
         &read_src("src/modules/resize/resize_api.rs"),
         "src/modules/resize/resize_api.rs",
         "resize",
     );
-    assert_session_id_command_uses_snake_case(
+    assert_command_uses_snake_case(
         &read_src("src/modules/session/session_api.rs"),
         "src/modules/session/session_api.rs",
         "close",
+    );
+    assert_command_uses_snake_case(
+        &read_src("src/modules/session/session_api.rs"),
+        "src/modules/session/session_api.rs",
+        "open",
     );
 }

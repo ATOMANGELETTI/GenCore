@@ -20,6 +20,9 @@ pub struct OpenArgs {
     /// UI theme name: `polar-night`, `snow-storm`, or omitted.
     #[serde(default)]
     pub theme: Option<String>,
+    /// Oh My Posh prompt theme name: `gencore`, `bubbles`, `iterm2`, `wholespace`, `wopian`, `clean-detailed`, `kali`, or omitted.
+    #[serde(default)]
+    pub posh_theme: Option<String>,
 }
 
 /// Result of a successful [`open`] call.
@@ -38,7 +41,7 @@ pub struct CloseArgs {
 }
 
 /// Opens a new pty session and starts emitting data/exit events.
-#[tauri::command]
+#[tauri::command(rename_all = "snake_case")]
 pub async fn open<R: Runtime>(
     app: AppHandle<R>,
     state: State<'_, Arc<Mutex<SessionMap>>>,
@@ -46,12 +49,14 @@ pub async fn open<R: Runtime>(
     rows: u16,
     cwd: Option<String>,
     theme: Option<String>,
+    posh_theme: Option<String>,
 ) -> Result<OpenResult, SessionError> {
     let args = OpenArgs {
         cols,
         rows,
         cwd,
         theme,
+        posh_theme,
     };
     let resource_dir = app.path().resource_dir().ok();
     let map = Arc::clone(state.inner());

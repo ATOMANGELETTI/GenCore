@@ -1,5 +1,7 @@
 import { type ThemeName, useTheme } from "@gencore/ui-kit";
 import * as React from "react";
+import { useOptionalConfig } from "../config/config.hook";
+import type { PoshThemeId } from "../config/config.types";
 import { loadPinnedTabs, savePinnedTabs } from "../ipc/ipc.pinned";
 import {
   closePty,
@@ -306,16 +308,20 @@ function buildOpenArgs(
   cols: number,
   rows: number,
   theme: ThemeName,
+  poshTheme: PoshThemeId,
   cwd?: string | null,
 ): OpenPtyArgs {
+  const base: OpenPtyArgs = { cols, rows, theme, posh_theme: poshTheme };
   if (cwd) {
-    return { cols, rows, cwd, theme };
+    return { ...base, cwd };
   }
-  return { cols, rows, theme };
+  return base;
 }
 
 export function TerminalProvider({ children }: { children: React.ReactNode }) {
   const { theme } = useTheme();
+  const config = useOptionalConfig();
+  const poshTheme = config?.poshTheme ?? "gencore";
   const [tabs, setTabs] = React.useState<TerminalTab[]>([]);
   const [activeId, setActiveId] = React.useState("");
   const [cols, setCols] = React.useState(DEFAULT_COLS);
@@ -324,6 +330,8 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
   const tabsRef = React.useRef(tabs);
   const activeIdRef = React.useRef(activeId);
   const themeRef = React.useRef(theme);
+  const poshThemeRef = React.useRef(poshTheme);
+  poshThemeRef.current = poshTheme;
   const sizeRef = React.useRef({ cols, rows });
   const writersRef = React.useRef(new Map<string, (data: Uint8Array) => void>());
   const queuesRef = React.useRef(new Map<string, Uint8Array[]>());
@@ -439,13 +447,13 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       themeReadyRef.current = true;
       return;
     }
-    const command = poshThemeSwapCommand(theme);
+    const command = poshThemeSwapCommand(poshTheme, theme);
     for (const tab of tabsRef.current) {
       if (tab.sessionId && tab.status === "live") {
         void writeSession(tab.id, tab.sessionId, command);
       }
     }
-  }, [theme, writeSession]);
+  }, [theme, poshTheme, writeSession]);
 
   const bumpSpawn = React.useCallback((id: string): number => {
     const next = (spawnGenRef.current.get(id) ?? 0) + 1;
@@ -468,10 +476,14 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
   /** Public `readScrollback`: only the live serializer, "" if none is registered (e.g. Assistant snapshots). */
   const readScrollback = React.useCallback((tabId: string): string => {
     try {
-      return serializersRef.current.get(tabId)?.() ?? "";
+      const serializer = serializersRef.current.get(tabId);
+      if (serializer) {
+        return serializer();
+      }
     } catch {
-      return "";
+      // Terminal unmounted or serialization failed.
     }
+    return "";
   }, []);
 
   const allowPersist = React.useCallback(() => {
@@ -546,11 +558,15 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       try {
         let sessionId: string;
         try {
-          const opened = await openPty(buildOpenArgs(nextCols, nextRows, themeRef.current, cwd));
+          const opened = await openPty(
+            buildOpenArgs(nextCols, nextRows, themeRef.current, poshThemeRef.current, cwd),
+          );
           sessionId = opened.session_id;
         } catch (error) {
           if (cwd && isInvalidCwd(error)) {
-            const opened = await openPty(buildOpenArgs(nextCols, nextRows, themeRef.current, null));
+            const opened = await openPty(
+              buildOpenArgs(nextCols, nextRows, themeRef.current, poshThemeRef.current, null),
+            );
             sessionId = opened.session_id;
           } else {
             throw error;

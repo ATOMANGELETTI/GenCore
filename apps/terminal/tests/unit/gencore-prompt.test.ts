@@ -23,4 +23,11 @@ describe("gencore-prompt.ps1 preference hygiene", () => {
   it("quiets only Get-Command oh-my-posh", () => {
     expect(promptScript).toMatch(/Get-Command\s+oh-my-posh\s+-ErrorAction\s+SilentlyContinue/);
   });
+
+  it("captures inner prompt as a ScriptBlock to avoid string execution failure", () => {
+    expect(promptScript).toMatch(
+      /\(Get-Command -Name 'prompt' -CommandType Function -ErrorAction SilentlyContinue\)\.ScriptBlock/,
+    );
+    expect(promptScript).not.toMatch(/\$gencoreInner\s*=\s*\$function:Prompt/);
+  });
 });

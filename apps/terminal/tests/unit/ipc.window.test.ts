@@ -6,9 +6,9 @@ const currentWindowMock = {
   toggleMaximize: vi.fn(() => Promise.resolve()),
   startDragging: vi.fn(() => Promise.resolve()),
   theme: vi.fn<() => Promise<"light" | "dark" | null>>(() => Promise.resolve("dark")),
-  onThemeChanged: vi.fn<(handler: (event: { payload: "light" | "dark" }) => void) => Promise<() => void>>(
-    () => Promise.resolve(() => undefined),
-  ),
+  onThemeChanged: vi.fn<
+    (handler: (event: { payload: "light" | "dark" }) => void) => Promise<() => void>
+  >(() => Promise.resolve(() => undefined)),
 };
 
 const getCurrentWindow = vi.fn(() => currentWindowMock);

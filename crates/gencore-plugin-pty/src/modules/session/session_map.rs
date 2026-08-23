@@ -76,6 +76,7 @@ pub fn spawn_session(
     on_exit: impl Fn(PtyExitPayload) + Send + 'static,
 ) -> Result<String, SessionError> {
     validate_theme(args.theme.as_deref())?;
+    validate_posh_theme(args.posh_theme.as_deref())?;
     let cwd = resolve_cwd(args.cwd.as_deref())?;
 
     let pair = native_pty_system()
@@ -87,7 +88,11 @@ pub fn spawn_session(
         })
         .map_err(|err| SessionError::SpawnFailed(err.to_string()))?;
 
-    let omp = resolve_oh_my_posh(resource_dir.as_deref(), args.theme.as_deref());
+    let omp = resolve_oh_my_posh(
+        resource_dir.as_deref(),
+        args.theme.as_deref(),
+        args.posh_theme.as_deref(),
+    );
     let launch = shell_launch(omp.as_ref());
     let mut cmd = CommandBuilder::new(&launch.program);
     for arg in &launch.args {
@@ -192,6 +197,20 @@ pub fn kill_session(map: &Arc<Mutex<SessionMap>>, session_id: &str) -> Result<()
 fn validate_theme(theme: Option<&str>) -> Result<(), SessionError> {
     match theme {
         None | Some("polar-night") | Some("snow-storm") => Ok(()),
+        Some(_) => Err(SessionError::InvalidTheme),
+    }
+}
+
+fn validate_posh_theme(posh_theme: Option<&str>) -> Result<(), SessionError> {
+    match posh_theme {
+        None
+        | Some("gencore")
+        | Some("bubbles")
+        | Some("iterm2")
+        | Some("wholespace")
+        | Some("wopian")
+        | Some("clean-detailed")
+        | Some("kali") => Ok(()),
         Some(_) => Err(SessionError::InvalidTheme),
     }
 }

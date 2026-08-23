@@ -1,3 +1,5 @@
+import type { PoshThemeId } from "../config/config.types";
+
 /** Mirrors `gencore_core::AppInfo`; keep in sync with `crates/gencore-core`. */
 export interface AppInfo {
   readonly name: string;
@@ -40,6 +42,7 @@ export interface OpenPtyArgs {
   readonly rows: number;
   readonly cwd?: string;
   readonly theme?: "polar-night" | "snow-storm";
+  readonly posh_theme?: PoshThemeId;
 }
 
 /** Mirrors `gencore_pty::OpenResult`. */

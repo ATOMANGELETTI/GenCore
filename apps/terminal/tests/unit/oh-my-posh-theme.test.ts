@@ -111,20 +111,66 @@ describe("oh-my-posh Nord themes", () => {
   });
 });
 
+describe("bundled oh-my-posh upstream themes", () => {
+  const themeFiles = [
+    "gencore-polar-night.omp.json",
+    "gencore-snow-storm.omp.json",
+    "bubbles.omp.json",
+    "iterm2.omp.json",
+    "wholespace.omp.json",
+    "wopian.omp.json",
+    "clean-detailed.omp.json",
+    "kali.omp.json",
+  ];
+
+  it.each(themeFiles)("loads and parses %s as valid Oh My Posh JSON schema", (themeName) => {
+    const theme = readTheme(themeName);
+    expect(theme).toBeDefined();
+    expect(Array.isArray(theme.blocks)).toBe(true);
+    expect(theme.blocks?.length).toBeGreaterThan(0);
+  });
+});
+
 describe("poshThemeSwapCommand", () => {
-  it("swaps only the theme filename and does not emit a filesystem path", () => {
-    const polar = poshThemeSwapCommand("polar-night");
-    const snow = poshThemeSwapCommand("snow-storm");
+  it("swaps only the theme filename and does not emit a filesystem path for gencore themes", () => {
+    const polar = poshThemeSwapCommand("gencore", "polar-night");
+    const snow = poshThemeSwapCommand("gencore", "snow-storm");
 
     expect(polar).toContain("gencore-polar-night.omp.json");
     expect(snow).toContain("gencore-snow-storm.omp.json");
-    expect(polar).toMatch(/gencore-\(polar-night\|snow-storm\)/);
-    expect(snow).toMatch(/gencore-\(polar-night\|snow-storm\)/);
+    expect(polar).toContain("$env:POSH_THEME");
+    expect(polar).toContain("$env:POSH_CONFIG");
+    expect(polar).toContain(
+      "(gencore-(polar-night|snow-storm)|bubbles|iterm2|wholespace|wopian|clean-detailed|kali)",
+    );
     expect(polar.endsWith("\n")).toBe(true);
     expect(snow.endsWith("\n")).toBe(true);
     expect(polar).not.toMatch(/[A-Za-z]:\\/);
     expect(snow).not.toMatch(/[A-Za-z]:\\/);
-    expect(polar).not.toContain("POSH_THEME = 'C:");
-    expect(snow).not.toContain("POSH_THEME = 'C:");
+  });
+
+  it("swaps to standalone theme filenames (bubbles, kali, iterm2, wholespace, wopian, clean-detailed)", () => {
+    const themes = ["bubbles", "iterm2", "wholespace", "wopian", "clean-detailed", "kali"] as const;
+    for (const themeId of themes) {
+      const cmd = poshThemeSwapCommand(themeId, "polar-night");
+      expect(cmd).toContain(`${themeId}.omp.json`);
+      expect(cmd).toContain("$env:POSH_THEME");
+      expect(cmd).toContain("$env:POSH_CONFIG");
+      expect(cmd).toContain(
+        "(gencore-(polar-night|snow-storm)|bubbles|iterm2|wholespace|wopian|clean-detailed|kali)",
+      );
+      expect(cmd.endsWith("\n")).toBe(true);
+      expect(cmd).not.toMatch(/[A-Za-z]:\\/);
+    }
+  });
+
+  it("supports legacy single-argument call signature (polar-night / snow-storm)", () => {
+    const legacyPolar = poshThemeSwapCommand("polar-night");
+    const legacySnow = poshThemeSwapCommand("snow-storm");
+
+    expect(legacyPolar).toContain("gencore-polar-night.omp.json");
+    expect(legacySnow).toContain("gencore-snow-storm.omp.json");
+    expect(legacyPolar).toContain("$env:POSH_THEME");
+    expect(legacyPolar).toContain("$env:POSH_CONFIG");
   });
 });

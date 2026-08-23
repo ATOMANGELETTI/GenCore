@@ -1,10 +1,23 @@
-import type { TerminalConfigV1, ThemePreference } from "./config.types";
+import type { PoshThemeId, TerminalConfigV1, ThemePreference } from "./config.types";
 
 export const CONFIG_STORAGE_KEY = "gencore.terminal.config";
 
-export const DEFAULT_CONFIG: TerminalConfigV1 = { version: 1, theme: "system" };
+export const DEFAULT_CONFIG: TerminalConfigV1 = {
+  version: 1,
+  theme: "system",
+  poshTheme: "gencore",
+};
 
 const THEME_PREFERENCES: ReadonlySet<string> = new Set(["system", "polar-night", "snow-storm"]);
+const POSH_THEMES: ReadonlySet<string> = new Set([
+  "gencore",
+  "bubbles",
+  "iterm2",
+  "wholespace",
+  "wopian",
+  "clean-detailed",
+  "kali",
+]);
 
 export function parseConfig(raw: string | null): TerminalConfigV1 {
   if (raw == null || raw === "") {
@@ -22,10 +35,21 @@ export function parseConfig(raw: string | null): TerminalConfigV1 {
       typeof value.theme === "string" &&
       THEME_PREFERENCES.has(value.theme)
     ) {
-      return { version: 1, theme: value.theme as ThemePreference };
+      const poshTheme =
+        "poshTheme" in value &&
+        typeof value.poshTheme === "string" &&
+        POSH_THEMES.has(value.poshTheme)
+          ? (value.poshTheme as PoshThemeId)
+          : "gencore";
+
+      return {
+        version: 1,
+        theme: value.theme as ThemePreference,
+        poshTheme,
+      };
     }
   } catch {
-    // Invalid JSON is treated as Match system.
+    // Invalid JSON is treated as default config.
   }
 
   return DEFAULT_CONFIG;

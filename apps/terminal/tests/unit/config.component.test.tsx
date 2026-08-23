@@ -5,12 +5,21 @@ import { Config } from "../../src/modules/config/config.component";
 import type { ConfigContextValue } from "../../src/modules/config/config.types";
 
 const setPreference = vi.fn();
+const setPoshTheme = vi.fn();
+
+const configState = {
+  preference: "system" as const,
+  resolvedTheme: "polar-night" as const,
+  poshTheme: "gencore" as const,
+};
 
 vi.mock("../../src/modules/config/config.hook", () => ({
   useConfig: (): ConfigContextValue => ({
-    preference: "system",
+    preference: configState.preference,
     setPreference,
-    resolvedTheme: "polar-night",
+    resolvedTheme: configState.resolvedTheme,
+    poshTheme: configState.poshTheme,
+    setPoshTheme,
   }),
 }));
 
@@ -42,12 +51,16 @@ vi.mock("../../src/modules/config/config.agent", () => ({
 describe("Config", () => {
   beforeEach(() => {
     setPreference.mockClear();
+    setPoshTheme.mockClear();
     setModel.mockClear();
     setContextLines.mockClear();
     saveKey.mockReset();
     saveKey.mockResolvedValue(true);
     clearKey.mockClear();
     replaceKey.mockClear();
+    configState.preference = "system";
+    configState.resolvedTheme = "polar-night";
+    configState.poshTheme = "gencore";
     agentSettingsState.model = "gemini-3.7-flash";
     agentSettingsState.contextLines = 80;
     agentSettingsState.hasApiKey = false;
@@ -85,6 +98,54 @@ describe("Config", () => {
     await user.click(screen.getByRole("radio", { name: /Snow Storm/ }));
     expect(setPreference).toHaveBeenCalledTimes(1);
     expect(setPreference).toHaveBeenCalledWith("snow-storm");
+  });
+
+  describe("Prompt Theme section", () => {
+    it("renders the Prompt Theme label and all 7 themes", () => {
+      render(<Config />);
+
+      expect(screen.getByText("Prompt Theme")).toBeVisible();
+      const group = screen.getByRole("radiogroup", { name: "Prompt Theme" });
+      expect(group).toBeInTheDocument();
+      expect(screen.getByRole("radio", { name: /GenCore/ })).toBeInTheDocument();
+      expect(screen.getByRole("radio", { name: /Bubbles/ })).toBeInTheDocument();
+      expect(screen.getByRole("radio", { name: /iTerm2/ })).toBeInTheDocument();
+      expect(screen.getByRole("radio", { name: /Wholespace/ })).toBeInTheDocument();
+      expect(screen.getByRole("radio", { name: /Wopian/ })).toBeInTheDocument();
+      expect(screen.getByRole("radio", { name: /Clean Detailed/ })).toBeInTheDocument();
+      expect(screen.getByRole("radio", { name: /Kali/ })).toBeInTheDocument();
+    });
+
+    it("checks GenCore by default", () => {
+      render(<Config />);
+
+      expect(screen.getByRole("radio", { name: /GenCore/ })).toHaveAttribute(
+        "aria-checked",
+        "true",
+      );
+      expect(screen.getByRole("radio", { name: /Bubbles/ })).toHaveAttribute(
+        "aria-checked",
+        "false",
+      );
+    });
+
+    it("calls setPoshTheme('bubbles') when Bubbles is clicked", async () => {
+      const user = userEvent.setup();
+      render(<Config />);
+
+      await user.click(screen.getByRole("radio", { name: /Bubbles/ }));
+      expect(setPoshTheme).toHaveBeenCalledTimes(1);
+      expect(setPoshTheme).toHaveBeenCalledWith("bubbles");
+    });
+
+    it("calls setPoshTheme('kali') when Kali is clicked", async () => {
+      const user = userEvent.setup();
+      render(<Config />);
+
+      await user.click(screen.getByRole("radio", { name: /Kali/ }));
+      expect(setPoshTheme).toHaveBeenCalledTimes(1);
+      expect(setPoshTheme).toHaveBeenCalledWith("kali");
+    });
   });
 
   describe("Assistant section", () => {
