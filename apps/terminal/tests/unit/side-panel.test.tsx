@@ -30,6 +30,7 @@ vi.mock("../../src/modules/ipc/ipc.assistant", () => ({
 }));
 
 import { ConfigProvider } from "../../src/modules/config/config.hook";
+import { FileTreeProvider } from "../../src/modules/file-tree/file-tree.hook";
 import { SidePanel } from "../../src/modules/side-panel/side-panel.component";
 
 restoreJsdomLocalStorage();
@@ -53,7 +54,9 @@ function expectPanelHiddenState(id: "files" | "assistant" | "config", isHidden: 
 async function renderSidePanel() {
   const view = render(
     <ConfigProvider>
-      <SidePanel />
+      <FileTreeProvider>
+        <SidePanel />
+      </FileTreeProvider>
     </ConfigProvider>,
   );
   expect(await screen.findByText("FILES")).toBeVisible();
@@ -194,7 +197,9 @@ describe("SidePanel", () => {
   it("collapses to zero width when open is false and stays mounted", async () => {
     render(
       <ConfigProvider>
-        <SidePanel open={false} />
+        <FileTreeProvider>
+          <SidePanel open={false} />
+        </FileTreeProvider>
       </ConfigProvider>,
     );
     const aside = await screen.findByRole("complementary", { hidden: true });

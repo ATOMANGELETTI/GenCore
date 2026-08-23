@@ -453,7 +453,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
     return next;
   }, []);
 
-  const readScrollback = React.useCallback((tab: TerminalTab): string => {
+  const scrollbackForTab = React.useCallback((tab: TerminalTab): string => {
     try {
       const serialized = serializersRef.current.get(tab.id)?.();
       if (typeof serialized === "string") {
@@ -463,6 +463,15 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       // Terminal may already be disposed.
     }
     return scrollbackCacheRef.current.get(tab.id) ?? tab.restore?.scrollback ?? "";
+  }, []);
+
+  /** Public `readScrollback`: only the live serializer, "" if none is registered (e.g. Assistant snapshots). */
+  const readScrollback = React.useCallback((tabId: string): string => {
+    try {
+      return serializersRef.current.get(tabId)?.() ?? "";
+    } catch {
+      return "";
+    }
   }, []);
 
   const allowPersist = React.useCallback(() => {
@@ -488,7 +497,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       name: tab.name,
       pinned: tab.pinned,
       cwd: tab.cwd,
-      scrollback: readScrollback(tab),
+      scrollback: scrollbackForTab(tab),
       cols: nextCols,
       rows: nextRows,
     }));
@@ -501,7 +510,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // Best-effort persist; Isolation/IPC may be unavailable in tests.
     }
-  }, [readScrollback]);
+  }, [scrollbackForTab]);
 
   const scheduleSave = React.useCallback(() => {
     if (!hydratedRef.current) {
@@ -994,6 +1003,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       registerWriter,
       registerSerializer,
       registerClipboard,
+      readScrollback,
       onTerminalInput,
       clipboard,
       flushPinnedSave: flushSave,
@@ -1008,6 +1018,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       flushSave,
       newTab,
       onTerminalInput,
+      readScrollback,
       registerClipboard,
       registerSerializer,
       registerWriter,
@@ -1030,4 +1041,26 @@ export function useTerminalSession(): TerminalSessionApi {
     throw new Error("useTerminalSession must be used inside a <TerminalProvider>");
   }
   return context;
+}
+
+/**
+ * Non-throwing accessor for consumers (the Assistant) that may render outside
+ * a `<TerminalProvider>` in isolated specs; `null` means no session is available.
+ */
+export function useTerminalSessionOptional(): TerminalSessionApi | null {
+  return React.useContext(TerminalSessionContext);
+}
+
+/**
+ * Test-only stub so specs can supply a fake `TerminalSessionApi` without
+ * mounting the real `<TerminalProvider>` (which subscribes to PTY IPC events).
+ */
+export function TerminalSessionStubProvider({
+  value,
+  children,
+}: {
+  value: TerminalSessionApi;
+  children: React.ReactNode;
+}) {
+  return React.createElement(TerminalSessionContext.Provider, { value }, children);
 }

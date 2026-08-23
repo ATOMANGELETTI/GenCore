@@ -61,6 +61,8 @@ export interface TerminalSessionApi {
   registerWriter: (tabId: string, write: (data: Uint8Array) => void) => () => void;
   registerSerializer: (tabId: string, serialize: () => string) => () => void;
   registerClipboard: (api: TerminalClipboardApi) => () => void;
+  /** Reads the live xterm buffer for a tab via its registered serializer; "" if none is registered. */
+  readScrollback: (tabId: string) => string;
   onTerminalInput: (tabId: string, data: string) => void;
   clipboard: TerminalClipboardApi;
   /** Persists pinned tabs immediately; awaited on the window-close path. */

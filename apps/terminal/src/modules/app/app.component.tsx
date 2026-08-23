@@ -4,6 +4,7 @@ import { AgentSettingsProvider } from "../config/config.agent";
 import { ConfigProvider, useConfig } from "../config/config.hook";
 import { TerminalContextMenu } from "../context-menu/context-menu.terminal";
 import { TitlebarContextMenu } from "../context-menu/context-menu.titlebar";
+import { FileTreeProvider } from "../file-tree/file-tree.hook";
 import { getAppInfo } from "../ipc/ipc.app-info";
 import { openRepoInBrowser } from "../ipc/ipc.opener";
 import type { AppInfo } from "../ipc/ipc.types";
@@ -57,7 +58,9 @@ function AppShellTree() {
   return (
     <ThemeProvider theme={resolvedTheme}>
       <TerminalProvider>
-        <AppShellFrame title={APP_TITLE} version={version} />
+        <FileTreeProvider>
+          <AppShellFrame title={APP_TITLE} version={version} />
+        </FileTreeProvider>
       </TerminalProvider>
     </ThemeProvider>
   );

@@ -4,6 +4,7 @@ import {
   type AgentSettingsValue,
   useAgentSettings,
 } from "../config/config.agent";
+import { toFilesSelection, useFileTreeApiOptional } from "../file-tree/file-tree.hook";
 import {
   confirmAction,
   createConversation,
@@ -14,12 +15,47 @@ import {
   subscribeAssistantError,
   subscribeAssistantToken,
   subscribeAssistantTurn,
+  subscribeAssistantUiAction,
 } from "../ipc/ipc.assistant";
-import type { AssistantMessage, AssistantToolCall, Conversation } from "../ipc/ipc.types";
+import type {
+  AssistantMessage,
+  AssistantToolCall,
+  AssistantUiActionPayload,
+  Conversation,
+} from "../ipc/ipc.types";
+import { useTerminalSessionOptional } from "../terminal/terminal.hook";
+import { buildSnapshot } from "./assistant.snapshot";
 import type { AssistantApi } from "./assistant.types";
-import { STUB_ASSISTANT_SNAPSHOT } from "./assistant.types";
 
 export { useAgentSettings };
+
+/**
+ * Applies a `gencore-assistant://ui-action` payload emitted after the user
+ * confirms `switch_tab` or `reveal_in_files`. Unknown action names and
+ * malformed args are silent no-ops; the tool already ran on the Rust side.
+ */
+export function applyAssistantUiAction(
+  payload: AssistantUiActionPayload,
+  handlers: {
+    setActive?: (id: string) => void;
+    revealPath?: (path: string) => void;
+  },
+): void {
+  const args = payload.args as Record<string, unknown> | null;
+  if (payload.name === "switch_tab") {
+    const tabId = typeof args?.tab_id === "string" ? args.tab_id : null;
+    if (tabId) {
+      handlers.setActive?.(tabId);
+    }
+    return;
+  }
+  if (payload.name === "reveal_in_files") {
+    const path = typeof args?.path === "string" ? args.path : null;
+    if (path) {
+      handlers.revealPath?.(path);
+    }
+  }
+}
 
 /**
  * Test-only stub for specs that only care about `hasApiKey`. Provides the
@@ -51,7 +87,9 @@ export function AgentSettingsStubProvider({
 }
 
 export function useAssistant(): AssistantApi {
-  const { hasApiKey } = useAgentSettings();
+  const { hasApiKey, contextLines } = useAgentSettings();
+  const terminalSession = useTerminalSessionOptional();
+  const fileTreeApi = useFileTreeApiOptional();
   const [conversations, setConversations] = React.useState<Conversation[]>([]);
   const [conversationId, setConversationId] = React.useState<string | null>(null);
   const [messagesByConversation, setMessagesByConversation] = React.useState<
@@ -191,6 +229,31 @@ export function useAssistant(): AssistantApi {
     };
   }, [applyFetchedMessages]);
 
+  React.useEffect(() => {
+    let cancelled = false;
+    let unlisten: (() => void) | undefined;
+
+    void subscribeAssistantUiAction((payload) => {
+      applyAssistantUiAction(payload, {
+        setActive: terminalSession?.setActive,
+        revealPath: fileTreeApi?.revealPath,
+      });
+    })
+      .then((fn) => {
+        if (cancelled) {
+          fn();
+          return;
+        }
+        unlisten = fn;
+      })
+      .catch(() => undefined);
+
+    return () => {
+      cancelled = true;
+      unlisten?.();
+    };
+  }, [terminalSession, fileTreeApi]);
+
   const send = React.useCallback(async () => {
     const activeId = conversationId;
     const isActiveStreaming = activeId ? (streamingByConversation[activeId] ?? false) : false;
@@ -215,7 +278,18 @@ export function useAssistant(): AssistantApi {
       const sendingId = id;
       setStreamingByConversation((current) => ({ ...current, [sendingId]: true }));
       setStreamTextByConversation((current) => ({ ...current, [sendingId]: "" }));
-      const result = await sendMessage(sendingId, text, STUB_ASSISTANT_SNAPSHOT);
+      const snapshot = buildSnapshot({
+        tabs: terminalSession?.tabs ?? [],
+        activeId: terminalSession?.activeId ?? "",
+        readScrollback: terminalSession
+          ? () => terminalSession.readScrollback(terminalSession.activeId)
+          : () => "",
+        contextLines,
+        filesSelection: fileTreeApi
+          ? toFilesSelection(fileTreeApi.nodes, fileTreeApi.selectedId)
+          : null,
+      });
+      const result = await sendMessage(sendingId, text, snapshot);
       if (!result.accepted) {
         setStreamingByConversation((current) => ({ ...current, [sendingId]: false }));
         return;
@@ -246,7 +320,15 @@ export function useAssistant(): AssistantApi {
         setStreamingByConversation((current) => ({ ...current, [failedId]: false }));
       }
     }
-  }, [composer, conversationId, hasApiKey, streamingByConversation]);
+  }, [
+    composer,
+    conversationId,
+    contextLines,
+    fileTreeApi,
+    hasApiKey,
+    streamingByConversation,
+    terminalSession,
+  ]);
 
   const newChat = React.useCallback(async () => {
     try {

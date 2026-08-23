@@ -21,3 +21,9 @@ export interface FileTreeCreateDraft {
 }
 
 export const FILE_TREE_CREATE_ID = "__gencore-create__";
+
+/** The selected Files-tab entry, shared with the Assistant snapshot (`AssistantFilesSelection`). */
+export interface FilesSelection {
+  readonly path: string;
+  readonly kind: string;
+}

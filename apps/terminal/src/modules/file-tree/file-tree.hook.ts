@@ -12,6 +12,7 @@ import {
 import type { DriveEntry, FsEntry } from "../ipc/ipc.types";
 import {
   FILE_TREE_CREATE_ID,
+  type FilesSelection,
   type FileTreeCreateDraft,
   type FileTreeNode,
   type FileTreeNodeKind,
@@ -157,6 +158,25 @@ function flattenRows(state: FileTreeState): TreeRow[] {
   }
 
   return rows;
+}
+
+/** Drives have no `AssistantFilesSelection` equivalent on the Rust side; treat them as a directory. */
+export function mapFileTreeKind(kind: FileTreeNodeKind): string {
+  return kind === "drive" ? "dir" : kind;
+}
+
+export function toFilesSelection(
+  nodes: Readonly<Record<string, FileTreeNode>>,
+  selectedId: string | null,
+): FilesSelection | null {
+  if (selectedId == null) {
+    return null;
+  }
+  const node = nodes[selectedId];
+  if (!node) {
+    return null;
+  }
+  return { path: node.path, kind: mapFileTreeKind(node.kind) };
 }
 
 function formatIpcError(error: unknown): string {
@@ -381,6 +401,22 @@ export function useFileTree() {
     }
   }
 
+  /**
+   * Applies the Assistant's `reveal_in_files` ui-action: selects the node if
+   * it exists, expanding it first when it is a collapsed folder/drive. A
+   * missing path is a silent no-op (the tree just doesn't move).
+   */
+  function revealPath(path: string) {
+    const node = stateRef.current.nodes[path];
+    if (!node) {
+      return;
+    }
+    setState((current) => ({ ...current, selectedId: path }));
+    if (isExpandableKind(node.kind) && !node.expanded) {
+      void expand(path).catch(() => undefined);
+    }
+  }
+
   async function refresh() {
     setRefreshing(true);
     try {
@@ -416,5 +452,49 @@ export function useFileTree() {
     collapseAll,
     refresh,
     refreshPath,
+    revealPath,
   };
+}
+
+export type FileTreeApi = ReturnType<typeof useFileTree>;
+
+const FileTreeContext = React.createContext<FileTreeApi | null>(null);
+
+/**
+ * Owns the single `useFileTree()` instance shared by `<FileTree />` and the
+ * Assistant, so a `reveal_in_files` ui-action mutates the same tree the user
+ * sees instead of a disconnected copy.
+ */
+export function FileTreeProvider({ children }: { children: React.ReactNode }) {
+  const tree = useFileTree();
+  return React.createElement(FileTreeContext.Provider, { value: tree }, children);
+}
+
+/** Throws outside a `<FileTreeProvider>`; used by `<FileTree />` itself, which always has one. */
+export function useFileTreeContext(): FileTreeApi {
+  const context = React.useContext(FileTreeContext);
+  if (!context) {
+    throw new Error("useFileTreeContext must be used inside a <FileTreeProvider>");
+  }
+  return context;
+}
+
+/** Non-throwing accessor for the Assistant, which may render outside a `<FileTreeProvider>` in isolated specs. */
+export function useFileTreeApiOptional(): FileTreeApi | null {
+  return React.useContext(FileTreeContext);
+}
+
+/**
+ * Test-only stub so specs can supply a fake `FileTreeApi` without mounting the
+ * real `useFileTree()` (which calls `listDrives`/`listDir`/`watchDir` over IPC
+ * on mount).
+ */
+export function FileTreeApiStubProvider({
+  value,
+  children,
+}: {
+  value: FileTreeApi;
+  children: React.ReactNode;
+}) {
+  return React.createElement(FileTreeContext.Provider, { value }, children);
 }

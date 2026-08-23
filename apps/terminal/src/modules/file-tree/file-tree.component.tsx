@@ -16,7 +16,7 @@ import { FilePlus, FolderPlus, FoldVertical, RefreshCw } from "lucide-react";
 import * as React from "react";
 import { copyText } from "../context-menu/context-menu.clipboard";
 import { FileTreeContextMenu } from "../context-menu/context-menu.file-tree";
-import { useFileTree } from "./file-tree.hook";
+import { useFileTreeContext } from "./file-tree.hook";
 import {
   FILE_TREE_CREATE_ID,
   type FileTreeCreateDraft,
@@ -148,7 +148,7 @@ function CreateNameInput({
 }
 
 export function FileTree() {
-  const tree = useFileTree();
+  const tree = useFileTreeContext();
   const createDisabled = tree.selectedId == null;
   const [menuTargetId, setMenuTargetId] = React.useState<string | null>(null);
 

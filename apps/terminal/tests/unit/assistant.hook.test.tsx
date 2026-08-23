@@ -1,11 +1,16 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { FileTreeApi } from "../../src/modules/file-tree/file-tree.hook";
+import { FileTreeApiStubProvider } from "../../src/modules/file-tree/file-tree.hook";
 import type {
   AssistantMessage,
   AssistantToolCall,
+  AssistantUiActionPayload,
   Conversation,
 } from "../../src/modules/ipc/ipc.types";
+import { TerminalSessionStubProvider } from "../../src/modules/terminal/terminal.hook";
+import type { TerminalSessionApi } from "../../src/modules/terminal/terminal.types";
 
 const {
   listConversations,
@@ -48,9 +53,16 @@ vi.mock("../../src/modules/ipc/ipc.assistant", () => ({
 
 import {
   AgentSettingsStubProvider,
+  applyAssistantUiAction,
   useAssistant,
 } from "../../src/modules/assistant/assistant.hook";
-import { STUB_ASSISTANT_SNAPSHOT } from "../../src/modules/assistant/assistant.types";
+
+/** What `buildSnapshot` produces with no `<TerminalProvider>`/`<FileTreeProvider>` ancestor. */
+const EMPTY_SNAPSHOT = {
+  active_tab_id: "",
+  output_excerpt: "",
+  tabs: [],
+};
 
 const CONVERSATION: Conversation = {
   id: "c1",
@@ -152,6 +164,58 @@ function renderHookProbe(hasApiKey: boolean) {
   );
 }
 
+function fakeTerminalSession(overrides: Partial<TerminalSessionApi> = {}): TerminalSessionApi {
+  return {
+    tabs: [],
+    activeId: "",
+    cols: 80,
+    rows: 24,
+    shellName: "pwsh",
+    newTab: vi.fn(),
+    closeTab: vi.fn(),
+    setActive: vi.fn(),
+    renameTab: vi.fn(),
+    togglePin: vi.fn(),
+    closeOthers: vi.fn(),
+    closeUnpinned: vi.fn(),
+    restartTab: vi.fn(),
+    setViewport: vi.fn(),
+    registerWriter: vi.fn(() => () => undefined),
+    registerSerializer: vi.fn(() => () => undefined),
+    registerClipboard: vi.fn(() => () => undefined),
+    readScrollback: () => "",
+    onTerminalInput: vi.fn(),
+    clipboard: {
+      hasSelection: () => false,
+      copy: async () => undefined,
+      paste: async () => undefined,
+      selectAll: () => undefined,
+    },
+    flushPinnedSave: async () => undefined,
+    ...overrides,
+  };
+}
+
+function fakeFileTreeApi(overrides: Partial<FileTreeApi> = {}): FileTreeApi {
+  return {
+    rows: [],
+    nodes: {},
+    selectedId: null,
+    create: null,
+    refreshing: false,
+    onSelect: vi.fn(),
+    onToggle: vi.fn(),
+    startCreate: vi.fn(async () => undefined),
+    commitCreate: vi.fn(async () => undefined),
+    cancelCreate: vi.fn(),
+    collapseAll: vi.fn(),
+    refresh: vi.fn(async () => undefined),
+    refreshPath: vi.fn(async () => undefined),
+    revealPath: vi.fn(),
+    ...overrides,
+  };
+}
+
 describe("useAssistant", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -169,7 +233,7 @@ describe("useAssistant", () => {
     expect(sendMessage).not.toHaveBeenCalled();
   });
 
-  it("sends with the stub snapshot when a key is present", async () => {
+  it("sends an empty snapshot when no terminal session or files selection is available", async () => {
     const user = userEvent.setup();
     listConversations.mockResolvedValue([CONVERSATION]);
     renderHookProbe(true);
@@ -182,12 +246,71 @@ describe("useAssistant", () => {
     await user.click(screen.getByText("send"));
 
     await waitFor(() => {
-      expect(sendMessage).toHaveBeenCalledWith("c1", "hello", STUB_ASSISTANT_SNAPSHOT);
+      expect(sendMessage).toHaveBeenCalledWith("c1", "hello", EMPTY_SNAPSHOT);
     });
-    expect(STUB_ASSISTANT_SNAPSHOT).toEqual({
-      active_tab_id: "stub",
-      output_excerpt: "",
-      tabs: [],
+  });
+
+  it("sends a real snapshot built from the terminal session and files selection", async () => {
+    const user = userEvent.setup();
+    listConversations.mockResolvedValue([CONVERSATION]);
+    const terminalSession = fakeTerminalSession({
+      tabs: [
+        {
+          id: "t1",
+          name: "Build",
+          pinned: false,
+          cwd: "C:\\work",
+          sessionId: "sess-1",
+          status: "live",
+          error: null,
+        },
+      ],
+      activeId: "t1",
+      readScrollback: () => "line1\nline2",
+    });
+    const fileTreeApi = fakeFileTreeApi({
+      selectedId: "C:\\work\\app.rs",
+      nodes: {
+        "C:\\work\\app.rs": {
+          name: "app.rs",
+          path: "C:\\work\\app.rs",
+          kind: "file",
+          extension: "rs",
+          hidden: false,
+          system: false,
+          label: null,
+          expanded: false,
+          children: [],
+        },
+      },
+    });
+
+    render(
+      <TerminalSessionStubProvider value={terminalSession}>
+        <FileTreeApiStubProvider value={fileTreeApi}>
+          <AgentSettingsStubProvider hasApiKey={true}>
+            <Probe />
+          </AgentSettingsStubProvider>
+        </FileTreeApiStubProvider>
+      </TerminalSessionStubProvider>,
+    );
+
+    await waitFor(() => {
+      expect(listConversations).toHaveBeenCalledTimes(1);
+    });
+
+    await user.type(screen.getByLabelText("composer"), "hello");
+    await user.click(screen.getByText("send"));
+
+    await waitFor(() => {
+      expect(sendMessage).toHaveBeenCalledWith("c1", "hello", {
+        active_tab_id: "t1",
+        active_session_id: "sess-1",
+        cwd: "C:\\work",
+        output_excerpt: "line1\nline2",
+        tabs: [{ id: "t1", name: "Build", cwd: "C:\\work", pinned: false }],
+        files_selection: { path: "C:\\work\\app.rs", kind: "file" },
+      });
     });
   });
 
@@ -299,7 +422,7 @@ describe("useAssistant", () => {
     await user.click(screen.getByText("send"));
 
     await waitFor(() => {
-      expect(sendMessage).toHaveBeenCalledWith("c1", "hello", STUB_ASSISTANT_SNAPSHOT);
+      expect(sendMessage).toHaveBeenCalledWith("c1", "hello", EMPTY_SNAPSHOT);
     });
     const userTurn = screen.getByTestId("messages").querySelector("[data-role='user']");
     expect(userTurn).toHaveTextContent("hello");
@@ -348,7 +471,7 @@ describe("useAssistant", () => {
     await user.click(screen.getByText("send"));
 
     await waitFor(() => {
-      expect(sendMessage).toHaveBeenCalledWith("c1", "hello", STUB_ASSISTANT_SNAPSHOT);
+      expect(sendMessage).toHaveBeenCalledWith("c1", "hello", EMPTY_SNAPSHOT);
     });
     await waitFor(() => {
       const userTurn = screen.getByTestId("messages").querySelector("[data-role='user']");
@@ -410,7 +533,7 @@ describe("useAssistant", () => {
     await user.type(screen.getByLabelText("composer"), "hello from c1");
     await user.click(screen.getByText("send"));
     await waitFor(() => {
-      expect(sendMessage).toHaveBeenCalledWith("c1", "hello from c1", STUB_ASSISTANT_SNAPSHOT);
+      expect(sendMessage).toHaveBeenCalledWith("c1", "hello from c1", EMPTY_SNAPSHOT);
     });
 
     // History switch while the c1 send is still awaiting.
@@ -481,5 +604,79 @@ describe("useAssistant", () => {
 
     expect(screen.getByTestId("messages").querySelector("[data-role='user']")).toBeNull();
     expect(screen.getByTestId("messages")).toBeEmptyDOMElement();
+  });
+
+  it("switches tabs and reveals a path when a ui-action fires after confirm", async () => {
+    let onUiAction: ((payload: AssistantUiActionPayload) => void) | undefined;
+    subscribeAssistantUiAction.mockImplementation(async (handler) => {
+      onUiAction = handler;
+      return () => {};
+    });
+    const terminalSession = fakeTerminalSession();
+    const fileTreeApi = fakeFileTreeApi();
+
+    render(
+      <TerminalSessionStubProvider value={terminalSession}>
+        <FileTreeApiStubProvider value={fileTreeApi}>
+          <AgentSettingsStubProvider hasApiKey={true}>
+            <Probe />
+          </AgentSettingsStubProvider>
+        </FileTreeApiStubProvider>
+      </TerminalSessionStubProvider>,
+    );
+
+    await waitFor(() => {
+      expect(onUiAction).toBeTypeOf("function");
+    });
+
+    onUiAction?.({ id: "call-1", name: "switch_tab", args: { tab_id: "tab-2" } });
+    expect(terminalSession.setActive).toHaveBeenCalledWith("tab-2");
+
+    onUiAction?.({ id: "call-2", name: "reveal_in_files", args: { path: "C:\\work\\app.rs" } });
+    expect(fileTreeApi.revealPath).toHaveBeenCalledWith("C:\\work\\app.rs");
+  });
+});
+
+describe("applyAssistantUiAction", () => {
+  it("calls setActive with args.tab_id for switch_tab", () => {
+    const setActive = vi.fn();
+    applyAssistantUiAction(
+      { id: "1", name: "switch_tab", args: { tab_id: "tab-2" } },
+      { setActive },
+    );
+    expect(setActive).toHaveBeenCalledWith("tab-2");
+  });
+
+  it("calls revealPath with args.path for reveal_in_files", () => {
+    const revealPath = vi.fn();
+    applyAssistantUiAction(
+      { id: "1", name: "reveal_in_files", args: { path: "C:\\repo" } },
+      { revealPath },
+    );
+    expect(revealPath).toHaveBeenCalledWith("C:\\repo");
+  });
+
+  it("is a no-op for an unknown action name", () => {
+    const setActive = vi.fn();
+    const revealPath = vi.fn();
+    applyAssistantUiAction({ id: "1", name: "pty_write", args: {} }, { setActive, revealPath });
+    expect(setActive).not.toHaveBeenCalled();
+    expect(revealPath).not.toHaveBeenCalled();
+  });
+
+  it("is a no-op when args are missing or malformed", () => {
+    const setActive = vi.fn();
+    const revealPath = vi.fn();
+    applyAssistantUiAction({ id: "1", name: "switch_tab", args: null }, { setActive });
+    applyAssistantUiAction({ id: "2", name: "switch_tab", args: { tab_id: 5 } }, { setActive });
+    applyAssistantUiAction({ id: "3", name: "reveal_in_files", args: {} }, { revealPath });
+    expect(setActive).not.toHaveBeenCalled();
+    expect(revealPath).not.toHaveBeenCalled();
+  });
+
+  it("does not throw when the matching handler is not provided", () => {
+    expect(() => {
+      applyAssistantUiAction({ id: "1", name: "switch_tab", args: { tab_id: "t1" } }, {});
+    }).not.toThrow();
   });
 });

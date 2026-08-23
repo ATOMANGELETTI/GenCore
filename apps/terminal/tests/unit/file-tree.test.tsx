@@ -25,6 +25,7 @@ vi.mock("../../src/modules/ipc/ipc.fs", () => ({
 }));
 
 import { FileTree } from "../../src/modules/file-tree/file-tree.component";
+import { FileTreeProvider } from "../../src/modules/file-tree/file-tree.hook";
 
 const DRIVES: DriveEntry[] = [
   { name: "C:", path: "C:\\", kind: "fixed", label: "System" },
@@ -77,7 +78,11 @@ function mockFs() {
 
 async function renderTree() {
   const user = userEvent.setup();
-  const view = render(<FileTree />);
+  const view = render(
+    <FileTreeProvider>
+      <FileTree />
+    </FileTreeProvider>,
+  );
   expect(await screen.findByText("C:")).toBeVisible();
   expect(screen.getByText("D:")).toBeVisible();
   return { user, ...view };
