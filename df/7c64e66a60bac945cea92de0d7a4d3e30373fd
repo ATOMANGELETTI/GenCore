@@ -1,0 +1,70 @@
+apps/terminal/src/modules/terminal/terminal.hook.ts
+  s_99c71c4fe8a644::t_c27c065008e042 1045-1066
+  s_99c71c4fe8a644::t_65c574f1786d5e 456,468-476
+  s_99c71c4fe8a644::t_5ad6023eb0e8a1 1006,1021
+  s_99c71c4fe8a644::t_9b44eb02c8e36e 500,513
+apps/terminal/tests/unit/file-tree.test.tsx
+  s_99c71c4fe8a644::t_732cf69a604d9c 28
+  s_99c71c4fe8a644::t_93e6569e9a540f 81-85
+apps/terminal/src/modules/file-tree/file-tree.hook.ts
+  s_99c71c4fe8a644::t_1b8912ccc7bda2 15
+  s_99c71c4fe8a644::t_7c43695f5ad077 404-419
+  s_99c71c4fe8a644::t_d12a50fa512a07 455,458-500
+  s_99c71c4fe8a644::t_0274b27612a58e 163-181
+apps/terminal/src/modules/assistant/assistant.snapshot.ts
+  s_99c71c4fe8a644::t_a939fec54e676e 1-66
+apps/terminal/src/modules/assistant/assistant.hook.ts
+  s_99c71c4fe8a644::t_b84dd986123c76 90-92
+  s_99c71c4fe8a644::t_bfd796c65f08e4 281-287,291-292
+  s_99c71c4fe8a644::t_097748823037ae 7,18,20-27,32-58
+  s_99c71c4fe8a644::t_23a7ac5d295db5 232-256
+  s_99c71c4fe8a644::t_281e27e3950f73 288-290,323-331
+  s_99c71c4fe8a644::t_f6ac050e2dd748 59
+apps/terminal/src/modules/terminal/terminal.types.ts
+  s_99c71c4fe8a644::t_18a10745977c67 64-65
+apps/terminal/tests/unit/side-panel.test.tsx
+  s_99c71c4fe8a644::t_241bc326d293c7 200-202
+  s_99c71c4fe8a644::t_64afed2f6133ae 57-59
+  s_99c71c4fe8a644::t_d9b1f79d984a7e 33
+apps/terminal/tests/unit/assistant.hook.test.tsx
+  s_99c71c4fe8a644::t_3517398859c0d7 474
+  s_99c71c4fe8a644::t_90aa8414a378d8 4,9,12-13
+  s_99c71c4fe8a644::t_81574cece2649f 236,249-299,301-313
+  s_99c71c4fe8a644::t_5b2a3476ea3595 425
+  s_99c71c4fe8a644::t_402bb1f30aa7ff 56,59-65
+  s_99c71c4fe8a644::t_dcea68546ea250 5
+  s_99c71c4fe8a644::t_0bab6f7ec5d65e 536
+  s_99c71c4fe8a644::t_c4031e5f05a73e 167-218
+  s_99c71c4fe8a644::t_b2b2b50140688e 608-681
+apps/terminal/tests/unit/assistant.snapshot.test.ts
+  s_99c71c4fe8a644::t_53380df3217464 1-119
+apps/terminal/src/modules/file-tree/file-tree.types.ts
+  s_99c71c4fe8a644::t_ceff1b4b039a6f 24-29
+apps/terminal/src/modules/app/app.component.tsx
+  s_99c71c4fe8a644::t_fcecd725fbec80 61-63
+  s_99c71c4fe8a644::t_90a2ba0f0e0d5d 7
+apps/terminal/src/modules/file-tree/file-tree.component.tsx
+  s_99c71c4fe8a644::t_f7ef664c1f389d 19
+  s_99c71c4fe8a644::t_f02b57d0e5242f 151
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "df7c64e66a60bac945cea92de0d7a4d3e30373fd",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_99c71c4fe8a644": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e756c07a-fd06-4700-be5e-52e34267055a",
+        "model": "claude-sonnet-5-thinking-xhigh"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
