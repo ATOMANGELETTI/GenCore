@@ -1,0 +1,94 @@
+apps/terminal/tests/unit/config.agent.test.tsx
+  s_ac6e7634e6ada7::t_2f63a885a378d7 199,211,213
+  s_ac6e7634e6ada7::t_2ecb6f81047f7b 144-178
+apps/terminal/src/modules/ipc/ipc.assistant.ts
+  s_ac6e7634e6ada7::t_cbc802a8a138a5 52-53
+  s_ac6e7634e6ada7::t_638f5cb3069dc1 13
+apps/terminal/src/modules/assistant/assistant.types.ts
+  s_ac6e7634e6ada7::t_85d6437802976f 7-12,20,29
+apps/terminal/src/modules/ipc/ipc.types.ts
+  s_ac6e7634e6ada7::t_7d49b062a1a258 178-181,184-185
+  s_ac6e7634e6ada7::t_73a7345c01a3cf 143-151
+apps/terminal/tests/unit/isolation.hook.test.ts
+  s_ac6e7634e6ada7::t_8ba5ec6029afaa 996-1013
+  s_ac6e7634e6ada7::t_1bdc7cf08b3cb0 964
+  s_ac6e7634e6ada7::t_ab59ca18fba803 1014
+apps/terminal/tests/unit/side-panel.test.tsx
+  s_ac6e7634e6ada7::t_2f60b0e267c1f7 21
+apps/terminal/src/modules/assistant/assistant.component.tsx
+  s_ac6e7634e6ada7::t_7a900b7a512444 18-28,54
+  s_ac6e7634e6ada7::t_264da13ec067dc 153-169,174-179
+apps/terminal/src/modules/assistant/assistant.hook.ts
+  s_ac6e7634e6ada7::t_e0837164a6e137 91
+  s_ac6e7634e6ada7::t_866aa5af17a132 9,29,33-35,64-68,118-123,138-149,179-192,219,221-222,229,250,263,265-267,277-280,291,342,359-362,364-365,382,386,391,413,424-433,435-441,444-481,483,485,496,505
+  s_ac6e7634e6ada7::t_1b1286637ca0be 69-70
+apps/terminal/tests/unit/config.component.test.tsx
+  s_ac6e7634e6ada7::t_9b79420e8426cd 170-179,185,187-188,190-210
+  s_ac6e7634e6ada7::t_66a675d0ccd7de 132,140-156
+  s_ac6e7634e6ada7::t_1f2230cb81a9b9 1
+  s_ac6e7634e6ada7::t_b0de4bd3ac39f1 47-48
+apps/terminal/src/modules/config/config.agent.ts
+  s_ac6e7634e6ada7::t_4b8cc81f10fe45 78,82,84-86
+  s_ac6e7634e6ada7::t_6a25c66ced855f 16-17,28
+  s_ac6e7634e6ada7::t_5b98c8d8c9a811 99-103
+apps/terminal/src/modules/config/config.component.tsx
+  s_ac6e7634e6ada7::t_3113a369c08b2d 215,222,253,257-263,266-270
+  s_ac6e7634e6ada7::t_21c6ac94627d0e 114,119-135
+  s_ac6e7634e6ada7::t_4bf3ea3332f8db 65
+apps/terminal/isolation/isolation.hook.js
+  s_ac6e7634e6ada7::t_d22134088b06ab 106-108
+  s_ac6e7634e6ada7::t_2ed72868c0ae9e 598
+apps/terminal/tests/unit/assistant.hook.test.tsx
+  s_ac6e7634e6ada7::t_262b58db4b0331 424
+  s_ac6e7634e6ada7::t_76228df27513ba 621-623,626-630,632
+  s_ac6e7634e6ada7::t_e03fc7dc51695c 674-679
+  s_ac6e7634e6ada7::t_17b8f792e02dc2 437
+  s_ac6e7634e6ada7::t_068d9ff9acb738 337-347,361-365
+  s_ac6e7634e6ada7::t_264fe4102000a0 147-149
+  s_ac6e7634e6ada7::t_21a312e05d8954 409
+  s_ac6e7634e6ada7::t_0b92aac722063b 556,560,563,585,587
+  s_ac6e7634e6ada7::t_85e7890d34704f 92-93
+  s_ac6e7634e6ada7::t_c96ef7ee8511e8 390-392,396,400-408,412,416-419,422-423,425-429,431-436,438-439,442-447,450-452,463-464,466,470-499
+  s_ac6e7634e6ada7::t_9b7a6d5b75f7f3 393
+  s_ac6e7634e6ada7::t_d8e8c604920c75 21,33,48
+  s_ac6e7634e6ada7::t_3cbc49b8acd1e1 690-692,724-726,748-750
+  s_ac6e7634e6ada7::t_5ef8789735ff4c 501,722-723,727-747,751-835
+  s_ac6e7634e6ada7::t_231def5e2ac57c 349-358,366,386-389
+  s_ac6e7634e6ada7::t_1e26edacbffce3 448,455-461
+  s_ac6e7634e6ada7::t_ff4b1f8c832418 157,159
+  s_ac6e7634e6ada7::t_eeccbfa8d5aeaa 348,394,449,500,836
+apps/terminal/tests/unit/assistant.component.test.tsx
+  s_ac6e7634e6ada7::t_51607e1161abf1 159-165
+  s_ac6e7634e6ada7::t_fc6514a7a9d85a 14-16,25-27,40-42
+  s_ac6e7634e6ada7::t_37f98716772396 304-370
+  s_ac6e7634e6ada7::t_bde53e754d1518 132
+  s_ac6e7634e6ada7::t_9c623e156e0f61 225-227,229-231
+  s_ac6e7634e6ada7::t_38e76de72c31e3 98-100
+  s_ac6e7634e6ada7::t_0bc5d274b37be2 96
+  s_ac6e7634e6ada7::t_7aecbfb0017b9c 275
+apps/terminal/tests/unit/ipc.assistant.test.ts
+  s_ac6e7634e6ada7::t_2f2995ad084777 52,54,61
+  s_ac6e7634e6ada7::t_52c6c5b36fa7c2 235,237
+  s_ac6e7634e6ada7::t_3cbc49b8acd1e1 238-242
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "f4ad79cb039c610a1df8b09d55c69d8f70111570",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_ac6e7634e6ada7": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "5319e3aa-4c09-4c8d-82a0-3ca43114c4f6",
+        "model": "claude-sonnet-5-thinking-xhigh"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
