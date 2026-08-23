@@ -17,6 +17,7 @@ Monorepo layout (pnpm + Cargo workspaces):
   - `crates/gencore-core` — package/crate name `gencore-core`.
   - `crates/gencore-plugin-pty` — package name **and** Tauri plugin id `gencore-pty`.
   - `crates/gencore-plugin-fs` — package name **and** Tauri plugin id `gencore-fs`.
+  - `crates/gencore-plugin-assistant` — package name **and** Tauri plugin id `gencore-assistant`.
 
 Rules:
 

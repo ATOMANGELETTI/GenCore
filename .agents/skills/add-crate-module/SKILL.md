@@ -9,7 +9,7 @@ description: "Adds a new module (command + error type) to an existing Rust crate
 # Add crate module
 
 Use this when adding a new module to `crates/gencore-core`, `crates/gencore-plugin-pty`,
-or `crates/gencore-plugin-fs`.
+`crates/gencore-plugin-fs`, or `crates/gencore-plugin-assistant`.
 
 ## Steps
 
@@ -30,6 +30,6 @@ or `crates/gencore-plugin-fs`.
 
 ## Constraints
 
-- Plugin package name must equal its plugin id (`gencore-pty`, `gencore-fs`) — never
-  `tauri-plugin-*`.
+- Plugin package name must equal its plugin id (`gencore-pty`, `gencore-fs`,
+  `gencore-assistant`) — never `tauri-plugin-*`.
 - `#[serde(deny_unknown_fields)]` on any struct crossing the IPC boundary.
