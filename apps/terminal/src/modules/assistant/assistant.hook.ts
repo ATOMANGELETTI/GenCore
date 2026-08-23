@@ -39,11 +39,41 @@ export function useAssistant(): AssistantApi {
   const [pendingByConversation, setPendingByConversation] = React.useState<
     Record<string, AssistantToolCall[]>
   >({});
-  const [streaming, setStreaming] = React.useState(false);
-  const [streamText, setStreamText] = React.useState("");
+  const [streamingByConversation, setStreamingByConversation] = React.useState<
+    Record<string, boolean>
+  >({});
+  const [streamTextByConversation, setStreamTextByConversation] = React.useState<
+    Record<string, string>
+  >({});
   const [composer, setComposer] = React.useState("");
   const conversationIdRef = React.useRef<string | null>(null);
   conversationIdRef.current = conversationId;
+
+  // A fetched message list only ever lands if its conversation is still active,
+  // and any optimistic `local-user-*` row for that conversation survives unless
+  // the fetch already carries the persisted copy (matched by content).
+  const applyFetchedMessages = React.useCallback(
+    (requestedId: string, list: readonly AssistantMessage[]) => {
+      if (conversationIdRef.current !== requestedId) {
+        return;
+      }
+      setMessages((current) => {
+        const localRows = current.filter(
+          (message) =>
+            message.conversation_id === requestedId && message.id.startsWith("local-user-"),
+        );
+        if (localRows.length === 0) {
+          return [...list];
+        }
+        const fetchedUserContent = new Set(
+          list.filter((message) => message.role === "user").map((message) => message.content),
+        );
+        const survivingLocal = localRows.filter((row) => !fetchedUserContent.has(row.content));
+        return [...list, ...survivingLocal];
+      });
+    },
+    [],
+  );
 
   React.useEffect(() => {
     let cancelled = false;
@@ -53,7 +83,11 @@ export function useAssistant(): AssistantApi {
           return;
         }
         setConversations(list);
-        setConversationId((current) => current ?? list[0]?.id ?? null);
+        setConversationId((current) => {
+          const next = current ?? list[0]?.id ?? null;
+          conversationIdRef.current = next;
+          return next;
+        });
       })
       .catch(() => undefined);
     return () => {
@@ -70,14 +104,14 @@ export function useAssistant(): AssistantApi {
     void listMessages(conversationId)
       .then((list) => {
         if (!cancelled) {
-          setMessages(list);
+          applyFetchedMessages(conversationId, list);
         }
       })
       .catch(() => undefined);
     return () => {
       cancelled = true;
     };
-  }, [conversationId]);
+  }, [conversationId, applyFetchedMessages]);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -92,37 +126,36 @@ export function useAssistant(): AssistantApi {
     }
 
     void subscribeAssistantToken((payload) => {
-      if (payload.conversation_id !== conversationIdRef.current) {
-        return;
-      }
-      setStreaming(true);
-      setStreamText((current) => `${current}${payload.text}`);
+      const id = payload.conversation_id;
+      setStreamingByConversation((current) => ({ ...current, [id]: true }));
+      setStreamTextByConversation((current) => ({
+        ...current,
+        [id]: `${current[id] ?? ""}${payload.text}`,
+      }));
     })
       .then(keep)
       .catch(() => undefined);
 
     void subscribeAssistantTurn((payload) => {
+      const id = payload.conversation_id;
       setPendingByConversation((current) => ({
         ...current,
-        [payload.conversation_id]: payload.pending.filter((call) => call.status === "pending"),
+        [id]: payload.pending.filter((call) => call.status === "pending"),
       }));
-      if (payload.conversation_id !== conversationIdRef.current) {
-        return;
-      }
-      setStreaming(false);
-      setStreamText("");
-      void listMessages(payload.conversation_id)
-        .then(setMessages)
+      setStreamingByConversation((current) => ({ ...current, [id]: false }));
+      setStreamTextByConversation((current) => ({ ...current, [id]: "" }));
+      void listMessages(id)
+        .then((list) => {
+          applyFetchedMessages(id, list);
+        })
         .catch(() => undefined);
     })
       .then(keep)
       .catch(() => undefined);
 
     void subscribeAssistantError((payload) => {
-      if (payload.conversation_id !== conversationIdRef.current) {
-        return;
-      }
-      setStreaming(false);
+      const id = payload.conversation_id;
+      setStreamingByConversation((current) => ({ ...current, [id]: false }));
     })
       .then(keep)
       .catch(() => undefined);
@@ -133,29 +166,41 @@ export function useAssistant(): AssistantApi {
         stop();
       }
     };
-  }, []);
+  }, [applyFetchedMessages]);
 
   const send = React.useCallback(async () => {
-    if (!hasApiKey || streaming) {
+    const activeId = conversationId;
+    const isActiveStreaming = activeId ? (streamingByConversation[activeId] ?? false) : false;
+    if (!hasApiKey || isActiveStreaming) {
       return;
     }
     const text = composer.trim();
     if (!text) {
       return;
     }
-    let id = conversationId;
+    let id = activeId;
     try {
       if (!id) {
         const created = await createConversation();
         id = created.id;
+        // Set the ref immediately: the listMessages effect fired by
+        // setConversationId below can resolve before this render commits.
+        conversationIdRef.current = id;
         setConversationId(created.id);
         setConversations((current) => [created, ...current.filter((row) => row.id !== created.id)]);
       }
-      setStreaming(true);
-      setStreamText("");
-      const result = await sendMessage(id, text, STUB_ASSISTANT_SNAPSHOT);
+      const sendingId = id;
+      setStreamingByConversation((current) => ({ ...current, [sendingId]: true }));
+      setStreamTextByConversation((current) => ({ ...current, [sendingId]: "" }));
+      const result = await sendMessage(sendingId, text, STUB_ASSISTANT_SNAPSHOT);
       if (!result.accepted) {
-        setStreaming(false);
+        setStreamingByConversation((current) => ({ ...current, [sendingId]: false }));
+        return;
+      }
+      // If History moved to another chat while this send was in flight, leave
+      // that chat's composer and ledger alone; the real message is already
+      // persisted and will arrive through that conversation's own fetch.
+      if (conversationIdRef.current !== sendingId) {
         return;
       }
       setComposer("");
@@ -163,20 +208,24 @@ export function useAssistant(): AssistantApi {
         ...current,
         {
           id: `local-user-${Date.now()}`,
-          conversation_id: id,
+          conversation_id: sendingId,
           role: "user",
           content: text,
           created_at: Date.now(),
         },
       ]);
     } catch {
-      setStreaming(false);
+      if (id) {
+        const failedId = id;
+        setStreamingByConversation((current) => ({ ...current, [failedId]: false }));
+      }
     }
-  }, [composer, conversationId, hasApiKey, streaming]);
+  }, [composer, conversationId, hasApiKey, streamingByConversation]);
 
   const newChat = React.useCallback(async () => {
     try {
       const created = await createConversation();
+      conversationIdRef.current = created.id;
       setConversationId(created.id);
       setConversations((current) => [created, ...current.filter((row) => row.id !== created.id)]);
       setMessages([]);
@@ -184,17 +233,16 @@ export function useAssistant(): AssistantApi {
         ...current,
         [created.id]: [],
       }));
-      setStreamText("");
-      setStreaming(false);
+      setStreamingByConversation((current) => ({ ...current, [created.id]: false }));
+      setStreamTextByConversation((current) => ({ ...current, [created.id]: "" }));
     } catch {
       // Keep the current thread when create fails (no Tauri in some tests).
     }
   }, []);
 
   const selectConversation = React.useCallback((id: string) => {
+    conversationIdRef.current = id;
     setConversationId(id);
-    setStreamText("");
-    setStreaming(false);
   }, []);
 
   const confirmPending = React.useCallback(async (id: string) => {
@@ -218,8 +266,8 @@ export function useAssistant(): AssistantApi {
     conversationId,
     messages,
     pending: conversationId ? (pendingByConversation[conversationId] ?? []) : [],
-    streaming,
-    streamText,
+    streaming: conversationId ? (streamingByConversation[conversationId] ?? false) : false,
+    streamText: conversationId ? (streamTextByConversation[conversationId] ?? "") : "",
     composer,
     hasApiKey,
     setComposer,

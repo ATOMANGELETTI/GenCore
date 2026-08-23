@@ -1,7 +1,11 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { AssistantToolCall, Conversation } from "../../src/modules/ipc/ipc.types";
+import type {
+  AssistantMessage,
+  AssistantToolCall,
+  Conversation,
+} from "../../src/modules/ipc/ipc.types";
 
 const {
   listConversations,
@@ -319,6 +323,129 @@ describe("useAssistant", () => {
       expect(sendMessage).toHaveBeenCalled();
     });
     expect(screen.getByLabelText("composer")).toHaveValue("keep this draft");
+    expect(screen.getByTestId("messages")).toBeEmptyDOMElement();
+  });
+
+  it("does not let a delayed empty listMessages([]) wipe the You row on a brand-new chat", async () => {
+    const user = userEvent.setup();
+    listConversations.mockResolvedValue([]);
+    createConversation.mockResolvedValue(CONVERSATION);
+    let resolveList: ((value: never[]) => void) | undefined;
+    listMessages.mockImplementation(
+      () =>
+        new Promise<never[]>((resolve) => {
+          resolveList = resolve;
+        }),
+    );
+    sendMessage.mockResolvedValue({ accepted: true });
+
+    renderHookProbe(true);
+    await waitFor(() => {
+      expect(listConversations).toHaveBeenCalledTimes(1);
+    });
+
+    await user.type(screen.getByLabelText("composer"), "hello");
+    await user.click(screen.getByText("send"));
+
+    await waitFor(() => {
+      expect(sendMessage).toHaveBeenCalledWith("c1", "hello", STUB_ASSISTANT_SNAPSHOT);
+    });
+    await waitFor(() => {
+      const userTurn = screen.getByTestId("messages").querySelector("[data-role='user']");
+      expect(userTurn).toHaveTextContent("hello");
+    });
+
+    // The listMessages([]) fired when the new conversation id was set settles
+    // only now, well after the You row was appended.
+    resolveList?.([]);
+    await waitFor(() => {
+      expect(listMessages).toHaveBeenCalledWith("c1");
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const userTurn = screen.getByTestId("messages").querySelector("[data-role='user']");
+    expect(userTurn).toHaveTextContent("hello");
+  });
+
+  it("keeps the new chat's composer draft and messages safe from a stale send and turn on the old chat", async () => {
+    const user = userEvent.setup();
+    listConversations.mockResolvedValue([CONVERSATION, OTHER_CONVERSATION]);
+
+    let resolveSend: ((value: { accepted: boolean }) => void) | undefined;
+    sendMessage.mockImplementation(
+      () =>
+        new Promise<{ accepted: boolean }>((resolve) => {
+          resolveSend = resolve;
+        }),
+    );
+
+    let onTurn:
+      | ((payload: {
+          conversation_id: string;
+          assistant_text: string;
+          pending: Pick<AssistantToolCall, "id" | "status">[];
+        }) => void)
+      | undefined;
+    subscribeAssistantTurn.mockImplementation(async (handler) => {
+      onTurn = handler;
+      return () => {};
+    });
+
+    const pendingC1Resolvers: Array<(value: AssistantMessage[]) => void> = [];
+    listMessages.mockImplementation((conversationId: string) => {
+      if (conversationId === "c1") {
+        return new Promise<AssistantMessage[]>((resolve) => {
+          pendingC1Resolvers.push(resolve);
+        });
+      }
+      return Promise.resolve([]);
+    });
+
+    renderHookProbe(true);
+    await waitFor(() => {
+      expect(screen.getByTestId("conversation-id")).toHaveTextContent("c1");
+      expect(onTurn).toBeTypeOf("function");
+    });
+
+    await user.type(screen.getByLabelText("composer"), "hello from c1");
+    await user.click(screen.getByText("send"));
+    await waitFor(() => {
+      expect(sendMessage).toHaveBeenCalledWith("c1", "hello from c1", STUB_ASSISTANT_SNAPSHOT);
+    });
+
+    // History switch while the c1 send is still awaiting.
+    await user.click(screen.getByText("select-c2"));
+    await waitFor(() => {
+      expect(screen.getByTestId("conversation-id")).toHaveTextContent("c2");
+    });
+
+    await user.clear(screen.getByLabelText("composer"));
+    await user.type(screen.getByLabelText("composer"), "draft for c2");
+    expect(screen.getByLabelText("composer")).toHaveValue("draft for c2");
+
+    // The old chat's send finally accepts...
+    resolveSend?.({ accepted: true });
+    await waitFor(() => {
+      expect(sendMessage).toHaveBeenCalledTimes(1);
+    });
+    // ...followed by a turn event for the old chat, which kicks off a stale
+    // listMessages(c1) fetch.
+    onTurn?.({ conversation_id: "c1", assistant_text: "ok", pending: [] });
+    await waitFor(() => {
+      expect(pendingC1Resolvers.length).toBeGreaterThan(1);
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(screen.getByLabelText("composer")).toHaveValue("draft for c2");
+    expect(screen.getByTestId("messages")).toBeEmptyDOMElement();
+
+    // The stale turn's listMessages(c1) settles after everything above.
+    pendingC1Resolvers[pendingC1Resolvers.length - 1]?.([
+      { id: "m1", conversation_id: "c1", role: "user", content: "hello from c1", created_at: 1 },
+    ]);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(screen.getByLabelText("composer")).toHaveValue("draft for c2");
     expect(screen.getByTestId("messages")).toBeEmptyDOMElement();
   });
 });
