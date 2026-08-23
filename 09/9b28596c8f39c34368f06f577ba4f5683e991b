@@ -1,0 +1,184 @@
+.agents/rules/superpowers-tasks.md
+  s_22d5a0d5445f73::t_e49f51e13b7065 1-10,13-21,23-26,28-29,32-33,38-46
+  s_602e982ba9a182::t_1b6524284fe428 22,27,30-31,34-37
+  s_42fac98324a28e::t_ad33b5cad1cf88 11-12,56
+  s_42fac98324a28e::t_45fa32edb97aed 47-55
+.cursor/rules/superpowers.mdc
+  s_99c71c4fe8a644::t_18a10745977c67 15
+.cursor/hooks/state/continual-learning.json
+  s_ac6e7634e6ada7::t_a60ffcae64c711 3,5
+  s_ac6e7634e6ada7::t_3907ec713ffa35 4
+  s_ac6e7634e6ada7::t_88af68bb7d6ead 6
+.superpowers/sdd/progress.md
+  s_5bed3f8a4cd774::t_37de28244f2c54 15
+  s_5bed3f8a4cd774::t_b3eafdb3a1d943 20
+  s_f3375bd5ae4478::t_1cccf82321328a 373-378
+  s_5bed3f8a4cd774::t_d71701ed114b15 16
+  s_5bed3f8a4cd774::t_2da713d52a7194 25-26
+  s_5bed3f8a4cd774::t_8c368e3e2e1134 12
+  s_5bed3f8a4cd774::t_1a147a0111171c 5-7
+  s_5bed3f8a4cd774::t_0b128dcb4f533c 11
+  s_5bed3f8a4cd774::t_ad4c0fe7626277 13
+  s_5bed3f8a4cd774::t_6084a1b1516501 19
+  s_5bed3f8a4cd774::t_9581fa43347854 22
+  s_5bed3f8a4cd774::t_5e4b4445abb639 10
+  s_7b44d30f913ff3::t_778259fc129a46 17
+  s_5bed3f8a4cd774::t_a880934dd774a4 18
+  s_5bed3f8a4cd774::t_c8c20509b9fd4d 21
+  s_5bed3f8a4cd774::t_446e376847e666 14
+  s_5bed3f8a4cd774::t_8d9873c17306a8 23-24
+  s_5bed3f8a4cd774::t_2c2871deb9f82a 3-4
+  s_5bed3f8a4cd774::t_c177ee657aa318 8-9
+  s_5bed3f8a4cd774::t_7f47001d452469 27-29
+  s_f3375bd5ae4478::t_2c5ea21763993b 379
+  h_90ad036e211778 369,371
+.agents/rules/superpowers.md
+  s_42fac98324a28e::t_ad33b5cad1cf88 18
+.superpowers/docs/tasks/2026-08-22-terminal-assistant.md
+  s_5bed3f8a4cd774::t_98eea30cf0d35f 16
+  s_e8059f62afadbb::t_897762456ac8a1 8
+  s_97305b5d59048e::t_d5fb5682ff86ba 12
+  s_d8acf577ad2562::t_8a7de6cc5b9d61 10
+  s_5bed3f8a4cd774::t_b7415ca4783db7 15
+  s_5bed3f8a4cd774::t_184c35aaa8f86f 13
+  s_13b05d89da867c::t_6dc7ee777f0601 11
+  s_33affd319986ee::t_073c726ee472e8 1-2,4-5
+  s_602e982ba9a182::t_5fafa2694dc1bc 3,6-7
+  s_e8059f62afadbb::t_6efb59c3faa1aa 9
+  s_2af5a8db180c98::t_8a3e0344d6c625 14
+.cursor/hooks/state/edited-files.json
+  s_5bed3f8a4cd774::t_21a60e9c9fd421 359-414
+.cursor/rules/superpowers-tasks.mdc
+  s_33affd319986ee::t_ec553e167f7a79 1-7,11-18,20-23,25-26,29-30,35-41,43
+  s_602e982ba9a182::t_4d843270489964 42,44-52
+  h_90ad036e211778 8-9,53
+  s_602e982ba9a182::t_648937291a93c8 19,24,27-28,31-34
+  s_d8acf577ad2562::t_5d610c284747f9 10
+crates/gencore-core/src/modules/telemetry/mod.rs
+  s_99c71c4fe8a644::t_18a10745977c67 12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "099b28596c8f39c34368f06f577ba4f5683e991b",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_13b05d89da867c": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "8302ba8d-0712-40f9-8cca-6313d168d20a",
+        "model": "claude-sonnet-5-thinking-xhigh"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_22d5a0d5445f73": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "ff55194b-7a17-4c94-890a-95fb04918e14",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_2af5a8db180c98": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "3ab7f493-10b8-476b-8966-c9de90c6e9ad",
+        "model": "claude-sonnet-5-thinking-xhigh"
+      },
+      "human_author": null
+    },
+    "s_33affd319986ee": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "344281e0-d8e1-4490-90ee-77f1471ea5c4",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_42fac98324a28e": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "6aa3af23-8aef-4aa1-9d10-dff59df4a8c6",
+        "model": "claude-sonnet-5-thinking-xhigh"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_5bed3f8a4cd774": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "258f2b5b-8031-4236-90e0-cd5af54d5adf",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_602e982ba9a182": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "5dac8caa-b1a3-40e4-b1a2-b6a99effa455",
+        "model": "gemini-3.7-flash"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_7b44d30f913ff3": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "53b744be-cb40-4caa-afdc-543be8c2840c",
+        "model": "claude-sonnet-5-thinking-xhigh"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_97305b5d59048e": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "25e764fe-44fc-4d97-b2d8-7bb93a40a0b2",
+        "model": "claude-sonnet-5-thinking-xhigh"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_99c71c4fe8a644": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e756c07a-fd06-4700-be5e-52e34267055a",
+        "model": "claude-sonnet-5-thinking-xhigh"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_ac6e7634e6ada7": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "5319e3aa-4c09-4c8d-82a0-3ca43114c4f6",
+        "model": "claude-sonnet-5-thinking-xhigh"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_d8acf577ad2562": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "6c1cf4d7-a88e-448d-a869-003f6e6a012a",
+        "model": "gemini-3.7-flash"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_e8059f62afadbb": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "584f5a38-4fe4-473e-b948-d80409f4e34a",
+        "model": "claude-sonnet-5-thinking-xhigh"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    },
+    "s_f3375bd5ae4478": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "a4777a1d-e505-459d-ad6c-32020ec1fa85",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
