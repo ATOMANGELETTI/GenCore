@@ -14,6 +14,10 @@ const EMPTY_ARG_COMMANDS = [
   "plugin:window|start_dragging",
   "plugin:window|theme",
   "plugin:gencore-fs|list_drives",
+  "plugin:gencore-assistant|list_conversations",
+  "plugin:gencore-assistant|create_conversation",
+  "plugin:gencore-assistant|get_agent_settings",
+  "plugin:gencore-assistant|clear_api_key",
 ] as const;
 
 const WINDOW_COMMANDS = [
@@ -62,7 +66,58 @@ const FORBIDDEN_TOKENS = [
   "core:event:default",
   "core:window:default",
   "core:window:allow-set-theme",
+  "gencore-assistant:default",
 ] as const;
+
+const DELETE_CONVERSATION_CMD = "plugin:gencore-assistant|delete_conversation";
+const LIST_MESSAGES_CMD = "plugin:gencore-assistant|list_messages";
+const SEND_MESSAGE_CMD = "plugin:gencore-assistant|send_message";
+const CANCEL_TURN_CMD = "plugin:gencore-assistant|cancel_turn";
+const CONFIRM_ACTION_CMD = "plugin:gencore-assistant|confirm_action";
+const REJECT_ACTION_CMD = "plugin:gencore-assistant|reject_action";
+const SET_AGENT_SETTINGS_CMD = "plugin:gencore-assistant|set_agent_settings";
+const SET_API_KEY_CMD = "plugin:gencore-assistant|set_api_key";
+const CONVERSATION_ID_COMMANDS = [
+  DELETE_CONVERSATION_CMD,
+  LIST_MESSAGES_CMD,
+  CANCEL_TURN_CMD,
+] as const;
+const ACTION_ID_COMMANDS = [CONFIRM_ACTION_CMD, REJECT_ACTION_CMD] as const;
+const ASSISTANT_ALLOWED_COMMANDS = [
+  "plugin:gencore-assistant|list_conversations",
+  "plugin:gencore-assistant|create_conversation",
+  DELETE_CONVERSATION_CMD,
+  LIST_MESSAGES_CMD,
+  SEND_MESSAGE_CMD,
+  CANCEL_TURN_CMD,
+  CONFIRM_ACTION_CMD,
+  REJECT_ACTION_CMD,
+  "plugin:gencore-assistant|get_agent_settings",
+  SET_AGENT_SETTINGS_CMD,
+  SET_API_KEY_CMD,
+  "plugin:gencore-assistant|clear_api_key",
+] as const;
+const ASSISTANT_TOKEN_EVENT = "gencore-assistant://token";
+const ASSISTANT_TURN_EVENT = "gencore-assistant://turn";
+const ASSISTANT_ERROR_EVENT = "gencore-assistant://error";
+const ASSISTANT_UI_ACTION_EVENT = "gencore-assistant://ui-action";
+const ASSISTANT_LISTEN_EVENTS = [
+  ASSISTANT_TOKEN_EVENT,
+  ASSISTANT_TURN_EVENT,
+  ASSISTANT_ERROR_EVENT,
+  ASSISTANT_UI_ACTION_EVENT,
+] as const;
+
+function validSnapshot() {
+  return {
+    active_tab_id: "tab-1",
+    active_session_id: "session-1",
+    cwd: "C:\\work",
+    output_excerpt: "PS>",
+    tabs: [{ id: "tab-1", name: "pwsh", cwd: "C:\\work", pinned: false }],
+    files_selection: { path: "C:\\work\\file.txt", kind: "file" },
+  };
+}
 
 const hookSource = readFileSync(resolve(process.cwd(), "isolation/isolation.hook.js"), "utf8");
 const capabilitySource = readFileSync(
@@ -281,6 +336,18 @@ describe("terminal isolation hook", () => {
         identifier: "opener:allow-open-url",
         allow: [{ url: GENCORE_REPO_URL }],
       },
+      "gencore-assistant:allow-list-conversations",
+      "gencore-assistant:allow-create-conversation",
+      "gencore-assistant:allow-delete-conversation",
+      "gencore-assistant:allow-list-messages",
+      "gencore-assistant:allow-send-message",
+      "gencore-assistant:allow-cancel-turn",
+      "gencore-assistant:allow-confirm-action",
+      "gencore-assistant:allow-reject-action",
+      "gencore-assistant:allow-get-agent-settings",
+      "gencore-assistant:allow-set-agent-settings",
+      "gencore-assistant:allow-set-api-key",
+      "gencore-assistant:allow-clear-api-key",
     ]);
 
     const permissionText = JSON.stringify(capability.permissions);
@@ -796,6 +863,302 @@ describe("terminal isolation hook", () => {
     expect(() => hook(envelope(TRAY_ACTION_CMD, { action: "foo" }))).toThrow();
     expect(() => hook(envelope(TRAY_ACTION_CMD, {}))).toThrow();
     expect(() => hook(envelope(TRAY_ACTION_CMD, { label: "main" }))).toThrow();
+  });
+
+  it("allowlists the twelve gencore-assistant commands and not stat", () => {
+    for (const cmd of ASSISTANT_ALLOWED_COMMANDS) {
+      expect(hookSource).toContain(`"${cmd}",`);
+    }
+    expect(hookSource).not.toContain("plugin:gencore-assistant|stat");
+  });
+
+  it("throws for an unknown gencore-assistant command", () => {
+    const hook = getHook();
+    expect(() => hook(envelope("plugin:gencore-assistant|stat"))).toThrow();
+    expect(() => hook(envelope("plugin:gencore-assistant|delete_all"))).toThrow();
+  });
+
+  it.each(CONVERSATION_ID_COMMANDS)("reconstructs %s as conversation_id only", (cmd) => {
+    const hook = getHook();
+    const inner = { conversation_id: "conv-1" };
+    const input = envelope(cmd, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.cmd).toBe(cmd);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({ conversation_id: "conv-1" });
+    expect(Object.keys(result.payload as object)).toEqual(["conversation_id"]);
+  });
+
+  it.each(CONVERSATION_ID_COMMANDS)(
+    "throws for %s with extra keys, a missing id, or a bad length",
+    (cmd) => {
+      const hook = getHook();
+      expect(() => hook(envelope(cmd, { conversation_id: "conv-1", extra: true }))).toThrow();
+      expect(() => hook(envelope(cmd, {}))).toThrow();
+      expect(() => hook(envelope(cmd, { conversation_id: "" }))).toThrow();
+      expect(() => hook(envelope(cmd, { conversation_id: "a".repeat(65) }))).toThrow();
+      expect(() => hook(envelope(cmd, { conversation_id: 12 }))).toThrow();
+    },
+  );
+
+  it.each(CONVERSATION_ID_COMMANDS)("allows %s with a conversation_id of length 64", (cmd) => {
+    const hook = getHook();
+    const conversationId = "a".repeat(64);
+    const result = hook(envelope(cmd, { conversation_id: conversationId }));
+    expect(result.payload).toEqual({ conversation_id: conversationId });
+  });
+
+  it.each(ACTION_ID_COMMANDS)("reconstructs %s as id only", (cmd) => {
+    const hook = getHook();
+    const inner = { id: "tool-1" };
+    const input = envelope(cmd, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.cmd).toBe(cmd);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({ id: "tool-1" });
+    expect(Object.keys(result.payload as object)).toEqual(["id"]);
+  });
+
+  it.each(ACTION_ID_COMMANDS)(
+    "throws for %s with extra keys, a missing id, or a bad length",
+    (cmd) => {
+      const hook = getHook();
+      expect(() => hook(envelope(cmd, { id: "tool-1", extra: true }))).toThrow();
+      expect(() => hook(envelope(cmd, {}))).toThrow();
+      expect(() => hook(envelope(cmd, { id: "" }))).toThrow();
+      expect(() => hook(envelope(cmd, { id: "a".repeat(65) }))).toThrow();
+    },
+  );
+
+  it("reconstructs send_message with the full snapshot", () => {
+    const hook = getHook();
+    const inner = { conversation_id: "conv-1", text: "list files", snapshot: validSnapshot() };
+    const input = envelope(SEND_MESSAGE_CMD, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.cmd).toBe(SEND_MESSAGE_CMD);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual(inner);
+  });
+
+  it("reconstructs send_message without optional snapshot fields", () => {
+    const hook = getHook();
+    const inner = {
+      conversation_id: "conv-1",
+      text: "list files",
+      snapshot: {
+        active_tab_id: "tab-1",
+        output_excerpt: "",
+        tabs: [{ id: "tab-1", pinned: true }],
+      },
+    };
+    const result = hook(envelope(SEND_MESSAGE_CMD, inner));
+    expect(result.payload).toEqual(inner);
+  });
+
+  it("strips an injected top-level field from send_message and does not throw", () => {
+    const hook = getHook();
+    const inner = {
+      conversation_id: "conv-1",
+      text: "list files",
+      snapshot: validSnapshot(),
+      injected: "strip-me",
+    };
+    expect(() => hook(envelope(SEND_MESSAGE_CMD, inner))).toThrow();
+  });
+
+  it("strips an injected snapshot field from send_message", () => {
+    const hook = getHook();
+    const snapshot = { ...validSnapshot(), injected: "strip-me" } as Record<string, unknown>;
+    expect(() =>
+      hook(envelope(SEND_MESSAGE_CMD, { conversation_id: "conv-1", text: "hi", snapshot })),
+    ).toThrow();
+  });
+
+  it("throws for send_message with a missing conversation_id, text, or snapshot", () => {
+    const hook = getHook();
+    expect(() =>
+      hook(envelope(SEND_MESSAGE_CMD, { text: "hi", snapshot: validSnapshot() })),
+    ).toThrow();
+    expect(() =>
+      hook(envelope(SEND_MESSAGE_CMD, { conversation_id: "conv-1", snapshot: validSnapshot() })),
+    ).toThrow();
+    expect(() =>
+      hook(envelope(SEND_MESSAGE_CMD, { conversation_id: "conv-1", text: "hi" })),
+    ).toThrow();
+  });
+
+  it("throws for send_message when output_excerpt exceeds 65536 characters", () => {
+    const hook = getHook();
+    const snapshot = { ...validSnapshot(), output_excerpt: "a".repeat(65537) };
+    expect(() =>
+      hook(envelope(SEND_MESSAGE_CMD, { conversation_id: "conv-1", text: "hi", snapshot })),
+    ).toThrow();
+  });
+
+  it("allows send_message when output_excerpt is exactly 65536 characters", () => {
+    const hook = getHook();
+    const snapshot = { ...validSnapshot(), output_excerpt: "a".repeat(65536) };
+    const result = hook(
+      envelope(SEND_MESSAGE_CMD, { conversation_id: "conv-1", text: "hi", snapshot }),
+    );
+    expect(
+      (result.payload as { snapshot: { output_excerpt: string } }).snapshot.output_excerpt,
+    ).toHaveLength(65536);
+  });
+
+  it("throws for send_message with a malformed tab entry", () => {
+    const hook = getHook();
+    const snapshot = { ...validSnapshot(), tabs: [{ id: "tab-1" }] };
+    expect(() =>
+      hook(envelope(SEND_MESSAGE_CMD, { conversation_id: "conv-1", text: "hi", snapshot })),
+    ).toThrow();
+  });
+
+  it("throws for send_message with a malformed files_selection", () => {
+    const hook = getHook();
+    const snapshot = { ...validSnapshot(), files_selection: { path: "C:\\a" } };
+    expect(() =>
+      hook(envelope(SEND_MESSAGE_CMD, { conversation_id: "conv-1", text: "hi", snapshot })),
+    ).toThrow();
+  });
+
+  it("reconstructs set_agent_settings with model and context_lines", () => {
+    const hook = getHook();
+    const inner = { model: "gemini-3.5-flash", context_lines: 100 };
+    const input = envelope(SET_AGENT_SETTINGS_CMD, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual(inner);
+  });
+
+  it("allows set_agent_settings with an empty patch", () => {
+    const hook = getHook();
+    const result = hook(envelope(SET_AGENT_SETTINGS_CMD, {}));
+    expect(result.payload).toEqual({});
+  });
+
+  it("throws for set_agent_settings with an unknown model or out-of-range context_lines", () => {
+    const hook = getHook();
+    expect(() => hook(envelope(SET_AGENT_SETTINGS_CMD, { model: "gpt-4o" }))).toThrow();
+    expect(() => hook(envelope(SET_AGENT_SETTINGS_CMD, { context_lines: 19 }))).toThrow();
+    expect(() => hook(envelope(SET_AGENT_SETTINGS_CMD, { context_lines: 201 }))).toThrow();
+    expect(() => hook(envelope(SET_AGENT_SETTINGS_CMD, { context_lines: 80.5 }))).toThrow();
+    expect(() =>
+      hook(envelope(SET_AGENT_SETTINGS_CMD, { model: "gemini-3.7-flash", extra: true })),
+    ).toThrow();
+  });
+
+  it("reconstructs set_api_key as key only", () => {
+    const hook = getHook();
+    const inner = { key: "secret-key" };
+    const input = envelope(SET_API_KEY_CMD, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({ key: "secret-key" });
+  });
+
+  it("throws for set_api_key with an empty or oversized key", () => {
+    const hook = getHook();
+    expect(() => hook(envelope(SET_API_KEY_CMD, { key: "" }))).toThrow();
+    expect(() => hook(envelope(SET_API_KEY_CMD, { key: "a".repeat(4097) }))).toThrow();
+    expect(() => hook(envelope(SET_API_KEY_CMD, { key: "a".repeat(4096), extra: true }))).toThrow();
+  });
+
+  it("allows set_api_key with a key of length 4096", () => {
+    const hook = getHook();
+    const key = "a".repeat(4096);
+    const result = hook(envelope(SET_API_KEY_CMD, { key }));
+    expect(result.payload).toEqual({ key });
+  });
+
+  it.each(ASSISTANT_LISTEN_EVENTS)("reconstructs listen for %s with Any target", (event) => {
+    const hook = getHook();
+    const inner = { event, target: { kind: "Any" }, handler: 9 };
+    const input = envelope(EVENT_LISTEN_CMD, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.cmd).toBe(EVENT_LISTEN_CMD);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({ event, target: { kind: "Any" }, handler: 9 });
+    expect((result.payload as { target: unknown }).target).not.toBe(inner.target);
+  });
+
+  it.each(ASSISTANT_LISTEN_EVENTS)("throws for %s listen with a Window target", (event) => {
+    const hook = getHook();
+    expect(() =>
+      hook(
+        envelope(EVENT_LISTEN_CMD, {
+          event,
+          target: { kind: "Window", label: "main" },
+          handler: 9,
+        }),
+      ),
+    ).toThrow();
+  });
+
+  it.each(ASSISTANT_LISTEN_EVENTS)("reconstructs unlisten for %s", (event) => {
+    const hook = getHook();
+    const inner = { event, eventId: 4 };
+    const input = envelope(EVENT_UNLISTEN_CMD, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({ event, eventId: 4 });
+  });
+
+  it("throws for listen to an unknown gencore-assistant event and does not fall through to entry-changed", () => {
+    const hook = getHook();
+    expect(() =>
+      hook(
+        envelope(EVENT_LISTEN_CMD, {
+          event: "gencore-assistant://pwn",
+          target: { kind: "Any" },
+          handler: 7,
+        }),
+      ),
+    ).toThrow();
+  });
+
+  it("keeps capabilitySource containing every gencore-assistant:allow-* grant and not gencore-assistant:default", () => {
+    const capability = JSON.parse(capabilitySource) as CapabilityFile;
+    const permissionText = JSON.stringify(capability.permissions);
+    const assistantPermissions = [
+      "gencore-assistant:allow-list-conversations",
+      "gencore-assistant:allow-create-conversation",
+      "gencore-assistant:allow-delete-conversation",
+      "gencore-assistant:allow-list-messages",
+      "gencore-assistant:allow-send-message",
+      "gencore-assistant:allow-cancel-turn",
+      "gencore-assistant:allow-confirm-action",
+      "gencore-assistant:allow-reject-action",
+      "gencore-assistant:allow-get-agent-settings",
+      "gencore-assistant:allow-set-agent-settings",
+      "gencore-assistant:allow-set-api-key",
+      "gencore-assistant:allow-clear-api-key",
+    ];
+    for (const permission of assistantPermissions) {
+      expect(permissionText).toContain(permission);
+    }
+    expect(permissionText).not.toContain("gencore-assistant:default");
+  });
+
+  it("registers gencore-assistant so capability grants resolve at build time", () => {
+    expect(cargoTomlSource).toContain(
+      'gencore-assistant = { path = "../../../crates/gencore-plugin-assistant" }',
+    );
+    expect(libRsSource).toContain("gencore_assistant::init()");
   });
 
   it("loads the isolation script from head", () => {

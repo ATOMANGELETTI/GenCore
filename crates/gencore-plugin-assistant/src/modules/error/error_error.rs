@@ -1,5 +1,6 @@
 use thiserror::Error;
 
+use crate::modules::secrets::SecretsError;
 use crate::modules::store::StoreError;
 
 /// Typed errors for assistant settings and later IPC/agent work.
@@ -35,6 +36,12 @@ pub enum AssistantError {
     /// The underlying store operation failed.
     #[error(transparent)]
     Store(#[from] StoreError),
+    /// DPAPI (or the identity mock) failed to protect/unprotect a secret.
+    #[error(transparent)]
+    Secrets(#[from] SecretsError),
+    /// A `tauri::async_runtime::spawn_blocking` task panicked or was cancelled.
+    #[error("background task failed: {0}")]
+    TaskJoin(String),
 }
 
 impl serde::Serialize for AssistantError {

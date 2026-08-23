@@ -5,10 +5,19 @@ mod modules;
 pub use modules::agent::{
     ConfirmOutcome, TurnResult, confirm_tool, reject_tool, resume_turn, send_turn,
 };
+pub use modules::assistant::{
+    ASSISTANT_ERROR_EVENT, ASSISTANT_TOKEN_EVENT, ASSISTANT_TURN_EVENT, ASSISTANT_UI_ACTION_EVENT,
+    ActionIdArgs, AgentSettingsDto, AssistantErrorPayload, AssistantTokenPayload,
+    AssistantTurnPayload, AssistantUiActionPayload, ConversationIdArgs, FilesSelectionArgs,
+    SendMessageArgs, SendMessageResult, SetAgentSettingsArgs, SetApiKeyArgs, SnapshotArgs,
+    SnapshotTabArgs, cancel_turn, clear_api_key, confirm_action, create_conversation,
+    delete_conversation, get_agent_settings, list_conversations, list_messages, reject_action,
+    send_message, set_agent_settings, set_api_key,
+};
 pub use modules::error::AssistantError;
 pub use modules::gemini::{
     GeminiContent, GeminiError, GeminiEvent, GeminiPart, GeminiRequest, GeminiTransport,
-    ScriptedTransport, function_declarations, parse_sse_data,
+    ReqwestTransport, ScriptedTransport, function_declarations, parse_sse_data,
 };
 #[cfg(windows)]
 pub use modules::secrets::DpapiProtector;
@@ -32,8 +41,33 @@ pub const PLUGIN_ID: &str = "gencore-assistant";
 
 /// Initializes the `gencore-assistant` plugin.
 ///
-/// No permissions are allowed by default; see `permissions/default.toml`.
-/// Commands stay unregistered until a later task wires the invoke handler.
+/// Seeds the SQLite store's `app_facts` on setup (idempotent: an `UPSERT`
+/// per fact) so the turn loop's system prompt is populated from the first
+/// conversation onward. Register this plugin after `gencore_pty::init()` —
+/// `confirm_action` reads the PTY plugin's managed `SessionMap` state.
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
-    Builder::new(PLUGIN_ID).build()
+    Builder::new(PLUGIN_ID)
+        .invoke_handler(tauri::generate_handler![
+            list_conversations,
+            create_conversation,
+            delete_conversation,
+            list_messages,
+            send_message,
+            cancel_turn,
+            confirm_action,
+            reject_action,
+            get_agent_settings,
+            set_agent_settings,
+            set_api_key,
+            clear_api_key,
+        ])
+        .setup(|_app, _api| {
+            let exe = std::env::current_exe()?;
+            let exe_parent = exe.parent().ok_or(StoreError::DataDir)?;
+            let data_dir = resolve_data_dir(exe_parent);
+            let store = AssistantStore::open(&sqlite_path(&data_dir))?;
+            seed_app_facts(&store)?;
+            Ok(())
+        })
+        .build()
 }

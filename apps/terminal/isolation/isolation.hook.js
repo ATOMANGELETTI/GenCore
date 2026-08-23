@@ -36,6 +36,18 @@
     "plugin:gencore-pty|close",
     "plugin:event|listen",
     "plugin:event|unlisten",
+    "plugin:gencore-assistant|list_conversations",
+    "plugin:gencore-assistant|create_conversation",
+    "plugin:gencore-assistant|delete_conversation",
+    "plugin:gencore-assistant|list_messages",
+    "plugin:gencore-assistant|send_message",
+    "plugin:gencore-assistant|cancel_turn",
+    "plugin:gencore-assistant|confirm_action",
+    "plugin:gencore-assistant|reject_action",
+    "plugin:gencore-assistant|get_agent_settings",
+    "plugin:gencore-assistant|set_agent_settings",
+    "plugin:gencore-assistant|set_api_key",
+    "plugin:gencore-assistant|clear_api_key",
   ];
   const OPEN_URL_CMD = "plugin:opener|open_url";
   const GET_APP_INFO_CMD = "plugin:gencore-core|get_app_info";
@@ -72,6 +84,36 @@
   const PINNED_JSON_MAX_LENGTH = 8388608;
   const THEME_POLAR_NIGHT = "polar-night";
   const THEME_SNOW_STORM = "snow-storm";
+  const LIST_CONVERSATIONS_CMD = "plugin:gencore-assistant|list_conversations";
+  const CREATE_CONVERSATION_CMD = "plugin:gencore-assistant|create_conversation";
+  const DELETE_CONVERSATION_CMD = "plugin:gencore-assistant|delete_conversation";
+  const LIST_MESSAGES_CMD = "plugin:gencore-assistant|list_messages";
+  const SEND_MESSAGE_CMD = "plugin:gencore-assistant|send_message";
+  const CANCEL_TURN_CMD = "plugin:gencore-assistant|cancel_turn";
+  const CONFIRM_ACTION_CMD = "plugin:gencore-assistant|confirm_action";
+  const REJECT_ACTION_CMD = "plugin:gencore-assistant|reject_action";
+  const GET_AGENT_SETTINGS_CMD = "plugin:gencore-assistant|get_agent_settings";
+  const SET_AGENT_SETTINGS_CMD = "plugin:gencore-assistant|set_agent_settings";
+  const SET_API_KEY_CMD = "plugin:gencore-assistant|set_api_key";
+  const CLEAR_API_KEY_CMD = "plugin:gencore-assistant|clear_api_key";
+  const ASSISTANT_TOKEN_EVENT = "gencore-assistant://token";
+  const ASSISTANT_TURN_EVENT = "gencore-assistant://turn";
+  const ASSISTANT_ERROR_EVENT = "gencore-assistant://error";
+  const ASSISTANT_UI_ACTION_EVENT = "gencore-assistant://ui-action";
+  const ASSISTANT_ID_MAX_LENGTH = 64;
+  const API_KEY_MAX_LENGTH = 4096;
+  const OUTPUT_EXCERPT_MAX_LENGTH = 65536;
+  const SNAPSHOT_TAB_ID_MAX_LENGTH = 256;
+  const CONTEXT_LINES_MIN = 20;
+  const CONTEXT_LINES_MAX = 200;
+  // Exact Gemini Developer API model IDs offered in Config. Mirrors
+  // `gencore_assistant::modules::secrets::secrets_api::ALLOWED_MODELS`.
+  const ALLOWED_MODELS = [
+    "gemini-3.7-flash",
+    "gemini-3.5-flash",
+    "gemini-3.5-flash-lite",
+    "gemini-3.1-pro-preview",
+  ];
 
   function isPlainObject(value) {
     return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -88,7 +130,11 @@
       cmd === GET_APP_INFO_CMD ||
       cmd === GET_SYSTEM_TELEMETRY_CMD ||
       cmd === LIST_DRIVES_CMD ||
-      cmd === LOAD_PINNED_CMD
+      cmd === LOAD_PINNED_CMD ||
+      cmd === LIST_CONVERSATIONS_CMD ||
+      cmd === CREATE_CONVERSATION_CMD ||
+      cmd === GET_AGENT_SETTINGS_CMD ||
+      cmd === CLEAR_API_KEY_CMD
     );
   }
 
@@ -343,6 +389,268 @@
     );
   }
 
+  function isAssistantId(value) {
+    return (
+      typeof value === "string" && value.length >= 1 && value.length <= ASSISTANT_ID_MAX_LENGTH
+    );
+  }
+
+  function isConversationIdCommand(cmd) {
+    return cmd === DELETE_CONVERSATION_CMD || cmd === LIST_MESSAGES_CMD || cmd === CANCEL_TURN_CMD;
+  }
+
+  function isActionIdCommand(cmd) {
+    return cmd === CONFIRM_ACTION_CMD || cmd === REJECT_ACTION_CMD;
+  }
+
+  function isConversationIdArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    return (
+      keys.length === 1 && keys[0] === "conversation_id" && isAssistantId(args.conversation_id)
+    );
+  }
+
+  function isActionIdArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    return keys.length === 1 && keys[0] === "id" && isAssistantId(args.id);
+  }
+
+  function isSnapshotTab(tab) {
+    if (!isPlainObject(tab)) {
+      return false;
+    }
+    const keys = Object.keys(tab);
+    let hasId = false;
+    let hasPinned = false;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key === "id") {
+        hasId = true;
+        continue;
+      }
+      if (key === "name" || key === "cwd") {
+        continue;
+      }
+      if (key === "pinned") {
+        hasPinned = true;
+        continue;
+      }
+      return false;
+    }
+    if (!hasId || !hasPinned || typeof tab.pinned !== "boolean") {
+      return false;
+    }
+    if (
+      typeof tab.id !== "string" ||
+      tab.id.length < 1 ||
+      tab.id.length > SNAPSHOT_TAB_ID_MAX_LENGTH
+    ) {
+      return false;
+    }
+    if (tab.name !== undefined && typeof tab.name !== "string") {
+      return false;
+    }
+    if (tab.cwd !== undefined && !isAllowedPath(tab.cwd)) {
+      return false;
+    }
+    return true;
+  }
+
+  function isFilesSelectionArgs(value) {
+    if (!isPlainObject(value)) {
+      return false;
+    }
+    const keys = Object.keys(value);
+    if (keys.length !== 2) {
+      return false;
+    }
+    let hasPath = false;
+    let hasKind = false;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key === "path") {
+        hasPath = true;
+        continue;
+      }
+      if (key === "kind") {
+        hasKind = true;
+        continue;
+      }
+      return false;
+    }
+    return (
+      hasPath &&
+      hasKind &&
+      isAllowedPath(value.path) &&
+      typeof value.kind === "string" &&
+      value.kind.length >= 1
+    );
+  }
+
+  function isAssistantSnapshotArgs(value) {
+    if (!isPlainObject(value)) {
+      return false;
+    }
+    const keys = Object.keys(value);
+    let hasActiveTabId = false;
+    let hasActiveSessionId = false;
+    let hasCwd = false;
+    let hasOutputExcerpt = false;
+    let hasTabs = false;
+    let hasFilesSelection = false;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key === "active_tab_id") {
+        hasActiveTabId = true;
+        continue;
+      }
+      if (key === "active_session_id") {
+        hasActiveSessionId = true;
+        continue;
+      }
+      if (key === "cwd") {
+        hasCwd = true;
+        continue;
+      }
+      if (key === "output_excerpt") {
+        hasOutputExcerpt = true;
+        continue;
+      }
+      if (key === "tabs") {
+        hasTabs = true;
+        continue;
+      }
+      if (key === "files_selection") {
+        hasFilesSelection = true;
+        continue;
+      }
+      return false;
+    }
+    if (!hasActiveTabId || !hasOutputExcerpt || !hasTabs) {
+      return false;
+    }
+    if (typeof value.active_tab_id !== "string" || value.active_tab_id.length < 1) {
+      return false;
+    }
+    if (hasActiveSessionId && !isSessionId(value.active_session_id)) {
+      return false;
+    }
+    if (hasCwd && !isAllowedPath(value.cwd)) {
+      return false;
+    }
+    if (
+      typeof value.output_excerpt !== "string" ||
+      value.output_excerpt.length > OUTPUT_EXCERPT_MAX_LENGTH
+    ) {
+      return false;
+    }
+    if (!Array.isArray(value.tabs) || !value.tabs.every(isSnapshotTab)) {
+      return false;
+    }
+    if (hasFilesSelection && !isFilesSelectionArgs(value.files_selection)) {
+      return false;
+    }
+    return true;
+  }
+
+  function isSendMessageArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    if (keys.length !== 3) {
+      return false;
+    }
+    let hasConversationId = false;
+    let hasText = false;
+    let hasSnapshot = false;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key === "conversation_id") {
+        hasConversationId = true;
+        continue;
+      }
+      if (key === "text") {
+        hasText = true;
+        continue;
+      }
+      if (key === "snapshot") {
+        hasSnapshot = true;
+        continue;
+      }
+      return false;
+    }
+    return (
+      hasConversationId &&
+      hasText &&
+      hasSnapshot &&
+      isAssistantId(args.conversation_id) &&
+      typeof args.text === "string" &&
+      isAssistantSnapshotArgs(args.snapshot)
+    );
+  }
+
+  function isValidAssistantModel(value) {
+    return ALLOWED_MODELS.indexOf(value) !== -1;
+  }
+
+  function isContextLines(value) {
+    return (
+      isFiniteNumber(value) &&
+      Number.isInteger(value) &&
+      value >= CONTEXT_LINES_MIN &&
+      value <= CONTEXT_LINES_MAX
+    );
+  }
+
+  function isSetAgentSettingsArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    let hasModel = false;
+    let hasContextLines = false;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key === "model") {
+        hasModel = true;
+        continue;
+      }
+      if (key === "context_lines") {
+        hasContextLines = true;
+        continue;
+      }
+      return false;
+    }
+    if (hasModel && !isValidAssistantModel(args.model)) {
+      return false;
+    }
+    if (hasContextLines && !isContextLines(args.context_lines)) {
+      return false;
+    }
+    return true;
+  }
+
+  function isSetApiKeyArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    return (
+      keys.length === 1 &&
+      keys[0] === "key" &&
+      typeof args.key === "string" &&
+      args.key.length >= 1 &&
+      args.key.length <= API_KEY_MAX_LENGTH
+    );
+  }
+
   function isAllowedWindowLabel(label) {
     return label === MAIN_WINDOW_LABEL || label === TRAY_MENU_WINDOW_LABEL;
   }
@@ -381,7 +689,15 @@
   }
 
   function isAnyListenEvent(event) {
-    return event === ENTRY_CHANGED_EVENT || event === PTY_DATA_EVENT || event === PTY_EXIT_EVENT;
+    return (
+      event === ENTRY_CHANGED_EVENT ||
+      event === PTY_DATA_EVENT ||
+      event === PTY_EXIT_EVENT ||
+      event === ASSISTANT_TOKEN_EVENT ||
+      event === ASSISTANT_TURN_EVENT ||
+      event === ASSISTANT_ERROR_EVENT ||
+      event === ASSISTANT_UI_ACTION_EVENT
+    );
   }
 
   function isAllowedListenEvent(event, target) {
@@ -471,6 +787,58 @@
     return payload;
   }
 
+  function reconstructSnapshotTab(tab) {
+    const result = { id: tab.id, pinned: tab.pinned };
+    if (typeof tab.name === "string") {
+      result.name = tab.name;
+    }
+    if (typeof tab.cwd === "string") {
+      result.cwd = tab.cwd;
+    }
+    return result;
+  }
+
+  function reconstructFilesSelection(selection) {
+    return { path: selection.path, kind: selection.kind };
+  }
+
+  function reconstructSnapshot(snapshot) {
+    const result = {
+      active_tab_id: snapshot.active_tab_id,
+      output_excerpt: snapshot.output_excerpt,
+      tabs: snapshot.tabs.map(reconstructSnapshotTab),
+    };
+    if (typeof snapshot.active_session_id === "string") {
+      result.active_session_id = snapshot.active_session_id;
+    }
+    if (typeof snapshot.cwd === "string") {
+      result.cwd = snapshot.cwd;
+    }
+    if (isPlainObject(snapshot.files_selection)) {
+      result.files_selection = reconstructFilesSelection(snapshot.files_selection);
+    }
+    return result;
+  }
+
+  function reconstructSendMessage(args) {
+    return {
+      conversation_id: args.conversation_id,
+      text: args.text,
+      snapshot: reconstructSnapshot(args.snapshot),
+    };
+  }
+
+  function reconstructSetAgentSettings(args) {
+    const result = {};
+    if (typeof args.model === "string") {
+      result.model = args.model;
+    }
+    if (args.context_lines !== undefined) {
+      result.context_lines = args.context_lines;
+    }
+    return result;
+  }
+
   function reconstructListen(args) {
     if (args.event === THEME_CHANGED_EVENT) {
       return {
@@ -479,25 +847,24 @@
         handler: args.handler,
       };
     }
-    if (args.event === PTY_DATA_EVENT) {
+    if (
+      args.event === ENTRY_CHANGED_EVENT ||
+      args.event === PTY_DATA_EVENT ||
+      args.event === PTY_EXIT_EVENT ||
+      args.event === ASSISTANT_TOKEN_EVENT ||
+      args.event === ASSISTANT_TURN_EVENT ||
+      args.event === ASSISTANT_ERROR_EVENT ||
+      args.event === ASSISTANT_UI_ACTION_EVENT
+    ) {
       return {
-        event: PTY_DATA_EVENT,
+        event: args.event,
         target: { kind: "Any" },
         handler: args.handler,
       };
     }
-    if (args.event === PTY_EXIT_EVENT) {
-      return {
-        event: PTY_EXIT_EVENT,
-        target: { kind: "Any" },
-        handler: args.handler,
-      };
-    }
-    return {
-      event: ENTRY_CHANGED_EVENT,
-      target: { kind: "Any" },
-      handler: args.handler,
-    };
+    // Every allowed event is enumerated above. Never default an unknown
+    // event through to entry-changed (or any other event) — reject it.
+    return reject();
   }
 
   function reconstructInnerPayload(cmd, args) {
@@ -539,6 +906,21 @@
     }
     if (cmd === UNLISTEN_CMD) {
       return { event: args.event, eventId: args.eventId };
+    }
+    if (isConversationIdCommand(cmd)) {
+      return { conversation_id: args.conversation_id };
+    }
+    if (isActionIdCommand(cmd)) {
+      return { id: args.id };
+    }
+    if (cmd === SEND_MESSAGE_CMD) {
+      return reconstructSendMessage(args);
+    }
+    if (cmd === SET_AGENT_SETTINGS_CMD) {
+      return reconstructSetAgentSettings(args);
+    }
+    if (cmd === SET_API_KEY_CMD) {
+      return { key: args.key };
     }
     if (cmd === THEME_CMD && !isEmptyArgs(args)) {
       return { label: args.label };
@@ -621,6 +1003,26 @@
       }
     } else if (payload.cmd === UNLISTEN_CMD) {
       if (!isUnlistenArgs(payload.payload)) {
+        reject();
+      }
+    } else if (isConversationIdCommand(payload.cmd)) {
+      if (!isConversationIdArgs(payload.payload)) {
+        reject();
+      }
+    } else if (isActionIdCommand(payload.cmd)) {
+      if (!isActionIdArgs(payload.payload)) {
+        reject();
+      }
+    } else if (payload.cmd === SEND_MESSAGE_CMD) {
+      if (!isSendMessageArgs(payload.payload)) {
+        reject();
+      }
+    } else if (payload.cmd === SET_AGENT_SETTINGS_CMD) {
+      if (!isSetAgentSettingsArgs(payload.payload)) {
+        reject();
+      }
+    } else if (payload.cmd === SET_API_KEY_CMD) {
+      if (!isSetApiKeyArgs(payload.payload)) {
         reject();
       }
     } else if (payload.cmd === THEME_CMD) {

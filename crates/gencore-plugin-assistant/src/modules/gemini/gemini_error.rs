@@ -12,6 +12,10 @@ pub enum GeminiError {
     /// The real network call has not been wired up yet (lands in a later task).
     #[error("Gemini network call is not implemented yet")]
     NotImplemented,
+    /// The HTTP request failed, or Gemini responded with a non-2xx status.
+    /// Never includes the API key.
+    #[error("Gemini HTTP request failed: {0}")]
+    Http(String),
 }
 
 impl serde::Serialize for GeminiError {

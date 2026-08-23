@@ -1,4 +1,5 @@
 pub mod agent;
+pub mod assistant;
 pub mod error;
 pub mod gemini;
 pub mod secrets;

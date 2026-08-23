@@ -15,7 +15,7 @@ serde_json = { workspace = true }
 thiserror = { workspace = true }
 rusqlite = { version = "0.40", features = ["bundled"] }
 uuid = { version = "1", features = ["v4"] }
-reqwest = { version = "0.13", default-features = false, features = ["rustls", "json", "stream"] }
+reqwest = { version = "0.13", default-features = false, features = ["rustls", "json", "stream", "blocking"] }
 gencore-pty = { path = "../gencore-plugin-pty" }
 
 [target.'cfg(windows)'.dependencies]

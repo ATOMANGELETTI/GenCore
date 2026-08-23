@@ -2,6 +2,7 @@ use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use rusqlite::{Connection, OptionalExtension, Row, params};
+use serde::Serialize;
 use uuid::Uuid;
 
 use super::store_error::StoreError;
@@ -34,7 +35,7 @@ pub struct AssistantStore {
     conn: Connection,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Conversation {
     pub id: String,
     pub title: String,
@@ -42,7 +43,7 @@ pub struct Conversation {
     pub updated_at: i64,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Message {
     pub id: String,
     pub conversation_id: String,
@@ -51,7 +52,7 @@ pub struct Message {
     pub created_at: i64,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct ToolCall {
     pub id: String,
     pub conversation_id: String,
