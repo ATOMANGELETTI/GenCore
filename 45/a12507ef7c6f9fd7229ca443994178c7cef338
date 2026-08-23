@@ -1,0 +1,25 @@
+apps/terminal/isolation/isolation.hook.js
+  s_70a5373714095a::t_1da3a1a7e8fee3 253-267,277,296-299,311
+  s_70a5373714095a::t_2351625eb75139 313,814-816
+  s_70a5373714095a::t_5a090a60d1906a 312
+apps/terminal/tests/unit/isolation.hook.test.ts
+  s_70a5373714095a::t_4a09e5807af15c 773-779
+  s_70a5373714095a::t_960583fd88808e 48-57
+  s_70a5373714095a::t_d07259b23e2797 764-772,780-796
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "45a12507ef7c6f9fd7229ca443994178c7cef338",
+  "prompts": {},
+  "sessions": {
+    "s_70a5373714095a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "d7f8a0cf-a862-4d5c-9c5f-751d4c958254",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
