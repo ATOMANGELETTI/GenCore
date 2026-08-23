@@ -89,12 +89,12 @@ export function Assistant() {
   const turns = assistant.messages.filter(
     (message) => message.role === "user" || message.role === "assistant",
   );
-  if (assistant.streaming && assistant.streamText) {
+  if (assistant.streaming) {
     turns.push({
       id: "__stream__",
       conversation_id: assistant.conversationId ?? "",
       role: "assistant",
-      content: assistant.streamText,
+      content: assistant.streamText || "Assistant is responding…",
       created_at: 0,
     });
   }

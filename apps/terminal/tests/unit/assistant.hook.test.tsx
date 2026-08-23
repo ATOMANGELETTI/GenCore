@@ -357,7 +357,7 @@ describe("useAssistant", () => {
     fireTurn: TurnHandler;
   }> {
     const user = userEvent.setup();
-    listConversations.mockResolvedValue([CONVERSATION]);
+    listConversations.mockResolvedValue([CONVERSATION, OTHER_CONVERSATION]);
     // Mirrors what a real `list_messages` would return once the turn below
     // has persisted this pending tool_call, so the hook's post-turn refetch
     // (Important 2) does not stomp the optimistic pending state with stale
@@ -805,6 +805,65 @@ describe("useAssistant", () => {
     await waitFor(() => {
       expect(cancelTurn).toHaveBeenCalledWith("c1");
     });
+  });
+
+  it("cancel() clears streaming for that conversation so the composer is usable again", async () => {
+    const user = userEvent.setup();
+    listConversations.mockResolvedValue([CONVERSATION]);
+    let onToken: ((payload: { conversation_id: string; text: string }) => void) | undefined;
+    subscribeAssistantToken.mockImplementation(async (handler) => {
+      onToken = handler;
+      return () => {};
+    });
+
+    renderHookProbe(true);
+    await waitFor(() => {
+      expect(onToken).toBeTypeOf("function");
+    });
+
+    onToken?.({ conversation_id: "c1", text: "thinking" });
+    await waitFor(() => {
+      expect(screen.getByTestId("streaming")).toHaveTextContent("true");
+    });
+
+    await user.click(screen.getByText("cancel"));
+
+    await waitFor(() => {
+      expect(cancelTurn).toHaveBeenCalledWith("c1");
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId("streaming")).toHaveTextContent("false");
+    });
+  });
+
+  it("keeps confirm streaming on the tool's conversation if History changes before confirm resolves", async () => {
+    let resolveConfirm: (value: { name: string; result_json: string; ui_action: null }) => void =
+      () => undefined;
+    confirmAction.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveConfirm = resolve;
+        }),
+    );
+    const { user } = await renderWithOnePending();
+
+    await user.click(screen.getByText("approve"));
+    await user.click(screen.getByText("select-c2"));
+    await waitFor(() => {
+      expect(screen.getByTestId("conversation-id")).toHaveTextContent("c2");
+    });
+
+    listMessages.mockResolvedValue({ messages: [], pending: [] });
+    resolveConfirm({ name: "pty_write", result_json: "{}", ui_action: null });
+
+    await user.click(screen.getByText("select-c1"));
+    await waitFor(() => {
+      expect(screen.getByTestId("pending-count")).toHaveTextContent("0");
+    });
+    expect(screen.getByTestId("streaming")).toHaveTextContent("true");
+
+    await user.click(screen.getByText("select-c2"));
+    expect(screen.getByTestId("streaming")).toHaveTextContent("false");
   });
 
   it("keys composer drafts by conversation: switching chats swaps drafts instead of sharing them (Important 10)", async () => {

@@ -11,9 +11,10 @@ pub use modules::assistant::{
     ActionIdArgs, AgentSettingsDto, AssistantErrorPayload, AssistantTokenPayload,
     AssistantTurnPayload, AssistantUiActionPayload, ConversationIdArgs, FilesSelectionArgs,
     ListMessagesResult, SendMessageArgs, SendMessageResult, SetAgentSettingsArgs, SetApiKeyArgs,
-    SnapshotArgs, SnapshotTabArgs, cancel_turn, clear_api_key, confirm_action, create_conversation,
-    delete_conversation, get_agent_settings, list_conversations, list_messages, reject_action,
-    send_message, set_agent_settings, set_api_key,
+    SnapshotArgs, SnapshotTabArgs, begin_turn, cancel_active_turn, cancel_turn, clear_api_key,
+    confirm_action, create_conversation, delete_conversation, get_agent_settings,
+    is_turn_cancelled, list_conversations, list_messages, reject_action, send_message,
+    set_agent_settings, set_api_key, take_turn_cancelled,
 };
 pub use modules::error::AssistantError;
 pub use modules::gemini::{

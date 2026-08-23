@@ -13,8 +13,7 @@
 //! [`prepare_turn`] / [`prepare_resume`] + [`finish_turn`], dropping the
 //! connection for the (up to 120s) HTTP call in between (Important 5).
 
-use std::collections::HashSet;
-use std::sync::{Arc, LazyLock, Mutex};
+use std::sync::{Arc, Mutex};
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -24,6 +23,9 @@ use gencore_pty::SessionMap;
 
 use crate::modules::agent::{
     ConfirmOutcome, confirm_tool, finish_turn, prepare_resume, prepare_turn, reject_tool,
+};
+use crate::modules::assistant::assistant_cancel::{
+    begin_turn, cancel_active_turn, is_turn_cancelled, take_turn_cancelled,
 };
 use crate::modules::error::AssistantError;
 use crate::modules::gemini::{GeminiEvent, GeminiTransport, ReqwestTransport};
@@ -179,40 +181,6 @@ pub struct AssistantUiActionPayload {
     pub args: Value,
 }
 
-/// Conversation ids with a `cancel_turn` call pending consumption.
-///
-/// Set by `cancel_turn`. Polled (without clearing) by the transport's
-/// `is_cancelled` hook while a stream is being read, and consumed once (via
-/// [`take_cancelled`]) after `generate` returns, to suppress the `token` /
-/// `turn` / `error` events a background task would otherwise emit for a
-/// turn that was in fact cancelled.
-static CANCELLED_TURNS: LazyLock<Mutex<HashSet<String>>> =
-    LazyLock::new(|| Mutex::new(HashSet::new()));
-
-fn mark_cancelled(conversation_id: &str) {
-    if let Ok(mut cancelled) = CANCELLED_TURNS.lock() {
-        cancelled.insert(conversation_id.to_string());
-    }
-}
-
-/// Non-consuming check used as the transport's `is_cancelled` hook — called
-/// repeatedly while a stream is being read, so it must not clear the flag
-/// (that happens once, afterwards, via [`take_cancelled`]).
-fn is_turn_cancelled(conversation_id: &str) -> bool {
-    CANCELLED_TURNS
-        .lock()
-        .map(|cancelled| cancelled.contains(conversation_id))
-        .unwrap_or(false)
-}
-
-/// Consumes a pending cancellation flag for `conversation_id`, if any.
-fn take_cancelled(conversation_id: &str) -> bool {
-    match CANCELLED_TURNS.lock() {
-        Ok(mut cancelled) => cancelled.remove(conversation_id),
-        Err(_) => false,
-    }
-}
-
 #[cfg(windows)]
 fn protector() -> DpapiProtector {
     DpapiProtector
@@ -305,6 +273,7 @@ where
     let (conversation_id, request) = prepare(&store, &secret_protector)?;
     drop(store);
 
+    let generation = begin_turn(&conversation_id);
     let app_for_events = app.clone();
     let conversation_id_for_events = conversation_id.clone();
     let on_event = move |event: &GeminiEvent| {
@@ -319,14 +288,23 @@ where
         }
     };
     let conversation_id_for_cancel = conversation_id.clone();
-    let is_cancelled = move || is_turn_cancelled(&conversation_id_for_cancel);
+    let is_cancelled = move || is_turn_cancelled(&conversation_id_for_cancel, generation);
     let transport = ReqwestTransport {
         api_key,
         on_event: &on_event,
         is_cancelled: &is_cancelled,
     };
 
-    let events = transport.generate(request).map_err(map_gemini_error)?;
+    let events = match transport.generate(request) {
+        Ok(events) => events,
+        Err(err) => {
+            let _ = take_turn_cancelled(&conversation_id, generation);
+            return Err(map_gemini_error(err));
+        }
+    };
+    if take_turn_cancelled(&conversation_id, generation) {
+        return Err(AssistantError::Cancelled);
+    }
 
     let store = open_store()?;
     finish_turn(&store, &conversation_id, events)
@@ -339,36 +317,32 @@ fn map_gemini_error(err: crate::modules::gemini::GeminiError) -> AssistantError 
     }
 }
 
-/// Emits `token` + `turn` on success, or `error` on failure — unless
-/// `conversation_id` was cancelled (cooperative flag, or `turn` itself
-/// resolved to [`AssistantError::Cancelled`]), in which case nothing is
-/// emitted at all. Shared tail of every background turn task
-/// (`send_message`, `confirm_action`, `reject_action`).
+/// Emits `turn` on success, or `error` on failure. A cancelled turn emits an
+/// empty `turn` (no extra token dump) so the WebView can leave the streaming
+/// state without treating cancel as a Gemini failure.
 fn emit_turn_result<R: Runtime>(
     app: &AppHandle<R>,
     conversation_id: &str,
     turn: Result<crate::modules::agent::TurnResult, AssistantError>,
 ) {
-    let was_cancelled = take_cancelled(conversation_id);
-    if was_cancelled || matches!(turn, Err(AssistantError::Cancelled)) {
-        return;
-    }
-
     match turn {
         Ok(turn) => {
-            let _ = app.emit(
-                ASSISTANT_TOKEN_EVENT,
-                AssistantTokenPayload {
-                    conversation_id: conversation_id.to_string(),
-                    text: turn.assistant_text.clone(),
-                },
-            );
             let _ = app.emit(
                 ASSISTANT_TURN_EVENT,
                 AssistantTurnPayload {
                     conversation_id: conversation_id.to_string(),
                     assistant_text: turn.assistant_text,
                     pending: turn.pending,
+                },
+            );
+        }
+        Err(AssistantError::Cancelled) => {
+            let _ = app.emit(
+                ASSISTANT_TURN_EVENT,
+                AssistantTurnPayload {
+                    conversation_id: conversation_id.to_string(),
+                    assistant_text: String::new(),
+                    pending: Vec::new(),
                 },
             );
         }
@@ -473,9 +447,10 @@ pub async fn list_messages(conversation_id: String) -> Result<ListMessagesResult
 /// the command itself (`Err`), never a later-only event. The background
 /// task then calls [`run_gemini_turn`] with [`prepare_turn`], which checks
 /// the API key, rewrites the title, and calls Gemini; it never re-inserts
-/// the message/snapshot this command already persisted. It emits
-/// `token` / `turn` / `error` via [`emit_turn_result`] — unless
-/// `cancel_turn` marked this conversation cancelled first.
+/// the message/snapshot this command already persisted. Incremental
+/// `://token` events fire from the SSE reader; [`emit_turn_result`]
+/// emits `://turn` (including an empty turn when the generation was
+/// cancelled) or `://error`.
 #[tauri::command(rename_all = "snake_case")]
 pub async fn send_message<R: Runtime>(
     app: AppHandle<R>,
@@ -524,10 +499,10 @@ pub async fn send_message<R: Runtime>(
     Ok(SendMessageResult { accepted: true })
 }
 
-/// Marks `conversation_id`'s in-flight turn cancelled; see [`CANCELLED_TURNS`].
+/// Marks `conversation_id`'s in-flight generation cancelled.
 #[tauri::command(rename_all = "snake_case")]
 pub async fn cancel_turn(conversation_id: String) -> Result<(), AssistantError> {
-    mark_cancelled(&conversation_id);
+    cancel_active_turn(&conversation_id);
     Ok(())
 }
 

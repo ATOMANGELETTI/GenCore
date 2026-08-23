@@ -123,6 +123,8 @@ export function useAssistant(): AssistantApi {
   >({});
   const conversationIdRef = React.useRef<string | null>(null);
   conversationIdRef.current = conversationId;
+  const pendingByConversationRef = React.useRef(pendingByConversation);
+  pendingByConversationRef.current = pendingByConversation;
   // useFileTree()/TerminalProvider hand back a new object on nearly every
   // render (tree listings, tab output, etc.). Reading through refs lets the
   // ui-action subscription below stay mounted for the component's lifetime
@@ -274,6 +276,7 @@ export function useAssistant(): AssistantApi {
     void subscribeAssistantError((payload) => {
       const id = payload.conversation_id;
       setStreamingByConversation((current) => ({ ...current, [id]: false }));
+      setStreamTextByConversation((current) => ({ ...current, [id]: "" }));
       setErrorByConversation((current) => ({
         ...current,
         [id]: { code: payload.code, message: payload.message },
@@ -427,18 +430,23 @@ export function useAssistant(): AssistantApi {
   // event that eventually follows (Critical 1). A later `://turn` still
   // replaces pending with its own `payload.pending`, which is the source of
   // truth once it arrives.
-  const settlePendingAction = React.useCallback((id: string) => {
-    const activeId = conversationIdRef.current;
-    if (!activeId) {
-      return;
-    }
+  const conversationIdForTool = React.useCallback((id: string): string | null => {
+    const fromRow = Object.values(pendingByConversationRef.current)
+      .flat()
+      .find((call) => call.id === id)?.conversation_id;
+    return fromRow ?? conversationIdRef.current;
+  }, []);
+
+  const settlePendingAction = React.useCallback((id: string, conversationIdForCall: string) => {
     setPendingByConversation((current) => ({
       ...current,
-      [activeId]: (current[activeId] ?? []).filter((call) => call.id !== id),
+      [conversationIdForCall]: (current[conversationIdForCall] ?? []).filter(
+        (call) => call.id !== id,
+      ),
     }));
-    setStreamingByConversation((current) => ({ ...current, [activeId]: true }));
-    setStreamTextByConversation((current) => ({ ...current, [activeId]: "" }));
-    setErrorByConversation((current) => ({ ...current, [activeId]: undefined }));
+    setStreamingByConversation((current) => ({ ...current, [conversationIdForCall]: true }));
+    setStreamTextByConversation((current) => ({ ...current, [conversationIdForCall]: "" }));
+    setErrorByConversation((current) => ({ ...current, [conversationIdForCall]: undefined }));
   }, []);
 
   const recordPendingActionError = React.useCallback((err: unknown) => {
@@ -451,27 +459,35 @@ export function useAssistant(): AssistantApi {
 
   const confirmPending = React.useCallback(
     async (id: string) => {
+      const conversationIdForCall = conversationIdForTool(id);
+      if (!conversationIdForCall) {
+        return;
+      }
       try {
         await confirmAction(id);
-        settlePendingAction(id);
+        settlePendingAction(id, conversationIdForCall);
       } catch (err) {
         // Failed confirm/reject keeps the card so the user can retry it.
         recordPendingActionError(err);
       }
     },
-    [settlePendingAction, recordPendingActionError],
+    [conversationIdForTool, settlePendingAction, recordPendingActionError],
   );
 
   const rejectPending = React.useCallback(
     async (id: string) => {
+      const conversationIdForCall = conversationIdForTool(id);
+      if (!conversationIdForCall) {
+        return;
+      }
       try {
         await rejectAction(id);
-        settlePendingAction(id);
+        settlePendingAction(id, conversationIdForCall);
       } catch (err) {
         recordPendingActionError(err);
       }
     },
-    [settlePendingAction, recordPendingActionError],
+    [conversationIdForTool, settlePendingAction, recordPendingActionError],
   );
 
   const cancel = React.useCallback(async () => {
@@ -484,6 +500,8 @@ export function useAssistant(): AssistantApi {
     } catch {
       // Best-effort; the stream may finish on its own before cancel lands.
     }
+    setStreamingByConversation((current) => ({ ...current, [activeId]: false }));
+    setStreamTextByConversation((current) => ({ ...current, [activeId]: "" }));
   }, []);
 
   return {

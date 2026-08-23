@@ -282,7 +282,7 @@ describe("Assistant", () => {
 
     expect(await screen.findByText("You")).toBeVisible();
     expect(screen.getByText("List the files")).toHaveClass("select-text");
-    expect(screen.queryByText("Assistant")).toBeNull();
+    expect(screen.getByRole("button", { name: "Cancel" })).toBeVisible();
   });
 
   it("restores the composer when send fails", async () => {
@@ -341,6 +341,19 @@ describe("Assistant", () => {
     const message = screen.getByText("no key stored");
     expect(message).toHaveClass("text-destructive");
     expect(message).not.toHaveClass("rounded-full");
+  });
+
+  it("shows Cancel while streaming even before the first token", async () => {
+    const user = userEvent.setup();
+    listConversations.mockResolvedValue([CONVERSATION]);
+    sendMessage.mockImplementation(() => new Promise(() => {}));
+
+    renderAssistant(true);
+    const composer = await screen.findByRole("textbox", { name: "Message" });
+    await user.type(composer, "hello{Enter}");
+
+    expect(await screen.findByRole("button", { name: "Cancel" })).toBeVisible();
+    expect(composer).toBeDisabled();
   });
 
   it("shows a Cancel control on the streaming row that calls cancelTurn (Important 4)", async () => {
