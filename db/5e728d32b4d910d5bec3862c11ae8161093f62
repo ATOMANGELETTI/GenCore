@@ -1,0 +1,46 @@
+crates/gencore-plugin-assistant/src/modules/error/error_error.rs
+  s_13b05d89da867c::t_6171d324b0ce73 27-34
+crates/gencore-plugin-assistant/tests/agent.rs
+  s_13b05d89da867c::t_6fc52c0e657166 1,4-8,11-13
+  s_13b05d89da867c::t_624e1f9d0bd200 110-278,280-338
+  s_13b05d89da867c::t_c762c4b9d0ad11 279
+  s_13b05d89da867c::t_bab3a24d91c018 14
+crates/gencore-plugin-assistant/src/lib.rs
+  s_13b05d89da867c::t_7d825d337e9f15 5-7,10-11
+crates/gencore-plugin-assistant/src/modules/agent/mod.rs
+  s_13b05d89da867c::t_f3fd3df314b639 4
+  s_13b05d89da867c::t_a53e87e4ce87c8 5-6
+crates/gencore-plugin-assistant/src/modules/agent/agent_api.rs
+  s_13b05d89da867c::t_1f174dd8b2b099 140-341
+  s_13b05d89da867c::t_4700919c352402 1-2,5-8,16-20,23-27
+  s_13b05d89da867c::t_36dd7e91cf016b 28
+  s_13b05d89da867c::t_e1404619680f44 342-343
+crates/gencore-plugin-assistant/src/modules/gemini/gemini_api.rs
+  s_13b05d89da867c::t_7199effae47c87 1,3-9,15-30
+crates/gencore-plugin-assistant/src/modules/gemini/mod.rs
+  s_13b05d89da867c::t_a7225f1783411a 6
+crates/gencore-plugin-assistant/src/modules/store/store_api.rs
+  s_13b05d89da867c::t_9ab49e29ea07de 192-212
+  s_13b05d89da867c::t_15a2fc1cc36492 373-381
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "db5e728d32b4d910d5bec3862c11ae8161093f62",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_13b05d89da867c": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "8302ba8d-0712-40f9-8cca-6313d168d20a",
+        "model": "claude-sonnet-5-thinking-xhigh"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
