@@ -1,0 +1,20 @@
+AGENTS.md
+  s_a5bc4095426b38::t_25eb95a981f941 109
+  s_a5bc4095426b38::t_afc50b6a0cf2f8 103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "d99031a46eac491178092ee2f4aa8ea4c35296d6",
+  "prompts": {},
+  "sessions": {
+    "s_a5bc4095426b38": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "6088058d-b971-4d42-ad50-664a48230f9c",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
