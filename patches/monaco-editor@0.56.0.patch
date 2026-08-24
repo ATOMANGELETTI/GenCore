@@ -1,0 +1,65 @@
+diff --git a/esm/vs/base/common/keyCodes.js b/esm/vs/base/common/keyCodes.js
+index 1f51ec8df8c9f2a76e66f5020954eef2427fd343..c590b960e63a9c37f1f5b283bb2cfa63974a64e6 100644
+--- a/esm/vs/base/common/keyCodes.js
++++ b/esm/vs/base/common/keyCodes.js
+@@ -300,7 +300,7 @@ var KeyCodeUtils;
+     function toString(keyCode) {
+         return uiMap.keyCodeToStr(keyCode);
+     }
+-    KeyCodeUtils.toString = toString;
++    Object.defineProperty(KeyCodeUtils, 'toString', { value: toString, writable: true, configurable: true, enumerable: true });
+     function fromString(key) {
+         return uiMap.strToKeyCode(key);
+     }
+diff --git a/esm/vs/base/common/severity.js b/esm/vs/base/common/severity.js
+index 8e5ac801d0c679986d8150f99f5cc971b15d50f6..aee194eb3a77c03f330e24212057192b3d7cba45 100644
+--- a/esm/vs/base/common/severity.js
++++ b/esm/vs/base/common/severity.js
+@@ -45,7 +45,7 @@ var Severity;
+             default: return _ignore;
+         }
+     }
+-    Severity.toString = toString;
++    Object.defineProperty(Severity, 'toString', { value: toString, writable: true, configurable: true, enumerable: true });
+ })(Severity || (Severity = {}));
+ var Severity$1 = Severity;
+ 
+diff --git a/esm/vs/editor/contrib/inlineCompletions/browser/model/InlineSuggestAlternativeAction.js b/esm/vs/editor/contrib/inlineCompletions/browser/model/InlineSuggestAlternativeAction.js
+index 00e5b1e9eb1672e1a93ecc3f6b8a3f291da6579a..816dafb8c6a082074edb9a910b64ebf5ac5b7fe0 100644
+--- a/esm/vs/editor/contrib/inlineCompletions/browser/model/InlineSuggestAlternativeAction.js
++++ b/esm/vs/editor/contrib/inlineCompletions/browser/model/InlineSuggestAlternativeAction.js
+@@ -3,7 +3,7 @@ var InlineSuggestAlternativeAction;
+     function toString(action) {
+         return action?.command.id ?? undefined;
+     }
+-    InlineSuggestAlternativeAction.toString = toString;
++    Object.defineProperty(InlineSuggestAlternativeAction, 'toString', { value: toString, writable: true, configurable: true, enumerable: true });
+ })(InlineSuggestAlternativeAction || (InlineSuggestAlternativeAction = {}));
+ 
+ export { InlineSuggestAlternativeAction };
+diff --git a/esm/vs/platform/instantiation/common/instantiation.js b/esm/vs/platform/instantiation/common/instantiation.js
+index eacee82cbcfbdb53ed89274aa422668cb06d7cda..e49a29fbe6a889d9ecff025eee19b1f4e8e74d2c 100644
+--- a/esm/vs/platform/instantiation/common/instantiation.js
++++ b/esm/vs/platform/instantiation/common/instantiation.js
+@@ -36,7 +36,7 @@ function createDecorator(serviceId) {
+         }
+         storeServiceDependency(id, target, index);
+     };
+-    id.toString = () => serviceId;
++    Object.defineProperty(id, 'toString', { value: () => serviceId, writable: true, configurable: true, enumerable: true });
+     _util.serviceIds.set(serviceId, id);
+     return id;
+ }
+diff --git a/esm/vs/platform/markers/common/markers.js b/esm/vs/platform/markers/common/markers.js
+index 1ca35e0e46300943370a5d844effc94d31537b81..f29ad96b75c0ddc2bb8644394de093125a810006 100644
+--- a/esm/vs/platform/markers/common/markers.js
++++ b/esm/vs/platform/markers/common/markers.js
+@@ -25,7 +25,7 @@ var MarkerSeverity;
+     function toString(a) {
+         return _displayStrings[a] || '';
+     }
+-    MarkerSeverity.toString = toString;
++    Object.defineProperty(MarkerSeverity, 'toString', { value: toString, writable: true, configurable: true, enumerable: true });
+     const _displayStringsPlural = Object.create(null);
+     _displayStringsPlural[MarkerSeverity.Error] = localize(1798, "Errors");
+     _displayStringsPlural[MarkerSeverity.Warning] = localize(1799, "Warnings");

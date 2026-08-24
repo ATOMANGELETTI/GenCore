@@ -9,6 +9,10 @@ const base = createTauriViteConfig({ port: 5173 });
 // See https://v2.tauri.app/start/frontend/vite/ for the official Tauri + Vite setup.
 export default defineConfig({
   ...base,
+  optimizeDeps: {
+    ...base.optimizeDeps,
+    force: true,
+  },
   build: {
     ...base.build,
     rollupOptions: {

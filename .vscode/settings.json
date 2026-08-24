@@ -51,7 +51,7 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "github.copilot.chat.commitMessageGeneration.instructions": [
     {
-      "text": "Strictly follow Conventional Commits (@commitlint/config-conventional). The header must never exceed 72 characters (strict commitlint max 100). Use <type>(<scope>): <subject> in lowercase imperative mood without trailing period. Do not add AI trailers."
+      "text": "Strictly follow Conventional Commits (@commitlint/config-conventional):\n1. Line 1 (Header): '<type>(<scope>): <concise subject>' in lowercase imperative mood without trailing period. Keep header to minimum length (strictly under 72 characters, never exceed 100).\n2. Line 2: Empty blank line.\n3. Line 3+ (Body): Detailed description explaining what and why, wrapped at 72 characters.\n\nExample format:\nfeat(terminal): add Monaco and Micro diff editor options\n\nImplement modular configuration storage and introduce Monaco/Micro diff\neditor options with corresponding settings and UI components.\n\nNever add AI co-author or attribution trailers (e.g. Co-authored-by: Cursor/Copilot)."
     }
   ]
 }

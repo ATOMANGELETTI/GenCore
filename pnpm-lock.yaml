@@ -6,6 +6,7 @@ settings:
 
 patchedDependencies:
   '@xterm/xterm@6.0.0': 9edfae4e0c07ac9825b5805b1575160bb3657aa425f8ef2819cd54399fccdb1f
+  monaco-editor@0.56.0: 2e9ad5b94b39f9932de161dd3ce5cc1920134d925eebbd77f4efe48dfedf088a
 
 importers:
 
@@ -101,7 +102,7 @@ importers:
         version: link:../../packages/ui-kit
       '@monaco-editor/react':
         specifier: ^4.7.0
-        version: 4.7.0(monaco-editor@0.56.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        version: 4.7.0(monaco-editor@0.56.0(patch_hash=2e9ad5b94b39f9932de161dd3ce5cc1920134d925eebbd77f4efe48dfedf088a))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@tauri-apps/api':
         specifier: 2.11.1
         version: 2.11.1
@@ -122,7 +123,7 @@ importers:
         version: 1.31.0(react@19.2.8)
       monaco-editor:
         specifier: ^0.56.0
-        version: 0.56.0
+        version: 0.56.0(patch_hash=2e9ad5b94b39f9932de161dd3ce5cc1920134d925eebbd77f4efe48dfedf088a)
       react:
         specifier: 19.2.8
         version: 19.2.8
@@ -3604,10 +3605,10 @@ snapshots:
     dependencies:
       state-local: 1.0.7
 
-  '@monaco-editor/react@4.7.0(monaco-editor@0.56.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+  '@monaco-editor/react@4.7.0(monaco-editor@0.56.0(patch_hash=2e9ad5b94b39f9932de161dd3ce5cc1920134d925eebbd77f4efe48dfedf088a))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@monaco-editor/loader': 1.7.0
-      monaco-editor: 0.56.0
+      monaco-editor: 0.56.0(patch_hash=2e9ad5b94b39f9932de161dd3ce5cc1920134d925eebbd77f4efe48dfedf088a)
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
 
@@ -5195,7 +5196,7 @@ snapshots:
 
   min-indent@1.0.1: {}
 
-  monaco-editor@0.56.0:
+  monaco-editor@0.56.0(patch_hash=2e9ad5b94b39f9932de161dd3ce5cc1920134d925eebbd77f4efe48dfedf088a):
     dependencies:
       dompurify: 3.4.8
       marked: 14.0.0

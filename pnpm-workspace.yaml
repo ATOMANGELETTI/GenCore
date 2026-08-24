@@ -5,3 +5,4 @@ allowBuilds:
   esbuild: true
 patchedDependencies:
   '@xterm/xterm@6.0.0': patches/@xterm__xterm@6.0.0.patch
+  monaco-editor@0.56.0: patches/monaco-editor@0.56.0.patch
