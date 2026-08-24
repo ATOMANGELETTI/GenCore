@@ -1,0 +1,78 @@
+.agents/.agents/hooks/state/edited-files.json
+  h_90ad036e211778 42-45
+.agents/skills/git-commit/SKILL.md
+  h_90ad036e211778 1-46
+.agents/workflows/git-commit.md
+  h_90ad036e211778 1-23
+.cursor/commands/git-commit.md
+  h_90ad036e211778 1-16
+.cursor/skills/git-commit/SKILL.md
+  h_90ad036e211778 1-45
+LICENSE
+  h_90ad036e211778 1-2,9
+crates/gencore-plugin-git/src/modules/branch/branch_api.rs
+  h_90ad036e211778 4,34,46
+crates/gencore-plugin-git/src/modules/commit/commit_api.rs
+  h_90ad036e211778 4,15-41,45
+crates/gencore-plugin-git/src/modules/dialog/dialog_api.rs
+  h_90ad036e211778 3
+crates/gencore-plugin-git/src/modules/diff/diff_api.rs
+  h_90ad036e211778 4,28-29
+crates/gencore-plugin-git/src/modules/graph/graph_api.rs
+  h_90ad036e211778 4
+crates/gencore-plugin-git/src/modules/init/init_api.rs
+  h_90ad036e211778 4
+crates/gencore-plugin-git/src/modules/stage/stage_api.rs
+  h_90ad036e211778 4-17,22,60,65,87,95,100,108,129-130
+crates/gencore-plugin-git/src/modules/stash/stash_api.rs
+  h_90ad036e211778 4,12
+crates/gencore-plugin-git/src/modules/status/status_api.rs
+  h_90ad036e211778 21
+crates/gencore-plugin-git/tests/command_snake_case_lock.rs
+  h_90ad036e211778 1-66
+crates/gencore-plugin-git/tests/git_plugin_test.rs
+  h_90ad036e211778 1-2,23-74
+packages/ui-kit/src/assets/icons/cursors/cursor_aurora.ico
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/cursors/cursor_aurora.png
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/cursors/cursor_frost.ico
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/cursors/cursor_frost.png
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/cursors/cursor_polar-night.ico
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/cursors/cursor_polar-night.png
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/cursors/cursor_snow-storm.ico
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/cursors/cursor_snow-storm.png
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/favicon/terminal/favicon-alt_polar-night.ico
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/favicon/terminal/favicon-alt_polar-night.png
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/favicon/terminal/favicon-alt_snow-storm.ico
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/favicon/terminal/favicon-alt_snow-storm.png
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/favicon/terminal/favicon_polar-night.ico
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/favicon/terminal/favicon_polar-night.png
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/favicon/terminal/favicon_snow-storm.ico
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/favicon/terminal/favicon_snow-storm.png
+  h_90ad036e211778 1-3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "eefc5de27ac032fd71bd400418039a308539b928",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
