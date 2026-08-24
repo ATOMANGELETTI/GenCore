@@ -18,7 +18,7 @@ impl GitStatusResult {
     }
 }
 
-#[tauri::command]
+#[tauri::command(rename_all = "snake_case")]
 pub fn git_get_status(path: String) -> Result<GitStatusResult, StatusError> {
     let p = Path::new(&path);
     let repo = match gix::discover(p) {

@@ -1,7 +1,7 @@
 use super::branch_error::{BranchError, GitBranchInfo};
 use std::path::Path;
 
-#[tauri::command]
+#[tauri::command(rename_all = "snake_case")]
 pub fn git_list_branches(repo_path: String) -> Result<Vec<GitBranchInfo>, BranchError> {
     let p = Path::new(&repo_path);
     let repo =
@@ -31,7 +31,7 @@ pub fn git_list_branches(repo_path: String) -> Result<Vec<GitBranchInfo>, Branch
     Ok(branches)
 }
 
-#[tauri::command]
+#[tauri::command(rename_all = "snake_case")]
 pub fn git_checkout_branch(repo_path: String, name: String) -> Result<(), BranchError> {
     let p = Path::new(&repo_path);
     let repo =
@@ -43,7 +43,7 @@ pub fn git_checkout_branch(repo_path: String, name: String) -> Result<(), Branch
     Ok(())
 }
 
-#[tauri::command]
+#[tauri::command(rename_all = "snake_case")]
 pub fn git_create_branch(repo_path: String, name: String) -> Result<(), BranchError> {
     let p = Path::new(&repo_path);
     let repo =

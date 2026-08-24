@@ -39,5 +39,9 @@
   "92da2a7e-47ff-42bf-aade-973cfd96dfd9": {
     "members": ["apps/terminal"],
     "testReminderSent": true
+  },
+  "319f7e4e-9037-41ce-a3ef-6070d9a6b31b": {
+    "members": ["crates/gencore-plugin-git"],
+    "testReminderSent": true
   }
 }

@@ -1,7 +1,7 @@
 use super::diff_error::{DiffError, GitDiffResult};
 use std::path::Path;
 
-#[tauri::command]
+#[tauri::command(rename_all = "snake_case")]
 pub fn git_get_diff(repo_path: String, file_path: String) -> Result<GitDiffResult, DiffError> {
     let p = Path::new(&repo_path);
     let repo =
@@ -25,7 +25,8 @@ pub fn git_get_diff(repo_path: String, file_path: String) -> Result<GitDiffResul
         } else {
             full_path
         };
-        if let Ok(Some(entry)) = tree.lookup_entry_by_path(rel)
+        let rel_posix = rel.to_string_lossy().replace('\\', "/");
+        if let Ok(Some(entry)) = tree.lookup_entry_by_path(&rel_posix)
             && let Ok(obj) = entry.object()
         {
             head_content = String::from_utf8_lossy(&obj.data).to_string();

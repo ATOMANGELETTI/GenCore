@@ -1,6 +1,6 @@
 use super::dialog_error::DialogError;
 
-#[tauri::command]
+#[tauri::command(rename_all = "snake_case")]
 pub async fn git_pick_folder() -> Result<Option<String>, DialogError> {
     let folder = rfd::AsyncFileDialog::new()
         .set_title("Open Workspace Folder")

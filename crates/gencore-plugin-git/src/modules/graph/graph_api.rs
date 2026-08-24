@@ -1,7 +1,7 @@
 use super::graph_error::{GitCommitNode, GraphError};
 use std::path::Path;
 
-#[tauri::command]
+#[tauri::command(rename_all = "snake_case")]
 pub fn git_get_log(
     repo_path: String,
     limit: Option<usize>,

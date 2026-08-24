@@ -1,14 +1,25 @@
 use super::stage_error::StageError;
 use std::path::Path;
 
-#[tauri::command]
+fn open_or_create_index(repo: &gix::Repository) -> Result<gix::index::File, StageError> {
+    match repo.open_index() {
+        Ok(idx) => Ok(idx),
+        Err(_) => {
+            let state = gix::index::State::new(repo.object_hash());
+            Ok(gix::index::File::from_state(
+                state,
+                repo.git_dir().join("index"),
+            ))
+        }
+    }
+}
+
+#[tauri::command(rename_all = "snake_case")]
 pub fn git_stage_file(repo_path: String, file_path: String) -> Result<(), StageError> {
     let p = Path::new(&repo_path);
     let repo =
         gix::open(p).map_err(|e| StageError::RepoOpenFailed(repo_path.clone(), e.to_string()))?;
-    let mut index = repo
-        .open_index()
-        .map_err(|e| StageError::StageFailed(file_path.clone(), e.to_string()))?;
+    let mut index = open_or_create_index(&repo)?;
 
     // Convert to relative path
     let rel_path = Path::new(&file_path);
@@ -46,14 +57,12 @@ pub fn git_stage_file(repo_path: String, file_path: String) -> Result<(), StageE
     Ok(())
 }
 
-#[tauri::command]
+#[tauri::command(rename_all = "snake_case")]
 pub fn git_unstage_file(repo_path: String, file_path: String) -> Result<(), StageError> {
     let p = Path::new(&repo_path);
     let repo =
         gix::open(p).map_err(|e| StageError::RepoOpenFailed(repo_path.clone(), e.to_string()))?;
-    let mut index = repo
-        .open_index()
-        .map_err(|e| StageError::UnstageFailed(file_path.clone(), e.to_string()))?;
+    let mut index = open_or_create_index(&repo)?;
 
     let rel_path = Path::new(&file_path);
     let rel_path_clean = if rel_path.is_absolute() {
@@ -75,7 +84,7 @@ pub fn git_unstage_file(repo_path: String, file_path: String) -> Result<(), Stag
     Ok(())
 }
 
-#[tauri::command]
+#[tauri::command(rename_all = "snake_case")]
 pub fn git_stage_all(repo_path: String) -> Result<(), StageError> {
     let p = Path::new(&repo_path);
     let _repo =
@@ -83,14 +92,12 @@ pub fn git_stage_all(repo_path: String) -> Result<(), StageError> {
     Ok(())
 }
 
-#[tauri::command]
+#[tauri::command(rename_all = "snake_case")]
 pub fn git_unstage_all(repo_path: String) -> Result<(), StageError> {
     let p = Path::new(&repo_path);
     let repo =
         gix::open(p).map_err(|e| StageError::RepoOpenFailed(repo_path.clone(), e.to_string()))?;
-    let mut index = repo
-        .open_index()
-        .map_err(|e| StageError::UnstageFailed("all".to_string(), e.to_string()))?;
+    let mut index = open_or_create_index(&repo)?;
     while !index.entries().is_empty() {
         index.remove_entry_at_index(0);
     }
@@ -98,7 +105,7 @@ pub fn git_unstage_all(repo_path: String) -> Result<(), StageError> {
     Ok(())
 }
 
-#[tauri::command]
+#[tauri::command(rename_all = "snake_case")]
 pub fn git_discard_changes(repo_path: String, file_path: String) -> Result<(), StageError> {
     let p = Path::new(&repo_path);
     let repo =
@@ -119,7 +126,8 @@ pub fn git_discard_changes(repo_path: String, file_path: String) -> Result<(), S
         } else {
             full_path
         };
-        if let Ok(Some(entry)) = tree.lookup_entry_by_path(rel)
+        let rel_posix = rel.to_string_lossy().replace('\\', "/");
+        if let Ok(Some(entry)) = tree.lookup_entry_by_path(&rel_posix)
             && let Ok(obj) = entry.object()
         {
             let _ = std::fs::write(&full, &obj.data);

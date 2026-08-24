@@ -1,7 +1,7 @@
 use super::stash_error::StashError;
 use std::path::Path;
 
-#[tauri::command]
+#[tauri::command(rename_all = "snake_case")]
 pub fn git_stash_save(repo_path: String, _message: Option<String>) -> Result<(), StashError> {
     let p = Path::new(&repo_path);
     let _repo =
@@ -9,7 +9,7 @@ pub fn git_stash_save(repo_path: String, _message: Option<String>) -> Result<(),
     Ok(())
 }
 
-#[tauri::command]
+#[tauri::command(rename_all = "snake_case")]
 pub fn git_stash_pop(repo_path: String) -> Result<(), StashError> {
     let p = Path::new(&repo_path);
     let _repo =
