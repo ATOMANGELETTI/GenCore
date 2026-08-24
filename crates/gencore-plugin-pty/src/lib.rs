@@ -11,7 +11,8 @@ pub use modules::resize::{ResizeArgs, ResizeError, resize, resize_session};
 pub use modules::session::{
     CloseArgs, OhMyPoshSpawn, OpenArgs, OpenResult, PTY_DATA_EVENT, PTY_EXIT_EVENT, PtyDataPayload,
     PtyExitPayload, SessionError, SessionMap, ShellLaunch, close, is_real_executable, kill_session,
-    open, resolve_oh_my_posh, resolve_shell, shell_launch, spawn_session, strip_verbatim_prefix,
+    open, resolve_custom_command, resolve_micro, resolve_oh_my_posh, resolve_shell, shell_launch,
+    spawn_session, strip_verbatim_prefix,
 };
 
 use std::sync::{Arc, Mutex};

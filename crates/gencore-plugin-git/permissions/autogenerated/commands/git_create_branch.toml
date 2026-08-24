@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-git-create-branch"
+description = "Enables the git_create_branch command without any pre-configured scope."
+commands.allow = ["git_create_branch"]
+
+[[permission]]
+identifier = "deny-git-create-branch"
+description = "Denies the git_create_branch command without any pre-configured scope."
+commands.deny = ["git_create_branch"]

@@ -401,4 +401,29 @@ describe("TerminalProvider session lifecycle", () => {
     session?.registerWriter(tab.id, writer2);
     expect(writer2).not.toHaveBeenCalled();
   });
+
+  it("openEditorTab creates an editor tab and spawns micro with target file", async () => {
+    renderProvider();
+    await liveTab();
+
+    openPty.mockResolvedValueOnce({ session_id: "editor-session" });
+    session?.openEditorTab("C:\\repo\\src\\main.rs");
+
+    await waitFor(() => {
+      expect(session?.tabs).toHaveLength(2);
+      const editorTab = session?.tabs[1];
+      expect(editorTab?.name).toBe("Diff: main.rs");
+      expect(editorTab?.kind).toBe("editor");
+      expect(editorTab?.diffFile).toBe("C:\\repo\\src\\main.rs");
+      expect(editorTab?.command).toEqual(["micro", "C:\\repo\\src\\main.rs"]);
+      expect(editorTab?.sessionId).toBe("editor-session");
+    });
+
+    expect(openPty).toHaveBeenCalledWith(
+      expect.objectContaining({
+        command: ["micro", "C:\\repo\\src\\main.rs"],
+        cwd: "C:\\repo\\src",
+      }),
+    );
+  });
 });

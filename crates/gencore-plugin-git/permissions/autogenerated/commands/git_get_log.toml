@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-git-get-log"
+description = "Enables the git_get_log command without any pre-configured scope."
+commands.allow = ["git_get_log"]
+
+[[permission]]
+identifier = "deny-git-get-log"
+description = "Denies the git_get_log command without any pre-configured scope."
+commands.deny = ["git_get_log"]

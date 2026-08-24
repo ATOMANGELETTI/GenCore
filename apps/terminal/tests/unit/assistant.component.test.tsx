@@ -318,6 +318,51 @@ describe("Assistant", () => {
     expect(screen.queryByText("PTY write")).toBeNull();
   });
 
+  it("titles and formats pending git tool cards (git_stage, git_commit, git_create_branch, git_stash)", async () => {
+    listConversations.mockResolvedValue([CONVERSATION]);
+    const gitTools: AssistantToolCall[] = [
+      {
+        ...PENDING_WRITE,
+        id: "tool-git-1",
+        name: "git_stage",
+        args_json: '{"path":"src/app.tsx"}',
+      },
+      {
+        ...PENDING_WRITE,
+        id: "tool-git-2",
+        name: "git_commit",
+        args_json: '{"message":"feat: add new feature"}',
+      },
+      {
+        ...PENDING_WRITE,
+        id: "tool-git-3",
+        name: "git_create_branch",
+        args_json: '{"branch":"feat/user-ui"}',
+      },
+      {
+        ...PENDING_WRITE,
+        id: "tool-git-4",
+        name: "git_stash",
+        args_json: '{"message":"wip"}',
+      },
+    ];
+    listMessages.mockResolvedValue({ messages: [], pending: gitTools });
+
+    renderAssistant(true);
+
+    expect(await screen.findByText("Git Stage")).toBeVisible();
+    expect(screen.getByText("git add src/app.tsx")).toBeVisible();
+
+    expect(screen.getByText("Git Commit")).toBeVisible();
+    expect(screen.getByText('git commit -m "feat: add new feature"')).toBeVisible();
+
+    expect(screen.getByText("Git Create Branch")).toBeVisible();
+    expect(screen.getByText("git checkout -b feat/user-ui")).toBeVisible();
+
+    expect(screen.getByText("Git Stash")).toBeVisible();
+    expect(screen.getByText('git stash push -m "wip"')).toBeVisible();
+  });
+
   it("renders a compact error row (Nord tokens, no bubbles) after gencore-assistant://error fires (Important 3)", async () => {
     listConversations.mockResolvedValue([CONVERSATION]);
     let onError:

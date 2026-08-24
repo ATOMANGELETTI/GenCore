@@ -310,12 +310,16 @@ function buildOpenArgs(
   theme: ThemeName,
   poshTheme: PoshThemeId,
   cwd?: string | null,
+  command?: readonly string[] | null,
 ): OpenPtyArgs {
-  const base: OpenPtyArgs = { cols, rows, theme, posh_theme: poshTheme };
-  if (cwd) {
-    return { ...base, cwd };
-  }
-  return base;
+  return {
+    cols,
+    rows,
+    theme,
+    posh_theme: poshTheme,
+    ...(cwd ? { cwd } : {}),
+    ...(command && command.length > 0 ? { command } : {}),
+  };
 }
 
 export function TerminalProvider({ children }: { children: React.ReactNode }) {
@@ -552,20 +556,32 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const spawnSession = React.useCallback(
-    async (tabId: string, cwd?: string | null, size?: { cols: number; rows: number }) => {
+    async (
+      tabId: string,
+      cwd?: string | null,
+      size?: { cols: number; rows: number },
+      command?: readonly string[] | null,
+    ) => {
       const generation = bumpSpawn(tabId);
       const { cols: nextCols, rows: nextRows } = size ?? sizeRef.current;
       try {
         let sessionId: string;
         try {
           const opened = await openPty(
-            buildOpenArgs(nextCols, nextRows, themeRef.current, poshThemeRef.current, cwd),
+            buildOpenArgs(nextCols, nextRows, themeRef.current, poshThemeRef.current, cwd, command),
           );
           sessionId = opened.session_id;
         } catch (error) {
           if (cwd && isInvalidCwd(error)) {
             const opened = await openPty(
-              buildOpenArgs(nextCols, nextRows, themeRef.current, poshThemeRef.current, null),
+              buildOpenArgs(
+                nextCols,
+                nextRows,
+                themeRef.current,
+                poshThemeRef.current,
+                null,
+                command,
+              ),
             );
             sessionId = opened.session_id;
           } else {
@@ -618,6 +634,34 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
     setActiveId(tab.id);
     void spawnSession(tab.id);
   }, [spawnSession]);
+
+  const openEditorTab = React.useCallback(
+    (filePath: string, title?: string) => {
+      const fileName = filePath.split(/[/\\]/).pop() || filePath;
+      const tabTitle = title ?? `Diff: ${fileName}`;
+      const lastSlash = Math.max(filePath.lastIndexOf("/"), filePath.lastIndexOf("\\"));
+      const fileDir = lastSlash > 0 ? filePath.slice(0, lastSlash) : null;
+
+      const tab: TerminalTab = {
+        id: crypto.randomUUID(),
+        name: tabTitle,
+        pinned: false,
+        cwd: fileDir,
+        sessionId: null,
+        status: "live",
+        error: null,
+        kind: "editor",
+        diffFile: filePath,
+        command: ["micro", filePath],
+      };
+      const next = [...tabsRef.current, tab];
+      tabsRef.current = next;
+      setTabs(next);
+      setActiveId(tab.id);
+      void spawnSession(tab.id, fileDir, undefined, tab.command);
+    },
+    [spawnSession],
+  );
 
   const closeTab = React.useCallback(
     (id: string) => {
@@ -757,7 +801,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       startupBytesRef.current.delete(id);
       void killSession(tab.sessionId);
       updateTab(id, { sessionId: null, status: "live", error: null });
-      void spawnSession(id, tab.cwd);
+      void spawnSession(id, tab.cwd, undefined, tab.command);
     },
     [bumpSpawn, killSession, spawnSession, updateTab],
   );
@@ -1008,6 +1052,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       rows,
       shellName: DEFAULT_SHELL,
       newTab,
+      openEditorTab,
       closeTab,
       setActive,
       renameTab,
@@ -1034,6 +1079,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       flushSave,
       newTab,
       onTerminalInput,
+      openEditorTab,
       readScrollback,
       registerClipboard,
       registerSerializer,

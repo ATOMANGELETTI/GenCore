@@ -181,6 +181,7 @@ function fakeTerminalSession(overrides: Partial<TerminalSessionApi> = {}): Termi
     rows: 24,
     shellName: "pwsh",
     newTab: vi.fn(),
+    openEditorTab: vi.fn(),
     closeTab: vi.fn(),
     setActive: vi.fn(),
     renameTab: vi.fn(),
@@ -1024,6 +1025,27 @@ describe("applyAssistantUiAction", () => {
       { revealPath },
     );
     expect(revealPath).toHaveBeenCalledWith("C:\\repo");
+  });
+
+  it("handles git_stage, git_commit, git_create_branch, git_stash and calls onGitAction", async () => {
+    const onGitAction = vi.fn();
+    applyAssistantUiAction(
+      { id: "1", name: "git_stage", args: { path: "src/file.ts" } },
+      { onGitAction },
+    );
+    applyAssistantUiAction(
+      { id: "2", name: "git_commit", args: { message: "feat: msg" } },
+      { onGitAction },
+    );
+    applyAssistantUiAction(
+      { id: "3", name: "git_create_branch", args: { branch: "feat/branch" } },
+      { onGitAction },
+    );
+    applyAssistantUiAction(
+      { id: "4", name: "git_stash", args: { message: "stash msg" } },
+      { onGitAction },
+    );
+    expect(onGitAction).not.toThrow();
   });
 
   it("is a no-op for an unknown action name", () => {

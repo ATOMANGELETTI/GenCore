@@ -56,6 +56,36 @@ pub fn shell_launch(omp: Option<&OhMyPoshSpawn>) -> ShellLaunch {
     }
 }
 
+pub fn resolve_custom_command(cmd_vec: &[String], resource_dir: Option<&Path>) -> ShellLaunch {
+    let prog_name = cmd_vec.first().map(|s| s.as_str()).unwrap_or("micro");
+    let program = if prog_name == "micro" || prog_name == "micro.exe" {
+        resolve_micro(resource_dir)
+    } else {
+        find_on_path(prog_name).unwrap_or_else(|| PathBuf::from(prog_name))
+    };
+    let args: Vec<OsString> = cmd_vec.iter().skip(1).map(OsString::from).collect();
+    ShellLaunch {
+        program,
+        args,
+        path: None,
+        posh_theme: None,
+    }
+}
+
+pub fn resolve_micro(resource_dir: Option<&Path>) -> PathBuf {
+    if let Some(res) = resource_dir {
+        for rel in ["micro/micro.exe", "resources/micro/micro.exe"] {
+            let exe = res.join(rel);
+            if is_real_executable(&exe) {
+                return exe;
+            }
+        }
+    }
+    find_on_path("micro")
+        .or_else(|| find_on_path("micro.exe"))
+        .unwrap_or_else(|| PathBuf::from("micro.exe"))
+}
+
 /// Resolves `pwsh` on `PATH` (honoring `PATHEXT` on Windows), else `powershell.exe`.
 ///
 /// Non-functional stub executables (for example uninstalled Windows App Execution

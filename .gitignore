@@ -13,6 +13,7 @@ playwright-report
 **/src-tauri/gen/
 artifacts/
 apps/terminal/src-tauri/resources/oh-my-posh/oh-my-posh.exe
+apps/terminal/src-tauri/resources/micro/micro.exe
 
 # Superpowers generated scratch — keep .superpowers/docs/ tracked
 .superpowers/brainstorm/

@@ -10,6 +10,6 @@ pub use session_map::{
     spawn_session,
 };
 pub use session_shell::{
-    OhMyPoshSpawn, ShellLaunch, is_real_executable, resolve_oh_my_posh, resolve_shell,
-    shell_launch, strip_verbatim_prefix,
+    OhMyPoshSpawn, ShellLaunch, is_real_executable, resolve_custom_command, resolve_micro,
+    resolve_oh_my_posh, resolve_shell, shell_launch, strip_verbatim_prefix,
 };

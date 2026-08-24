@@ -1,0 +1,24 @@
+[package]
+name = "gencore-git"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Git plugin for GenCore using gitoxide."
+links = "gencore-git"
+
+[dependencies]
+tauri = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+gix = { version = "0.87" }
+rfd = { version = "0.17", default-features = false }
+dunce = "1"
+
+[dev-dependencies]
+serde_json = { workspace = true }
+tempfile = "3"
+
+[build-dependencies]
+tauri-plugin = { workspace = true, features = ["build"] }

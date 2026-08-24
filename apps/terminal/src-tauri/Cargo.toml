@@ -22,4 +22,5 @@ gencore-core = { path = "../../../crates/gencore-core" }
 gencore-pty = { path = "../../../crates/gencore-plugin-pty" }
 gencore-fs = { path = "../../../crates/gencore-plugin-fs" }
 gencore-assistant = { path = "../../../crates/gencore-plugin-assistant" }
+gencore-git = { path = "../../../crates/gencore-plugin-git" }
 tauri-plugin-opener = { workspace = true }

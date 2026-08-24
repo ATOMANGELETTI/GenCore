@@ -33,7 +33,7 @@ const GEMINI_API_KEY: &str = "gemini_api_key";
 const NEW_CHAT_TITLE: &str = "New chat";
 const TITLE_CHAR_LIMIT: usize = 48;
 
-const SYSTEM_INSTRUCTIONS: &str = r"You are the GenCore Terminal assistant. Only call tools from the declared set (pty_write, switch_tab, reveal_in_files); propose one action and wait for the user to confirm or reject it before anything runs — you never run a tool or write to the pty yourself. Never claim a command ran unless a tool result says so. Never pass Windows \\?\ verbatim paths into PowerShell. Do not ask the user to paste or share their Gemini API key.";
+const SYSTEM_INSTRUCTIONS: &str = r"You are the GenCore Terminal assistant. Only call tools from the declared set (pty_write, switch_tab, reveal_in_files, git_stage, git_commit, git_create_branch, git_stash); propose one action and wait for the user to confirm or reject it before anything runs — you never run a tool or write to the pty yourself. Never claim a command ran unless a tool result says so. Never pass Windows \\?\ verbatim paths into PowerShell. Do not ask the user to paste or share their Gemini API key.";
 
 /// Result of a tool call that ran (or was applied by the UI) after confirm.
 #[derive(Debug, Clone, PartialEq, serde::Serialize)]
@@ -59,7 +59,8 @@ pub fn confirm_tool(
 
     match call.name.as_str() {
         "pty_write" => confirm_pty_write(store, &call, pty),
-        "switch_tab" | "reveal_in_files" => confirm_ui_action(store, &call),
+        "switch_tab" | "reveal_in_files" | "git_stage" | "git_commit" | "git_create_branch"
+        | "git_stash" => confirm_ui_action(store, &call),
         _ => fail(store, &call, AssistantError::InvalidArgs),
     }
 }

@@ -23,6 +23,9 @@ pub struct OpenArgs {
     /// Oh My Posh prompt theme name: `gencore`, `bubbles`, `iterm2`, `wholespace`, `wopian`, `clean-detailed`, `kali`, or omitted.
     #[serde(default)]
     pub posh_theme: Option<String>,
+    /// Optional command and arguments to launch instead of default shell (e.g. `["micro", "path/to/file"]`).
+    #[serde(default)]
+    pub command: Option<Vec<String>>,
 }
 
 /// Result of a successful [`open`] call.
@@ -42,6 +45,7 @@ pub struct CloseArgs {
 
 /// Opens a new pty session and starts emitting data/exit events.
 #[tauri::command(rename_all = "snake_case")]
+#[allow(clippy::too_many_arguments)]
 pub async fn open<R: Runtime>(
     app: AppHandle<R>,
     state: State<'_, Arc<Mutex<SessionMap>>>,
@@ -50,6 +54,7 @@ pub async fn open<R: Runtime>(
     cwd: Option<String>,
     theme: Option<String>,
     posh_theme: Option<String>,
+    command: Option<Vec<String>>,
 ) -> Result<OpenResult, SessionError> {
     let args = OpenArgs {
         cols,
@@ -57,6 +62,7 @@ pub async fn open<R: Runtime>(
         cwd,
         theme,
         posh_theme,
+        command,
     };
     let resource_dir = app.path().resource_dir().ok();
     let map = Arc::clone(state.inner());

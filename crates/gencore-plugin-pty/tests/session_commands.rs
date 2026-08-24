@@ -51,6 +51,7 @@ fn spawn_session_rejects_invalid_theme() {
             cwd: None,
             theme: Some("nord".into()),
             posh_theme: None,
+            command: None,
         },
         None,
         |_| {},
@@ -70,6 +71,7 @@ fn spawn_session_rejects_invalid_posh_theme() {
             cwd: None,
             theme: None,
             posh_theme: Some("not-a-real-theme".into()),
+            command: None,
         },
         None,
         |_| {},
@@ -89,6 +91,7 @@ fn spawn_session_rejects_invalid_cwd() {
             cwd: Some("C:\\gencore-pty-invalid-cwd-test".into()),
             theme: None,
             posh_theme: None,
+            command: None,
         },
         None,
         |_| {},
@@ -132,6 +135,7 @@ fn open_echo_and_close() {
             cwd: None,
             theme: None,
             posh_theme: None,
+            command: None,
         },
         None,
         move |payload| {
@@ -179,6 +183,7 @@ fn exited_shell_is_reaped_from_the_session_map() {
             cwd: None,
             theme: None,
             posh_theme: None,
+            command: None,
         },
         None,
         move |payload| {
@@ -417,6 +422,7 @@ fn omp_file_spawn_stays_alive_and_echoes() {
             cwd: None,
             theme: None,
             posh_theme: None,
+            command: None,
         },
         Some(dir.clone()),
         move |payload| {
@@ -492,6 +498,23 @@ fn resolve_oh_my_posh_resolves_all_theme_variants() {
     // Fallback if requested theme is missing
     let missing = resolve_oh_my_posh(Some(&temp), Some("polar-night"), Some("wopian")).unwrap();
     assert_eq!(missing.theme, omp.join("gencore-polar-night.omp.json"));
+
+    let _ = std::fs::remove_dir_all(&temp);
+}
+
+#[test]
+fn resolve_custom_command_resolves_micro_from_resources() {
+    let temp = std::env::temp_dir().join(format!("gencore-pty-micro-test-{}", std::process::id()));
+    let micro_dir = temp.join("resources/micro");
+    std::fs::create_dir_all(&micro_dir).unwrap();
+    let micro_exe = micro_dir.join("micro.exe");
+    std::fs::write(&micro_exe, b"MZ").unwrap();
+
+    let launch =
+        gencore_pty::resolve_custom_command(&["micro".into(), "Cargo.toml".into()], Some(&temp));
+    assert_eq!(launch.program, micro_exe);
+    assert_eq!(launch.args.len(), 1);
+    assert_eq!(launch.args[0], "Cargo.toml");
 
     let _ = std::fs::remove_dir_all(&temp);
 }

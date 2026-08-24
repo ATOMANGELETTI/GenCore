@@ -33,16 +33,26 @@ export { useAgentSettings };
 /** Composer draft key for the state before any conversation has been selected. */
 const NEW_CHAT_COMPOSER_KEY = "";
 
+import { readWorkspaceFolder } from "../files/files.storage";
+import {
+  gitCommit,
+  gitCreateBranch,
+  gitStageAll,
+  gitStageFile,
+  gitStashSave,
+} from "../ipc/ipc.git";
+
 /**
  * Applies a `gencore-assistant://ui-action` payload emitted after the user
- * confirms `switch_tab` or `reveal_in_files`. Unknown action names and
- * malformed args are silent no-ops; the tool already ran on the Rust side.
+ * confirms `switch_tab`, `reveal_in_files`, or Git tools. Unknown action names
+ * and malformed args are silent no-ops; the tool already ran on the Rust side.
  */
 export function applyAssistantUiAction(
   payload: AssistantUiActionPayload,
   handlers: {
     setActive?: (id: string) => void;
     revealPath?: (path: string) => void;
+    onGitAction?: () => void;
   },
 ): void {
   const args = payload.args as Record<string, unknown> | null;
@@ -58,6 +68,42 @@ export function applyAssistantUiAction(
     if (path) {
       handlers.revealPath?.(path);
     }
+    return;
+  }
+
+  const folder = readWorkspaceFolder();
+  if (!folder) return;
+
+  if (payload.name === "git_stage") {
+    if (typeof args?.path === "string") {
+      void gitStageFile(folder, args.path).then(() => handlers.onGitAction?.());
+    } else if (Array.isArray(args?.paths) && args.paths.length > 0) {
+      void Promise.all(
+        args.paths
+          .filter((p): p is string => typeof p === "string")
+          .map((p) => gitStageFile(folder, p)),
+      ).then(() => handlers.onGitAction?.());
+    } else {
+      void gitStageAll(folder).then(() => handlers.onGitAction?.());
+    }
+    return;
+  }
+  if (payload.name === "git_commit") {
+    const msg = typeof args?.message === "string" ? args.message : "Commit from assistant";
+    void gitCommit(folder, msg).then(() => handlers.onGitAction?.());
+    return;
+  }
+  if (payload.name === "git_create_branch") {
+    const branch = typeof args?.branch === "string" ? args.branch : null;
+    if (branch) {
+      void gitCreateBranch(folder, branch).then(() => handlers.onGitAction?.());
+    }
+    return;
+  }
+  if (payload.name === "git_stash") {
+    const msg = typeof args?.message === "string" ? args.message : undefined;
+    void gitStashSave(folder, msg).then(() => handlers.onGitAction?.());
+    return;
   }
 }
 

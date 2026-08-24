@@ -140,6 +140,52 @@ pub fn function_declarations() -> Value {
                         },
                         "required": ["path"]
                     }
+                },
+                {
+                    "name": "git_stage",
+                    "description": "Stages files for commit in the active git repository. The user must confirm before this runs.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "path": { "type": "string" },
+                            "paths": {
+                                "type": "array",
+                                "items": { "type": "string" }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "git_commit",
+                    "description": "Commits staged changes in the active git repository. The user must confirm before this runs.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "message": { "type": "string" }
+                        },
+                        "required": ["message"]
+                    }
+                },
+                {
+                    "name": "git_create_branch",
+                    "description": "Creates and checks out a new git branch in the active repository. The user must confirm before this runs.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "branch": { "type": "string" }
+                        },
+                        "required": ["branch"]
+                    }
+                },
+                {
+                    "name": "git_stash",
+                    "description": "Stashes current working changes in the active git repository. The user must confirm before this runs.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "message": { "type": "string" }
+                        }
+                    }
                 }
             ]
         }

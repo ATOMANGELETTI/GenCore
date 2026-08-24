@@ -12,7 +12,7 @@ use uuid::Uuid;
 
 use super::session_api::OpenArgs;
 use super::session_error::SessionError;
-use super::session_shell::{resolve_oh_my_posh, shell_launch};
+use super::session_shell::{resolve_custom_command, resolve_oh_my_posh, shell_launch};
 
 /// Event name for raw pty output chunks (standard base64).
 pub const PTY_DATA_EVENT: &str = "gencore-pty://data";
@@ -88,12 +88,16 @@ pub fn spawn_session(
         })
         .map_err(|err| SessionError::SpawnFailed(err.to_string()))?;
 
-    let omp = resolve_oh_my_posh(
-        resource_dir.as_deref(),
-        args.theme.as_deref(),
-        args.posh_theme.as_deref(),
-    );
-    let launch = shell_launch(omp.as_ref());
+    let launch = if let Some(ref custom_cmd) = args.command {
+        resolve_custom_command(custom_cmd, resource_dir.as_deref())
+    } else {
+        let omp = resolve_oh_my_posh(
+            resource_dir.as_deref(),
+            args.theme.as_deref(),
+            args.posh_theme.as_deref(),
+        );
+        shell_launch(omp.as_ref())
+    };
     let mut cmd = CommandBuilder::new(&launch.program);
     for arg in &launch.args {
         cmd.arg(arg);

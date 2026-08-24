@@ -5,6 +5,7 @@ members = [
     "crates/gencore-plugin-pty",
     "crates/gencore-plugin-fs",
     "crates/gencore-plugin-assistant",
+    "crates/gencore-plugin-git",
     "apps/terminal/src-tauri",
     "apps/explorer/src-tauri",
 ]

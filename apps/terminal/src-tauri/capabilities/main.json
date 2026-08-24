@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/tauri-v2.11.1/crates/tauri-schema-generator/schemas/capability.schema.json",
   "identifier": "main",
-  "description": "Least-privilege capabilities for the GenCore Terminal main window: core window chrome controls, OS window theme, app-info, read-only system telemetry, pinned-tab load/save, scoped gencore-fs list/create/watch for the file tree, scoped gencore-pty open/write/resize/close, scoped open-url for the GenCore GitHub repo only, and scoped gencore-assistant conversation/turn/settings commands for the Gemini assistant panel.",
+  "description": "Least-privilege capabilities for the GenCore Terminal main window: core window chrome controls, OS window theme, app-info, read-only system telemetry, pinned-tab load/save, scoped gencore-fs list/create/watch for the file tree, scoped gencore-pty open/write/resize/close, scoped open-url for the GenCore GitHub repo only, scoped gencore-assistant conversation/turn/settings commands for the Gemini assistant panel, and scoped gencore-git commands for the Source Control panel.",
   "windows": ["main"],
   "permissions": [
     "core:window:allow-close",
@@ -40,6 +40,22 @@
     "gencore-assistant:allow-get-agent-settings",
     "gencore-assistant:allow-set-agent-settings",
     "gencore-assistant:allow-set-api-key",
-    "gencore-assistant:allow-clear-api-key"
+    "gencore-assistant:allow-clear-api-key",
+    "gencore-git:allow-git-get-status",
+    "gencore-git:allow-git-init-repo",
+    "gencore-git:allow-git-stage-file",
+    "gencore-git:allow-git-unstage-file",
+    "gencore-git:allow-git-stage-all",
+    "gencore-git:allow-git-unstage-all",
+    "gencore-git:allow-git-discard-changes",
+    "gencore-git:allow-git-commit",
+    "gencore-git:allow-git-list-branches",
+    "gencore-git:allow-git-checkout-branch",
+    "gencore-git:allow-git-create-branch",
+    "gencore-git:allow-git-get-diff",
+    "gencore-git:allow-git-get-log",
+    "gencore-git:allow-git-pick-folder",
+    "gencore-git:allow-git-stash-save",
+    "gencore-git:allow-git-stash-pop"
   ]
 }

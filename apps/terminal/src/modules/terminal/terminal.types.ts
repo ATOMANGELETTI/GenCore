@@ -29,6 +29,9 @@ export interface TerminalTab {
   sessionId: string | null;
   status: TerminalTabStatus;
   error: string | null;
+  kind?: "shell" | "editor";
+  diffFile?: string;
+  command?: readonly string[];
   restore?: {
     scrollback: string;
     cols: number;
@@ -50,6 +53,7 @@ export interface TerminalSessionApi {
   rows: number;
   shellName: ShellName;
   newTab: () => void;
+  openEditorTab: (filePath: string, title?: string) => void;
   closeTab: (id: string) => void;
   setActive: (id: string) => void;
   renameTab: (id: string, name: string | null) => void;

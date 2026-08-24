@@ -22,5 +22,14 @@
   "0c462383-e2e5-4799-a193-64afb1ce8785": {
     "members": ["apps/terminal"],
     "testReminderSent": true
+  },
+  "69ff43f1-b92d-4971-b86a-2223c9a66762": {
+    "members": [
+      "crates/gencore-plugin-git",
+      "apps/terminal",
+      "crates/gencore-plugin-pty",
+      "crates/gencore-plugin-assistant"
+    ],
+    "testReminderSent": true
   }
 }

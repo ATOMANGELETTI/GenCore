@@ -19,6 +19,7 @@ pub fn run() {
         .plugin(gencore_pty::init())
         .plugin(gencore_assistant::init())
         .plugin(gencore_fs::init())
+        .plugin(gencore_git::init())
         .plugin(tauri_plugin_opener::init())
         .setup(setup)
         .run(tauri::generate_context!())

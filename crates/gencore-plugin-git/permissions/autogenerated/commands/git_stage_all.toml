@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-git-stage-all"
+description = "Enables the git_stage_all command without any pre-configured scope."
+commands.allow = ["git_stage_all"]
+
+[[permission]]
+identifier = "deny-git-stage-all"
+description = "Denies the git_stage_all command without any pre-configured scope."
+commands.deny = ["git_stage_all"]

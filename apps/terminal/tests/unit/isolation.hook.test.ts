@@ -358,6 +358,22 @@ describe("terminal isolation hook", () => {
       "gencore-assistant:allow-set-agent-settings",
       "gencore-assistant:allow-set-api-key",
       "gencore-assistant:allow-clear-api-key",
+      "gencore-git:allow-git-get-status",
+      "gencore-git:allow-git-init-repo",
+      "gencore-git:allow-git-stage-file",
+      "gencore-git:allow-git-unstage-file",
+      "gencore-git:allow-git-stage-all",
+      "gencore-git:allow-git-unstage-all",
+      "gencore-git:allow-git-discard-changes",
+      "gencore-git:allow-git-commit",
+      "gencore-git:allow-git-list-branches",
+      "gencore-git:allow-git-checkout-branch",
+      "gencore-git:allow-git-create-branch",
+      "gencore-git:allow-git-get-diff",
+      "gencore-git:allow-git-get-log",
+      "gencore-git:allow-git-pick-folder",
+      "gencore-git:allow-git-stash-save",
+      "gencore-git:allow-git-stash-pop",
     ]);
 
     const permissionText = JSON.stringify(capability.permissions);
@@ -794,6 +810,30 @@ describe("terminal isolation hook", () => {
     ).toThrow();
   });
 
+  it("reconstructs open with command array", () => {
+    const hook = getHook();
+    const inner = {
+      cols: 80,
+      rows: 24,
+      cwd: "C:\\work",
+      command: ["micro", "C:\\work\\test.txt"],
+    };
+    const result = hook(envelope(PTY_OPEN_CMD, inner));
+    expect(result.payload).toEqual({
+      cols: 80,
+      rows: 24,
+      cwd: "C:\\work",
+      command: ["micro", "C:\\work\\test.txt"],
+    });
+  });
+
+  it("throws for open with invalid command array", () => {
+    const hook = getHook();
+    expect(() =>
+      hook(envelope(PTY_OPEN_CMD, { cols: 80, rows: 24, command: "not-an-array" })),
+    ).toThrow();
+  });
+
   it("reconstructs write as session_id and data", () => {
     const hook = getHook();
     const inner = { session_id: "session-1", data: "hi" };
@@ -1221,6 +1261,34 @@ describe("terminal isolation hook", () => {
       'gencore-assistant = { path = "../../../crates/gencore-plugin-assistant" }',
     );
     expect(libRsSource).toContain("gencore_assistant::init()");
+  });
+
+  it("registers gencore-git so capability grants resolve at build time", () => {
+    expect(cargoTomlSource).toContain(
+      'gencore-git = { path = "../../../crates/gencore-plugin-git" }',
+    );
+    expect(libRsSource).toContain("gencore_git::init()");
+  });
+
+  it("allowlists the 16 gencore-git commands", () => {
+    const hook = getHook();
+    expect(hook(envelope("plugin:gencore-git|git_pick_folder")).cmd).toBe(
+      "plugin:gencore-git|git_pick_folder",
+    );
+    expect(hook(envelope("plugin:gencore-git|git_get_status", { path: "C:\\repo" })).cmd).toBe(
+      "plugin:gencore-git|git_get_status",
+    );
+    expect(hook(envelope("plugin:gencore-git|git_init_repo", { path: "C:\\repo" })).cmd).toBe(
+      "plugin:gencore-git|git_init_repo",
+    );
+    expect(
+      hook(
+        envelope("plugin:gencore-git|git_stage_file", {
+          repo_path: "C:\\repo",
+          file_path: "a.txt",
+        }),
+      ).cmd,
+    ).toBe("plugin:gencore-git|git_stage_file");
   });
 
   it("loads the isolation script from head", () => {

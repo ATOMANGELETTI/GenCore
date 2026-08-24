@@ -11,6 +11,8 @@
 //   - event listen/unlisten for gencore-fs://entry-changed (Any),
 //     gencore-pty://data (Any), gencore-pty://exit (Any), and
 //     tauri://theme-changed (Window main or tray-menu) only
+//   - gencore-assistant conversation/message/turn/settings/secrets commands
+//   - gencore-git status/init/stage/unstage/commit/branch/diff/graph/stash commands
 (() => {
   const ALLOWED_COMMANDS = [
     "plugin:gencore-core|get_app_info",
@@ -48,6 +50,22 @@
     "plugin:gencore-assistant|set_agent_settings",
     "plugin:gencore-assistant|set_api_key",
     "plugin:gencore-assistant|clear_api_key",
+    "plugin:gencore-git|git_get_status",
+    "plugin:gencore-git|git_init_repo",
+    "plugin:gencore-git|git_stage_file",
+    "plugin:gencore-git|git_unstage_file",
+    "plugin:gencore-git|git_stage_all",
+    "plugin:gencore-git|git_unstage_all",
+    "plugin:gencore-git|git_discard_changes",
+    "plugin:gencore-git|git_commit",
+    "plugin:gencore-git|git_list_branches",
+    "plugin:gencore-git|git_checkout_branch",
+    "plugin:gencore-git|git_create_branch",
+    "plugin:gencore-git|git_get_diff",
+    "plugin:gencore-git|git_get_log",
+    "plugin:gencore-git|git_pick_folder",
+    "plugin:gencore-git|git_stash_save",
+    "plugin:gencore-git|git_stash_pop",
   ];
   const OPEN_URL_CMD = "plugin:opener|open_url";
   const GET_APP_INFO_CMD = "plugin:gencore-core|get_app_info";
@@ -103,20 +121,37 @@
   const ASSISTANT_ID_MAX_LENGTH = 64;
   const API_KEY_MAX_LENGTH = 4096;
   const OUTPUT_EXCERPT_MAX_LENGTH = 65536;
-  // Same cap as `output_excerpt` — `send_message.text` is free-form user
-  // input with no other length constraint from Rust's `SendMessageArgs`.
   const SEND_MESSAGE_TEXT_MAX_LENGTH = 65536;
   const SNAPSHOT_TAB_ID_MAX_LENGTH = 256;
   const CONTEXT_LINES_MIN = 20;
   const CONTEXT_LINES_MAX = 200;
-  // Exact Gemini Developer API model IDs offered in Config. Mirrors
-  // `gencore_assistant::modules::secrets::secrets_api::ALLOWED_MODELS`.
   const ALLOWED_MODELS = [
     "gemini-3.7-flash",
     "gemini-3.5-flash",
     "gemini-3.5-flash-lite",
     "gemini-3.1-pro-preview",
   ];
+
+  // Git command constants
+  const GIT_GET_STATUS_CMD = "plugin:gencore-git|git_get_status";
+  const GIT_INIT_REPO_CMD = "plugin:gencore-git|git_init_repo";
+  const GIT_STAGE_FILE_CMD = "plugin:gencore-git|git_stage_file";
+  const GIT_UNSTAGE_FILE_CMD = "plugin:gencore-git|git_unstage_file";
+  const GIT_STAGE_ALL_CMD = "plugin:gencore-git|git_stage_all";
+  const GIT_UNSTAGE_ALL_CMD = "plugin:gencore-git|git_unstage_all";
+  const GIT_DISCARD_CHANGES_CMD = "plugin:gencore-git|git_discard_changes";
+  const GIT_COMMIT_CMD = "plugin:gencore-git|git_commit";
+  const GIT_LIST_BRANCHES_CMD = "plugin:gencore-git|git_list_branches";
+  const GIT_CHECKOUT_BRANCH_CMD = "plugin:gencore-git|git_checkout_branch";
+  const GIT_CREATE_BRANCH_CMD = "plugin:gencore-git|git_create_branch";
+  const GIT_GET_DIFF_CMD = "plugin:gencore-git|git_get_diff";
+  const GIT_GET_LOG_CMD = "plugin:gencore-git|git_get_log";
+  const GIT_PICK_FOLDER_CMD = "plugin:gencore-git|git_pick_folder";
+  const GIT_STASH_SAVE_CMD = "plugin:gencore-git|git_stash_save";
+  const GIT_STASH_POP_CMD = "plugin:gencore-git|git_stash_pop";
+
+  const GIT_BRANCH_NAME_MAX_LENGTH = 256;
+  const GIT_COMMIT_MESSAGE_MAX_LENGTH = 65536;
 
   function isPlainObject(value) {
     return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -137,7 +172,8 @@
       cmd === LIST_CONVERSATIONS_CMD ||
       cmd === CREATE_CONVERSATION_CMD ||
       cmd === GET_AGENT_SETTINGS_CMD ||
-      cmd === CLEAR_API_KEY_CMD
+      cmd === CLEAR_API_KEY_CMD ||
+      cmd === GIT_PICK_FOLDER_CMD
     );
   }
 
@@ -197,7 +233,12 @@
 
   function isFsPathCommand(cmd) {
     return (
-      cmd === LIST_CMD || cmd === CREATE_FILE_CMD || cmd === CREATE_DIR_CMD || cmd === UNWATCH_CMD
+      cmd === LIST_CMD ||
+      cmd === CREATE_FILE_CMD ||
+      cmd === CREATE_DIR_CMD ||
+      cmd === UNWATCH_CMD ||
+      cmd === GIT_GET_STATUS_CMD ||
+      cmd === GIT_INIT_REPO_CMD
     );
   }
 
@@ -250,9 +291,6 @@
     return value === THEME_POLAR_NIGHT || value === THEME_SNOW_STORM;
   }
 
-  // Mirrors `PoshThemeId` (config.types.ts) and Rust's `validate_posh_theme`
-  // (session_map.rs) so the isolation hook and the Rust command agree on the
-  // exact same set of Oh My Posh prompt theme ids.
   function isPoshTheme(value) {
     return (
       value === "gencore" ||
@@ -275,6 +313,7 @@
     let hasCwd = false;
     let hasTheme = false;
     let hasPoshTheme = false;
+    let hasCommand = false;
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
       if (key === "cols") {
@@ -297,6 +336,10 @@
         hasPoshTheme = true;
         continue;
       }
+      if (key === "command") {
+        hasCommand = true;
+        continue;
+      }
       return false;
     }
     if (!hasCols || !hasRows || !isDimension(args.cols) || !isDimension(args.rows)) {
@@ -309,6 +352,16 @@
       return false;
     }
     if (hasPoshTheme && !isPoshTheme(args.posh_theme)) {
+      return false;
+    }
+    if (
+      hasCommand &&
+      (!Array.isArray(args.command) ||
+        args.command.length > 32 ||
+        !args.command.every(
+          (item) => typeof item === "string" && item.length >= 1 && item.length <= PATH_MAX_LENGTH,
+        ))
+    ) {
       return false;
     }
     return true;
@@ -678,6 +731,231 @@
     );
   }
 
+  // -------------------------------------------------------------------------
+  // Git validators
+  // -------------------------------------------------------------------------
+
+  function isGitRepoPathCommand(cmd) {
+    return (
+      cmd === GIT_STAGE_ALL_CMD || cmd === GIT_UNSTAGE_ALL_CMD || cmd === GIT_LIST_BRANCHES_CMD
+    );
+  }
+
+  function isGitRepoPathOnlyArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    return keys.length === 1 && keys[0] === "repo_path" && isAllowedPath(args.repo_path);
+  }
+
+  function isGitFilePathCommand(cmd) {
+    return (
+      cmd === GIT_STAGE_FILE_CMD ||
+      cmd === GIT_UNSTAGE_FILE_CMD ||
+      cmd === GIT_DISCARD_CHANGES_CMD ||
+      cmd === GIT_GET_DIFF_CMD
+    );
+  }
+
+  function isGitFilePathArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    if (keys.length !== 2) {
+      return false;
+    }
+    let hasRepoPath = false;
+    let hasFilePath = false;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key === "repo_path") {
+        hasRepoPath = true;
+        continue;
+      }
+      if (key === "file_path") {
+        hasFilePath = true;
+        continue;
+      }
+      return false;
+    }
+    return (
+      hasRepoPath && hasFilePath && isAllowedPath(args.repo_path) && isAllowedPath(args.file_path)
+    );
+  }
+
+  function isGitBranchCommand(cmd) {
+    return cmd === GIT_CHECKOUT_BRANCH_CMD || cmd === GIT_CREATE_BRANCH_CMD;
+  }
+
+  function isGitBranchArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    if (keys.length !== 2) {
+      return false;
+    }
+    let hasRepoPath = false;
+    let hasName = false;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key === "repo_path") {
+        hasRepoPath = true;
+        continue;
+      }
+      if (key === "name") {
+        hasName = true;
+        continue;
+      }
+      return false;
+    }
+    return (
+      hasRepoPath &&
+      hasName &&
+      isAllowedPath(args.repo_path) &&
+      typeof args.name === "string" &&
+      args.name.length >= 1 &&
+      args.name.length <= GIT_BRANCH_NAME_MAX_LENGTH
+    );
+  }
+
+  function isGitCommitArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    let hasRepoPath = false;
+    let hasMessage = false;
+    let hasAmend = false;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key === "repo_path") {
+        hasRepoPath = true;
+        continue;
+      }
+      if (key === "message") {
+        hasMessage = true;
+        continue;
+      }
+      if (key === "amend") {
+        hasAmend = true;
+        continue;
+      }
+      return false;
+    }
+    if (!hasRepoPath || !hasMessage || !isAllowedPath(args.repo_path)) {
+      return false;
+    }
+    if (
+      typeof args.message !== "string" ||
+      args.message.length < 1 ||
+      args.message.length > GIT_COMMIT_MESSAGE_MAX_LENGTH
+    ) {
+      return false;
+    }
+    if (hasAmend && typeof args.amend !== "boolean") {
+      return false;
+    }
+    return true;
+  }
+
+  function isGitGetLogArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    let hasRepoPath = false;
+    let hasLimit = false;
+    let hasSkip = false;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key === "repo_path") {
+        hasRepoPath = true;
+        continue;
+      }
+      if (key === "limit") {
+        hasLimit = true;
+        continue;
+      }
+      if (key === "skip") {
+        hasSkip = true;
+        continue;
+      }
+      return false;
+    }
+    if (!hasRepoPath || !isAllowedPath(args.repo_path)) {
+      return false;
+    }
+    if (hasLimit && (!isFiniteNumber(args.limit) || args.limit < 1 || args.limit > 1000)) {
+      return false;
+    }
+    if (hasSkip && (!isFiniteNumber(args.skip) || args.skip < 0)) {
+      return false;
+    }
+    return true;
+  }
+
+  function isGitStashSaveArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    let hasRepoPath = false;
+    let hasMessage = false;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key === "repo_path") {
+        hasRepoPath = true;
+        continue;
+      }
+      if (key === "message") {
+        hasMessage = true;
+        continue;
+      }
+      return false;
+    }
+    if (!hasRepoPath || !isAllowedPath(args.repo_path)) {
+      return false;
+    }
+    if (
+      hasMessage &&
+      (typeof args.message !== "string" || args.message.length > GIT_COMMIT_MESSAGE_MAX_LENGTH)
+    ) {
+      return false;
+    }
+    return true;
+  }
+
+  function isGitStashPopArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    let hasRepoPath = false;
+    let hasIndex = false;
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (key === "repo_path") {
+        hasRepoPath = true;
+        continue;
+      }
+      if (key === "index") {
+        hasIndex = true;
+        continue;
+      }
+      return false;
+    }
+    if (!hasRepoPath || !isAllowedPath(args.repo_path)) {
+      return false;
+    }
+    if (hasIndex && (!isFiniteNumber(args.index) || args.index < 0)) {
+      return false;
+    }
+    return true;
+  }
+
   function isAllowedWindowLabel(label) {
     return label === MAIN_WINDOW_LABEL || label === TRAY_MENU_WINDOW_LABEL;
   }
@@ -814,6 +1092,9 @@
     if (typeof args.posh_theme === "string") {
       payload.posh_theme = args.posh_theme;
     }
+    if (Array.isArray(args.command)) {
+      payload.command = args.command.slice();
+    }
     return payload;
   }
 
@@ -869,6 +1150,41 @@
     return result;
   }
 
+  function reconstructGitCommit(args) {
+    const result = { repo_path: args.repo_path, message: args.message };
+    if (typeof args.amend === "boolean") {
+      result.amend = args.amend;
+    }
+    return result;
+  }
+
+  function reconstructGitGetLog(args) {
+    const result = { repo_path: args.repo_path };
+    if (typeof args.limit === "number") {
+      result.limit = args.limit;
+    }
+    if (typeof args.skip === "number") {
+      result.skip = args.skip;
+    }
+    return result;
+  }
+
+  function reconstructGitStashSave(args) {
+    const result = { repo_path: args.repo_path };
+    if (typeof args.message === "string") {
+      result.message = args.message;
+    }
+    return result;
+  }
+
+  function reconstructGitStashPop(args) {
+    const result = { repo_path: args.repo_path };
+    if (typeof args.index === "number") {
+      result.index = args.index;
+    }
+    return result;
+  }
+
   function reconstructListen(args) {
     if (args.event === THEME_CHANGED_EVENT) {
       return {
@@ -892,8 +1208,6 @@
         handler: args.handler,
       };
     }
-    // Every allowed event is enumerated above. Never default an unknown
-    // event through to entry-changed (or any other event) — reject it.
     return reject();
   }
 
@@ -915,6 +1229,27 @@
     }
     if (isFsPathCommand(cmd)) {
       return { path: args.path };
+    }
+    if (isGitRepoPathCommand(cmd)) {
+      return { repo_path: args.repo_path };
+    }
+    if (isGitFilePathCommand(cmd)) {
+      return { repo_path: args.repo_path, file_path: args.file_path };
+    }
+    if (isGitBranchCommand(cmd)) {
+      return { repo_path: args.repo_path, name: args.name };
+    }
+    if (cmd === GIT_COMMIT_CMD) {
+      return reconstructGitCommit(args);
+    }
+    if (cmd === GIT_GET_LOG_CMD) {
+      return reconstructGitGetLog(args);
+    }
+    if (cmd === GIT_STASH_SAVE_CMD) {
+      return reconstructGitStashSave(args);
+    }
+    if (cmd === GIT_STASH_POP_CMD) {
+      return reconstructGitStashPop(args);
     }
     if (cmd === WATCH_CMD) {
       return { path: args.path, recursive: false };
@@ -1005,6 +1340,34 @@
       }
     } else if (isFsPathCommand(payload.cmd)) {
       if (!isPathOnlyArgs(payload.payload)) {
+        reject();
+      }
+    } else if (isGitRepoPathCommand(payload.cmd)) {
+      if (!isGitRepoPathOnlyArgs(payload.payload)) {
+        reject();
+      }
+    } else if (isGitFilePathCommand(payload.cmd)) {
+      if (!isGitFilePathArgs(payload.payload)) {
+        reject();
+      }
+    } else if (isGitBranchCommand(payload.cmd)) {
+      if (!isGitBranchArgs(payload.payload)) {
+        reject();
+      }
+    } else if (payload.cmd === GIT_COMMIT_CMD) {
+      if (!isGitCommitArgs(payload.payload)) {
+        reject();
+      }
+    } else if (payload.cmd === GIT_GET_LOG_CMD) {
+      if (!isGitGetLogArgs(payload.payload)) {
+        reject();
+      }
+    } else if (payload.cmd === GIT_STASH_SAVE_CMD) {
+      if (!isGitStashSaveArgs(payload.payload)) {
+        reject();
+      }
+    } else if (payload.cmd === GIT_STASH_POP_CMD) {
+      if (!isGitStashPopArgs(payload.payload)) {
         reject();
       }
     } else if (payload.cmd === WATCH_CMD) {

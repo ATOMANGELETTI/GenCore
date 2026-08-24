@@ -43,6 +43,7 @@ export interface OpenPtyArgs {
   readonly cwd?: string;
   readonly theme?: "polar-night" | "snow-storm";
   readonly posh_theme?: PoshThemeId;
+  readonly command?: readonly string[];
 }
 
 /** Mirrors `gencore_pty::OpenResult`. */
@@ -197,4 +198,69 @@ export interface AssistantUiActionPayload {
   readonly id: string;
   readonly name: string;
   readonly args: unknown;
+}
+
+// ---------------------------------------------------------------------------
+// Git & Source Control Types
+// ---------------------------------------------------------------------------
+
+/** Mirrors `gencore_git::GitFileStatus`. */
+export interface GitFileStatus {
+  readonly path: string;
+  readonly status: string;
+  readonly additions: number;
+  readonly deletions: number;
+}
+
+/** Mirrors `gencore_git::GitStatusResult`. */
+export interface GitStatusResult {
+  readonly is_repo: boolean;
+  readonly root_path: string | null;
+  readonly branch: string | null;
+  readonly upstream: string | null;
+  readonly ahead: number;
+  readonly behind: number;
+  readonly staged: readonly GitFileStatus[];
+  readonly unstaged: readonly GitFileStatus[];
+  readonly untracked: readonly string[];
+  readonly conflicted: readonly string[];
+}
+
+/** Mirrors `gencore_git::GitInitResult`. */
+export interface GitInitResult {
+  readonly root_path: string;
+  readonly default_branch: string;
+}
+
+/** Mirrors `gencore_git::GitCommitResult`. */
+export interface GitCommitResult {
+  readonly id: string;
+  readonly short_id: string;
+  readonly summary: string;
+}
+
+/** Mirrors `gencore_git::GitBranchInfo`. */
+export interface GitBranchInfo {
+  readonly name: string;
+  readonly is_current: boolean;
+  readonly is_remote: boolean;
+}
+
+/** Mirrors `gencore_git::GitDiffResult`. */
+export interface GitDiffResult {
+  readonly path: string;
+  readonly head_content: string;
+  readonly working_content: string;
+}
+
+/** Mirrors `gencore_git::GitCommitNode`. */
+export interface GitCommitNode {
+  readonly id: string;
+  readonly short_id: string;
+  readonly summary: string;
+  readonly author_name: string;
+  readonly author_email: string;
+  readonly timestamp: number;
+  readonly parents: readonly string[];
+  readonly refs: readonly string[];
 }

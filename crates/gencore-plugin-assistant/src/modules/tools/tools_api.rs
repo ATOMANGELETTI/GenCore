@@ -30,6 +30,30 @@ struct RevealInFilesArgs {
     path: String,
 }
 
+#[derive(Deserialize)]
+struct GitStageArgs {
+    #[serde(default)]
+    path: Option<String>,
+    #[serde(default)]
+    paths: Option<Vec<String>>,
+}
+
+#[derive(Deserialize)]
+struct GitCommitArgs {
+    message: String,
+}
+
+#[derive(Deserialize)]
+struct GitCreateBranchArgs {
+    branch: String,
+}
+
+#[derive(Deserialize)]
+struct GitStashArgs {
+    #[serde(default)]
+    message: Option<String>,
+}
+
 /// Extracts the `data` field from a `pty_write` tool call's `args_json`.
 ///
 /// Any `session_id` key present is ignored (serde drops unknown fields by
@@ -41,7 +65,7 @@ pub(crate) fn parse_pty_write_data(args_json: &str) -> Result<String, AssistantE
         .map_err(|_| AssistantError::InvalidArgs)
 }
 
-/// Builds the `ui_action` payload for `switch_tab` or `reveal_in_files`.
+/// Builds the `ui_action` payload for `switch_tab`, `reveal_in_files`, or Git tools.
 ///
 /// Returns [`AssistantError::InvalidArgs`] for any other `name`, or if the
 /// known name's `args_json` is missing its required field.
@@ -61,6 +85,38 @@ pub(crate) fn build_ui_action(name: &str, args_json: &str) -> Result<UiAction, A
             Ok(UiAction {
                 name: name.to_string(),
                 args: json!({ "path": args.path }),
+            })
+        }
+        "git_stage" => {
+            let args: GitStageArgs =
+                serde_json::from_str(args_json).map_err(|_| AssistantError::InvalidArgs)?;
+            Ok(UiAction {
+                name: name.to_string(),
+                args: json!({ "path": args.path, "paths": args.paths }),
+            })
+        }
+        "git_commit" => {
+            let args: GitCommitArgs =
+                serde_json::from_str(args_json).map_err(|_| AssistantError::InvalidArgs)?;
+            Ok(UiAction {
+                name: name.to_string(),
+                args: json!({ "message": args.message }),
+            })
+        }
+        "git_create_branch" => {
+            let args: GitCreateBranchArgs =
+                serde_json::from_str(args_json).map_err(|_| AssistantError::InvalidArgs)?;
+            Ok(UiAction {
+                name: name.to_string(),
+                args: json!({ "branch": args.branch }),
+            })
+        }
+        "git_stash" => {
+            let args: GitStashArgs =
+                serde_json::from_str(args_json).map_err(|_| AssistantError::InvalidArgs)?;
+            Ok(UiAction {
+                name: name.to_string(),
+                args: json!({ "message": args.message }),
             })
         }
         _ => Err(AssistantError::InvalidArgs),

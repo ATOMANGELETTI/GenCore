@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-git-get-status"
+description = "Enables the git_get_status command without any pre-configured scope."
+commands.allow = ["git_get_status"]
+
+[[permission]]
+identifier = "deny-git-get-status"
+description = "Denies the git_get_status command without any pre-configured scope."
+commands.deny = ["git_get_status"]

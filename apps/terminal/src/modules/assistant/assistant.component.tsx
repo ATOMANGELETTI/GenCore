@@ -20,20 +20,43 @@ const PENDING_TITLES: Record<string, string> = {
   pty_write: "PTY write",
   switch_tab: "Switch tab",
   reveal_in_files: "Reveal in Files",
+  git_stage: "Git Stage",
+  git_commit: "Git Commit",
+  git_create_branch: "Git Create Branch",
+  git_stash: "Git Stash",
 };
 
 function titleForToolName(name: string): string {
   return PENDING_TITLES[name] ?? name;
 }
 
-function commandFromArgs(argsJson: string): string {
+function commandFromArgs(callName: string, argsJson: string): string {
   try {
-    const parsed = JSON.parse(argsJson) as { data?: unknown };
+    const parsed = JSON.parse(argsJson) as Record<string, unknown>;
+    if (callName === "pty_write" && typeof parsed.data === "string") {
+      return parsed.data;
+    }
+    if (callName === "git_stage") {
+      if (typeof parsed.path === "string") return `git add ${parsed.path}`;
+      if (Array.isArray(parsed.paths)) return `git add ${parsed.paths.join(" ")}`;
+      return "git add .";
+    }
+    if (callName === "git_commit" && typeof parsed.message === "string") {
+      return `git commit -m "${parsed.message}"`;
+    }
+    if (callName === "git_create_branch" && typeof parsed.branch === "string") {
+      return `git checkout -b ${parsed.branch}`;
+    }
+    if (callName === "git_stash") {
+      return typeof parsed.message === "string"
+        ? `git stash push -m "${parsed.message}"`
+        : "git stash";
+    }
     if (typeof parsed.data === "string") {
       return parsed.data;
     }
   } catch {
-    // Show the raw payload when it is not a pty_write data object.
+    // Show the raw payload when it is not a valid JSON object.
   }
   return argsJson;
 }
@@ -78,7 +101,7 @@ function PendingGroup({
         </div>
       </div>
       <p className="border-t border-border px-2 py-1 font-mono text-[10px]">
-        {commandFromArgs(call.args_json)}
+        {commandFromArgs(call.name, call.args_json)}
       </p>
     </div>
   );

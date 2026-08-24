@@ -98,3 +98,103 @@ fn reject_switch_tab_marks_rejected() {
     let row = store.get_tool_call(&id).unwrap().unwrap();
     assert_eq!(row.status, "rejected");
 }
+
+#[test]
+fn confirm_git_stage_returns_ui_action() {
+    let dir = tempfile::tempdir().unwrap();
+    let store = AssistantStore::open(&dir.path().join("db.sqlite")).unwrap();
+    let conv = store.create_conversation().unwrap();
+    store
+        .insert_snapshot(&Snapshot::for_conversation(&conv.id))
+        .unwrap();
+    let id = store
+        .insert_tool_call(&conv.id, None, "git_stage", r#"{"path":"src/app.tsx"}"#)
+        .unwrap();
+
+    let outcome = confirm_tool(&store, &id, None).unwrap();
+    assert_eq!(outcome.name, "git_stage");
+    let ui_action = outcome.ui_action.expect("git_stage returns a ui_action");
+    assert_eq!(ui_action.name, "git_stage");
+    assert_eq!(ui_action.args["path"], "src/app.tsx");
+
+    let row = store.get_tool_call(&id).unwrap().unwrap();
+    assert_eq!(row.status, "ran");
+}
+
+#[test]
+fn confirm_git_commit_returns_ui_action() {
+    let dir = tempfile::tempdir().unwrap();
+    let store = AssistantStore::open(&dir.path().join("db.sqlite")).unwrap();
+    let conv = store.create_conversation().unwrap();
+    store
+        .insert_snapshot(&Snapshot::for_conversation(&conv.id))
+        .unwrap();
+    let id = store
+        .insert_tool_call(
+            &conv.id,
+            None,
+            "git_commit",
+            r#"{"message":"feat: add feature"}"#,
+        )
+        .unwrap();
+
+    let outcome = confirm_tool(&store, &id, None).unwrap();
+    assert_eq!(outcome.name, "git_commit");
+    let ui_action = outcome.ui_action.expect("git_commit returns a ui_action");
+    assert_eq!(ui_action.name, "git_commit");
+    assert_eq!(ui_action.args["message"], "feat: add feature");
+
+    let row = store.get_tool_call(&id).unwrap().unwrap();
+    assert_eq!(row.status, "ran");
+}
+
+#[test]
+fn confirm_git_create_branch_returns_ui_action() {
+    let dir = tempfile::tempdir().unwrap();
+    let store = AssistantStore::open(&dir.path().join("db.sqlite")).unwrap();
+    let conv = store.create_conversation().unwrap();
+    store
+        .insert_snapshot(&Snapshot::for_conversation(&conv.id))
+        .unwrap();
+    let id = store
+        .insert_tool_call(
+            &conv.id,
+            None,
+            "git_create_branch",
+            r#"{"branch":"feat/new-view"}"#,
+        )
+        .unwrap();
+
+    let outcome = confirm_tool(&store, &id, None).unwrap();
+    assert_eq!(outcome.name, "git_create_branch");
+    let ui_action = outcome
+        .ui_action
+        .expect("git_create_branch returns a ui_action");
+    assert_eq!(ui_action.name, "git_create_branch");
+    assert_eq!(ui_action.args["branch"], "feat/new-view");
+
+    let row = store.get_tool_call(&id).unwrap().unwrap();
+    assert_eq!(row.status, "ran");
+}
+
+#[test]
+fn confirm_git_stash_returns_ui_action() {
+    let dir = tempfile::tempdir().unwrap();
+    let store = AssistantStore::open(&dir.path().join("db.sqlite")).unwrap();
+    let conv = store.create_conversation().unwrap();
+    store
+        .insert_snapshot(&Snapshot::for_conversation(&conv.id))
+        .unwrap();
+    let id = store
+        .insert_tool_call(&conv.id, None, "git_stash", r#"{"message":"WIP"}"#)
+        .unwrap();
+
+    let outcome = confirm_tool(&store, &id, None).unwrap();
+    assert_eq!(outcome.name, "git_stash");
+    let ui_action = outcome.ui_action.expect("git_stash returns a ui_action");
+    assert_eq!(ui_action.name, "git_stash");
+    assert_eq!(ui_action.args["message"], "WIP");
+
+    let row = store.get_tool_call(&id).unwrap().unwrap();
+    assert_eq!(row.status, "ran");
+}

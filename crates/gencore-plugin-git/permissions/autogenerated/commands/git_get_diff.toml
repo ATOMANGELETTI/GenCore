@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-git-get-diff"
+description = "Enables the git_get_diff command without any pre-configured scope."
+commands.allow = ["git_get_diff"]
+
+[[permission]]
+identifier = "deny-git-get-diff"
+description = "Denies the git_get_diff command without any pre-configured scope."
+commands.deny = ["git_get_diff"]

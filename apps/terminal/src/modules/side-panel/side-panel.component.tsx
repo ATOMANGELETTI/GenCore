@@ -10,7 +10,7 @@ import { Bot, Folder, type LucideIcon, Settings } from "lucide-react";
 import * as React from "react";
 import { Assistant } from "../assistant/assistant.component";
 import { Config } from "../config/config.component";
-import { FileTree } from "../file-tree/file-tree.component";
+import { Files } from "../files/files.component";
 import {
   clampSidePanelWidth,
   DEFAULT_SIDE_PANEL_WIDTH,
@@ -161,9 +161,7 @@ export function SidePanel({ open = true }: SidePanelProps) {
             className="h-full"
           >
             {tab.id === "files" ? (
-              <div className="flex h-full min-h-0 flex-col">
-                <FileTree />
-              </div>
+              <Files />
             ) : tab.id === "assistant" ? (
               <Assistant />
             ) : tab.id === "config" ? (
