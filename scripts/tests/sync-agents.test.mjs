@@ -49,6 +49,25 @@ alwaysApply: true
   });
   assert.equal(skipped, null);
 
+  const agyModels = convertRule({
+    filename: "superpowers-antigravity-models.mdc",
+    sourceRel: ".cursor/rules/superpowers-antigravity-models.mdc",
+    text: `---
+description: Antigravity models
+alwaysApply: true
+---
+
+# Antigravity Superpowers model selection
+`,
+  });
+  assert.equal(agyModels.relPath, "rules/superpowers-models.md");
+  assert.match(agyModels.content, /trigger: always_on/);
+  assert.match(
+    agyModels.content,
+    /Generated from \.cursor\/rules\/superpowers-antigravity-models\.mdc/,
+  );
+  assert.match(agyModels.content, /# Antigravity Superpowers model selection/);
+
   const converted = convertRule({
     filename: "security.mdc",
     sourceRel: ".cursor/rules/security.mdc",
@@ -229,6 +248,15 @@ alwaysApply: true
 `,
   );
   await writeFile(
+    path.join(root, ".cursor", "rules", "superpowers-antigravity-models.mdc"),
+    `---
+alwaysApply: true
+---
+
+# Antigravity Models
+`,
+  );
+  await writeFile(
     path.join(root, ".cursor", "skills", "demo", "SKILL.md"),
     `---
 name: demo
@@ -252,7 +280,7 @@ readonly: true
   );
   const planned = await planGeneratedFiles(root);
   assert.equal(planned.has("rules/security.md"), true);
-  assert.equal(planned.has("rules/superpowers-models.md"), false);
+  assert.equal(planned.has("rules/superpowers-models.md"), true);
   assert.equal(planned.has("skills/demo/SKILL.md"), true);
   assert.equal(planned.has("workflows/new-module.md"), true);
   assert.equal(planned.has("agents/tauri-reviewer/agent.md"), true);

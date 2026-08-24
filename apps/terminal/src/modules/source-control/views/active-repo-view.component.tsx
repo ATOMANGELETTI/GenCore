@@ -19,6 +19,7 @@ import {
   Check,
   ChevronDown,
   ChevronRight,
+  FolderOpen,
   GitBranch,
   GitBranchPlus,
   GitCommit,
@@ -29,6 +30,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import * as React from "react";
+import { useOptionalConfig } from "../../config/config.hook";
 import { useTerminalSessionOptional } from "../../terminal/terminal.hook";
 import { useSourceControlContext } from "../source-control.hook";
 
@@ -70,6 +72,7 @@ export function ActiveRepoView() {
     commits,
     refreshing,
     refresh,
+    openFolderPicker,
     stageFile,
     unstageFile,
     stageAll,
@@ -80,6 +83,8 @@ export function ActiveRepoView() {
     createBranch,
   } = useSourceControlContext();
 
+  const config = useOptionalConfig();
+  const diffEditor = config?.diffEditor ?? "monaco";
   const terminal = useTerminalSessionOptional();
 
   const [message, setMessage] = React.useState("");
@@ -121,11 +126,16 @@ export function ActiveRepoView() {
 
   function handleFileClick(filePath: string) {
     if (!folderPath) return;
-    const fullPath =
-      folderPath.endsWith("\\") || folderPath.endsWith("/")
-        ? `${folderPath}${filePath}`
-        : `${folderPath}\\${filePath}`;
-    terminal?.openEditorTab(fullPath, `Diff: ${filePath.split(/[/\\]/).pop() || filePath}`);
+    const fileName = filePath.split(/[/\\]/).pop() || filePath;
+    if (diffEditor === "micro") {
+      const fullPath =
+        folderPath.endsWith("\\") || folderPath.endsWith("/")
+          ? `${folderPath}${filePath}`
+          : `${folderPath}\\${filePath}`;
+      terminal?.openEditorTab(fullPath, `Diff: ${fileName}`);
+    } else {
+      terminal?.openDiffTab(filePath, folderPath, `Diff: ${fileName}`);
+    }
   }
 
   return (
@@ -199,6 +209,22 @@ export function ActiveRepoView() {
             </span>
           ) : null}
           <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-xs"
+                  aria-label="Open repository"
+                  onClick={() => {
+                    void openFolderPicker();
+                  }}
+                >
+                  <FolderOpen className="size-3.5 text-primary" aria-hidden="true" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Open Repository...</TooltipContent>
+            </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button

@@ -5,6 +5,7 @@ import { loadConfig, saveConfig } from "./config.storage";
 import type {
   BackgroundEffectType,
   ConfigContextValue,
+  DiffEditorPreference,
   EffectInteractionMode,
   PoshThemeId,
   TerminalConfigV1,
@@ -35,6 +36,9 @@ export function useTerminalConfig(): ConfigContextValue {
   );
   const [effectSpeed, setEffectSpeedState] = React.useState<number>(
     () => initialConfig.effectSpeed,
+  );
+  const [diffEditor, setDiffEditorState] = React.useState<DiffEditorPreference>(
+    () => initialConfig.diffEditor,
   );
   const [osTheme, setOsTheme] = React.useState<ThemeName>("polar-night");
 
@@ -94,6 +98,14 @@ export function useTerminalConfig(): ConfigContextValue {
       const clamped = Math.min(Math.max(next, 0.2), 2.0);
       setEffectSpeedState(clamped);
       persist({ effectSpeed: clamped });
+    },
+    [persist],
+  );
+
+  const setDiffEditor = React.useCallback(
+    (next: DiffEditorPreference) => {
+      setDiffEditorState(next);
+      persist({ diffEditor: next });
     },
     [persist],
   );
@@ -158,6 +170,8 @@ export function useTerminalConfig(): ConfigContextValue {
     setEffectOpacity,
     effectSpeed,
     setEffectSpeed,
+    diffEditor,
+    setDiffEditor,
   };
 }
 

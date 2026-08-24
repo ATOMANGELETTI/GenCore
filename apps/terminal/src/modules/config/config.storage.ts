@@ -1,6 +1,7 @@
 import type {
   BackgroundEffectType,
   ConfigSubviewId,
+  DiffEditorPreference,
   EffectInteractionMode,
   PoshThemeId,
   TerminalConfigV1,
@@ -17,6 +18,7 @@ export const DEFAULT_CONFIG: TerminalConfigV1 = {
   effectInteraction: "repel",
   effectOpacity: 0.5,
   effectSpeed: 1.0,
+  diffEditor: "monaco",
 };
 
 const THEME_PREFERENCES: ReadonlySet<string> = new Set(["system", "polar-night", "snow-storm"]);
@@ -31,6 +33,7 @@ const POSH_THEMES: ReadonlySet<string> = new Set([
 ]);
 const BACKGROUND_EFFECTS: ReadonlySet<string> = new Set(["none", "particles", "molecules", "orbs"]);
 const EFFECT_INTERACTIONS: ReadonlySet<string> = new Set(["ambient", "repel", "ripple"]);
+const DIFF_EDITORS: ReadonlySet<string> = new Set(["monaco", "micro"]);
 
 function clampNumber(value: unknown, min: number, max: number, fallback: number): number {
   if (typeof value !== "number" || Number.isNaN(value)) {
@@ -82,6 +85,13 @@ export function parseConfig(raw: string | null): TerminalConfigV1 {
       const effectSpeed =
         "effectSpeed" in value ? clampNumber(value.effectSpeed, 0.2, 2.0, 1.0) : 1.0;
 
+      const diffEditor =
+        "diffEditor" in value &&
+        typeof value.diffEditor === "string" &&
+        DIFF_EDITORS.has(value.diffEditor)
+          ? (value.diffEditor as DiffEditorPreference)
+          : "monaco";
+
       return {
         version: 1,
         theme: value.theme as ThemePreference,
@@ -90,6 +100,7 @@ export function parseConfig(raw: string | null): TerminalConfigV1 {
         effectInteraction,
         effectOpacity,
         effectSpeed,
+        diffEditor,
       };
     }
   } catch {

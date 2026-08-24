@@ -18,7 +18,7 @@ All Superpowers files live under `.superpowers/`:
 - Tasks: `.superpowers/docs/tasks/YYYY-MM-DD-<feature-name>.md`
 - Reviews: `.superpowers/docs/reviews/`
 - Visual companion: `.superpowers/brainstorm/` (plugin default)
-- SDD scratch: `.superpowers/sdd/` (plugin default)
+- SDD scratch workspace: `.superpowers/sdd/<plan-slug>/` (contains `progress.md`, `task-N-brief.md`, `task-N-report.md`, `task-N-review.md`, `review-task-N.diff`, `whole-branch-review.md`)
 
 Never write to `docs/superpowers/`, `docs/plans/`, or `docs/specs/`.
 
@@ -29,3 +29,4 @@ suggests that; ignore it here so tracked docs survive. Gitignore only:
 - `.superpowers/sdd/`
 
 Keep `.superpowers/docs/` tracked.
+

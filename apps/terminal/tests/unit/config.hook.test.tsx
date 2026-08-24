@@ -141,6 +141,7 @@ describe("useTerminalConfig", () => {
       effectInteraction: "repel",
       effectOpacity: 0.5,
       effectSpeed: 1.0,
+      diffEditor: "monaco",
     });
     await waitFor(() => {
       expect(unlisten).toHaveBeenCalledTimes(1);
@@ -180,6 +181,7 @@ describe("useTerminalConfig", () => {
       effectInteraction: "repel",
       effectOpacity: 0.5,
       effectSpeed: 1.0,
+      diffEditor: "monaco",
     });
   });
 
@@ -210,6 +212,7 @@ describe("useTerminalConfig", () => {
       effectInteraction: "ripple",
       effectOpacity: 0.8,
       effectSpeed: 1.5,
+      diffEditor: "monaco",
     });
   });
 });

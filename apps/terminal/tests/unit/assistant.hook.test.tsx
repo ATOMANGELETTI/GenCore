@@ -182,6 +182,7 @@ function fakeTerminalSession(overrides: Partial<TerminalSessionApi> = {}): Termi
     shellName: "pwsh",
     newTab: vi.fn(),
     openEditorTab: vi.fn(),
+    openDiffTab: vi.fn(),
     closeTab: vi.fn(),
     setActive: vi.fn(),
     renameTab: vi.fn(),

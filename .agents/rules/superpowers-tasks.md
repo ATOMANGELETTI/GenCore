@@ -6,20 +6,21 @@ description: "Superpowers per-plan tasks checklists — create and check off und
 <!-- Generated from .cursor/rules/superpowers-tasks.mdc by `pnpm sync:agents`. Do not edit. -->
 
 
-# Superpowers tasks files
+# Superpowers tasks files & SDD progress ledger
 
-Every implementation plan gets a matching checklist. This file is the
-progress board — not the long plan body and not `.superpowers/sdd/progress.md`.
+Two-tier progress tracking model for Superpowers execution:
+1. **Simple Task Checklist** (`.superpowers/docs/tasks/YYYY-MM-DD-<feature-name>.md`): High-level, concise progress board. Tracked in git.
+2. **Detailed SDD Execution Ledger** (`.superpowers/sdd/<plan-slug>/progress.md`): Live, detailed operational log tracking active task status and completed task summaries. Git-ignored scratch.
 
-## Path
+---
 
-`.superpowers/docs/tasks/YYYY-MM-DD-<feature-name>.md` — same slug as the plan.
+## 1. Simple Task Checklist (`.superpowers/docs/tasks/`)
 
-Track these files. Do not gitignore `.superpowers/docs/tasks/`.
+### Path
+`.superpowers/docs/tasks/YYYY-MM-DD-<feature-name>.md` — same slug as the plan. Track these files; do not gitignore `.superpowers/docs/tasks/`.
 
-## Format
-
-Title, `Spec:` and `Plan:` links, then one checkbox per `### Task N:` heading with the assigned subagent model in parentheses. No file maps, commands, or copied steps.
+### Format
+Keep this file simple, clean, and concise: title, `Spec:` and `Plan:` links, then one checkbox per `### Task N:` heading with the assigned subagent model in parentheses and a short outcome clause. No file maps, test logs, or copied code.
 
 ```markdown
 # Terminal Assistant
@@ -28,29 +29,87 @@ Spec: `.superpowers/docs/specs/2026-08-22-terminal-assistant-design.md`
 Plan: `.superpowers/docs/plans/2026-08-22-terminal-assistant.md`
 
 - [x] Task 1: Plugin crate and data directory (Grok) — scaffold gencore-assistant and the portable data dir
-- [ ] Task 4: Gemini model allowlist and SSE parse (Sonnet 5) — allowlisted models and stream parse
+- [ ] Task 2: Gemini model allowlist and SSE parse (Sonnet 5) — allowlisted models and stream parse
 ```
 
 - Title matches the plan heading.
-- Under the title, provide relative links to the associated specification (`Spec:`) and plan (`Plan:`). If a plan had no preceding spec, write `Spec: none`.
-- Each task line lists the task number, title, execution model in parentheses (e.g. `(Grok)`, `(Sonnet 5)`, `(Opus 5)`, `(Kimi)`), and after an em dash, one short outcome clause.
-- The model tag reflects the planned model per `.cursor/rules/superpowers-models.mdc` (defaulting to Grok, elevated to Sonnet 5 or Opus 5 for complex tasks/re-dispatches). If a task is re-dispatched to a stronger model, update the tag.
+- Under the title, provide relative links to `Spec:` (or `Spec: none`) and `Plan:`.
+- Each task line lists: `- [ ] Task N: Title (Model) — short outcome clause`.
 - `- [ ]` until finished, then `- [x]`.
-- If the plan gains tasks, append matching unchecked lines. Do not delete completed items.
 
-## When to write
+---
 
-1. **Create** the file in the same turn the plan is saved. All items unchecked.
-2. **Before executing** an existing plan, create the file from `### Task N:` headings if it is missing. Check off tasks already finished.
-3. **Check off** the matching line immediately when a task is finished. The parent/controller does this. Do not wait for the user to ask.
-4. Do not require flipping checkboxes inside the plan body.
+## 2. Detailed SDD Progress Ledger (`.superpowers/sdd/<plan-slug>/progress.md`)
 
-## Bookkeeping Sequence on Task Completion
+Each plan execution maintains a dedicated, detailed progress ledger at `.superpowers/sdd/<plan-slug>/progress.md` (or `.superpowers/sdd/progress.md`).
 
-Whenever a task completes (review approved, tests pass, or manual task verified), the controller must perform all 3 bookkeeping actions in the exact same turn:
+### Progress Ledger Structure
 
-1. **Check off the task file**: Mark `- [x]` in `.superpowers/docs/tasks/YYYY-MM-DD-<feature>.md`.
-2. **Update the SDD progress ledger**: Record `Task N: complete (...)` in `.superpowers/sdd/progress.md`.
-3. **Update Cursor todos**: Mark the task completed via `TodoWrite`.
+```markdown
+# SDD Ledger: <Plan Title>
 
-Never dispatch the next task, pause, or end a turn without keeping `.superpowers/docs/tasks/` in sync with the latest completed task state.
+**Plan:** `.superpowers/docs/plans/YYYY-MM-DD-<feature>.md`
+**Spec:** `.superpowers/docs/specs/YYYY-MM-DD-<feature>-design.md`
+**Tasks:** `.superpowers/docs/tasks/YYYY-MM-DD-<feature>.md`
+
+## Pre-flight Conflict Scan
+| Task Pair | Produces / Consumes | Scan Finding | Ruling |
+|---|---|---|---|
+| Task 1 & Task 2 | Interface X vs Component Y | Clean | Approved |
+
+## Active Task / Current Work
+- **Task**: Task N: <Title>
+- **Model**: <Assigned Model> (e.g. Grok 4.6 Fast Mode, Sonnet 5)
+- **Stage**: Implementing | Testing | Reviewing (Spec & Quality) | Fix Loop (Round R/5)
+- **Target Files**: `path/to/file1.ts`, `path/to/file2.rs`
+- **Next Action**: Running automated tests / generating diff package
+
+## Completed Tasks
+- **Task 1: Plugin Crate & Data Dir (Grok)**
+  - Scaffolded `gencore-assistant` crate and portable database initialization.
+  - Files: `crates/gencore-plugin-assistant/Cargo.toml`, `src/lib.rs`.
+  - Tests: `cargo test -p gencore-plugin-assistant` (12/12 passed).
+  - Commits: `a1b2c3d..e4f5a6b` | Review: Spec ✅, Quality Approved (`task-1-review.md`).
+
+## Deferred Findings & Rulings
+- `Task N: Ruling: <finding> — <what was decided and why>`
+```
+
+### Active Work Tracking
+While executing a task, keep `## Active Task / Current Work` up to date with:
+1. **Task # and Title**
+2. **Assigned Model**
+3. **Current Stage**: `Extracting Brief` | `Implementing` | `Testing` | `Reviewing` | `Fix Loop (Round R/5)`
+4. **Target Files**: List of active files being edited/created
+5. **Next Action**: Immediate next step (e.g. running test command, preparing review diff)
+
+### Completed Task Summary
+When a task finishes, record a concise 2-3 line summary under `## Completed Tasks`:
+- What changed / what was implemented
+- Key files touched
+- Automated tests run and results (e.g. `vitest` or `cargo test`, N/N passed)
+- Commit hash range (`<base>..<head>`)
+- Review approval status (`Spec ✅, Quality Approved`)
+
+---
+
+## 3. Mandatory SDD Companion Artifacts
+
+In every plan workspace (`.superpowers/sdd/<plan-slug>/`), always generate and preserve the full suite of SDD companion artifacts alongside `progress.md`:
+
+1. **Task Brief** (`task-<N>-brief.md`): Extracted task brief containing exact values, constraints, and requirements before implementer dispatch.
+2. **Implementer Report** (`task-<N>-report.md`): Written by the implementer subagent with execution summary, files touched, test commands, and verbatim test output.
+3. **Review Package / Diff** (`review-task-<N>.diff`): Scoped git diff package for the task reviewer (`git diff BASE HEAD`).
+4. **Task Review** (`task-<N>-review.md`): Written by the task reviewer confirming Spec Compliance ✅ and Code Quality verdict.
+5. **Whole-Branch Review** (`whole-branch-review.md` & `whole-branch-fix-report.md`): Final review and fix reports across the entire branch.
+
+---
+
+## 4. Bookkeeping Sequence on Task Completion
+
+Whenever a task completes (review approved, tests pass, or manual task verified), the controller must perform all 4 actions in the exact same turn:
+
+1. **Update SDD Progress Ledger**: Record completed task summary in `## Completed Tasks` and update `## Active Task` in `.superpowers/sdd/<plan-slug>/progress.md`.
+2. **Check off the Task File**: Mark `- [x]` in `.superpowers/docs/tasks/YYYY-MM-DD-<feature>.md`.
+3. **Update Cursor Todos**: Mark the task completed via `TodoWrite`.
+4. **Preserve SDD Artifacts**: Ensure `task-N-brief.md`, `task-N-report.md`, `review-task-N.diff`, and `task-N-review.md` exist in `.superpowers/sdd/<plan-slug>/`.

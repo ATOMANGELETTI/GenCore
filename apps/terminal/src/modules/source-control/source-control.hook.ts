@@ -132,6 +132,27 @@ export function SourceControlProvider({ children }: { children: React.ReactNode 
 
   React.useEffect(() => {
     void refreshStatus(folderPath);
+
+    if (!folderPath) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      if (typeof document === "undefined" || document.visibilityState === "visible") {
+        void refreshStatus(folderPath);
+      }
+    }, 2500);
+
+    function onFocus() {
+      void refreshStatus(folderPath);
+    }
+
+    window.addEventListener("focus", onFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", onFocus);
+    };
   }, [folderPath, refreshStatus]);
 
   const setWorkspaceFolder = React.useCallback(

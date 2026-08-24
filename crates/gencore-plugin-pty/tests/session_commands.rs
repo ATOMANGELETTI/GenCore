@@ -509,12 +509,16 @@ fn resolve_custom_command_resolves_micro_from_resources() {
     std::fs::create_dir_all(&micro_dir).unwrap();
     let micro_exe = micro_dir.join("micro.exe");
     std::fs::write(&micro_exe, b"MZ").unwrap();
+    let settings = micro_dir.join("settings.json");
+    std::fs::write(&settings, b"{\"diffgutter\":true}").unwrap();
 
     let launch =
         gencore_pty::resolve_custom_command(&["micro".into(), "Cargo.toml".into()], Some(&temp));
     assert_eq!(launch.program, micro_exe);
-    assert_eq!(launch.args.len(), 1);
-    assert_eq!(launch.args[0], "Cargo.toml");
+    assert_eq!(launch.args.len(), 3);
+    assert_eq!(launch.args[0], "-config-dir");
+    assert_eq!(launch.args[1], micro_dir.as_os_str());
+    assert_eq!(launch.args[2], "Cargo.toml");
 
     let _ = std::fs::remove_dir_all(&temp);
 }

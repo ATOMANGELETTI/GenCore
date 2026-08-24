@@ -1,0 +1,11 @@
+{
+  "colorscheme": "nord",
+  "diffgutter": true,
+  "softwrap": true,
+  "statusformatl": "$(filename) $(modified)",
+  "statusformatr": "$(line):$(col) | $(opt:filetype)",
+  "tabsize": 2,
+  "tabstospaces": true,
+  "scrollbar": false,
+  "savecursor": true
+}

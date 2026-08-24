@@ -58,12 +58,29 @@ pub fn shell_launch(omp: Option<&OhMyPoshSpawn>) -> ShellLaunch {
 
 pub fn resolve_custom_command(cmd_vec: &[String], resource_dir: Option<&Path>) -> ShellLaunch {
     let prog_name = cmd_vec.first().map(|s| s.as_str()).unwrap_or("micro");
-    let program = if prog_name == "micro" || prog_name == "micro.exe" {
+    let is_micro = prog_name == "micro" || prog_name == "micro.exe";
+    let program = if is_micro {
         resolve_micro(resource_dir)
     } else {
         find_on_path(prog_name).unwrap_or_else(|| PathBuf::from(prog_name))
     };
-    let args: Vec<OsString> = cmd_vec.iter().skip(1).map(OsString::from).collect();
+
+    let mut args: Vec<OsString> = Vec::new();
+    if let (true, Some(res)) = (is_micro, resource_dir) {
+        for rel in ["micro", "resources/micro"] {
+            let config_dir = res.join(rel);
+            if config_dir.is_dir()
+                && (config_dir.join("settings.json").is_file()
+                    || config_dir.join("colorschemes").is_dir())
+            {
+                args.push(OsString::from("-config-dir"));
+                args.push(strip_verbatim_prefix(&config_dir).into_os_string());
+                break;
+            }
+        }
+    }
+    args.extend(cmd_vec.iter().skip(1).map(OsString::from));
+
     ShellLaunch {
         program,
         args,

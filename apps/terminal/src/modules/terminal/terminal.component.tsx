@@ -14,6 +14,7 @@ import { Pin, Plus, X } from "lucide-react";
 import * as React from "react";
 import { useConfig } from "../config/config.hook";
 import { TabContextMenu } from "../context-menu/context-menu.terminal";
+import { DiffEditorView } from "../diff-editor";
 import { TerminalBackgroundEffect } from "../terminal-effect/terminal-effect.component";
 import { autoTitle, clampPtyDim, seamLine, useTerminalSession } from "./terminal.hook";
 import { nordXtermTheme } from "./terminal.theme";
@@ -207,15 +208,45 @@ export function TerminalView() {
 
         <div ref={viewportRef} className="relative min-h-0 flex-1 overflow-hidden">
           <TerminalBackgroundEffect containerRef={viewportRef} />
-          {session.tabs.map((tab) => (
-            <TerminalHostPane
-              key={tab.id}
-              tab={tab}
-              active={tab.id === session.activeId}
-              onRestart={() => session.restartTab(tab.id)}
-              onRegister={registerHost}
-            />
-          ))}
+          {session.tabs.map((tab) => {
+            if (tab.kind === "diff" && tab.diffFile) {
+              const active = tab.id === session.activeId;
+              return (
+                <div
+                  key={tab.id}
+                  data-slot="diff-tab-pane"
+                  className={cn(
+                    "absolute inset-0 z-10 flex flex-col bg-background",
+                    active ? undefined : "pointer-events-none invisible",
+                  )}
+                  aria-hidden={!active}
+                >
+                  <DiffEditorView
+                    filePath={tab.diffFile}
+                    repoPath={tab.diffRepo ?? tab.cwd ?? ""}
+                    theme={theme === "snow-storm" ? "snow-storm" : "polar-night"}
+                    onOpenMicro={(filePath) => {
+                      session.openEditorTab(
+                        tab.diffRepo ? `${tab.diffRepo}/${filePath}` : filePath,
+                        `Micro: ${filePath.split(/[/\\]/).pop() || filePath}`,
+                      );
+                    }}
+                    onClose={() => session.closeTab(tab.id)}
+                  />
+                </div>
+              );
+            }
+
+            return (
+              <TerminalHostPane
+                key={tab.id}
+                tab={tab}
+                active={tab.id === session.activeId}
+                onRestart={() => session.restartTab(tab.id)}
+                onRegister={registerHost}
+              />
+            );
+          })}
         </div>
       </div>
     </TooltipProvider>

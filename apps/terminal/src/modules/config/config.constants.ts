@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   Ban,
   CircleDot,
+  Code2,
   Monitor,
   Moon,
   MousePointer,
@@ -9,10 +10,12 @@ import {
   Share2,
   Sparkles,
   Sun,
+  Terminal,
   Waves,
 } from "lucide-react";
 import type {
   BackgroundEffectType,
+  DiffEditorPreference,
   EffectInteractionMode,
   PoshThemeId,
   ThemePreference,
@@ -27,6 +30,26 @@ export const THEME_OPTIONS: readonly {
   { id: "polar-night", title: "Polar Night", subtitle: "Dark Nord palette", Icon: Moon },
   { id: "snow-storm", title: "Snow Storm", subtitle: "Light Nord palette", Icon: Sun },
   { id: "system", title: "Match system", subtitle: "Follow Windows light or dark", Icon: Monitor },
+];
+
+export const DIFF_EDITOR_OPTIONS: readonly {
+  id: DiffEditorPreference;
+  title: string;
+  subtitle: string;
+  Icon: LucideIcon;
+}[] = [
+  {
+    id: "monaco",
+    title: "Monaco Diff",
+    subtitle: "Rich side-by-side & unified diff viewer",
+    Icon: Code2,
+  },
+  {
+    id: "micro",
+    title: "Micro Editor",
+    subtitle: "Fast terminal TUI with git diff gutter",
+    Icon: Terminal,
+  },
 ];
 
 export const BACKGROUND_EFFECT_OPTIONS: readonly {

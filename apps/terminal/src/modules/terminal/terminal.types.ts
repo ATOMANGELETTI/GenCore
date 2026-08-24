@@ -29,8 +29,9 @@ export interface TerminalTab {
   sessionId: string | null;
   status: TerminalTabStatus;
   error: string | null;
-  kind?: "shell" | "editor";
+  kind?: "shell" | "editor" | "diff";
   diffFile?: string;
+  diffRepo?: string;
   command?: readonly string[];
   restore?: {
     scrollback: string;
@@ -54,6 +55,7 @@ export interface TerminalSessionApi {
   shellName: ShellName;
   newTab: () => void;
   openEditorTab: (filePath: string, title?: string) => void;
+  openDiffTab: (filePath: string, repoPath: string, title?: string) => void;
   closeTab: (id: string) => void;
   setActive: (id: string) => void;
   renameTab: (id: string, name: string | null) => void;

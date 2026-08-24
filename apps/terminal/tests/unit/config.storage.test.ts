@@ -35,6 +35,7 @@ describe("parseConfig", () => {
           effectInteraction: "ripple",
           effectOpacity: 0.75,
           effectSpeed: 1.5,
+          diffEditor: "monaco",
         }),
       ),
     ).toEqual({
@@ -45,6 +46,7 @@ describe("parseConfig", () => {
       effectInteraction: "ripple",
       effectOpacity: 0.75,
       effectSpeed: 1.5,
+      diffEditor: "monaco",
     });
   });
 
@@ -59,6 +61,7 @@ describe("parseConfig", () => {
       effectInteraction: "repel",
       effectOpacity: 0.5,
       effectSpeed: 1.0,
+      diffEditor: "monaco",
     });
   });
 
@@ -114,6 +117,7 @@ describe("loadConfig / saveConfig", () => {
       effectInteraction: "ripple",
       effectOpacity: 0.8,
       effectSpeed: 1.2,
+      diffEditor: "monaco",
     };
     expect(saveConfig(customConfig)).toBe(true);
     expect(localStorage.getItem(CONFIG_STORAGE_KEY)).toBe(JSON.stringify(customConfig));

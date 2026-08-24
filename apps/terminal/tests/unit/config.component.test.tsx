@@ -11,6 +11,8 @@ const setEffectInteraction = vi.fn();
 const setEffectOpacity = vi.fn();
 const setEffectSpeed = vi.fn();
 
+const setDiffEditor = vi.fn();
+
 const configState = {
   preference: "system" as const,
   resolvedTheme: "polar-night" as const,
@@ -19,6 +21,7 @@ const configState = {
   effectInteraction: "repel" as const,
   effectOpacity: 0.5,
   effectSpeed: 1.0,
+  diffEditor: "monaco" as const,
 };
 
 vi.mock("../../src/modules/config/config.hook", () => ({
@@ -36,6 +39,8 @@ vi.mock("../../src/modules/config/config.hook", () => ({
     setEffectOpacity,
     effectSpeed: configState.effectSpeed,
     setEffectSpeed,
+    diffEditor: configState.diffEditor,
+    setDiffEditor,
   }),
 }));
 

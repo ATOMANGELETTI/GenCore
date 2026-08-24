@@ -31,5 +31,9 @@
       "crates/gencore-plugin-assistant"
     ],
     "testReminderSent": true
+  },
+  "7561d698-c7ec-4946-be7b-cde75e80aa8f": {
+    "members": ["apps/terminal", "crates/gencore-plugin-pty"],
+    "testReminderSent": true
   }
 }

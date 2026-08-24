@@ -1,0 +1,54 @@
+---
+trigger: always_on
+description: "Superpowers and Task subagent model selection for Antigravity (IDE and CLI) — Gemini 3.7 only"
+---
+
+<!-- Generated from .cursor/rules/superpowers-antigravity-models.mdc by `pnpm sync:agents`. Do not edit. -->
+
+
+# Antigravity Superpowers model selection
+
+When running in **Antigravity IDE** or **Antigravity CLI (`agy`)**, Superpowers (SDD, parallel agents, reviews), planning, and subagent task dispatches must **strictly use only Gemini 3.7** (`high`, `medium`, or `low` thinking effort). Never use non-Gemini models in Antigravity.
+
+Always set the model/tier explicitly. Never omit it and never use `inherit`.
+
+## Model Tiers
+
+### 1. Gemini 3.7 Low (`gemini-3.7-flash-thinking-low`)
+Use for simple, mechanical tasks:
+- Formatting and lint fixes
+- Trivial one-line or single-function edits
+- Running build/test scripts or mechanical status checks
+- Simple documentation fixes
+
+### 2. Gemini 3.7 Medium (`gemini-3.7-flash-thinking-medium`)
+Use as the standard default for implementation and verification:
+- Standard feature implementation and UI components
+- Module wiring and standard refactoring
+- Unit tests and integration tests
+- Code review and task review packages
+
+### 3. Gemini 3.7 High (`gemini-3.7-flash-thinking-high`)
+Use for high-complexity, architectural, or subtle engineering tasks:
+- Initial brainstorming, design specs, and implementation planning
+- Multi-crate architecture, IPC boundaries, and security-critical logic
+- Subtle concurrency, PTY integration, or memory leak investigations
+- Complex debugging and root cause analysis
+
+## Planning & SDD Task Notation
+
+During planning and orchestration, decide the specific Gemini 3.7 tier needed for each task before dispatch:
+- In `.superpowers/docs/tasks/YYYY-MM-DD-<feature>.md` task checklists:
+  `- [ ] Task N: Title (Gemini 3.7 High/Medium/Low) — outcome clause`
+- In `.superpowers/sdd/<plan-slug>/progress.md` live ledger:
+  Record `- **Model**: Gemini 3.7 High`, `Gemini 3.7 Medium`, or `Gemini 3.7 Low`.
+
+## Escalation Policy
+
+If any subagent or task on a lower tier (Low or Medium) gets stuck, fails tests repeatedly, or encounters an unexpected architectural blocker:
+- **Directly escalate to Gemini 3.7 High**.
+- Never switch outside Gemini 3.7 in Antigravity. If Gemini 3.7 High encounters blockers, decompose the task into smaller steps or re-prompt with additional context.
+
+## Reviews
+
+Task reviews and whole-branch reviews in Antigravity default to **Gemini 3.7 Medium**. Escalate to **Gemini 3.7 High** only for security reviews, complex multi-crate designs, or when a medium reviewer gets stuck.

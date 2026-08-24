@@ -74,7 +74,10 @@ export function convertRule({ filename, text, sourceRel }) {
   if (typeof frontmatter.description === "string") {
     fields.description = frontmatter.description;
   }
-  const stem = filename.replace(/\.mdc$/i, "");
+  const stem =
+    filename === "superpowers-antigravity-models.mdc"
+      ? "superpowers-models"
+      : filename.replace(/\.mdc$/i, "");
   const content =
     `${stringifyFrontmatter(fields)}\n${GENERATED_HEADER(sourceRel)}\n${rewriteAgyBody(body)}`.replace(
       /^\uFEFF/,

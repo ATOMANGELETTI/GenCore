@@ -48,5 +48,10 @@
   "workbench.editor.pinnedTabsOnSeparateRow": true,
   "css.lint.unknownAtRules": "ignore",
   "tailwindCSS.experimental.configFile": "packages/ui-kit/src/styles/globals.css",
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "text": "Strictly follow Conventional Commits (@commitlint/config-conventional). The header must never exceed 72 characters (strict commitlint max 100). Use <type>(<scope>): <subject> in lowercase imperative mood without trailing period. Do not add AI trailers."
+    }
+  ]
 }

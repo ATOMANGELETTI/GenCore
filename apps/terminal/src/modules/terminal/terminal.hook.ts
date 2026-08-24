@@ -663,6 +663,28 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
     [spawnSession],
   );
 
+  const openDiffTab = React.useCallback((filePath: string, repoPath: string, title?: string) => {
+    const fileName = filePath.split(/[/\\]/).pop() || filePath;
+    const tabTitle = title ?? `Diff: ${fileName}`;
+
+    const tab: TerminalTab = {
+      id: crypto.randomUUID(),
+      name: tabTitle,
+      pinned: false,
+      cwd: repoPath,
+      sessionId: null,
+      status: "live",
+      error: null,
+      kind: "diff",
+      diffFile: filePath,
+      diffRepo: repoPath,
+    };
+    const next = [...tabsRef.current, tab];
+    tabsRef.current = next;
+    setTabs(next);
+    setActiveId(tab.id);
+  }, []);
+
   const closeTab = React.useCallback(
     (id: string) => {
       const current = tabsRef.current;
@@ -1053,6 +1075,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       shellName: DEFAULT_SHELL,
       newTab,
       openEditorTab,
+      openDiffTab,
       closeTab,
       setActive,
       renameTab,
@@ -1079,6 +1102,7 @@ export function TerminalProvider({ children }: { children: React.ReactNode }) {
       flushSave,
       newTab,
       onTerminalInput,
+      openDiffTab,
       openEditorTab,
       readScrollback,
       registerClipboard,

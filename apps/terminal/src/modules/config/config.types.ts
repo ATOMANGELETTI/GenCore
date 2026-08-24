@@ -14,6 +14,8 @@ export type PoshThemeId =
 export type BackgroundEffectType = "none" | "particles" | "molecules" | "orbs";
 export type EffectInteractionMode = "ambient" | "repel" | "ripple";
 
+export type DiffEditorPreference = "monaco" | "micro";
+
 export type ConfigSubviewId = "appearance" | "effects" | "prompt" | "assistant" | "all";
 
 export interface TerminalConfigV1 {
@@ -24,6 +26,7 @@ export interface TerminalConfigV1 {
   effectInteraction: EffectInteractionMode;
   effectOpacity: number;
   effectSpeed: number;
+  diffEditor: DiffEditorPreference;
 }
 
 export interface ConfigContextValue {
@@ -40,4 +43,6 @@ export interface ConfigContextValue {
   setEffectOpacity: (next: number) => void;
   effectSpeed: number;
   setEffectSpeed: (next: number) => void;
+  diffEditor: DiffEditorPreference;
+  setDiffEditor: (next: DiffEditorPreference) => void;
 }
