@@ -6,6 +6,7 @@ import {
   parseConfig,
   saveConfig,
 } from "../../src/modules/config/config.storage";
+import type { TerminalConfigV1 } from "../../src/modules/config/config.types";
 
 restoreJsdomLocalStorage();
 
@@ -21,22 +22,58 @@ describe("parseConfig", () => {
     ).toEqual(DEFAULT_CONFIG);
   });
 
-  it("accepts a valid v1 blob with poshTheme", () => {
+  it("accepts a valid v1 blob with poshTheme and background effect settings", () => {
     expect(
-      parseConfig(JSON.stringify({ version: 1, theme: "snow-storm", poshTheme: "bubbles" })),
+      parseConfig(
+        JSON.stringify({
+          version: 1,
+          theme: "snow-storm",
+          poshTheme: "bubbles",
+          backgroundEffect: "molecules",
+          effectInteraction: "ripple",
+          effectOpacity: 0.75,
+          effectSpeed: 1.5,
+        }),
+      ),
     ).toEqual({
       version: 1,
       theme: "snow-storm",
       poshTheme: "bubbles",
+      backgroundEffect: "molecules",
+      effectInteraction: "ripple",
+      effectOpacity: 0.75,
+      effectSpeed: 1.5,
     });
   });
 
-  it("migrates legacy v1 blob without poshTheme to default gencore", () => {
-    expect(parseConfig(JSON.stringify({ version: 1, theme: "snow-storm" }))).toEqual({
+  it("migrates legacy v1 blob without background effect settings to defaults", () => {
+    expect(
+      parseConfig(JSON.stringify({ version: 1, theme: "snow-storm", poshTheme: "gencore" })),
+    ).toEqual({
       version: 1,
       theme: "snow-storm",
       poshTheme: "gencore",
+      backgroundEffect: "particles",
+      effectInteraction: "repel",
+      effectOpacity: 0.5,
+      effectSpeed: 1.0,
     });
+  });
+
+  it("clamps invalid effectOpacity and effectSpeed to safe ranges", () => {
+    const parsed = parseConfig(
+      JSON.stringify({
+        version: 1,
+        theme: "polar-night",
+        poshTheme: "gencore",
+        backgroundEffect: "orbs",
+        effectInteraction: "ambient",
+        effectOpacity: 5.0,
+        effectSpeed: -1.0,
+      }),
+    );
+    expect(parsed.effectOpacity).toBe(1.0);
+    expect(parsed.effectSpeed).toBe(0.2);
   });
 });
 
@@ -67,18 +104,25 @@ describe("loadConfig / saveConfig", () => {
   });
 
   it("writes a valid blob on saveConfig and loadConfig reads it back", () => {
-    expect(saveConfig({ version: 1, theme: "polar-night", poshTheme: "kali" })).toBe(true);
-    expect(localStorage.getItem(CONFIG_STORAGE_KEY)).toBe(
-      JSON.stringify({ version: 1, theme: "polar-night", poshTheme: "kali" }),
-    );
-    expect(loadConfig()).toEqual({ version: 1, theme: "polar-night", poshTheme: "kali" });
+    const customConfig: TerminalConfigV1 = {
+      version: 1,
+      theme: "polar-night",
+      poshTheme: "kali",
+      backgroundEffect: "orbs",
+      effectInteraction: "ripple",
+      effectOpacity: 0.8,
+      effectSpeed: 1.2,
+    };
+    expect(saveConfig(customConfig)).toBe(true);
+    expect(localStorage.getItem(CONFIG_STORAGE_KEY)).toBe(JSON.stringify(customConfig));
+    expect(loadConfig()).toEqual(customConfig);
   });
 
   it("returns false and skips persistence when setItem throws", () => {
     vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
       throw new Error("quota");
     });
-    expect(saveConfig({ version: 1, theme: "system", poshTheme: "gencore" })).toBe(false);
+    expect(saveConfig(DEFAULT_CONFIG)).toBe(false);
   });
 });
 

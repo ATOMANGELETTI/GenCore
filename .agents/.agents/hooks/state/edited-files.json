@@ -1,15 +1,14 @@
 {
   "8e8fd41f-b3a2-4ae1-903a-190ee271f3ed": {
-    "members": [
-      "apps/terminal"
-    ],
+    "members": ["apps/terminal"],
     "testReminderSent": true
   },
   "2406e9be-5454-4a72-938c-92814489d6dd": {
-    "members": [
-      "apps/terminal",
-      "crates/gencore-plugin-pty"
-    ],
+    "members": ["apps/terminal", "crates/gencore-plugin-pty"],
+    "testReminderSent": true
+  },
+  "543b5bfe-f433-4683-b566-4316345fb319": {
+    "members": ["apps/terminal"],
     "testReminderSent": true
   }
 }
