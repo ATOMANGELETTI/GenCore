@@ -1,0 +1,19 @@
+.superpowers/docs/plans/2026-08-23-terminal-background-effects.md
+  s_70a5373714095a::t_bbd7e2c706ee3c 1-483
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "065ab92d580dde50fee29c07beb780acddd46eba",
+  "prompts": {},
+  "sessions": {
+    "s_70a5373714095a": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "d7f8a0cf-a862-4d5c-9c5f-751d4c958254",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
