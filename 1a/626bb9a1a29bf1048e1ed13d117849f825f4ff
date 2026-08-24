@@ -1,0 +1,19 @@
+apps/terminal/tests/unit/terminal.xterm.test.ts
+  s_6aae74eaa66f85::t_d4da973a217b08 8,12-14,34-35,42,53,60-67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "1a626bb9a1a29bf1048e1ed13d117849f825f4ff",
+  "prompts": {},
+  "sessions": {
+    "s_6aae74eaa66f85": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e32a620a-da74-4127-aacb-040db332e830",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
