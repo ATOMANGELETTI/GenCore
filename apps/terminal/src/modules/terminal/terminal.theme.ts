@@ -6,6 +6,7 @@ import {
   type ThemeName,
 } from "@gencore/ui-kit";
 import type { ITheme } from "@xterm/xterm";
+import type { BackgroundEffectType } from "../config/config.types";
 
 const ansiTheme = {
   black: nord["polar-1"],
@@ -26,9 +27,16 @@ const ansiTheme = {
   brightWhite: nord["snow-6"],
 } as const satisfies ITheme;
 
-export function nordXtermTheme(theme: ThemeName): ITheme {
+export function nordXtermTheme(theme: ThemeName, effect: BackgroundEffectType = "none"): ITheme {
   const semantic = resolveColors(theme === "snow-storm" ? snowStormColors : polarNightColors);
-  const background = theme === "snow-storm" ? nord["snow-6"] : nord["polar-0"];
+
+  let background: string;
+  if (effect === "none") {
+    background = theme === "snow-storm" ? nord["snow-6"] : nord["polar-0"];
+  } else {
+    background = theme === "snow-storm" ? "rgba(236, 239, 244, 0.78)" : "rgba(46, 52, 64, 0.74)";
+  }
+
   const foreground = theme === "snow-storm" ? nord["polar-0"] : nord["snow-4"];
 
   return {

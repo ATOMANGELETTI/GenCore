@@ -11,10 +11,17 @@ export type PoshThemeId =
   | "clean-detailed"
   | "kali";
 
+export type BackgroundEffectType = "none" | "particles" | "molecules" | "orbs";
+export type EffectInteractionMode = "ambient" | "repel" | "ripple";
+
 export interface TerminalConfigV1 {
   version: 1;
   theme: ThemePreference;
   poshTheme: PoshThemeId;
+  backgroundEffect: BackgroundEffectType;
+  effectInteraction: EffectInteractionMode;
+  effectOpacity: number;
+  effectSpeed: number;
 }
 
 export interface ConfigContextValue {
@@ -23,4 +30,12 @@ export interface ConfigContextValue {
   resolvedTheme: ThemeName;
   poshTheme: PoshThemeId;
   setPoshTheme: (next: PoshThemeId) => void;
+  backgroundEffect: BackgroundEffectType;
+  setBackgroundEffect: (next: BackgroundEffectType) => void;
+  effectInteraction: EffectInteractionMode;
+  setEffectInteraction: (next: EffectInteractionMode) => void;
+  effectOpacity: number;
+  setEffectOpacity: (next: number) => void;
+  effectSpeed: number;
+  setEffectSpeed: (next: number) => void;
 }

@@ -12,7 +12,9 @@ import {
 } from "@gencore/ui-kit";
 import { Pin, Plus, X } from "lucide-react";
 import * as React from "react";
+import { useConfig } from "../config/config.hook";
 import { TabContextMenu } from "../context-menu/context-menu.terminal";
+import { TerminalBackgroundEffect } from "../terminal-effect/terminal-effect.component";
 import { autoTitle, clampPtyDim, seamLine, useTerminalSession } from "./terminal.hook";
 import { nordXtermTheme } from "./terminal.theme";
 import type { TerminalTab } from "./terminal.types";
@@ -23,6 +25,7 @@ type GencoreXtermHost = HTMLDivElement & { __gencoreXterm?: import("@xterm/xterm
 export function TerminalView() {
   const session = useTerminalSession();
   const { theme } = useTheme();
+  const { backgroundEffect } = useConfig();
   const [editingId, setEditingId] = React.useState<string | null>(null);
   const hostsRef = React.useRef(new Map<string, XtermHost>());
   const viewportRef = React.useRef<HTMLDivElement | null>(null);
@@ -81,9 +84,9 @@ export function TerminalView() {
 
   React.useEffect(() => {
     for (const host of hostsRef.current.values()) {
-      host.terminal.options.theme = nordXtermTheme(theme);
+      host.terminal.options.theme = nordXtermTheme(theme, backgroundEffect);
     }
-  }, [theme]);
+  }, [theme, backgroundEffect]);
 
   React.useEffect(() => {
     hostsRef.current.get(session.activeId)?.terminal.focus();
@@ -203,6 +206,7 @@ export function TerminalView() {
         </div>
 
         <div ref={viewportRef} className="relative min-h-0 flex-1 overflow-hidden">
+          <TerminalBackgroundEffect containerRef={viewportRef} />
           {session.tabs.map((tab) => (
             <TerminalHostPane
               key={tab.id}
@@ -231,16 +235,19 @@ function TerminalHostPane({
 }) {
   const session = useTerminalSession();
   const { theme } = useTheme();
+  const { backgroundEffect } = useConfig();
   const [hasOutput, setHasOutput] = React.useState(false);
   const paneRef = React.useRef<HTMLDivElement | null>(null);
   const nodeRef = React.useRef<HTMLDivElement | null>(null);
   const sessionRef = React.useRef(session);
   const themeRef = React.useRef(theme);
+  const effectRef = React.useRef(backgroundEffect);
   const onRegisterRef = React.useRef(onRegister);
   const activeRef = React.useRef(active);
   const restoreRef = React.useRef(tab.restore);
   sessionRef.current = session;
   themeRef.current = theme;
+  effectRef.current = backgroundEffect;
   onRegisterRef.current = onRegister;
   activeRef.current = active;
   restoreRef.current = tab.restore;
@@ -250,7 +257,7 @@ function TerminalHostPane({
     if (!node) {
       return;
     }
-    const host = createXterm(node, themeRef.current);
+    const host = createXterm(node, themeRef.current, effectRef.current);
     const hostNode = (paneRef.current ?? node) as GencoreXtermHost;
     if (import.meta.env.DEV) {
       hostNode.__gencoreXterm = host.terminal;
@@ -361,7 +368,7 @@ function TerminalHostPane({
       data-has-output={hasOutput ? "true" : "false"}
       {...(tab.sessionId ? { "data-session-id": tab.sessionId } : {})}
       className={cn(
-        "absolute inset-0 flex flex-col",
+        "absolute inset-0 z-10 flex flex-col",
         active ? undefined : "pointer-events-none invisible",
       )}
       aria-hidden={!active}

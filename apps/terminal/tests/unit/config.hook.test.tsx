@@ -16,12 +16,30 @@ vi.mock("../../src/modules/ipc/ipc.window", () => ({
 }));
 
 function ConfigProbe() {
-  const { preference, resolvedTheme, setPreference, poshTheme, setPoshTheme } = useTerminalConfig();
+  const {
+    preference,
+    resolvedTheme,
+    setPreference,
+    poshTheme,
+    setPoshTheme,
+    backgroundEffect,
+    setBackgroundEffect,
+    effectInteraction,
+    setEffectInteraction,
+    effectOpacity,
+    setEffectOpacity,
+    effectSpeed,
+    setEffectSpeed,
+  } = useTerminalConfig();
   return (
     <div>
       <span data-testid="preference">{preference}</span>
       <span data-testid="resolved">{resolvedTheme}</span>
       <span data-testid="posh-theme">{poshTheme}</span>
+      <span data-testid="background-effect">{backgroundEffect}</span>
+      <span data-testid="effect-interaction">{effectInteraction}</span>
+      <span data-testid="effect-opacity">{effectOpacity}</span>
+      <span data-testid="effect-speed">{effectSpeed}</span>
       <button type="button" onClick={() => setPreference("snow-storm")}>
         snow
       </button>
@@ -30,6 +48,18 @@ function ConfigProbe() {
       </button>
       <button type="button" onClick={() => setPoshTheme("bubbles")}>
         bubbles
+      </button>
+      <button type="button" onClick={() => setBackgroundEffect("orbs")}>
+        orbs
+      </button>
+      <button type="button" onClick={() => setEffectInteraction("ripple")}>
+        ripple
+      </button>
+      <button type="button" onClick={() => setEffectOpacity(0.8)}>
+        opacity
+      </button>
+      <button type="button" onClick={() => setEffectSpeed(1.5)}>
+        speed
       </button>
     </div>
   );
@@ -107,6 +137,10 @@ describe("useTerminalConfig", () => {
       version: 1,
       theme: "snow-storm",
       poshTheme: "gencore",
+      backgroundEffect: "particles",
+      effectInteraction: "repel",
+      effectOpacity: 0.5,
+      effectSpeed: 1.0,
     });
     await waitFor(() => {
       expect(unlisten).toHaveBeenCalledTimes(1);
@@ -142,18 +176,54 @@ describe("useTerminalConfig", () => {
       version: 1,
       theme: "system",
       poshTheme: "bubbles",
+      backgroundEffect: "particles",
+      effectInteraction: "repel",
+      effectOpacity: 0.5,
+      effectSpeed: 1.0,
+    });
+  });
+
+  it("updates backgroundEffect, effectInteraction, opacity, and speed", async () => {
+    render(<ConfigProbe />);
+    expect(screen.getByTestId("background-effect")).toHaveTextContent("particles");
+    expect(screen.getByTestId("effect-interaction")).toHaveTextContent("repel");
+    expect(screen.getByTestId("effect-opacity")).toHaveTextContent("0.5");
+    expect(screen.getByTestId("effect-speed")).toHaveTextContent("1");
+
+    act(() => {
+      screen.getByText("orbs").click();
+      screen.getByText("ripple").click();
+      screen.getByText("opacity").click();
+      screen.getByText("speed").click();
+    });
+
+    expect(screen.getByTestId("background-effect")).toHaveTextContent("orbs");
+    expect(screen.getByTestId("effect-interaction")).toHaveTextContent("ripple");
+    expect(screen.getByTestId("effect-opacity")).toHaveTextContent("0.8");
+    expect(screen.getByTestId("effect-speed")).toHaveTextContent("1.5");
+
+    expect(JSON.parse(localStorage.getItem(CONFIG_STORAGE_KEY) ?? "")).toEqual({
+      version: 1,
+      theme: "system",
+      poshTheme: "gencore",
+      backgroundEffect: "orbs",
+      effectInteraction: "ripple",
+      effectOpacity: 0.8,
+      effectSpeed: 1.5,
     });
   });
 });
 
 describe("ConfigProvider", () => {
-  it("shares preference and poshTheme through useConfig", () => {
+  it("shares preference and backgroundEffect through useConfig", () => {
     function Child() {
-      const { preference, poshTheme } = useConfig();
+      const { preference, poshTheme, backgroundEffect, effectOpacity } = useConfig();
       return (
         <div>
           <span data-testid="ctx-pref">{preference}</span>
           <span data-testid="ctx-posh">{poshTheme}</span>
+          <span data-testid="ctx-effect">{backgroundEffect}</span>
+          <span data-testid="ctx-opacity">{effectOpacity}</span>
         </div>
       );
     }
@@ -166,6 +236,8 @@ describe("ConfigProvider", () => {
     );
     expect(screen.getByTestId("ctx-pref")).toHaveTextContent("system");
     expect(screen.getByTestId("ctx-posh")).toHaveTextContent("gencore");
+    expect(screen.getByTestId("ctx-effect")).toHaveTextContent("particles");
+    expect(screen.getByTestId("ctx-opacity")).toHaveTextContent("0.5");
   });
 });
 

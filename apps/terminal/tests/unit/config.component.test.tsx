@@ -6,11 +6,19 @@ import type { ConfigContextValue } from "../../src/modules/config/config.types";
 
 const setPreference = vi.fn();
 const setPoshTheme = vi.fn();
+const setBackgroundEffect = vi.fn();
+const setEffectInteraction = vi.fn();
+const setEffectOpacity = vi.fn();
+const setEffectSpeed = vi.fn();
 
 const configState = {
   preference: "system" as const,
   resolvedTheme: "polar-night" as const,
   poshTheme: "gencore" as const,
+  backgroundEffect: "particles" as const,
+  effectInteraction: "repel" as const,
+  effectOpacity: 0.5,
+  effectSpeed: 1.0,
 };
 
 vi.mock("../../src/modules/config/config.hook", () => ({
@@ -20,6 +28,14 @@ vi.mock("../../src/modules/config/config.hook", () => ({
     resolvedTheme: configState.resolvedTheme,
     poshTheme: configState.poshTheme,
     setPoshTheme,
+    backgroundEffect: configState.backgroundEffect,
+    setBackgroundEffect,
+    effectInteraction: configState.effectInteraction,
+    setEffectInteraction,
+    effectOpacity: configState.effectOpacity,
+    setEffectOpacity,
+    effectSpeed: configState.effectSpeed,
+    setEffectSpeed,
   }),
 }));
 
@@ -303,6 +319,52 @@ describe("Config", () => {
 
       await user.type(input, "5");
       expect(setContextLines).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Background Effect section", () => {
+    it("renders Background Effect cards and selects option on click", async () => {
+      const user = userEvent.setup();
+      render(<Config />);
+
+      expect(screen.getByText("Background Effect")).toBeVisible();
+      const group = screen.getByRole("radiogroup", { name: "Background Effect" });
+      expect(group).toBeInTheDocument();
+
+      const particlesCard = within(group).getByRole("radio", { name: /Particles/i });
+      expect(particlesCard).toHaveAttribute("aria-checked", "true");
+
+      const moleculesCard = within(group).getByRole("radio", { name: /Molecules/i });
+      await user.click(moleculesCard);
+      expect(setBackgroundEffect).toHaveBeenCalledWith("molecules");
+    });
+
+    it("renders Mouse Interaction options and selects on click", async () => {
+      const user = userEvent.setup();
+      render(<Config />);
+
+      expect(screen.getByText("Mouse Interaction")).toBeVisible();
+      const rippleOption = screen.getByRole("radio", { name: /Click Ripples/i });
+      await user.click(rippleOption);
+      expect(setEffectInteraction).toHaveBeenCalledWith("ripple");
+    });
+
+    it("updates opacity via slider and preset chips", async () => {
+      const user = userEvent.setup();
+      render(<Config />);
+
+      const subtlePreset = screen.getByRole("button", { name: /Subtle/i });
+      await user.click(subtlePreset);
+      expect(setEffectOpacity).toHaveBeenCalledWith(0.3);
+    });
+
+    it("updates speed via slider and preset chips", async () => {
+      const user = userEvent.setup();
+      render(<Config />);
+
+      const speedPreset = screen.getByRole("button", { name: "1.5x" });
+      await user.click(speedPreset);
+      expect(setEffectSpeed).toHaveBeenCalledWith(1.5);
     });
   });
 });

@@ -3,6 +3,7 @@ import { FitAddon } from "@xterm/addon-fit";
 import { SerializeAddon } from "@xterm/addon-serialize";
 import { Terminal } from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
+import type { BackgroundEffectType } from "../config/config.types";
 import { nordXtermTheme } from "./terminal.theme";
 
 export interface XtermHost {
@@ -12,7 +13,11 @@ export interface XtermHost {
   dispose: () => void;
 }
 
-export function createXterm(el: HTMLElement, theme: ThemeName): XtermHost {
+export function createXterm(
+  el: HTMLElement,
+  theme: ThemeName,
+  effect: BackgroundEffectType = "none",
+): XtermHost {
   const terminal = new Terminal({
     allowProposedApi: true,
     fontFamily: '"Terminess Nerd Font Mono", monospace',
@@ -20,7 +25,7 @@ export function createXterm(el: HTMLElement, theme: ThemeName): XtermHost {
     lineHeight: 1.2,
     cursorBlink: true,
     cursorStyle: "bar",
-    theme: nordXtermTheme(theme),
+    theme: nordXtermTheme(theme, effect),
     scrollback: 4096,
     rightClickSelectsWord: false,
   });
