@@ -5,9 +5,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const loadAddon = vi.fn();
 const open = vi.fn();
 const dispose = vi.fn();
+const terminalConstructor = vi.fn();
 
 vi.mock("@xterm/xterm", () => ({
   Terminal: class {
+    constructor(options?: unknown) {
+      terminalConstructor(options);
+    }
     loadAddon = loadAddon;
     open = open;
     dispose = dispose;
@@ -27,12 +31,15 @@ vi.mock("@xterm/addon-webgl", () => ({
   WebglAddon,
 }));
 
+import { createXterm } from "../../src/modules/terminal/terminal.xterm";
+
 describe("createXterm renderer", () => {
   beforeEach(() => {
     loadAddon.mockClear();
     open.mockClear();
     dispose.mockClear();
     WebglAddon.mockClear();
+    terminalConstructor.mockClear();
   });
 
   it("does not import @xterm/addon-webgl", () => {
@@ -43,12 +50,19 @@ describe("createXterm renderer", () => {
     expect(src).not.toMatch(/@xterm\/addon-webgl/);
   });
 
-  it("does not construct WebglAddon", async () => {
-    const { createXterm } = await import("../../src/modules/terminal/terminal.xterm");
+  it("does not construct WebglAddon", () => {
     const host = createXterm(document.createElement("div"), "polar-night");
     expect(WebglAddon).not.toHaveBeenCalled();
     expect(open).toHaveBeenCalledTimes(1);
     host.dispose();
     expect(dispose).toHaveBeenCalledTimes(1);
+  });
+
+  it("initializes Terminal with allowTransparency: true", () => {
+    const host = createXterm(document.createElement("div"), "polar-night");
+    expect(terminalConstructor).toHaveBeenCalledWith(
+      expect.objectContaining({ allowTransparency: true }),
+    );
+    host.dispose();
   });
 });

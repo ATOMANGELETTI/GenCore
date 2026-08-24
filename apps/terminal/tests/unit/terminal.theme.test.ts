@@ -24,9 +24,9 @@ describe("nordXtermTheme", () => {
   });
 
   it("uses translucent Nord veil when background effect is active", () => {
-    expect(nordXtermTheme("polar-night", "particles").background).toBe("rgba(46, 52, 64, 0.74)");
-    expect(nordXtermTheme("snow-storm", "molecules").background).toBe("rgba(236, 239, 244, 0.78)");
-    expect(nordXtermTheme("polar-night", "orbs").background).toBe("rgba(46, 52, 64, 0.74)");
+    expect(nordXtermTheme("polar-night", "particles").background).toBe("rgba(46, 52, 64, 0.50)");
+    expect(nordXtermTheme("snow-storm", "molecules").background).toBe("rgba(236, 239, 244, 0.55)");
+    expect(nordXtermTheme("polar-night", "orbs").background).toBe("rgba(46, 52, 64, 0.50)");
   });
 
   it("uses frost-8 for the cursor", () => {

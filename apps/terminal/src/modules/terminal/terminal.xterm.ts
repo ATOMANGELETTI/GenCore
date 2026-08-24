@@ -20,6 +20,7 @@ export function createXterm(
 ): XtermHost {
   const terminal = new Terminal({
     allowProposedApi: true,
+    allowTransparency: true,
     fontFamily: '"Terminess Nerd Font Mono", monospace',
     fontSize: 13,
     lineHeight: 1.2,

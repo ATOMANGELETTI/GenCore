@@ -7,3 +7,19 @@
   --gencore-titlebar-height: 28px;
   --gencore-statusbar-height: 24px;
 }
+
+/*
+ * Ensure xterm viewport is transparent so particle canvas effects and translucent veils are visible.
+ */
+.xterm,
+.xterm .xterm-viewport,
+div.xterm .xterm-viewport {
+  background-color: transparent;
+}
+
+/*
+ * Internal text padding for xterm without creating an outer container border.
+ */
+.xterm {
+  padding: 4px 8px;
+}

@@ -381,7 +381,7 @@ function TerminalHostPane({
           </Button>
         </div>
       ) : null}
-      <div className="min-h-0 flex-1 p-3">
+      <div className="relative min-h-0 flex-1 overflow-hidden">
         <div ref={nodeRef} className="h-full w-full overflow-hidden" />
       </div>
     </div>

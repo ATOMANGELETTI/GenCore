@@ -34,7 +34,7 @@ export function nordXtermTheme(theme: ThemeName, effect: BackgroundEffectType = 
   if (effect === "none") {
     background = theme === "snow-storm" ? nord["snow-6"] : nord["polar-0"];
   } else {
-    background = theme === "snow-storm" ? "rgba(236, 239, 244, 0.78)" : "rgba(46, 52, 64, 0.74)";
+    background = theme === "snow-storm" ? "rgba(236, 239, 244, 0.55)" : "rgba(46, 52, 64, 0.50)";
   }
 
   const foreground = theme === "snow-storm" ? nord["polar-0"] : nord["snow-4"];
