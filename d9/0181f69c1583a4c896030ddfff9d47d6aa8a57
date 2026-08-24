@@ -1,0 +1,28 @@
+.agents/.agents/hooks/state/edited-files.json
+  h_90ad036e211778 38-41
+.agents/rules/conventional-commits.md
+  h_90ad036e211778 13,15,34,39-47
+.cursor/rules/conventional-commits.mdc
+  h_90ad036e211778 10,12,31,36-44
+.vscode/settings.json
+  h_90ad036e211778 54
+apps/terminal/vite.config.ts
+  h_90ad036e211778 12-15
+patches/monaco-editor@0.56.0.patch
+  h_90ad036e211778 1-65
+pnpm-lock.yaml
+  h_90ad036e211778 9,105,126,3608,3611,5199
+pnpm-workspace.yaml
+  h_90ad036e211778 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "d90181f69c1583a4c896030ddfff9d47d6aa8a57",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
