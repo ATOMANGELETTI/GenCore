@@ -4,6 +4,7 @@ const COMMANDS: &[&str] = &[
     "save_pinned_tabs",
     "tray_action",
     "get_system_telemetry",
+    "set_theme_icon",
 ];
 
 fn main() {

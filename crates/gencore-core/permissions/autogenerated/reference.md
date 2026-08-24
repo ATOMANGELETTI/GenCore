@@ -122,6 +122,32 @@ Denies the save_pinned_tabs command without any pre-configured scope.
 <tr>
 <td>
 
+`gencore-core:allow-set-theme-icon`
+
+</td>
+<td>
+
+Enables the set_theme_icon command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`gencore-core:deny-set-theme-icon`
+
+</td>
+<td>
+
+Denies the set_theme_icon command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 `gencore-core:allow-tray-action`
 
 </td>

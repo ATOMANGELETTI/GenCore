@@ -11,6 +11,7 @@
   const ALLOWED_COMMANDS = [
     "plugin:gencore-core|get_app_info",
     "plugin:gencore-core|tray_action",
+    "plugin:gencore-core|set_theme_icon",
     "plugin:window|close",
     "plugin:window|minimize",
     "plugin:window|toggle_maximize",
@@ -23,10 +24,13 @@
   const OPEN_URL_CMD = "plugin:opener|open_url";
   const GET_APP_INFO_CMD = "plugin:gencore-core|get_app_info";
   const TRAY_ACTION_CMD = "plugin:gencore-core|tray_action";
+  const SET_THEME_ICON_CMD = "plugin:gencore-core|set_theme_icon";
   const THEME_CMD = "plugin:window|theme";
   const LISTEN_CMD = "plugin:event|listen";
   const UNLISTEN_CMD = "plugin:event|unlisten";
   const THEME_CHANGED_EVENT = "tauri://theme-changed";
+  const THEME_POLAR_NIGHT = "polar-night";
+  const THEME_SNOW_STORM = "snow-storm";
   const ALLOWED_OPEN_URL = "https://github.com/ATOMANGELETTI/GenCore";
   const MAIN_WINDOW_LABEL = "main";
   const TRAY_MENU_WINDOW_LABEL = "tray-menu";
@@ -103,6 +107,18 @@
       keys.length === 1 &&
       keys[0] === "action" &&
       (args.action === "show" || args.action === "hide" || args.action === "quit")
+    );
+  }
+
+  function isSetThemeIconArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    return (
+      keys.length === 1 &&
+      keys[0] === "theme" &&
+      (args.theme === THEME_POLAR_NIGHT || args.theme === THEME_SNOW_STORM)
     );
   }
 
@@ -208,6 +224,9 @@
     if (cmd === TRAY_ACTION_CMD) {
       return { action: args.action };
     }
+    if (cmd === SET_THEME_ICON_CMD) {
+      return { theme: args.theme };
+    }
     if (cmd === LISTEN_CMD) {
       return {
         event: THEME_CHANGED_EVENT,
@@ -263,6 +282,10 @@
       }
     } else if (payload.cmd === TRAY_ACTION_CMD) {
       if (!isTrayActionArgs(payload.payload)) {
+        reject();
+      }
+    } else if (payload.cmd === SET_THEME_ICON_CMD) {
+      if (!isSetThemeIconArgs(payload.payload)) {
         reject();
       }
     } else if (payload.cmd === LISTEN_CMD) {

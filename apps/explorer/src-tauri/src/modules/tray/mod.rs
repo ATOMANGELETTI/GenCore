@@ -4,14 +4,16 @@ use std::sync::{
 };
 use std::time::{Duration, Instant};
 
-use gencore_core::{PxRect, PxSize, tray_menu_origin};
+use gencore_core::{MAIN_TRAY_ID, PxRect, PxSize, tray_menu_origin};
 use tauri::{
     App, AppHandle, Manager, PhysicalPosition, Runtime, WindowEvent,
     image::Image,
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
 };
 
-const TRAY_PNG: &[u8] = include_bytes!("../../../icons/tray.png");
+const TRAY_PNG: &[u8] = include_bytes!(
+    "../../../../../../packages/ui-kit/src/assets/icons/favicon/explorer/favicon-alt_snow-storm.png"
+);
 const TRAY_TOOLTIP: &str = "GenCore Explorer";
 const TRAY_MENU_BLUR_GRACE: Duration = Duration::from_millis(300);
 
@@ -55,7 +57,7 @@ pub fn setup<R: Runtime>(app: &App<R>) -> Result<(), Box<dyn std::error::Error>>
     bind_window_events(app, Arc::clone(&latch))?;
 
     let image = Image::from_bytes(TRAY_PNG)?;
-    TrayIconBuilder::new()
+    TrayIconBuilder::with_id(MAIN_TRAY_ID)
         .icon(image)
         .tooltip(TRAY_TOOLTIP)
         .on_tray_icon_event(move |tray, event| match event {

@@ -8,6 +8,7 @@ const toggleMaximizeWindow = vi.fn();
 const getWindowTheme = vi.fn();
 const subscribeWindowTheme = vi.fn();
 const openRepoInBrowser = vi.fn();
+const setThemeIcon = vi.fn(() => Promise.resolve());
 
 vi.mock("../../src/modules/ipc/ipc.app-info", () => ({ getAppInfo }));
 vi.mock("../../src/modules/ipc/ipc.window", () => ({
@@ -19,6 +20,9 @@ vi.mock("../../src/modules/ipc/ipc.window", () => ({
 }));
 vi.mock("../../src/modules/ipc/ipc.opener", () => ({
   openRepoInBrowser,
+}));
+vi.mock("../../src/modules/ipc/ipc.theme-icon", () => ({
+  setThemeIcon,
 }));
 
 describe("App", () => {
@@ -133,5 +137,33 @@ describe("App", () => {
       expect(wrapper).toHaveAttribute("data-theme", "snow-storm");
       expect(wrapper).toHaveClass("theme-snow-storm", "light");
     });
+  });
+
+  it("synchronizes native theme icon and DOM favicon on theme transition", async () => {
+    let onTheme: ((theme: "light" | "dark") => void) | undefined;
+    subscribeWindowTheme.mockImplementation(async (handler: (theme: "light" | "dark") => void) => {
+      onTheme = handler;
+      return () => undefined;
+    });
+
+    const { App } = await import("../../src/modules/app/app.component");
+    render(<App />);
+
+    await waitFor(() => {
+      expect(setThemeIcon).toHaveBeenCalledWith("polar-night");
+    });
+
+    const link = document.querySelector<HTMLLinkElement>("link[rel~='icon']");
+    expect(link).not.toBeNull();
+    expect(link?.href).toContain("favicon_snow-storm.png");
+
+    act(() => {
+      onTheme?.("light");
+    });
+
+    await waitFor(() => {
+      expect(setThemeIcon).toHaveBeenCalledWith("snow-storm");
+    });
+    expect(link?.href).toContain("favicon_polar-night.png");
   });
 });

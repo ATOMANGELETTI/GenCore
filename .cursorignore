@@ -10,3 +10,6 @@
 
 # Local credential dumps (keep the committed root .npmrc readable).
 **/*.credentials.json
+
+# NOTEPADS AND DEVNOTES
+.notepads/

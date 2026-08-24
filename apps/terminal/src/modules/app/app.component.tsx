@@ -1,4 +1,4 @@
-import { AppShell, ThemeProvider } from "@gencore/ui-kit";
+import { AppShell, ThemeProvider, updateDomFavicon } from "@gencore/ui-kit";
 import * as React from "react";
 import { AgentSettingsProvider } from "../config/config.agent";
 import { ConfigProvider, useConfig } from "../config/config.hook";
@@ -7,6 +7,7 @@ import { TitlebarContextMenu } from "../context-menu/context-menu.titlebar";
 import { FileTreeProvider } from "../file-tree/file-tree.hook";
 import { getAppInfo } from "../ipc/ipc.app-info";
 import { openRepoInBrowser } from "../ipc/ipc.opener";
+import { setThemeIcon } from "../ipc/ipc.theme-icon";
 import type { AppInfo } from "../ipc/ipc.types";
 import { closeWindow, minimizeWindow, toggleMaximizeWindow } from "../ipc/ipc.window";
 import { SidePanel } from "../side-panel/side-panel.component";
@@ -34,6 +35,13 @@ export function App() {
 function AppShellTree() {
   const { resolvedTheme } = useConfig();
   const [appInfo, setAppInfo] = React.useState<AppInfo | null>(null);
+
+  React.useEffect(() => {
+    updateDomFavicon("terminal", resolvedTheme);
+    setThemeIcon(resolvedTheme).catch(() => {
+      // Non-fatal if native window/tray icon cannot be updated in web/test environment
+    });
+  }, [resolvedTheme]);
 
   React.useEffect(() => {
     let cancelled = false;

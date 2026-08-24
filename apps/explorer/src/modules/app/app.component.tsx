@@ -1,7 +1,8 @@
-import { AppShell, ThemeProvider } from "@gencore/ui-kit";
+import { AppShell, ThemeProvider, updateDomFavicon } from "@gencore/ui-kit";
 import * as React from "react";
 import { getAppInfo } from "../ipc/ipc.app-info";
 import { openRepoInBrowser } from "../ipc/ipc.opener";
+import { setThemeIcon } from "../ipc/ipc.theme-icon";
 import type { AppInfo } from "../ipc/ipc.types";
 import { closeWindow, minimizeWindow, toggleMaximizeWindow } from "../ipc/ipc.window";
 import { useOsTheme } from "./app.hook";
@@ -13,6 +14,13 @@ export function App() {
   const osTheme = useOsTheme();
   const [appInfo, setAppInfo] = React.useState<AppInfo | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    updateDomFavicon("explorer", osTheme);
+    setThemeIcon(osTheme).catch(() => {
+      // Non-fatal in web/test environment
+    });
+  }, [osTheme]);
 
   React.useEffect(() => {
     let cancelled = false;

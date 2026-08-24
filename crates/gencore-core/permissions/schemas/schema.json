@@ -343,6 +343,18 @@
           "markdownDescription": "Denies the save_pinned_tabs command without any pre-configured scope."
         },
         {
+          "description": "Enables the set_theme_icon command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-set-theme-icon",
+          "markdownDescription": "Enables the set_theme_icon command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the set_theme_icon command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-set-theme-icon",
+          "markdownDescription": "Denies the set_theme_icon command without any pre-configured scope."
+        },
+        {
           "description": "Enables the tray_action command without any pre-configured scope.",
           "type": "string",
           "const": "allow-tray-action",

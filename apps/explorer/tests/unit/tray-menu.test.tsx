@@ -22,6 +22,8 @@ vi.mock("../../src/modules/ipc/ipc.window", () => ({
   subscribeWindowTheme,
 }));
 
+import { TrayMenuApp } from "../../src/modules/tray-menu/tray-menu.component";
+
 describe("TrayMenuApp", () => {
   beforeEach(() => {
     trayAction.mockClear();
@@ -31,8 +33,7 @@ describe("TrayMenuApp", () => {
     subscribeWindowTheme.mockResolvedValue(() => undefined);
   });
 
-  it("renders Show, Hide, and Quit", async () => {
-    const { TrayMenuApp } = await import("../../src/modules/tray-menu/tray-menu.component");
+  it("renders Show, Hide, and Quit", () => {
     render(<TrayMenuApp />);
 
     expect(screen.getByRole("menuitem", { name: "Show" })).toBeInTheDocument();
@@ -42,7 +43,6 @@ describe("TrayMenuApp", () => {
 
   it("calls trayAction show when Show is clicked", async () => {
     const user = userEvent.setup();
-    const { TrayMenuApp } = await import("../../src/modules/tray-menu/tray-menu.component");
     render(<TrayMenuApp />);
 
     await user.click(screen.getByRole("menuitem", { name: "Show" }));

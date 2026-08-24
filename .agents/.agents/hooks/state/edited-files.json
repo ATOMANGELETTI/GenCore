@@ -43,5 +43,9 @@
   "319f7e4e-9037-41ce-a3ef-6070d9a6b31b": {
     "members": ["crates/gencore-plugin-git"],
     "testReminderSent": true
+  },
+  "c6569b61-7ca3-433c-917a-79419bfd293c": {
+    "members": ["crates/gencore-core", "apps/terminal", "apps/explorer", "packages/ui-kit"],
+    "testReminderSent": true
   }
 }

@@ -35,8 +35,16 @@ const { openRepoInBrowser } = vi.hoisted(() => ({
   openRepoInBrowser: vi.fn(() => Promise.resolve()),
 }));
 
+const { setThemeIcon } = vi.hoisted(() => ({
+  setThemeIcon: vi.fn(() => Promise.resolve()),
+}));
+
 vi.mock("../../src/modules/ipc/ipc.opener", () => ({
   openRepoInBrowser,
+}));
+
+vi.mock("../../src/modules/ipc/ipc.theme-icon", () => ({
+  setThemeIcon,
 }));
 
 vi.mock("../../src/modules/ipc/ipc.fs", () => ({
@@ -220,6 +228,35 @@ describe("App", () => {
       expect(wrapper).toHaveClass("theme-snow-storm", "light");
     });
     expect(subscribeWindowTheme).not.toHaveBeenCalled();
+  });
+
+  it("synchronizes native theme icon and DOM favicon on theme transition", async () => {
+    let onTheme: ((theme: "light" | "dark") => void) | undefined;
+    vi.mocked(subscribeWindowTheme).mockImplementation(
+      async (handler: (theme: "light" | "dark") => void) => {
+        onTheme = handler;
+        return () => undefined;
+      },
+    );
+
+    render(<App />);
+
+    await waitFor(() => {
+      expect(setThemeIcon).toHaveBeenCalledWith("polar-night");
+    });
+
+    const link = document.querySelector<HTMLLinkElement>("link[rel~='icon']");
+    expect(link).not.toBeNull();
+    expect(link?.href).toContain("favicon_snow-storm.png");
+
+    act(() => {
+      onTheme?.("light");
+    });
+
+    await waitFor(() => {
+      expect(setThemeIcon).toHaveBeenCalledWith("snow-storm");
+    });
+    expect(link?.href).toContain("favicon_polar-night.png");
   });
 
   it("does not show shell size in the statusbar", async () => {

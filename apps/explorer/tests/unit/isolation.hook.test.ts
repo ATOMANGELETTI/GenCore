@@ -227,6 +227,7 @@ describe("explorer isolation hook", () => {
       "core:window:allow-start-dragging",
       "core:window:allow-theme",
       "gencore-core:allow-get-app-info",
+      "gencore-core:allow-set-theme-icon",
       "core:event:allow-listen",
       "core:event:allow-unlisten",
       {
@@ -428,5 +429,32 @@ describe("explorer isolation hook", () => {
     expect(() => hook(envelope(TRAY_ACTION_CMD, { action: "foo" }))).toThrow();
     expect(() => hook(envelope(TRAY_ACTION_CMD, {}))).toThrow();
     expect(() => hook(envelope(TRAY_ACTION_CMD, { label: "main" }))).toThrow();
+  });
+
+  it.each(["polar-night", "snow-storm"] as const)(
+    "allows set_theme_icon %s and reconstructs a theme-only payload",
+    (theme) => {
+      const hook = getHook();
+      const inner = { theme };
+      const input = envelope("plugin:gencore-core|set_theme_icon", inner);
+      const result = hook(input);
+
+      expect(result).not.toBe(input);
+      expect(result.cmd).toBe("plugin:gencore-core|set_theme_icon");
+      expect(result.payload).not.toBe(inner);
+      expect(result.payload).toEqual({ theme });
+      expect(Object.keys(result.payload as object)).toEqual(["theme"]);
+    },
+  );
+
+  it("throws for set_theme_icon with extra keys or an unknown theme", () => {
+    const hook = getHook();
+    expect(() =>
+      hook(envelope("plugin:gencore-core|set_theme_icon", { theme: "polar-night", extra: true })),
+    ).toThrow();
+    expect(() =>
+      hook(envelope("plugin:gencore-core|set_theme_icon", { theme: "dracula" })),
+    ).toThrow();
+    expect(() => hook(envelope("plugin:gencore-core|set_theme_icon", {}))).toThrow();
   });
 });

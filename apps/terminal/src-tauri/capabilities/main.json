@@ -13,6 +13,7 @@
     "gencore-core:allow-get-system-telemetry",
     "gencore-core:allow-load-pinned-tabs",
     "gencore-core:allow-save-pinned-tabs",
+    "gencore-core:allow-set-theme-icon",
     "gencore-fs:allow-list",
     "gencore-fs:allow-list-drives",
     "gencore-fs:allow-create-file",

@@ -9,7 +9,7 @@ description = "Shared core types, typed errors, and the app-info command for Gen
 links = "gencore-core"
 
 [dependencies]
-tauri = { workspace = true }
+tauri = { workspace = true, features = ["image-png", "tray-icon"] }
 serde = { workspace = true }
 thiserror = { workspace = true }
 sysinfo = { version = "0.39.6", default-features = false, features = ["system", "network"] }

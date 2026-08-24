@@ -20,6 +20,7 @@
     "plugin:gencore-core|load_pinned_tabs",
     "plugin:gencore-core|save_pinned_tabs",
     "plugin:gencore-core|tray_action",
+    "plugin:gencore-core|set_theme_icon",
     "plugin:window|close",
     "plugin:window|minimize",
     "plugin:window|toggle_maximize",
@@ -73,6 +74,7 @@
   const LOAD_PINNED_CMD = "plugin:gencore-core|load_pinned_tabs";
   const SAVE_PINNED_CMD = "plugin:gencore-core|save_pinned_tabs";
   const TRAY_ACTION_CMD = "plugin:gencore-core|tray_action";
+  const SET_THEME_ICON_CMD = "plugin:gencore-core|set_theme_icon";
   const THEME_CMD = "plugin:window|theme";
   const LIST_DRIVES_CMD = "plugin:gencore-fs|list_drives";
   const LIST_CMD = "plugin:gencore-fs|list";
@@ -452,6 +454,18 @@
       keys.length === 1 &&
       keys[0] === "action" &&
       (args.action === "show" || args.action === "hide" || args.action === "quit")
+    );
+  }
+
+  function isSetThemeIconArgs(args) {
+    if (!isPlainObject(args)) {
+      return false;
+    }
+    const keys = Object.keys(args);
+    return (
+      keys.length === 1 &&
+      keys[0] === "theme" &&
+      (args.theme === THEME_POLAR_NIGHT || args.theme === THEME_SNOW_STORM)
     );
   }
 
@@ -1227,6 +1241,9 @@
     if (cmd === TRAY_ACTION_CMD) {
       return { action: args.action };
     }
+    if (cmd === SET_THEME_ICON_CMD) {
+      return { theme: args.theme };
+    }
     if (isFsPathCommand(cmd)) {
       return { path: args.path };
     }
@@ -1336,6 +1353,10 @@
       }
     } else if (payload.cmd === TRAY_ACTION_CMD) {
       if (!isTrayActionArgs(payload.payload)) {
+        reject();
+      }
+    } else if (payload.cmd === SET_THEME_ICON_CMD) {
+      if (!isSetThemeIconArgs(payload.payload)) {
         reject();
       }
     } else if (isFsPathCommand(payload.cmd)) {
