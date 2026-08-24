@@ -4,7 +4,9 @@ import {
   DEFAULT_CONFIG,
   loadConfig,
   parseConfig,
+  readActiveSubview,
   saveConfig,
+  writeActiveSubview,
 } from "../../src/modules/config/config.storage";
 import type { TerminalConfigV1 } from "../../src/modules/config/config.types";
 
@@ -123,6 +125,34 @@ describe("loadConfig / saveConfig", () => {
       throw new Error("quota");
     });
     expect(saveConfig(DEFAULT_CONFIG)).toBe(false);
+  });
+});
+
+describe("readActiveSubview / writeActiveSubview", () => {
+  afterEach(() => {
+    localStorage.clear();
+    vi.restoreAllMocks();
+  });
+
+  it("defaults to 'appearance' when nothing stored", () => {
+    expect(readActiveSubview()).toBe("appearance");
+  });
+
+  it("writes and reads back a valid subview", () => {
+    writeActiveSubview("effects");
+    expect(readActiveSubview()).toBe("effects");
+  });
+
+  it("falls back to 'appearance' on invalid stored value", () => {
+    localStorage.setItem("gencore:config:active-subview", "invalid-view");
+    expect(readActiveSubview()).toBe("appearance");
+  });
+
+  it("handles storage exceptions gracefully", () => {
+    vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new Error("blocked");
+    });
+    expect(readActiveSubview()).toBe("appearance");
   });
 });
 

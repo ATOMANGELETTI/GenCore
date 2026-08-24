@@ -103,7 +103,7 @@ describe("SidePanel", () => {
 
     await user.click(screen.getByRole("tab", { name: "Config" }));
 
-    expect(screen.getByText("CONFIG")).toBeVisible();
+    expect(screen.getByRole("tablist", { name: "Configuration categories" })).toBeVisible();
     expect(screen.getByRole("radiogroup", { name: "Theme" })).toBeVisible();
     expect(screen.queryByText("Tab 3")).toBeNull();
     expect(screen.queryByText("Tab 2")).toBeNull();

@@ -1,5 +1,6 @@
 import type {
   BackgroundEffectType,
+  ConfigSubviewId,
   EffectInteractionMode,
   PoshThemeId,
   TerminalConfigV1,
@@ -109,6 +110,37 @@ export function loadConfig(): TerminalConfigV1 {
 export function saveConfig(config: TerminalConfigV1): boolean {
   try {
     localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(config));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export const ACTIVE_SUBVIEW_KEY = "gencore:config:active-subview";
+
+const VALID_SUBVIEWS: ReadonlySet<string> = new Set([
+  "appearance",
+  "effects",
+  "prompt",
+  "assistant",
+  "all",
+]);
+
+export function readActiveSubview(): ConfigSubviewId {
+  try {
+    const raw = localStorage.getItem(ACTIVE_SUBVIEW_KEY);
+    if (raw && VALID_SUBVIEWS.has(raw)) {
+      return raw as ConfigSubviewId;
+    }
+  } catch {
+    // fallback to default
+  }
+  return "appearance";
+}
+
+export function writeActiveSubview(id: ConfigSubviewId): boolean {
+  try {
+    localStorage.setItem(ACTIVE_SUBVIEW_KEY, id);
     return true;
   } catch {
     return false;

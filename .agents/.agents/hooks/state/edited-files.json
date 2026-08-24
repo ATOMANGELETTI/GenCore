@@ -18,5 +18,9 @@
   "7e4d0bca-c442-4ae4-ac56-44db5900ef5c": {
     "members": ["apps/terminal"],
     "testReminderSent": true
+  },
+  "0c462383-e2e5-4799-a193-64afb1ce8785": {
+    "members": ["apps/terminal"],
+    "testReminderSent": true
   }
 }

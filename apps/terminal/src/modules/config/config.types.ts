@@ -14,6 +14,8 @@ export type PoshThemeId =
 export type BackgroundEffectType = "none" | "particles" | "molecules" | "orbs";
 export type EffectInteractionMode = "ambient" | "repel" | "ripple";
 
+export type ConfigSubviewId = "appearance" | "effects" | "prompt" | "assistant" | "all";
+
 export interface TerminalConfigV1 {
   version: 1;
   theme: ThemePreference;
