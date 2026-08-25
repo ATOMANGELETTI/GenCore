@@ -6,6 +6,7 @@ import { GENCORE_REPO_URL } from "../../src/modules/ipc/ipc.opener";
 
 const EMPTY_ARG_COMMANDS = [
   "plugin:gencore-core|get_app_info",
+  "plugin:gencore-fs|list_drives",
   "plugin:window|close",
   "plugin:window|minimize",
   "plugin:window|toggle_maximize",
@@ -21,17 +22,31 @@ const WINDOW_COMMANDS = [
   "plugin:window|theme",
 ] as const;
 
+const FS_PATH_ONLY_COMMANDS = [
+  "plugin:gencore-fs|list",
+  "plugin:gencore-fs|stat",
+  "plugin:gencore-fs|create_file",
+  "plugin:gencore-fs|create_dir",
+  "plugin:gencore-fs|unwatch",
+] as const;
+
 const OPEN_URL_CMD = "plugin:opener|open_url";
+const OPEN_PATH_CMD = "plugin:opener|open_path";
 const TRAY_ACTION_CMD = "plugin:gencore-core|tray_action";
 const TRAY_ACTIONS = ["show", "hide", "quit"] as const;
 const EVENT_LISTEN_CMD = "plugin:event|listen";
 const EVENT_UNLISTEN_CMD = "plugin:event|unlisten";
 const EVENT_EMIT_CMD = "plugin:event|emit";
 const THEME_CHANGED_EVENT = "tauri://theme-changed";
+const ENTRY_CHANGED_EVENT = "gencore-fs://entry-changed";
+const WATCH_CMD = "plugin:gencore-fs|watch";
+const RENAME_CMD = "plugin:gencore-fs|rename";
+const DELETE_CMD = "plugin:gencore-fs|delete";
+const COPY_CMD = "plugin:gencore-fs|copy";
+const MOVE_PATHS_CMD = "plugin:gencore-fs|move_paths";
 
 const FORBIDDEN_TOKENS = [
   "gencore-pty",
-  "gencore-fs",
   "core:default",
   "opener:default",
   "core:event:default",
@@ -151,6 +166,102 @@ describe("explorer isolation hook", () => {
     ).toThrow();
   });
 
+  it("allows open_path with a plain path and reconstructs a path-only payload", () => {
+    const hook = getHook();
+    const inner = { path: "C:\\Users\\dev\\report.pdf", with: undefined };
+    const input = envelope(OPEN_PATH_CMD, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({ path: "C:\\Users\\dev\\report.pdf" });
+  });
+
+  it("throws for open_path with a missing path, extra keys, or a custom app", () => {
+    const hook = getHook();
+    expect(() => hook(envelope(OPEN_PATH_CMD))).toThrow();
+    expect(() => hook(envelope(OPEN_PATH_CMD, { path: "" }))).toThrow();
+    expect(() => hook(envelope(OPEN_PATH_CMD, { path: "C:\\a.txt", with: "vlc" }))).toThrow();
+    expect(() => hook(envelope(OPEN_PATH_CMD, { path: "C:\\a.txt", extra: true }))).toThrow();
+  });
+
+  it.each(FS_PATH_ONLY_COMMANDS)("allows %s with a path-only payload", (cmd) => {
+    const hook = getHook();
+    const input = envelope(cmd, { path: "C:\\Users\\dev" });
+    const result = hook(input);
+    expect(result).not.toBe(input);
+    expect(result.payload).toEqual({ path: "C:\\Users\\dev" });
+  });
+
+  it.each(FS_PATH_ONLY_COMMANDS)("throws for %s with extra keys or a missing path", (cmd) => {
+    const hook = getHook();
+    expect(() => hook(envelope(cmd, { path: "C:\\Users\\dev", extra: true }))).toThrow();
+    expect(() => hook(envelope(cmd, {}))).toThrow();
+  });
+
+  it("allows watch with recursive:false and reconstructs a fixed payload", () => {
+    const hook = getHook();
+    const input = envelope(WATCH_CMD, { path: "C:\\Users\\dev", recursive: false });
+    const result = hook(input);
+    expect(result.payload).toEqual({ path: "C:\\Users\\dev", recursive: false });
+  });
+
+  it("throws for watch with recursive:true", () => {
+    const hook = getHook();
+    expect(() => hook(envelope(WATCH_CMD, { path: "C:\\Users\\dev", recursive: true }))).toThrow();
+  });
+
+  it("allows rename and reconstructs a path/new_name payload", () => {
+    const hook = getHook();
+    const inner = { path: "C:\\a.txt", new_name: "b.txt" };
+    const input = envelope(RENAME_CMD, inner);
+    const result = hook(input);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual(inner);
+  });
+
+  it("throws for rename with a missing field or an empty new_name", () => {
+    const hook = getHook();
+    expect(() => hook(envelope(RENAME_CMD, { path: "C:\\a.txt" }))).toThrow();
+    expect(() => hook(envelope(RENAME_CMD, { path: "C:\\a.txt", new_name: "" }))).toThrow();
+    expect(() =>
+      hook(envelope(RENAME_CMD, { path: "C:\\a.txt", new_name: "b.txt", extra: true })),
+    ).toThrow();
+  });
+
+  it("allows delete and reconstructs a paths-only payload", () => {
+    const hook = getHook();
+    const inner = { paths: ["C:\\a.txt", "C:\\b.txt"] };
+    const input = envelope(DELETE_CMD, inner);
+    const result = hook(input);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual(inner);
+    expect((result.payload as { paths: unknown[] }).paths).not.toBe(inner.paths);
+  });
+
+  it("throws for delete with an empty array or a non-array", () => {
+    const hook = getHook();
+    expect(() => hook(envelope(DELETE_CMD, { paths: [] }))).toThrow();
+    expect(() => hook(envelope(DELETE_CMD, { paths: "C:\\a.txt" }))).toThrow();
+  });
+
+  it.each([COPY_CMD, MOVE_PATHS_CMD])(
+    "allows %s and reconstructs a paths/destination_dir payload",
+    (cmd) => {
+      const hook = getHook();
+      const inner = { paths: ["C:\\a.txt"], destination_dir: "C:\\dest" };
+      const input = envelope(cmd, inner);
+      const result = hook(input);
+      expect(result.payload).not.toBe(inner);
+      expect(result.payload).toEqual(inner);
+    },
+  );
+
+  it.each([COPY_CMD, MOVE_PATHS_CMD])("throws for %s with a missing destination_dir", (cmd) => {
+    const hook = getHook();
+    expect(() => hook(envelope(cmd, { paths: ["C:\\a.txt"] }))).toThrow();
+  });
+
   it("throws when cmd is not a string", () => {
     const hook = getHook();
     expect(() => hook(envelope(1))).toThrow();
@@ -162,7 +273,6 @@ describe("explorer isolation hook", () => {
     const hook = getHook();
     expect(() => hook(envelope("plugin:gencore-pty|spawn"))).toThrow();
     expect(() => hook(envelope("plugin:gencore-fs|read"))).toThrow();
-    expect(() => hook(envelope("plugin:opener|open_path"))).toThrow();
   });
 
   it("throws for get_app_info with extra args", () => {
@@ -228,6 +338,18 @@ describe("explorer isolation hook", () => {
       "core:window:allow-theme",
       "gencore-core:allow-get-app-info",
       "gencore-core:allow-set-theme-icon",
+      "gencore-fs:allow-list",
+      "gencore-fs:allow-list-drives",
+      "gencore-fs:allow-stat",
+      "gencore-fs:allow-create-file",
+      "gencore-fs:allow-create-dir",
+      "gencore-fs:allow-rename",
+      "gencore-fs:allow-delete",
+      "gencore-fs:allow-copy",
+      "gencore-fs:allow-move-paths",
+      "gencore-fs:allow-watch",
+      "gencore-fs:allow-unwatch",
+      "opener:allow-open-path",
       "core:event:allow-listen",
       "core:event:allow-unlisten",
       {
@@ -346,6 +468,41 @@ describe("explorer isolation hook", () => {
     ).toThrow();
   });
 
+  it("reconstructs listen for gencore-fs://entry-changed with an Any target", () => {
+    const hook = getHook();
+    const inner = { event: ENTRY_CHANGED_EVENT, target: { kind: "Any" }, handler: 9 };
+    const input = envelope(EVENT_LISTEN_CMD, inner);
+    const result = hook(input);
+
+    expect(result).not.toBe(input);
+    expect(result.payload).not.toBe(inner);
+    expect(result.payload).toEqual({
+      event: ENTRY_CHANGED_EVENT,
+      target: { kind: "Any" },
+      handler: 9,
+    });
+  });
+
+  it("throws for entry-changed listen with a non-Any target", () => {
+    const hook = getHook();
+    expect(() =>
+      hook(
+        envelope(EVENT_LISTEN_CMD, {
+          event: ENTRY_CHANGED_EVENT,
+          target: { kind: "Window", label: "main" },
+          handler: 9,
+        }),
+      ),
+    ).toThrow();
+  });
+
+  it("reconstructs unlisten for gencore-fs://entry-changed", () => {
+    const hook = getHook();
+    const inner = { event: ENTRY_CHANGED_EVENT, eventId: 4 };
+    const result = hook(envelope(EVENT_UNLISTEN_CMD, inner));
+    expect(result.payload).toEqual(inner);
+  });
+
   it("throws for listen with a wrong event, extra keys, or emit", () => {
     const hook = getHook();
     const validTarget = { kind: "Window", label: "main" };
@@ -354,15 +511,6 @@ describe("explorer isolation hook", () => {
         envelope(EVENT_LISTEN_CMD, {
           event: "tauri://click",
           target: validTarget,
-          handler: 7,
-        }),
-      ),
-    ).toThrow();
-    expect(() =>
-      hook(
-        envelope(EVENT_LISTEN_CMD, {
-          event: "gencore-fs://entry-changed",
-          target: { kind: "Any" },
           handler: 7,
         }),
       ),

@@ -3,8 +3,8 @@ use std::time::Duration;
 
 use gencore_fs::{
     AccessKind, CreateKind, DataChange, EntryChangeKind, EventKind, ModifyKind, RemoveKind,
-    RenameMode, UnwatchArgs, WatchError, WatchMap, apply_debounced_events, handle_debounce_error,
-    map_event_kind, start_watch, stop_watch,
+    RenameMode, UnwatchArgs, WatchArgs, WatchError, WatchMap, apply_debounced_events,
+    handle_debounce_error, map_event_kind, start_watch, stop_watch,
 };
 
 #[test]
@@ -192,5 +192,12 @@ fn entry_changed_payload_serializes_lowercase_kinds() {
 fn unwatch_args_reject_unknown_fields() {
     let json = serde_json::json!({ "path": "/tmp", "unexpected": true });
     let parsed: Result<UnwatchArgs, _> = serde_json::from_value(json);
+    assert!(parsed.is_err());
+}
+
+#[test]
+fn watch_args_reject_unknown_fields() {
+    let json = serde_json::json!({ "path": "/tmp", "recursive": true, "unexpected": true });
+    let parsed: Result<WatchArgs, _> = serde_json::from_value(json);
     assert!(parsed.is_err());
 }

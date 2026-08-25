@@ -295,6 +295,18 @@
       "type": "string",
       "oneOf": [
         {
+          "description": "Enables the copy command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-copy",
+          "markdownDescription": "Enables the copy command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the copy command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-copy",
+          "markdownDescription": "Denies the copy command without any pre-configured scope."
+        },
+        {
           "description": "Enables the create_dir command without any pre-configured scope.",
           "type": "string",
           "const": "allow-create-dir",
@@ -319,6 +331,18 @@
           "markdownDescription": "Denies the create_file command without any pre-configured scope."
         },
         {
+          "description": "Enables the delete command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-delete",
+          "markdownDescription": "Enables the delete command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the delete command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-delete",
+          "markdownDescription": "Denies the delete command without any pre-configured scope."
+        },
+        {
           "description": "Enables the list command without any pre-configured scope.",
           "type": "string",
           "const": "allow-list",
@@ -341,6 +365,30 @@
           "type": "string",
           "const": "deny-list-drives",
           "markdownDescription": "Denies the list_drives command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the move_paths command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-move-paths",
+          "markdownDescription": "Enables the move_paths command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the move_paths command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-move-paths",
+          "markdownDescription": "Denies the move_paths command without any pre-configured scope."
+        },
+        {
+          "description": "Enables the rename command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-rename",
+          "markdownDescription": "Enables the rename command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the rename command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-rename",
+          "markdownDescription": "Denies the rename command without any pre-configured scope."
         },
         {
           "description": "Enables the stat command without any pre-configured scope.",

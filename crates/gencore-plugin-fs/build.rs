@@ -4,6 +4,10 @@ const COMMANDS: &[&str] = &[
     "create_file",
     "create_dir",
     "stat",
+    "rename",
+    "delete",
+    "copy",
+    "move_paths",
     "watch",
     "unwatch",
 ];

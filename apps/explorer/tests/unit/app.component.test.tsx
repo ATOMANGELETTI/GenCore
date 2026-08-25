@@ -18,11 +18,28 @@ vi.mock("../../src/modules/ipc/ipc.window", () => ({
   getWindowTheme,
   subscribeWindowTheme,
 }));
+const openFile = vi.fn(() => Promise.resolve());
+
 vi.mock("../../src/modules/ipc/ipc.opener", () => ({
   openRepoInBrowser,
+  openFile,
 }));
 vi.mock("../../src/modules/ipc/ipc.theme-icon", () => ({
   setThemeIcon,
+}));
+vi.mock("../../src/modules/ipc/ipc.fs", () => ({
+  listDrives: vi.fn(() => Promise.resolve([])),
+  listDir: vi.fn(() => Promise.resolve({ entries: [] })),
+  statPath: vi.fn(() => Promise.reject(new Error("no stat in tests"))),
+  createFile: vi.fn(() => Promise.resolve()),
+  createDir: vi.fn(() => Promise.resolve()),
+  renamePath: vi.fn(() => Promise.resolve({ path: "" })),
+  deletePaths: vi.fn(() => Promise.resolve()),
+  copyPaths: vi.fn(() => Promise.resolve()),
+  movePaths: vi.fn(() => Promise.resolve()),
+  watchDir: vi.fn(() => Promise.resolve()),
+  unwatchDir: vi.fn(() => Promise.resolve()),
+  subscribeFsChanges: vi.fn(() => Promise.resolve(() => undefined)),
 }));
 
 describe("App", () => {
@@ -33,7 +50,7 @@ describe("App", () => {
     subscribeWindowTheme.mockResolvedValue(() => undefined);
   });
 
-  it("renders the exact template heading", async () => {
+  it("renders the exact template copy in the titlebar and the real file explorer body", async () => {
     getAppInfo.mockResolvedValue({
       name: "GenCore Explorer",
       version: "0.1.0",
@@ -43,9 +60,12 @@ describe("App", () => {
     const { App } = await import("../../src/modules/app/app.component");
     render(<App />);
 
-    expect(
-      screen.getByRole("heading", { level: 1, name: "Tauri Explorer Template" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("banner")).toHaveTextContent("Tauri Explorer Template");
+    expect(screen.getByRole("button", { name: "New folder" })).toBeInTheDocument();
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Tree" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Details" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Config" })).toBeInTheDocument();
   });
 
   it("shows the version from get_app_info in the titlebar, not the statusbar", async () => {

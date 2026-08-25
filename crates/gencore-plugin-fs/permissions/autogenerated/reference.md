@@ -14,6 +14,32 @@ No commands are enabled by default for the gencore-fs plugin. Consumers must exp
 <tr>
 <td>
 
+`gencore-fs:allow-copy`
+
+</td>
+<td>
+
+Enables the copy command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`gencore-fs:deny-copy`
+
+</td>
+<td>
+
+Denies the copy command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 `gencore-fs:allow-create-dir`
 
 </td>
@@ -66,6 +92,32 @@ Denies the create_file command without any pre-configured scope.
 <tr>
 <td>
 
+`gencore-fs:allow-delete`
+
+</td>
+<td>
+
+Enables the delete command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`gencore-fs:deny-delete`
+
+</td>
+<td>
+
+Denies the delete command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 `gencore-fs:allow-list`
 
 </td>
@@ -111,6 +163,58 @@ Enables the list_drives command without any pre-configured scope.
 <td>
 
 Denies the list_drives command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`gencore-fs:allow-move-paths`
+
+</td>
+<td>
+
+Enables the move_paths command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`gencore-fs:deny-move-paths`
+
+</td>
+<td>
+
+Denies the move_paths command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`gencore-fs:allow-rename`
+
+</td>
+<td>
+
+Enables the rename command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`gencore-fs:deny-rename`
+
+</td>
+<td>
+
+Denies the rename command without any pre-configured scope.
 
 </td>
 </tr>
