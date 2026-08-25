@@ -3,6 +3,7 @@ import { observeElementRect, useVirtualizer } from "@tanstack/react-virtual";
 import { ChevronDown, ChevronUp, FolderOpen } from "lucide-react";
 import * as React from "react";
 import { useConfig } from "../config/config.hook";
+import type { FileSizeFormat } from "../config/config.types";
 import { FileListEntryMenu } from "../context-menu/context-menu.file-list";
 import { FileListBackgroundMenu } from "../context-menu/context-menu.file-list-background";
 import type { FileOpsApi } from "../file-ops/file-ops.types";
@@ -41,7 +42,7 @@ interface FileListProps {
 }
 
 export function FileList({ navigation, fileList, fileOps }: FileListProps) {
-  const { showFileExtensions, confirmBeforeDelete } = useConfig();
+  const { showFileExtensions, confirmBeforeDelete, fileSizeFormat } = useConfig();
   const [renamingPath, setRenamingPath] = React.useState<string | null>(null);
   const parentRef = React.useRef<HTMLDivElement>(null);
 
@@ -245,6 +246,7 @@ export function FileList({ navigation, fileList, fileOps }: FileListProps) {
                       key={virtualRow.key}
                       entry={entry}
                       showFileExtensions={showFileExtensions}
+                      fileSizeFormat={fileSizeFormat}
                       selected={fileList.selectedPaths.has(entry.path)}
                       renaming={renamingPath === entry.path}
                       style={{
@@ -305,6 +307,7 @@ function EmptyState({ hasFilter, error }: { hasFilter: boolean; error: string | 
 interface FileListRowProps {
   readonly entry: FsEntry;
   readonly showFileExtensions: boolean;
+  readonly fileSizeFormat: FileSizeFormat;
   readonly selected: boolean;
   readonly renaming: boolean;
   readonly style: React.CSSProperties;
@@ -323,6 +326,7 @@ interface FileListRowProps {
 function FileListRow({
   entry,
   showFileExtensions,
+  fileSizeFormat,
   selected,
   renaming,
   style,
@@ -410,7 +414,7 @@ function FileListRow({
             )}
           </div>
           <span className="w-20 shrink-0 text-right tabular-nums text-muted-foreground">
-            {formatSize(entry.size)}
+            {formatSize(entry.size, fileSizeFormat)}
           </span>
           <span className="w-32 shrink-0 truncate text-muted-foreground">{typeLabel(entry)}</span>
           <span className="w-40 shrink-0 truncate tabular-nums text-muted-foreground">

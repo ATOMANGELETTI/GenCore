@@ -23,6 +23,8 @@ describe("config.storage", () => {
       showHiddenFiles: true,
       showFileExtensions: false,
       confirmBeforeDelete: false,
+      themePreference: "polar-night",
+      fileSizeFormat: "decimal",
     };
     expect(parseConfig(JSON.stringify(config))).toEqual(config);
   });

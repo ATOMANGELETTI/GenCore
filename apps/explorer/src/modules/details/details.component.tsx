@@ -1,5 +1,6 @@
 import { Badge, FileIcon } from "@gencore/ui-kit";
 import { Info } from "lucide-react";
+import { useConfig } from "../config/config.hook";
 import { formatModified, formatSize } from "../file-list/file-list.format";
 import { useDetails } from "./details.hook";
 
@@ -23,6 +24,7 @@ export function Details({ selectedPaths }: DetailsProps) {
 
 function SingleSelectionDetails({ path }: { path: string }) {
   const { stat, loading } = useDetails(path);
+  const { fileSizeFormat } = useConfig();
 
   if (loading || !stat) {
     return <EmptyState message="Loading…" />;
@@ -49,7 +51,7 @@ function SingleSelectionDetails({ path }: { path: string }) {
           label="Type"
           value={stat.kind === "dir" ? "File folder" : (stat.extension?.toUpperCase() ?? "File")}
         />
-        {stat.kind !== "dir" && <Row label="Size" value={formatSize(stat.size)} />}
+        {stat.kind !== "dir" && <Row label="Size" value={formatSize(stat.size, fileSizeFormat)} />}
         <Row label="Modified" value={formatModified(stat.modifiedMs)} />
         <Row label="Created" value={formatModified(stat.createdMs)} />
         <Row label="Path" value={stat.path} mono />

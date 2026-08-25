@@ -1,6 +1,6 @@
 import { AppShell, ThemeProvider, TooltipProvider, updateDomFavicon } from "@gencore/ui-kit";
 import * as React from "react";
-import { ConfigProvider } from "../config/config.hook";
+import { ConfigProvider, useConfig } from "../config/config.hook";
 import { FileList } from "../file-list/file-list.component";
 import { getAppInfo } from "../ipc/ipc.app-info";
 import { listDrives } from "../ipc/ipc.fs";
@@ -10,7 +10,6 @@ import type { AppInfo } from "../ipc/ipc.types";
 import { closeWindow, minimizeWindow, toggleMaximizeWindow } from "../ipc/ipc.window";
 import { SidePanel } from "../side-panel/side-panel.component";
 import { SidePanelToggle } from "../side-panel/side-panel-toggle.component";
-import { useOsTheme } from "./app.hook";
 import { useWorkspace } from "./app.workspace.hook";
 import "./app.theme.css";
 
@@ -18,15 +17,23 @@ import "./app.theme.css";
 const APP_TITLE = "Tauri Explorer Template";
 
 export function App() {
-  const osTheme = useOsTheme();
+  return (
+    <ConfigProvider>
+      <AppShellTree />
+    </ConfigProvider>
+  );
+}
+
+function AppShellTree() {
+  const { resolvedTheme } = useConfig();
   const [appInfo, setAppInfo] = React.useState<AppInfo | null>(null);
 
   React.useEffect(() => {
-    updateDomFavicon("explorer", osTheme);
-    setThemeIcon(osTheme).catch(() => {
+    updateDomFavicon("explorer", resolvedTheme);
+    setThemeIcon(resolvedTheme).catch(() => {
       // Non-fatal in web/test environment
     });
-  }, [osTheme]);
+  }, [resolvedTheme]);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -49,12 +56,10 @@ export function App() {
   const version = appInfo?.version;
 
   return (
-    <ThemeProvider theme={osTheme}>
-      <ConfigProvider>
-        <TooltipProvider>
-          <ExplorerShell title={APP_TITLE} version={version} />
-        </TooltipProvider>
-      </ConfigProvider>
+    <ThemeProvider theme={resolvedTheme}>
+      <TooltipProvider>
+        <ExplorerShell title={APP_TITLE} version={version} />
+      </TooltipProvider>
     </ThemeProvider>
   );
 }
