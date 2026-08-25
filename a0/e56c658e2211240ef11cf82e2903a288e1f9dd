@@ -1,0 +1,20 @@
+crates/gencore-plugin-git/src/modules/diff/diff_api.rs
+  s_d5c826ca1feed3::t_27cf6bcb8c7b29 33
+  s_d5c826ca1feed3::t_ec2682962960fa 10-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "a0e56c658e2211240ef11cf82e2903a288e1f9dd",
+  "prompts": {},
+  "sessions": {
+    "s_d5c826ca1feed3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cb9cb4f8-db12-40d7-8bd9-7e1939f77e38",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
