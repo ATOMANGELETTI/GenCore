@@ -1,0 +1,245 @@
+apps/explorer/tests/unit/file-list.format.test.ts
+  s_714c715e3dcd86::t_cc5e3dd988b15a 1-83
+apps/explorer/src/modules/ipc/ipc.opener.ts
+  s_714c715e3dcd86::t_a8a53945bcec27 1,8-11
+  s_714c715e3dcd86::t_3949ab54e2dc02 12
+crates/gencore-plugin-fs/tests/copy_move_commands.rs
+  s_714c715e3dcd86::t_ae1aaa3c159c9c 1-152
+crates/gencore-plugin-fs/src/modules/move_paths/move_paths_error.rs
+  s_714c715e3dcd86::t_fcf481676bc796 1-35
+crates/gencore-plugin-fs/src/modules/stat/mod.rs
+  s_714c715e3dcd86::t_6d7362614aa0eb 4
+crates/gencore-plugin-fs/tests/watch_commands.rs
+  s_714c715e3dcd86::t_1d513204fb1698 6-7
+  s_714c715e3dcd86::t_bc3902897aee93 197-203
+crates/gencore-plugin-fs/tests/command_snake_case_lock.rs
+  s_714c715e3dcd86::t_3bb7dbf79eee4f 1-46
+crates/gencore-plugin-fs/src/modules/mod.rs
+  s_714c715e3dcd86::t_657d602a269372 1,4,7,9
+apps/explorer/src/modules/navigation/navigation.types.ts
+  s_714c715e3dcd86::t_4a3c63d77124b5 1-15
+apps/explorer/src/modules/folder-tree/folder-tree.component.tsx
+  s_714c715e3dcd86::t_01b1d8c69b3104 1-28
+apps/explorer/tests/unit/isolation.hook.test.ts
+  s_714c715e3dcd86::t_80ffe4bf3fc313 184-185,211
+  s_714c715e3dcd86::t_48d6b340463281 9,25-32,34,41-46,169-183,186-210,212-264,341-352,471-486,491-493,497-508,512-513
+crates/gencore-plugin-fs/src/modules/copy/copy_api.rs
+  s_714c715e3dcd86::t_abe47f051c3519 23-26
+  s_714c715e3dcd86::t_4a0537789cc264 1-5,9-22,27-43,45-47
+  s_714c715e3dcd86::t_7299f48fa52fbb 6-8
+  s_714c715e3dcd86::t_be5e1707d9f5c9 44
+crates/gencore-plugin-fs/src/modules/rename/rename_api.rs
+  s_714c715e3dcd86::t_b5f3ac0b11579d 26-29
+  s_714c715e3dcd86::t_d6850aca68b562 1-25,30-72
+apps/explorer/src/modules/app/app.workspace.hook.ts
+  s_714c715e3dcd86::t_c534322e570dca 1,5-21
+  s_714c715e3dcd86::t_1e9881f81d253d 2-4
+crates/gencore-plugin-fs/src/modules/rename/mod.rs
+  s_714c715e3dcd86::t_0d28eefa5f2b1e 1-5
+apps/explorer/src/modules/file-ops/file-ops.hook.ts
+  s_714c715e3dcd86::t_f4994feb0de4a3 1-38,48-152
+  s_714c715e3dcd86::t_1e9881f81d253d 39-47
+apps/explorer/src/modules/side-panel/side-panel.component.tsx
+  s_714c715e3dcd86::t_42eb09a766f2f3 3-161,167-228
+  s_714c715e3dcd86::t_1e9881f81d253d 1-2,162-166
+scripts/tauri-dev-explorer.mjs
+  s_714c715e3dcd86::t_3546585f33a6b4 1-22
+apps/explorer/src-tauri/src/lib.rs
+  s_714c715e3dcd86::t_78393cfff217cc 1,3-5
+apps/explorer/src/modules/side-panel/side-panel-toggle.component.tsx
+  s_714c715e3dcd86::t_4187a3f2c05bff 1-26
+apps/explorer/src-tauri/capabilities/main.json
+  s_714c715e3dcd86::t_709dbd3c55dea5 4,14-25
+crates/gencore-plugin-fs/src/modules/delete/delete_error.rs
+  s_714c715e3dcd86::t_e15efbd5b2091a 1-24
+apps/explorer/src/modules/context-menu/context-menu.file-list.tsx
+  s_714c715e3dcd86::t_b2ea3a960c82ff 1-23,25-37
+  s_714c715e3dcd86::t_ebf99e7b5525f8 24
+crates/gencore-plugin-fs/src/modules/move_paths/move_paths_api.rs
+  s_714c715e3dcd86::t_adeb4f6aacc7fd 1-24,29-68
+  s_714c715e3dcd86::t_57c67825d899a0 25-28
+crates/gencore-plugin-fs/src/modules/path_util/mod.rs
+  s_714c715e3dcd86::t_fca507c44e53ca 4-5,7
+  s_714c715e3dcd86::t_584179f0b8ce8e 6
+crates/gencore-plugin-fs/src/modules/delete/delete_api.rs
+  s_714c715e3dcd86::t_b5b1e32ad3a2ae 1-38
+apps/explorer/src/modules/file-ops/file-ops.types.ts
+  s_714c715e3dcd86::t_de25c695952469 1-20
+crates/gencore-plugin-fs/tests/delete_commands.rs
+  s_714c715e3dcd86::t_0dafdcab0bbfda 1-39
+apps/explorer/src/modules/ipc/ipc.fs.ts
+  s_714c715e3dcd86::t_d72d0a1901ffd7 1-79
+crates/gencore-plugin-fs/tests/stat_commands.rs
+  s_714c715e3dcd86::t_c63abaa0a5f957 1-49,67-71
+  s_714c715e3dcd86::t_ad3b91f8de6a6f 50-66
+  s_714c715e3dcd86::t_49348c213efe5c 72-77
+apps/explorer/tests/unit/config.storage.test.ts
+  s_714c715e3dcd86::t_b3888fb2c81d5a 1-35
+crates/gencore-plugin-fs/src/modules/delete/mod.rs
+  s_714c715e3dcd86::t_e5052cb6c39874 1-5
+apps/explorer/src/modules/config/config.types.ts
+  s_714c715e3dcd86::t_6c438bea92918f 1-12
+AGENTS.md
+  s_714c715e3dcd86::t_1357613d349f47 7
+apps/explorer/tests/unit/navigation.path.test.ts
+  s_714c715e3dcd86::t_84c66c3c7f996e 1-58
+.changeset/explorer-real-file-manager.md
+  s_714c715e3dcd86::t_b7bf99dd891fe6 1-5
+crates/gencore-plugin-fs/src/modules/copy/copy_error.rs
+  s_714c715e3dcd86::t_7b05ab64666400 1-35
+apps/explorer/src/modules/side-panel/side-panel.types.ts
+  s_714c715e3dcd86::t_4408733e927a51 1-8
+apps/explorer/tests/unit/navigation.hook.test.ts
+  s_714c715e3dcd86::t_a81f3c1a42ed2a 1-69
+apps/explorer/src/modules/details/details.hook.ts
+  s_714c715e3dcd86::t_83e238194a711c 1-40
+crates/gencore-plugin-fs/src/modules/path_util/path_util.rs
+  s_714c715e3dcd86::t_6f99c3a30829e6 50,52-90
+  s_714c715e3dcd86::t_e34143e3c39254 1,11-47
+  s_714c715e3dcd86::t_387330317c7278 51
+  s_714c715e3dcd86::t_80aa2724e7dd0d 48,91-106
+  s_714c715e3dcd86::t_e14c56996eb98e 49
+apps/explorer/src/modules/file-list/file-list.format.ts
+  s_714c715e3dcd86::t_a5c893b09192fc 1-15,18-49,77-85
+  s_714c715e3dcd86::t_d739c4b460be6b 16-17
+  s_714c715e3dcd86::t_50331b134286dc 65-76
+  s_714c715e3dcd86::t_a338091963f153 50-64
+crates/gencore-plugin-fs/src/modules/rename/rename_error.rs
+  s_714c715e3dcd86::t_cae2f9463e9514 1-39
+apps/explorer/src/modules/file-list/file-list.hook.ts
+  s_714c715e3dcd86::t_b4a032cee3cdd1 57
+  s_714c715e3dcd86::t_e518400ac7df5c 2
+  s_714c715e3dcd86::t_1e9881f81d253d 6-12,42-44
+  s_714c715e3dcd86::t_2402ae6f80d62b 113-115,117,120-121
+  s_714c715e3dcd86::t_9f7089175c4d70 1,3-5,13-41,45-56,58-112,116,118-119,122-188
+apps/explorer/tests/unit/ipc.fs.test.ts
+  s_714c715e3dcd86::t_44635db6d2f0f7 1-88
+crates/gencore-plugin-fs/src/modules/move_paths/mod.rs
+  s_714c715e3dcd86::t_e4c6612546d9f5 1-5
+apps/explorer/src/modules/file-list/file-list.toolbar.tsx
+  s_714c715e3dcd86::t_c47a53ff27c2c0 111,121,128-133
+  s_714c715e3dcd86::t_d184cdf56b37b7 12
+  s_714c715e3dcd86::t_1e9881f81d253d 1-9,76-79
+  s_714c715e3dcd86::t_0ffe34895f7901 10-11,13-75,80-110,112-117,120,122-123,125-127,135-183
+  s_714c715e3dcd86::t_550d98d323554e 118-119,124,134
+crates/gencore-plugin-fs/permissions/autogenerated/reference.md
+  s_714c715e3dcd86::t_e7a5f4edf61fe6 14-15,17-39,95-120,173-217,219-220,222-223
+  s_714c715e3dcd86::t_3a1a7f387d22c7 16,218,221,224
+apps/explorer/tests/unit/app.component.test.tsx
+  s_714c715e3dcd86::t_72e2b0beff9ee9 30-43
+  s_714c715e3dcd86::t_21dc8d898dc199 21-22,25
+  s_714c715e3dcd86::t_5a1b96a61f9669 53,63-68
+apps/explorer/src/modules/config/config.hook.ts
+  s_714c715e3dcd86::t_3ea461e93c228b 1-74
+crates/gencore-plugin-fs/tests/rename_commands.rs
+  s_714c715e3dcd86::t_0f377b546f73f1 1-64
+  s_714c715e3dcd86::t_295a22cfcbb005 65-73
+apps/explorer/src/modules/file-list/file-list.component.tsx
+  s_714c715e3dcd86::t_dac553b5f0d7c5 176
+  s_714c715e3dcd86::t_63b639514c19bb 359-361
+  s_714c715e3dcd86::t_0cee1774e92c8a 108-109
+  s_714c715e3dcd86::t_83bb5026cc6d50 307
+  s_714c715e3dcd86::t_dfea5ff51f1ed0 221-227
+  s_714c715e3dcd86::t_7942d6c7ec784f 57-66,68,70,72-85,87,94,96,103,105-107,110-120,122,125
+  s_714c715e3dcd86::t_0bec551c10520b 325
+  s_714c715e3dcd86::t_5e6cc4e32feaae 413
+  s_714c715e3dcd86::t_deffac793b3410 2-4,8-11,19-43,45-56,67,69,71,86,88-93,95,97-102,104,121,123-124,126-175,177-220,228,233,238-246,248-265,269-306,308-324,326-358,362,365-407,409-412,414-432
+  s_714c715e3dcd86::t_9fc6d23e053f0e 247
+  s_714c715e3dcd86::t_1e9881f81d253d 1,6-7,12-18,229-232,234-237,266-268
+  s_714c715e3dcd86::t_fbaf4d99d32650 408
+  s_714c715e3dcd86::t_e3a98d1bc423c9 5
+  s_714c715e3dcd86::t_558b15323b956c 363-364
+  s_714c715e3dcd86::t_25fda863884ea5 44
+apps/explorer/package.json
+  s_714c715e3dcd86::t_10fd7787a96007 20,23
+crates/gencore-plugin-fs/permissions/autogenerated/commands/move_paths.toml
+  s_714c715e3dcd86::t_e7a5f4edf61fe6 1-13
+crates/gencore-plugin-fs/src/lib.rs
+  s_714c715e3dcd86::t_8b586140e03745 3-5,12,15,20-22,51-54
+apps/explorer/src/modules/folder-tree/folder-tree.hook.ts
+  s_714c715e3dcd86::t_30f883ec670f57 1-207
+apps/explorer/src/modules/ipc/ipc.types.ts
+  s_714c715e3dcd86::t_05b2f6cd93f4d5 7-63
+apps/explorer/src/modules/config/config.storage.ts
+  s_714c715e3dcd86::t_7f5fc6e7d8c85e 1-62
+apps/explorer/src/modules/folder-tree/folder-tree.types.ts
+  s_714c715e3dcd86::t_4991a43740afc7 1-10
+crates/gencore-plugin-fs/permissions/autogenerated/commands/copy.toml
+  s_714c715e3dcd86::t_e7a5f4edf61fe6 1-13
+apps/explorer/AGENTS.md
+  s_714c715e3dcd86::t_837b03aed4d15f 3-6,9-39,42-43
+apps/explorer/src/modules/app/app.component.tsx
+  s_714c715e3dcd86::t_2c7454e12157c3 70,74,92-95
+  s_714c715e3dcd86::t_9d36f13745fbfc 40-41,55,62
+  s_714c715e3dcd86::t_59c9ea3ac98d46 1,3-4,6,11-12,14-15,53-54,56-57,61,63-69,71-73,75-91,96-154,160
+  s_714c715e3dcd86::t_1e9881f81d253d 155-159
+  s_714c715e3dcd86::t_14811a7c276806 161-162
+apps/explorer/src/modules/side-panel/side-panel.resize.ts
+  s_714c715e3dcd86::t_afcaac65232a7c 1-14
+crates/gencore-plugin-fs/src/modules/copy/mod.rs
+  s_714c715e3dcd86::t_213abcb750d604 1-5
+apps/explorer/src/modules/details/details.component.tsx
+  s_714c715e3dcd86::t_1e9881f81d253d 32-35,48-51
+  s_714c715e3dcd86::t_ca9301499884c1 1-31,36-47,52-96
+apps/explorer/src/modules/config/config.component.tsx
+  s_714c715e3dcd86::t_53e3baadd08aa9 1-29
+apps/explorer/src/modules/config/config.toggle.tsx
+  s_714c715e3dcd86::t_8b05bc68720785 1-44
+crates/gencore-plugin-fs/permissions/schemas/schema.json
+  s_714c715e3dcd86::t_e7a5f4edf61fe6 297-308,333-344,369-392
+crates/gencore-plugin-fs/Cargo.toml
+  s_714c715e3dcd86::t_db6e9068e68066 18
+crates/gencore-plugin-fs/tests/list_commands.rs
+  s_714c715e3dcd86::t_3f860a682b6ae3 174-200,217-221
+  s_714c715e3dcd86::t_3ec3db5c03c091 201-216
+  s_714c715e3dcd86::t_b62e31b462e965 3
+crates/gencore-plugin-fs/src/modules/stat/stat_error.rs
+  s_714c715e3dcd86::t_3dbaf4b266d10d 6-14,25-30
+  s_714c715e3dcd86::t_b6cad46134c23e 31-32
+crates/gencore-plugin-fs/permissions/autogenerated/commands/delete.toml
+  s_714c715e3dcd86::t_e7a5f4edf61fe6 1-13
+apps/explorer/isolation/isolation.hook.js
+  s_714c715e3dcd86::t_aa29a408ce8e1a 8-14,26-37,42,47-57,60,67-70,82-85,131-137,140-288,315-330,356-365,397,425-428,432-446,451-454,466-480,482,485,526-530,542-561
+  s_714c715e3dcd86::t_372772840e3bb7 6
+crates/gencore-plugin-fs/src/modules/stat/stat_api.rs
+  s_714c715e3dcd86::t_c78286a2a7c5dd 1,3-8,18-19,21-45,48-85
+  s_714c715e3dcd86::t_38ca899eb3a3e2 20
+apps/explorer/src/modules/context-menu/context-menu.file-list-background.tsx
+  s_714c715e3dcd86::t_4448105b5afce8 1-30
+apps/explorer/src/modules/file-list/file-list.types.ts
+  s_714c715e3dcd86::t_6752fefe18a675 1-29
+crates/gencore-plugin-fs/build.rs
+  s_714c715e3dcd86::t_5bea18f470ab44 7-10
+apps/explorer/src/modules/navigation/navigation.path.ts
+  s_714c715e3dcd86::t_04bea0c90183a9 1-58
+apps/explorer/src/modules/navigation/navigation.hook.ts
+  s_714c715e3dcd86::t_c22dda3da24727 1-37,41-65
+  s_714c715e3dcd86::t_1e9881f81d253d 38-40
+crates/gencore-plugin-fs/permissions/autogenerated/commands/rename.toml
+  s_714c715e3dcd86::t_e7a5f4edf61fe6 1-13
+crates/gencore-plugin-fs/src/modules/list/list_api.rs
+  s_714c715e3dcd86::t_dcbdcd0fb50b75 104-109
+  s_714c715e3dcd86::t_fe525a800fc424 34
+  s_714c715e3dcd86::t_ae3d2acf62e8e7 2,8-10
+  s_714c715e3dcd86::t_443c4ec739983d 48-51
+Cargo.lock
+  s_714c715e3dcd86::t_89efa58c5bf4bf 981,1182,1601,3689,4476,4738,4795,5240,5757,5760,6100-6117,6137,6166,6275-6280,6546-6547,6594,6618-6627,6671-6682,6689-6690,6702-6703,6731-6741,6753-6763,6809-6817
+pnpm-lock.yaml
+  s_714c715e3dcd86::t_8e1ab8c789a7d0 45-47,54-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "57a62b760db66e5084dd6f703e35b6526e44f394",
+  "prompts": {},
+  "sessions": {
+    "s_714c715e3dcd86": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "45f38213-e82e-486e-8425-62e8a53a6677",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
