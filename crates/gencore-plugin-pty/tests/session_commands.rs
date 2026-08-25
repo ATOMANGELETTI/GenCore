@@ -1,9 +1,13 @@
 use std::path::PathBuf;
+#[cfg(windows)]
 use std::sync::mpsc;
 use std::sync::{Arc, Mutex};
+#[cfg(windows)]
 use std::time::{Duration, Instant};
 
+#[cfg(windows)]
 use base64::Engine;
+#[cfg(windows)]
 use base64::engine::general_purpose::STANDARD;
 use gencore_pty::{
     IoError, OpenArgs, SessionError, SessionMap, is_real_executable, kill_session,
@@ -109,11 +113,13 @@ fn write_and_kill_unknown_session_are_not_found() {
     assert!(matches!(kill, Err(SessionError::SessionNotFound)));
 }
 
+#[cfg(windows)]
 struct KillOnDrop {
     map: Arc<Mutex<SessionMap>>,
     session_id: String,
 }
 
+#[cfg(windows)]
 impl Drop for KillOnDrop {
     fn drop(&mut self) {
         let _ = kill_session(&self.map, &self.session_id);
