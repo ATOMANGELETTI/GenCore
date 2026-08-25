@@ -1,0 +1,21 @@
+crates/gencore-plugin-git/Cargo.toml
+  s_d5c826ca1feed3::t_6e7cd13aac12ca 16
+Cargo.lock
+  s_d5c826ca1feed3::t_e39545081ca8a2 4265-4270,4673
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "afae0cbf068031463eaf53679c7b3b9a1cc0b76d",
+  "prompts": {},
+  "sessions": {
+    "s_d5c826ca1feed3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cb9cb4f8-db12-40d7-8bd9-7e1939f77e38",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
