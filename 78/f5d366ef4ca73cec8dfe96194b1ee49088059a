@@ -1,0 +1,20 @@
+crates/gencore-plugin-pty/tests/session_commands.rs
+  s_d5c826ca1feed3::t_629baf17e4861e 116,122
+  s_d5c826ca1feed3::t_42f05b6e4e6021 2,5,8,10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "78f5d366ef4ca73cec8dfe96194b1ee49088059a",
+  "prompts": {},
+  "sessions": {
+    "s_d5c826ca1feed3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cb9cb4f8-db12-40d7-8bd9-7e1939f77e38",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
