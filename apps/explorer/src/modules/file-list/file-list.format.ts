@@ -1,8 +1,10 @@
+import type { FileSizeFormat } from "../config/config.types";
 import type { FsEntry } from "../ipc/ipc.types";
 
-const SIZE_UNITS = ["bytes", "KB", "MB", "GB", "TB"] as const;
+const BINARY_UNITS = ["bytes", "KiB", "MiB", "GiB", "TiB"] as const;
+const DECIMAL_UNITS = ["bytes", "KB", "MB", "GB", "TB"] as const;
 
-export function formatSize(size: number | null): string {
+export function formatSize(size: number | null, unit: FileSizeFormat = "binary"): string {
   if (size == null) {
     return "—";
   }
@@ -10,11 +12,13 @@ export function formatSize(size: number | null): string {
     return "0 bytes";
   }
 
-  const exponent = Math.min(Math.floor(Math.log(size) / Math.log(1024)), SIZE_UNITS.length - 1);
-  const value = size / 1024 ** exponent;
+  const base = unit === "decimal" ? 1000 : 1024;
+  const units = unit === "decimal" ? DECIMAL_UNITS : BINARY_UNITS;
+  const exponent = Math.min(Math.floor(Math.log(size) / Math.log(base)), units.length - 1);
+  const value = size / base ** exponent;
   const precision = exponent === 0 ? 0 : value < 10 ? 2 : value < 100 ? 1 : 0;
   const rounded = Number.parseFloat(value.toFixed(precision));
-  return `${rounded} ${SIZE_UNITS[exponent]}`;
+  return `${rounded} ${units[exponent]}`;
 }
 
 export function formatModified(modifiedMs: number | null): string {

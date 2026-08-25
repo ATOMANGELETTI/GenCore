@@ -47,13 +47,9 @@ pub(crate) fn system_time_to_ms(time: std::time::SystemTime) -> Option<i64> {
         .and_then(|duration| i64::try_from(duration.as_millis()).ok())
 }
 
-/// Joins a directory and a final path component with a single `\` separator.
+/// Joins a directory and a final path component with the platform separator.
 fn join_path(dir: &str, name: &str) -> String {
-    if dir.ends_with('\\') || dir.ends_with('/') {
-        format!("{dir}{name}")
-    } else {
-        format!("{dir}\\{name}")
-    }
+    Path::new(dir).join(name).to_string_lossy().into_owned()
 }
 
 /// Splits `name` into (stem, extension). No extension when the name has no

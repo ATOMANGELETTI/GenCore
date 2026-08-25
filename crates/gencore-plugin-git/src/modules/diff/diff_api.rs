@@ -7,7 +7,12 @@ pub fn git_get_diff(repo_path: String, file_path: String) -> Result<GitDiffResul
     let repo =
         gix::open(p).map_err(|e| DiffError::RepoOpenFailed(repo_path.clone(), e.to_string()))?;
 
-    let full_path = Path::new(&file_path);
+    // `file_path` may arrive with Windows-style backslashes (the app's only
+    // shipping platform); normalize to `/` so both the disk read below and
+    // the git tree lookup resolve the same file regardless of host OS (`/`
+    // is also a valid separator on Windows, so this is a no-op there).
+    let normalized_path = file_path.replace('\\', "/");
+    let full_path = Path::new(&normalized_path);
     let full = if full_path.is_absolute() {
         full_path.to_path_buf()
     } else {
@@ -25,7 +30,7 @@ pub fn git_get_diff(repo_path: String, file_path: String) -> Result<GitDiffResul
         } else {
             full_path
         };
-        let rel_posix = rel.to_string_lossy().replace('\\', "/");
+        let rel_posix = rel.to_string_lossy().into_owned();
         if let Ok(Some(entry)) = tree.lookup_entry_by_path(&rel_posix)
             && let Ok(obj) = entry.object()
         {

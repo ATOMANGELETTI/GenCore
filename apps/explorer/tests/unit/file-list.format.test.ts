@@ -20,9 +20,14 @@ describe("file-list.format", () => {
       expect(formatSize(512)).toBe("512 bytes");
     });
 
-    it("renders KB/MB with sensible precision", () => {
-      expect(formatSize(2048)).toBe("2 KB");
-      expect(formatSize(1_572_864)).toBe("1.5 MB");
+    it("renders binary units (KiB/MiB) by default with sensible precision", () => {
+      expect(formatSize(2048)).toBe("2 KiB");
+      expect(formatSize(1_572_864)).toBe("1.5 MiB");
+    });
+
+    it("renders decimal units (KB/MB) when requested", () => {
+      expect(formatSize(2000, "decimal")).toBe("2 KB");
+      expect(formatSize(1_500_000, "decimal")).toBe("1.5 MB");
     });
   });
 

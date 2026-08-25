@@ -33,10 +33,17 @@ tools) are intentionally out of scope for now.
 - Isolation also allowlists `plugin:event|listen` / `plugin:event|unlisten` reconstructed only for
   `tauri://theme-changed` (`{ kind: "Window", label: "main" | "tray-menu" }`) and
   `gencore-fs://entry-changed` (`{ kind: "Any" }`)
-- OS appearance maps dark → Polar Night, light → Snow Storm, IPC failure/null → Polar Night. No
-  theme picker. Window theme IPC is `getWindowTheme` / `subscribeWindowTheme` in `ipc.window.ts`
-- Config tab settings (`showHiddenFiles`, `showFileExtensions`, `confirmBeforeDelete`) persist to
-  `localStorage` under `gencore.explorer.config`, not a native theme/settings dialog
+- OS appearance maps dark → Polar Night, light → Snow Storm, IPC failure/null → Polar Night by
+  default (`themePreference: "system"`). Window theme IPC is `getWindowTheme` /
+  `subscribeWindowTheme` in `ipc.window.ts`
+- Config tab has a top icon sub-tab toolbar (`config.toolbar.tsx`, same tablist + overflow "All
+  Settings" pattern as Terminal's) switching between General and Appearance categories. General
+  holds `showHiddenFiles`, `showFileExtensions`, `confirmBeforeDelete`, and `fileSizeFormat`
+  (Binary KiB/MiB vs Decimal KB/MB, used by the Size column and Details panel). Appearance holds
+  `themePreference` (Polar Night / Snow Storm / Match system — an explicit override on top of the
+  OS-appearance default, same picker as Terminal's Config tab). All settings persist to
+  `localStorage` under `gencore.explorer.config`; the active sub-tab persists under
+  `gencore.explorer.config.active-subview`. No native theme/settings dialog
 - Repo URL opens through `ipc.opener.ts` (`openRepoInBrowser`)
 - Override density only in `src/modules/app/app.theme.css`. Keep Nord tokens
 - Tests: `apps/explorer/tests/` (JS) and `apps/explorer/src-tauri/tests/` (Rust, plus

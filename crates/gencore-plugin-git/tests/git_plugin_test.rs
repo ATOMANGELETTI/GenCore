@@ -1,6 +1,25 @@
 use gencore_git::{git_commit, git_get_diff, git_get_status, git_init_repo, git_stage_file};
 use std::fs;
+use std::process::Command;
 use tempfile::TempDir;
+
+/// `git_commit` resolves the committer identity from git config, which a
+/// fresh CI runner has no global `user.name`/`user.email` for. Set a local,
+/// repo-scoped identity so the test doesn't depend on the ambient
+/// environment already having git configured (as a developer machine would).
+fn configure_test_identity(repo_path: &str) {
+    for (key, value) in [
+        ("user.name", "Test User"),
+        ("user.email", "test@example.com"),
+    ] {
+        let status = Command::new("git")
+            .args(["config", "--local", key, value])
+            .current_dir(repo_path)
+            .status()
+            .expect("git config should run");
+        assert!(status.success(), "git config {key} failed");
+    }
+}
 
 #[test]
 fn test_git_init_and_status() {
@@ -27,6 +46,7 @@ fn test_git_get_diff_root_and_nested() {
     let repo_path = temp.path().to_string_lossy().to_string();
 
     git_init_repo(repo_path.clone()).unwrap();
+    configure_test_identity(&repo_path);
 
     // Create initial root file and nested file
     let root_file = temp.path().join("LICENSE");

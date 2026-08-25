@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "explorer",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@gencore/explorer", "dev"],
+      "port": 5174
+    },
+    {
+      "name": "terminal",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@gencore/terminal", "dev"],
+      "port": 5173
+    }
+  ]
+}

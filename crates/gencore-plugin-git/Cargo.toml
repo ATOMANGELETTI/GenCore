@@ -13,7 +13,7 @@ tauri = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
 gix = { version = "0.87" }
-rfd = { version = "0.17", default-features = false }
+rfd = { version = "0.17", default-features = false, features = ["xdg-portal"] }
 dunce = "1"
 
 [dev-dependencies]
