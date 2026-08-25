@@ -1,0 +1,55 @@
+CLAUDE.md
+  s_5d0419854329ce::t_b63ec369beae55 1-25
+.claude/skills/tauri-capability/SKILL.md
+  s_5d0419854329ce::t_1978e826617776 1-32
+.claude/skills/add-ui-primitive/SKILL.md
+  s_5d0419854329ce::t_fbd17e3daca866 1-32
+.claude/commands/new-changeset.md
+  s_5d0419854329ce::t_90e3faaca05925 1-17
+.claude/commands/git-commit.md
+  s_5d0419854329ce::t_27fa204655b5f7 1-20
+.claude/skills/cut-changeset/SKILL.md
+  s_5d0419854329ce::t_eb3675c25035c9 1-36
+.claude/skills/add-crate-module/SKILL.md
+  s_5d0419854329ce::t_7830035a48e44b 1-32
+apps/terminal/CLAUDE.md
+  s_5d0419854329ce::t_e60501405a6049 1-6
+.claude/agents/ui-kit-reviewer.md
+  s_5d0419854329ce::t_c0e77c5512762d 1-28
+.claude/agents/tauri-reviewer.md
+  s_5d0419854329ce::t_c8d2253077c480 1-29
+apps/explorer/CLAUDE.md
+  s_5d0419854329ce::t_223d9d69d5982f 1-6
+.claude/commands/check-workspace.md
+  s_5d0419854329ce::t_57f4576ab192a9 1-19
+packages/ui-kit/CLAUDE.md
+  s_5d0419854329ce::t_d914c76b4a83e3 1-6
+.claude/commands/new-module.md
+  s_5d0419854329ce::t_32d9c7187f801e 1-22
+.claude/skills/git-commit/SKILL.md
+  s_5d0419854329ce::t_76d78b4703e0d6 1-43
+.claude/skills/add-app/SKILL.md
+  s_5d0419854329ce::t_11bd8ca4826a12 1-43
+crates/CLAUDE.md
+  s_5d0419854329ce::t_38f3e132b8fffb 1-6
+.claude/launch.json
+  s_5d0419854329ce::t_2d85744940df84 1-17
+.claude/agents/monorepo-debugger.md
+  s_5d0419854329ce::t_584c7100dfec3e 1-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "cf73a3ad569f009bb589eb2ab875e742a68247d7",
+  "prompts": {},
+  "sessions": {
+    "s_5d0419854329ce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e35c24bc-8282-46af-bfc2-4013d0f6f483",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
