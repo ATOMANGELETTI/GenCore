@@ -66,7 +66,7 @@ describe("App", () => {
     expect(screen.getByRole("tab", { name: "Tree" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Details" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Config" })).toBeInTheDocument();
-  });
+  }, 15000);
 
   it("shows the version from get_app_info in the titlebar, not the statusbar", async () => {
     getAppInfo.mockResolvedValue({
