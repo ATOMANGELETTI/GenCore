@@ -1,0 +1,63 @@
+apps/explorer/src/modules/config/subviews/all-settings-view.component.tsx
+  s_5d0419854329ce::t_d70843d174b04a 1-11
+apps/explorer/src/modules/config/subviews/appearance-view.component.tsx
+  s_5d0419854329ce::t_0daad6e4e9cd93 1-91
+apps/explorer/src/modules/file-list/file-list.format.ts
+  s_5d0419854329ce::t_074058084efad4 1,4-5,7,15-18,21
+apps/explorer/src/modules/file-list/file-list.component.tsx
+  s_5d0419854329ce::t_e7089377881606 6
+  s_5d0419854329ce::t_55d6e5f16fa041 310
+  s_5d0419854329ce::t_ce10ac03fe188d 329
+  s_5d0419854329ce::t_6eddde86872b5b 417
+  s_5d0419854329ce::t_1627df771d589f 249
+  s_5d0419854329ce::t_86b359c2bc8e19 45
+apps/explorer/src/modules/config/config.toolbar.tsx
+  s_5d0419854329ce::t_ab17dbc824231a 1-13,22-175
+  s_5d0419854329ce::t_37033cceb722f8 14-21
+apps/explorer/src/modules/config/config.constants.ts
+  s_5d0419854329ce::t_62c7dca5bd625d 1-47
+apps/explorer/src/modules/config/config.hook.ts
+  s_5d0419854329ce::t_cef61b93a874e9 2,4-9,25-31,63-80,89-93
+apps/explorer/src/modules/config/config.component.tsx
+  s_5d0419854329ce::t_111aa621d9a9b3 1-7,10-17,20-30
+apps/explorer/AGENTS.md
+  s_5d0419854329ce::t_bf90d8c37f3f11 36-46
+apps/explorer/tests/unit/file-list.format.test.ts
+  s_5d0419854329ce::t_3f5154eb5d09ba 23-30
+apps/explorer/src/modules/details/details.component.tsx
+  s_5d0419854329ce::t_8829460162474e 27
+  s_5d0419854329ce::t_37033cceb722f8 54
+  s_5d0419854329ce::t_054b72ef318c19 3
+apps/explorer/tests/unit/config.storage.test.ts
+  s_5d0419854329ce::t_25d136774de81e 26-27
+apps/explorer/src/modules/app/app.component.tsx
+  s_5d0419854329ce::t_6dab1549da4027 3,20-28,32-33,36,59-62
+apps/explorer/src/modules/config/config.types.ts
+  s_5d0419854329ce::t_c0986426d18af9 1-2
+  s_5d0419854329ce::t_885d8379377263 3-8,14-15,22-23
+  s_5d0419854329ce::t_82c4b007373866 24
+apps/explorer/src/modules/config/config.storage.ts
+  s_5d0419854329ce::t_02d9a6a4081431 15-16,19-21,34-36,39-46,49-53,79-98,100,102-103
+  s_5d0419854329ce::t_37033cceb722f8 1-6,37-38
+  s_5d0419854329ce::t_7f35807c0924c7 99,101
+apps/explorer/src/modules/config/subviews/general-view.component.tsx
+  s_5d0419854329ce::t_93032b71dbd9e9 1-123
+AGENTS.md
+  s_5d0419854329ce::t_a57d54b737b03a 108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "846494d65790bfb30cd935ef89d10b9dd7075c25",
+  "prompts": {},
+  "sessions": {
+    "s_5d0419854329ce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e35c24bc-8282-46af-bfc2-4013d0f6f483",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
