@@ -1,0 +1,19 @@
+.node-version
+  s_d5c826ca1feed3::t_0a6e69d7fcfa8a 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "cae602d10aaa4bc44730256430a47df49c0920aa",
+  "prompts": {},
+  "sessions": {
+    "s_d5c826ca1feed3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cb9cb4f8-db12-40d7-8bd9-7e1939f77e38",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
