@@ -1,11 +1,13 @@
 use std::cmp::Ordering;
-use std::fs::{DirEntry, Metadata};
+use std::fs::DirEntry;
 use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
 use super::list_error::{ListError, map_io};
-use crate::modules::path_util::normalize_path;
+use crate::modules::path_util::{
+    extension_of, file_attributes, is_hidden, is_system, normalize_path, system_time_to_ms,
+};
 
 /// Arguments for listing the contents of a directory.
 #[derive(Debug, Deserialize)]
@@ -29,6 +31,7 @@ pub enum FsKind {
 
 /// A single entry returned by [`list`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct FsEntry {
     /// File or folder name.
     pub name: String,
@@ -42,6 +45,10 @@ pub struct FsEntry {
     pub hidden: bool,
     /// Windows `FILE_ATTRIBUTE_SYSTEM`; always `false` on other platforms.
     pub system: bool,
+    /// Size in bytes. `None` for directories and symlinks-to-directories.
+    pub size: Option<u64>,
+    /// Last-modified time in milliseconds since the Unix epoch, when available.
+    pub modified_ms: Option<i64>,
 }
 
 /// Directory listing returned by [`list`].
@@ -94,6 +101,12 @@ fn fs_entry_from_dir_entry(entry: &DirEntry) -> Result<FsEntry, ListError> {
         extension: extension_of(&name),
         hidden: is_hidden(&name, attrs),
         system: is_system(attrs),
+        size: if kind == FsKind::File {
+            Some(metadata.len())
+        } else {
+            None
+        },
+        modified_ms: metadata.modified().ok().and_then(system_time_to_ms),
         name,
         path,
         kind,
@@ -113,32 +126,5 @@ fn sorts_as_directory(entry: &FsEntry) -> bool {
         FsKind::Dir => true,
         FsKind::Symlink => Path::new(&entry.path).is_dir(),
         FsKind::File => false,
-    }
-}
-
-fn extension_of(name: &str) -> Option<String> {
-    Path::new(name)
-        .extension()
-        .map(|ext| ext.to_string_lossy().into_owned())
-}
-
-fn is_hidden(name: &str, attrs: Option<u32>) -> bool {
-    name.starts_with('.') || attrs.is_some_and(|value| (value & 0x2) != 0)
-}
-
-fn is_system(attrs: Option<u32>) -> bool {
-    attrs.is_some_and(|value| (value & 0x4) != 0)
-}
-
-fn file_attributes(metadata: &Metadata) -> Option<u32> {
-    #[cfg(windows)]
-    {
-        use std::os::windows::fs::MetadataExt;
-        Some(metadata.file_attributes())
-    }
-    #[cfg(not(windows))]
-    {
-        let _ = metadata;
-        None
     }
 }

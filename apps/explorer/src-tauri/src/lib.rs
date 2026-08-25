@@ -1,9 +1,8 @@
-//! GenCore Explorer — standalone Tauri 2 + Vite + React template app.
+//! GenCore Explorer — standalone Tauri 2 + Vite + React file explorer app.
 //!
-//! Registers the shared `gencore-core` (app info) and `gencore-fs` (stub
-//! filesystem) plugins. `gencore-fs` is registered but is granted no
-//! permissions in `capabilities/main.json`; the crate is wired up so future
-//! Explorer features can opt in per-command without touching this file.
+//! Registers the shared `gencore-core` (app info) and `gencore-fs`
+//! (filesystem: list/stat/create/rename/delete/copy/move/watch) plugins. See
+//! `capabilities/main.json` for the exact commands granted to the UI.
 
 mod modules;
 

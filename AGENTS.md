@@ -4,7 +4,7 @@ This file is the repo-wide brief. Nested `AGENTS.md` files add path-specific rul
 
 ## What this is
 
-A pnpm + Turborepo + Cargo monorepo with two **template** Tauri 2 apps. The Terminal emulator is real; Explorer still has no PTY. Do not implement a real file manager unless the user asks.
+A pnpm + Turborepo + Cargo monorepo with two real Tauri 2 apps: Terminal (a terminal emulator) and Explorer (a Nord file explorer — browse, create/rename/delete/copy/move, no PTY).
 
 ## Layout
 

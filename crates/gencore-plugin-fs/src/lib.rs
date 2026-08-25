@@ -1,20 +1,25 @@
 //! Filesystem plugin for GenCore.
 //!
-//! `list`, `list_drives`, `create_file`, `create_dir`, `watch`, and `unwatch`
-//! perform real Windows filesystem access. `stat` remains a stub until a later task.
+//! `list`, `list_drives`, `create_file`, `create_dir`, `stat`, `rename`,
+//! `delete`, `copy`, `move_paths`, `watch`, and `unwatch` perform real
+//! Windows filesystem access.
 //!
 //! Note: this crate is deliberately not named `tauri-plugin-fs`, which is
 //! the official Tauri filesystem plugin.
 
 mod modules;
 
+pub use modules::copy::{CopyArgs, CopyError, copy};
 pub use modules::create_dir::{CreateDirArgs, CreateDirError, create_dir};
 pub use modules::create_file::{CreateFileArgs, CreateFileError, create_file};
+pub use modules::delete::{DeleteArgs, DeleteError, delete};
 pub use modules::list::{FsEntry, FsKind, ListArgs, ListError, ListResult, list};
 pub use modules::list_drives::{
     DriveEntry, DriveKind, ListDrivesError, is_usable_mount, list_drives,
 };
-pub use modules::stat::{StatArgs, StatError, stat};
+pub use modules::move_paths::{MoveArgs, MoveError, move_paths};
+pub use modules::rename::{RenameArgs, RenameError, RenameResult, rename};
+pub use modules::stat::{StatArgs, StatError, StatResult, stat};
 pub use modules::unwatch::{UnwatchArgs, UnwatchError, stop_watch, unwatch};
 pub use modules::watch::{
     AccessKind, CreateKind, DataChange, EntryChangeKind, EntryChangedPayload, EventKind,
@@ -43,6 +48,10 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             create_file,
             create_dir,
             stat,
+            rename,
+            delete,
+            copy,
+            move_paths,
             watch,
             unwatch
         ])

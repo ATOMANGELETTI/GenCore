@@ -42,12 +42,18 @@ importers:
       '@gencore/ui-kit':
         specifier: workspace:*
         version: link:../../packages/ui-kit
+      '@tanstack/react-virtual':
+        specifier: 3.14.9
+        version: 3.14.9(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@tauri-apps/api':
         specifier: 2.11.1
         version: 2.11.1
       '@tauri-apps/plugin-opener':
         specifier: 2.5.4
         version: 2.5.4
+      lucide-react:
+        specifier: 1.31.0
+        version: 1.31.0(react@19.2.8)
       react:
         specifier: 19.2.8
         version: 19.2.8

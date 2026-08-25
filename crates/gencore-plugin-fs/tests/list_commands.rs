@@ -1,6 +1,6 @@
 use std::future::Future;
 
-use gencore_fs::{FsKind, ListError, is_usable_mount, list};
+use gencore_fs::{FsKind, ListArgs, ListError, is_usable_mount, list};
 
 fn block_on<F: Future>(future: F) -> F::Output {
     tauri::async_runtime::block_on(future)
@@ -170,4 +170,52 @@ fn list_drives_returns_windows_drive_roots() {
         saw_drive_root = true;
     }
     assert!(saw_drive_root);
+}
+
+#[test]
+fn list_populates_size_and_modified_for_files_only() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    std::fs::write(dir.path().join("data.bin"), b"hello world").expect("write data.bin");
+    std::fs::create_dir(dir.path().join("sub")).expect("create sub");
+
+    let result =
+        block_on(list(dir.path().to_string_lossy().into_owned())).expect("list should succeed");
+
+    let file = result
+        .entries
+        .iter()
+        .find(|entry| entry.name == "data.bin")
+        .expect("data.bin should be listed");
+    assert_eq!(file.size, Some(11));
+    assert!(file.modified_ms.is_some());
+
+    let dir_entry = result
+        .entries
+        .iter()
+        .find(|entry| entry.name == "sub")
+        .expect("sub should be listed");
+    assert_eq!(dir_entry.size, None);
+}
+
+#[test]
+fn fs_entry_serializes_modified_ms_as_camel_case() {
+    let dir = tempfile::tempdir().expect("temp dir");
+    std::fs::write(dir.path().join("a.txt"), b"hi").expect("write a.txt");
+
+    let result =
+        block_on(list(dir.path().to_string_lossy().into_owned())).expect("list should succeed");
+    let json = serde_json::to_value(&result.entries[0]).expect("serialize FsEntry");
+
+    assert!(
+        json.get("modifiedMs").is_some(),
+        "wire format must be camelCase: {json}"
+    );
+    assert!(json.get("modified_ms").is_none());
+}
+
+#[test]
+fn list_args_reject_unknown_fields() {
+    let json = serde_json::json!({ "path": "/tmp", "unexpected": true });
+    let parsed: Result<ListArgs, _> = serde_json::from_value(json);
+    assert!(parsed.is_err());
 }

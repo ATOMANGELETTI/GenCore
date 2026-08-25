@@ -1,8 +1,12 @@
+pub mod copy;
 pub mod create_dir;
 pub mod create_file;
+pub mod delete;
 pub mod list;
 pub mod list_drives;
+pub mod move_paths;
 pub(crate) mod path_util;
+pub mod rename;
 pub mod stat;
 pub mod unwatch;
 pub mod watch;
