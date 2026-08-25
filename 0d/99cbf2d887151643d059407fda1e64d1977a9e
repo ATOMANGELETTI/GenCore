@@ -1,0 +1,22 @@
+crates/gencore-plugin-git/tests/git_plugin_test.rs
+  s_d5c826ca1feed3::t_ea0624b0250487 49
+  s_d5c826ca1feed3::t_4e7fdb8a444597 3,6-10,15-22
+  s_d5c826ca1feed3::t_06b23c6cc5e143 11-14
+  s_d5c826ca1feed3::t_e3cffb35b34881 23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "0d99cbf2d887151643d059407fda1e64d1977a9e",
+  "prompts": {},
+  "sessions": {
+    "s_d5c826ca1feed3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cb9cb4f8-db12-40d7-8bd9-7e1939f77e38",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
