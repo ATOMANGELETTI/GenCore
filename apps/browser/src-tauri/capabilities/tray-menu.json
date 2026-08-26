@@ -1,0 +1,12 @@
+{
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/tauri-v2.11.1/crates/tauri-schema-generator/schemas/capability.schema.json",
+  "identifier": "tray-menu",
+  "description": "Least-privilege capabilities for the tray-menu overlay: tray_action, OS window theme, and theme-changed listen/unlisten.",
+  "windows": ["tray-menu"],
+  "permissions": [
+    "gencore-core:allow-tray-action",
+    "core:window:allow-theme",
+    "core:event:allow-listen",
+    "core:event:allow-unlisten"
+  ]
+}

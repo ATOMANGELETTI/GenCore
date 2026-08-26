@@ -1,0 +1,94 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "GenCore Browser",
+  "version": "0.1.0",
+  "identifier": "com.gencore.browser",
+  "build": {
+    "beforeDevCommand": "pnpm --filter @gencore/browser dev",
+    "beforeBuildCommand": "pnpm --filter @gencore/browser build",
+    "devUrl": "http://localhost:5175",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "main",
+        "title": "GenCore Browser",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 760,
+        "minHeight": 480,
+        "resizable": true,
+        "decorations": false,
+        "transparent": false,
+        "center": true
+      },
+      {
+        "label": "tray-menu",
+        "url": "tray-menu.html",
+        "width": 200,
+        "height": 140,
+        "visible": false,
+        "decorations": false,
+        "transparent": true,
+        "skipTaskbar": true,
+        "alwaysOnTop": true,
+        "resizable": false,
+        "shadow": false,
+        "focus": false
+      }
+    ],
+    "security": {
+      "freezePrototype": true,
+      "assetProtocol": {
+        "enable": false
+      },
+      "pattern": {
+        "use": "isolation",
+        "options": {
+          "dir": "../isolation"
+        }
+      },
+      "csp": {
+        "default-src": "'self'",
+        "connect-src": ["ipc:", "http://ipc.localhost"],
+        "img-src": ["'self'", "data:", "https:"],
+        "style-src": ["'self'", "'unsafe-inline'"],
+        "font-src": ["'self'"],
+        "object-src": "'none'",
+        "base-uri": "'none'",
+        "script-src": "'self'",
+        "frame-ancestors": "'none'",
+        "form-action": "'none'",
+        "worker-src": "'none'"
+      },
+      "devCsp": {
+        "default-src": "'self'",
+        "connect-src": [
+          "ipc:",
+          "http://ipc.localhost",
+          "'self'",
+          "ws://localhost:5175",
+          "ws://127.0.0.1:5175"
+        ],
+        "img-src": ["'self'", "data:", "https:"],
+        "style-src": ["'self'", "'unsafe-inline'"],
+        "font-src": ["'self'"],
+        "object-src": "'none'",
+        "base-uri": "'none'",
+        "script-src": "'self'",
+        "frame-ancestors": "'none'",
+        "form-action": "'none'",
+        "worker-src": "'none'"
+      },
+      "headers": {
+        "Cross-Origin-Opener-Policy": "same-origin"
+      }
+    }
+  },
+  "bundle": {
+    "active": false,
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.ico"]
+  }
+}

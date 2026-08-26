@@ -12,6 +12,12 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "@gencore/terminal", "dev"],
       "port": 5173
+    },
+    {
+      "name": "browser",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@gencore/browser", "dev"],
+      "port": 5175
     }
   ]
 }
