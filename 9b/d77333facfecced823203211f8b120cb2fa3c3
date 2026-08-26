@@ -1,0 +1,34 @@
+AGENTS.md
+  s_a1d83ec13bbecf::t_d408926afc34ae 65
+  s_a1d83ec13bbecf::t_c1a2006887d78e 53
+apps/terminal/AGENTS.md
+  s_a1d83ec13bbecf::t_91b3df20b5c83a 20
+.cursor/skills/add-app/SKILL.md
+  s_a1d83ec13bbecf::t_0be94fe4976970 31-32
+.cursor/rules/architecture.mdc
+  s_a1d83ec13bbecf::t_9e96b010fe9ee0 31-32
+apps/explorer/AGENTS.md
+  s_a1d83ec13bbecf::t_f584e9b99e16dc 51
+README.md
+  s_a1d83ec13bbecf::t_bad53dff88a370 62
+.agents/skills/add-app/SKILL.md
+  s_a1d83ec13bbecf::t_48c0e209e05078 32-33
+.agents/rules/architecture.md
+  s_a1d83ec13bbecf::t_48c0e209e05078 34-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "9bd77333facfecced823203211f8b120cb2fa3c3",
+  "prompts": {},
+  "sessions": {
+    "s_a1d83ec13bbecf": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "528aa9b6-b4c5-48ee-aabd-1e35836a60c2",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
