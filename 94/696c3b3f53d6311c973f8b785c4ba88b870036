@@ -1,0 +1,32 @@
+.husky/post-commit
+  s_9e8ade96eaed8c::t_eada8e5deea870 1-5
+.husky/pre-push
+  s_9e8ade96eaed8c::t_32d8e0bd13105a 1-4,6-13
+.husky/post-merge
+  s_9e8ade96eaed8c::t_58d91fdddfb8fd 1-5
+.gitattributes
+  s_9e8ade96eaed8c::t_fd3369223d0468 4-6
+.husky/post-checkout
+  s_9e8ade96eaed8c::t_1f43cf4331f2f7 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "94696c3b3f53d6311c973f8b785c4ba88b870036",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  },
+  "sessions": {
+    "s_9e8ade96eaed8c": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "3803a80b-fdfb-41a2-a0d3-e57ce594b575",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
