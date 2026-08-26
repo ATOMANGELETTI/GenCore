@@ -1,0 +1,22 @@
+.cursor/hooks/state/continual-learning.json
+  h_90ad036e211778 4,6
+.cursor/hooks/state/edited-files.json
+  h_90ad036e211778 415-418
+.superpowers/docs/reviews/2026-08-25-windows-x64-portable-release.md
+  h_90ad036e211778 3-6
+"crates/gencore-plugin-git/src/modules/diff/diff_api (1).rs"
+  h_90ad036e211778 1-41
+"crates/gencore-plugin-git/tests/git_plugin_test (1).rs"
+  h_90ad036e211778 1-74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "724b343782693acc1e0c08a14a819c7b70065e68",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
