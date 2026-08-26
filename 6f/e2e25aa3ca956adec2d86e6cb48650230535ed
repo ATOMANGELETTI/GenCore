@@ -1,0 +1,19 @@
+.cursor/hooks/state/continual-learning.json
+  s_9e8ade96eaed8c::t_04a72ab0473a4d 4,6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "6fe2e25aa3ca956adec2d86e6cb48650230535ed",
+  "prompts": {},
+  "sessions": {
+    "s_9e8ade96eaed8c": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "3803a80b-fdfb-41a2-a0d3-e57ce594b575",
+        "model": "unknown"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
