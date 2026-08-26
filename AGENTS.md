@@ -50,7 +50,7 @@ Latest **stable** only. No beta/rc/canary. Do not downgrade the locked stack (Re
 
 ## Distribution
 
-Apps ship as **Windows x64 portable ZIP** only (`pnpm package:win64`). `tauri:build` compiles the exe (`--no-bundle`) and does not emit NSIS/MSI or other OS installers. Do not add installer targets or a default rustc triple in `.cargo/config.toml`.
+Apps ship as **Windows x64 portable ZIP** only (`pnpm package:win64`). ZIPs land in `release/` (not `artifacts/`). `tauri:build` compiles the exe (`--no-bundle`) and does not emit NSIS/MSI or other OS installers. Do not add installer targets or a default rustc triple in `.cargo/config.toml`.
 
 ## Commands
 
@@ -62,7 +62,7 @@ cargo clippy --workspace --all-targets -- -D warnings
 pnpm package:win64
 ```
 
-Scoped: `pnpm --filter @gencore/<pkg> test` or `cargo test -p <crate>`. Release ZIPs are produced only by the root `package:win64` script.
+Scoped: `pnpm --filter @gencore/<pkg> test` or `cargo test -p <crate>`. Release ZIPs are produced only by the root `package:win64` script and land in `release/`.
 
 ## Git
 

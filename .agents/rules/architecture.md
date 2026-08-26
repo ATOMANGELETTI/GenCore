@@ -31,4 +31,5 @@ Rules:
 - Keep new apps/packages/crates consistent with this graph — update this rule if the graph
   changes.
 - Product distribution is **Windows x64 portable ZIP** only (`pnpm package:win64`);
-  `bundle.active` stays `false` and apps do not emit NSIS/MSI/dmg/AppImage.
+  ZIP output lands in `release/`; `bundle.active` stays `false` and apps do not emit
+  NSIS/MSI/dmg/AppImage.

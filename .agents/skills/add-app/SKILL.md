@@ -29,7 +29,8 @@ Use this when adding a new app under `apps/{name}` (e.g. a third GenCore surface
      Vite `devUrl` port).
    - `bundle.active: false`. Windows icons only (PNG + `icon.ico`). Do not set
      `targets: "all"` and do not add `icon.icns`. Release ZIP is `pnpm package:win64`.
-     New `icons/*.png` / `icon.ico` are Git LFS-tracked automatically.
+     Output lands in `release/`. New `icons/*.png` / `icon.ico` are Git LFS-tracked
+     automatically.
 5. Capabilities: `src-tauri/capabilities/main.json`, `"windows": ["main"]`, least
    privilege — only the window/core commands the shell actually uses.
 6. UI: wrap the root component in `@gencore/ui-kit`'s `AppShell` (titlebar, statusbar).

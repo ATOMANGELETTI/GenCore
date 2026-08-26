@@ -12,6 +12,8 @@ playwright-report
 !.env.example
 **/src-tauri/gen/
 artifacts/
+release/**/*.zip
+release/.staging/
 apps/terminal/src-tauri/resources/oh-my-posh/oh-my-posh.exe
 apps/terminal/src-tauri/resources/micro/micro.exe
 

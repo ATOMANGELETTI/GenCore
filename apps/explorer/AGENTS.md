@@ -48,4 +48,4 @@ tools) are intentionally out of scope for now.
 - Override density only in `src/modules/app/app.theme.css`. Keep Nord tokens
 - Tests: `apps/explorer/tests/` (JS) and `apps/explorer/src-tauri/tests/` (Rust, plus
   `crates/gencore-plugin-fs/tests/` for the filesystem commands themselves)
-- Release packaging is root `pnpm package:win64` (Windows x64 portable ZIP only)
+- Release packaging is root `pnpm package:win64` (Windows x64 portable ZIP only; output `release/`)

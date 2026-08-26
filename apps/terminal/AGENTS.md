@@ -17,4 +17,4 @@ Template Tauri 2 shell with a real PTY backend. The Files tab is a real drive-ro
 - `gencore-fs`, `gencore-pty`, and `gencore-assistant` are registered in Rust (`gencore-assistant` registers after `gencore-pty` so its commands can read the PTY plugin's managed session state). Grant only the six Files-tab `gencore-fs` commands, the four Terminal PTY commands, and the twelve `gencore-assistant` commands the UI wrappers invoke
 - Override density only in `src/modules/app/app.theme.css`. Keep Nord tokens
 - Tests: `apps/terminal/tests/` (JS) and `apps/terminal/src-tauri/tests/` (Rust)
-- Release packaging is root `pnpm package:win64` (Windows x64 portable ZIP only)
+- Release packaging is root `pnpm package:win64` (Windows x64 portable ZIP only; output `release/`)

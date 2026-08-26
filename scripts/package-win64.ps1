@@ -5,7 +5,8 @@
 
 .DESCRIPTION
   Compiles each app with `tauri build --no-bundle` for x86_64-pc-windows-msvc
-  and zips the exe. Daily `tauri:dev` / `tauri:build` do not invoke this script.
+  and zips the portable folder. Daily `tauri:dev` / `tauri:build` do not invoke
+  this script. Output is `release/`; previous ZIPs move to `release/archive/`.
 #>
 
 $ErrorActionPreference = 'Stop'
@@ -20,12 +21,47 @@ if (-not [Environment]::Is64BitOperatingSystem) {
   throw 'package:win64 requires 64-bit Windows.'
 }
 
+function Assert-NonEmptyFile {
+  param([Parameter(Mandatory)][string]$Path)
+  if (-not (Test-Path -LiteralPath $Path)) {
+    throw "Expected file not found: $Path"
+  }
+  if ((Get-Item -LiteralPath $Path).Length -eq 0) {
+    throw "Expected file is zero-byte: $Path"
+  }
+}
+
+function Move-ZipToArchive {
+  param(
+    [Parameter(Mandatory)][string]$ZipPath,
+    [Parameter(Mandatory)][string]$ArchiveDir
+  )
+  if (-not (Test-Path -LiteralPath $ZipPath)) {
+    return
+  }
+  New-Item -ItemType Directory -Force -Path $ArchiveDir | Out-Null
+  $Leaf = Split-Path -Leaf $ZipPath
+  $Dest = Join-Path $ArchiveDir $Leaf
+  if (Test-Path -LiteralPath $Dest) {
+    $Base = [System.IO.Path]::GetFileNameWithoutExtension($Leaf)
+    $Stamp = Get-Date -Format 'yyyyMMdd-HHmm'
+    $Dest = Join-Path $ArchiveDir "$Base-$Stamp.zip"
+    if (Test-Path -LiteralPath $Dest) {
+      $Stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+      $Dest = Join-Path $ArchiveDir "$Base-$Stamp.zip"
+    }
+  }
+  Move-Item -LiteralPath $ZipPath -Destination $Dest
+}
+
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 Set-Location -LiteralPath $RepoRoot
 
-$ArtifactsDir = Join-Path $RepoRoot 'artifacts'
-$StagingRoot = Join-Path $ArtifactsDir '.staging'
-New-Item -ItemType Directory -Force -Path $ArtifactsDir | Out-Null
+$ReleaseDir = Join-Path $RepoRoot 'release'
+$ArchiveDir = Join-Path $ReleaseDir 'archive'
+$StagingRoot = Join-Path $ReleaseDir '.staging'
+New-Item -ItemType Directory -Force -Path $ReleaseDir | Out-Null
+New-Item -ItemType Directory -Force -Path $ArchiveDir | Out-Null
 
 if (Test-Path -LiteralPath $StagingRoot) {
   Remove-Item -LiteralPath $StagingRoot -Recurse -Force
@@ -55,6 +91,8 @@ foreach ($App in $Apps) {
   if ($App.Filter -eq '@gencore/terminal') {
     Write-Host 'Fetching Oh My Posh...'
     & (Join-Path $PSScriptRoot 'fetch-oh-my-posh.ps1')
+    Write-Host 'Fetching micro...'
+    & (Join-Path $PSScriptRoot 'fetch-micro.ps1')
   }
 
   Write-Host "Building $ProductName $Version (windows-x64)..."
@@ -64,30 +102,25 @@ foreach ($App in $Apps) {
   }
 
   $ExeSrc = Join-Path $RepoRoot "target/x86_64-pc-windows-msvc/release/$($App.Exe)"
-  if (-not (Test-Path -LiteralPath $ExeSrc)) {
-    throw "Expected exe not found: $ExeSrc"
-  }
-
+  Assert-NonEmptyFile $ExeSrc
   Copy-Item -LiteralPath $ExeSrc -Destination (Join-Path $StageDir $App.Exe)
 
   if ($App.Filter -eq '@gencore/terminal') {
     $OmpSrc = Join-Path $RepoRoot 'apps/terminal/src-tauri/resources/oh-my-posh'
-    if (-not (Test-Path -LiteralPath (Join-Path $OmpSrc 'oh-my-posh.exe'))) {
-      throw "Oh My Posh exe missing after fetch: $OmpSrc"
-    }
-    $OmpDestParent = Join-Path $StageDir 'resources'
-    New-Item -ItemType Directory -Force -Path $OmpDestParent | Out-Null
-    Copy-Item -LiteralPath $OmpSrc -Destination (Join-Path $OmpDestParent 'oh-my-posh') -Recurse -Force
+    $MicroSrc = Join-Path $RepoRoot 'apps/terminal/src-tauri/resources/micro'
+    Assert-NonEmptyFile (Join-Path $OmpSrc 'oh-my-posh.exe')
+    Assert-NonEmptyFile (Join-Path $MicroSrc 'micro.exe')
+    $ResDest = Join-Path $StageDir 'resources'
+    New-Item -ItemType Directory -Force -Path $ResDest | Out-Null
+    Copy-Item -LiteralPath $OmpSrc -Destination (Join-Path $ResDest 'oh-my-posh') -Recurse -Force
+    Copy-Item -LiteralPath $MicroSrc -Destination (Join-Path $ResDest 'micro') -Recurse -Force
   }
 
-  $ZipPath = Join-Path $ArtifactsDir "$Slug-$Version-windows-x64.zip"
-  if (Test-Path -LiteralPath $ZipPath) {
-    Remove-Item -LiteralPath $ZipPath -Force
-  }
-
+  $ZipPath = Join-Path $ReleaseDir "$Slug-$Version-windows-x64.zip"
+  Move-ZipToArchive -ZipPath $ZipPath -ArchiveDir $ArchiveDir
   Compress-Archive -LiteralPath $StageDir -DestinationPath $ZipPath
   Write-Host "Wrote $ZipPath"
 }
 
 Remove-Item -LiteralPath $StagingRoot -Recurse -Force
-Write-Host 'Windows x64 portable ZIPs are ready under artifacts/.'
+Write-Host 'Windows x64 portable ZIPs are ready under release/.'

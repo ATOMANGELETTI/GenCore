@@ -412,5 +412,9 @@
   "5319e3aa-4c09-4c8d-82a0-3ca43114c4f6": [
     "crates/gencore-plugin-assistant",
     "apps/terminal"
+  ],
+  "528aa9b6-b4c5-48ee-aabd-1e35836a60c2": [
+    "apps/terminal",
+    "apps/explorer"
   ]
 }
