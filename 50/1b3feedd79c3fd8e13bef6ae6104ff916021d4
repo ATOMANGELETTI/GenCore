@@ -1,0 +1,19 @@
+.superpowers/docs/specs/2026-08-25-taskbar-theme-icons-design.md
+  s_60306863cb6737::t_f2b5baa3d1ad71 1-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "501b3feedd79c3fd8e13bef6ae6104ff916021d4",
+  "prompts": {},
+  "sessions": {
+    "s_60306863cb6737": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "a7c91795-4669-442b-97d4-99b408d6f37c",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
