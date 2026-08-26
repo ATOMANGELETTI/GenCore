@@ -1,0 +1,21 @@
+scripts/package-win64.ps1
+  s_5f8cb9d5ac8c12::t_a71f3bf98fe82b 8-9,24-56,60-64,94-95,105,110-116,119-120,126
+.gitignore
+  s_5f8cb9d5ac8c12::t_7f81bea9f9c3d0 15-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "170ce8974108742cce7e4903d732f1665d399bc0",
+  "prompts": {},
+  "sessions": {
+    "s_5f8cb9d5ac8c12": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "5e439a2e-2e41-4480-8b2e-d8b723ad205b",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
