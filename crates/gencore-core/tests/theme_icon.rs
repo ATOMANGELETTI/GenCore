@@ -1,4 +1,7 @@
-use gencore_core::{CoreError, SetThemeIconArgs, ThemeIconError, ThemeName, app_theme_icons};
+use gencore_core::{
+    CoreError, ICON_BIG_MAX_EDGE, ICON_SMALL_EDGE, SetThemeIconArgs, ThemeIconError, ThemeName,
+    app_theme_icons, scale_rgba_to_max_edge,
+};
 
 #[test]
 fn set_theme_icon_args_round_trip() {
@@ -36,6 +39,24 @@ fn theme_icon_error_converts_to_core_error() {
 
     let img_err: CoreError = ThemeIconError::Image("bad png".into()).into();
     assert_eq!(img_err.to_string(), "failed to decode icon image: bad png");
+
+    let window_err: CoreError = ThemeIconError::WindowIcon("denied".into()).into();
+    assert_eq!(
+        window_err.to_string(),
+        "failed to apply window icon: denied"
+    );
+
+    let taskbar_err: CoreError = ThemeIconError::TaskbarIcon("createicon".into()).into();
+    assert_eq!(
+        taskbar_err.to_string(),
+        "failed to apply taskbar icon: createicon"
+    );
+
+    let tray_err: CoreError = ThemeIconError::TrayIcon("missing png".into()).into();
+    assert_eq!(tray_err.to_string(), "failed to apply tray icon: missing png");
+
+    let rgba_err: CoreError = ThemeIconError::InvalidRgba.into();
+    assert_eq!(rgba_err.to_string(), "invalid icon rgba buffer");
 }
 
 #[test]
@@ -66,4 +87,49 @@ fn theme_icon_contrast_mapping_explorer() {
     assert!(!tray_bytes_ss.is_empty());
     assert_ne!(window_bytes_pn, window_bytes_ss);
     assert_ne!(tray_bytes_pn, tray_bytes_ss);
+}
+
+fn solid_rgba(width: u32, height: u32, r: u8, g: u8, b: u8, a: u8) -> Vec<u8> {
+    let mut pixels = Vec::with_capacity((width * height * 4) as usize);
+    for _ in 0..(width * height) {
+        pixels.extend_from_slice(&[r, g, b, a]);
+    }
+    pixels
+}
+
+#[test]
+fn scale_rgba_rejects_mismatched_buffer() {
+    let err = scale_rgba_to_max_edge(&[0, 1, 2], 2, 2, 32).expect_err("len mismatch");
+    assert_eq!(err.to_string(), "invalid icon rgba buffer");
+}
+
+#[test]
+fn scale_rgba_keeps_buffer_when_already_within_max_edge() {
+    let src = solid_rgba(4, 4, 10, 20, 30, 255);
+    let (out, width, height) = scale_rgba_to_max_edge(&src, 4, 4, 32).expect("scale");
+    assert_eq!((width, height), (4, 4));
+    assert_eq!(out, src);
+}
+
+#[test]
+fn scale_rgba_downscales_to_max_edge_with_nearest_neighbor() {
+    let src = solid_rgba(4, 4, 10, 20, 30, 255);
+    let (out, width, height) = scale_rgba_to_max_edge(&src, 4, 4, 2).expect("scale");
+    assert_eq!((width, height), (2, 2));
+    assert_eq!(out, solid_rgba(2, 2, 10, 20, 30, 255));
+    assert_eq!(ICON_BIG_MAX_EDGE, 256);
+    assert_eq!(ICON_SMALL_EDGE, 32);
+}
+
+#[cfg(windows)]
+#[test]
+fn hicon_from_rgba_creates_a_valid_icon() {
+    use gencore_core::hicon_from_rgba;
+    use windows::Win32::UI::WindowsAndMessaging::DestroyIcon;
+
+    let src = solid_rgba(32, 32, 46, 52, 64, 255);
+    let icon = hicon_from_rgba(&src, 32, 32).expect("CreateIcon");
+    unsafe {
+        DestroyIcon(icon).expect("DestroyIcon");
+    }
 }
