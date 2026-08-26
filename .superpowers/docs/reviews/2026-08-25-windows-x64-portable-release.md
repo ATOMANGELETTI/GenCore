@@ -1,9 +1,9 @@
 # Whole-branch review: Windows x64 portable release
 
-**Branch:** `feat/windows-x64-portable-release`  
-**Range:** `826e62336d50cb82e9c9fc028b8057714ce873e3` .. `e4c266e1cf47ac6481a5d97910921750df98d961`  
-**Commits:** `2785f9f` test contract → `170ce89` packager+gitignore → `9bd7733` docs+sync:agents → `e4c266e` tasks checklist  
-**Diff:** 12 files, +113 / −33 (no ZIPs, no CI, no `tauri.conf.json`)  
+**Branch:** `feat/windows-x64-portable-release`
+**Range:** `826e62336d50cb82e9c9fc028b8057714ce873e3` .. `e4c266e1cf47ac6481a5d97910921750df98d961`
+**Commits:** `2785f9f` test contract → `170ce89` packager+gitignore → `9bd7733` docs+sync:agents → `e4c266e` tasks checklist
+**Diff:** 12 files, +113 / −33 (no ZIPs, no CI, no `tauri.conf.json`)
 **Tests at HEAD (controller):** `pnpm test:scripts` 34/34. Not re-run.
 
 Reviewed against `.superpowers/docs/specs/2026-08-25-windows-x64-portable-release-design.md` and `.superpowers/docs/plans/2026-08-25-windows-x64-portable-release.md`. Local packaging (Task 4) is gitignored and outside this git range; inner ZIP layout and gitignore behavior are taken from the Task 4 review/report, which independently listed both archives.
