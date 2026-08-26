@@ -1,0 +1,28 @@
+packages/ui-kit/src/assets/icons/favicon/browser/favicon-alt_polar-night.ico
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/favicon/browser/favicon-alt_polar-night.png
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/favicon/browser/favicon-alt_snow-storm.ico
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/favicon/browser/favicon-alt_snow-storm.png
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/favicon/browser/favicon_polar-night.ico
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/favicon/browser/favicon_polar-night.png
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/favicon/browser/favicon_snow-storm.ico
+  h_90ad036e211778 1-3
+packages/ui-kit/src/assets/icons/favicon/browser/favicon_snow-storm.png
+  h_90ad036e211778 1-3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "d7bf1af54a2c0621ed8cdc427d29a44251757465",
+  "prompts": {},
+  "humans": {
+    "h_90ad036e211778": {
+      "author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
