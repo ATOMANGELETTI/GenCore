@@ -1,0 +1,23 @@
+.superpowers/docs/specs/2026-08-25-windows-x64-portable-release-design.md
+  s_9dc06eae47681c::t_e849c36621ff71 1-75
+.superpowers/docs/plans/2026-08-25-windows-x64-portable-release.md
+  s_9dc06eae47681c::t_64b8d82cd9ccdc 1-395
+.superpowers/docs/tasks/2026-08-25-windows-x64-portable-release.md
+  s_9dc06eae47681c::t_74cfcbfa6c9952 1-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "826e62336d50cb82e9c9fc028b8057714ce873e3",
+  "prompts": {},
+  "sessions": {
+    "s_9dc06eae47681c": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "737fd26c-6234-4a63-918d-50e61b2e828d",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
