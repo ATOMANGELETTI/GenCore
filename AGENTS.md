@@ -4,18 +4,20 @@ This file is the repo-wide brief. Nested `AGENTS.md` files add path-specific rul
 
 ## What this is
 
-A pnpm + Turborepo + Cargo monorepo with two real Tauri 2 apps: Terminal (a terminal emulator) and Explorer (a Nord file explorer — browse, create/rename/delete/copy/move, no PTY).
+A pnpm + Turborepo + Cargo monorepo with three real Tauri 2 apps: Terminal (a terminal emulator), Explorer (a Nord file explorer — browse, create/rename/delete/copy/move, no PTY), and Browser (a Nord web browser — tabs, bookmarks, history, downloads, real per-tab page rendering via Tauri multiwebview).
 
 ## Layout
 
 - `apps/terminal` — `@gencore/terminal`, port 5173, identifier `com.gencore.terminal`
 - `apps/explorer` — `@gencore/explorer`, port 5174, identifier `com.gencore.explorer`
+- `apps/browser` — `@gencore/browser`, port 5175, identifier `com.gencore.browser`
 - `packages/ui-kit` — Nord design system; **no** `@tauri-apps/*` imports
 - `packages/config-typescript`, `packages/config-vite` — shared tooling
 - `crates/gencore-core` — package/plugin id `gencore-core`
 - `crates/gencore-plugin-pty` — package **and** plugin id `gencore-pty`
 - `crates/gencore-plugin-fs` — package **and** plugin id `gencore-fs`
 - `crates/gencore-plugin-assistant` — package **and** plugin id `gencore-assistant`
+- `crates/gencore-plugin-browser` — package **and** plugin id `gencore-browser`
 
 Never name a crate `tauri-plugin-fs` or `tauri-plugin-pty`. Plugin id must equal `CARGO_PKG_NAME` or ACL grants never match.
 
@@ -43,6 +45,7 @@ Exact template copy:
 
 - Terminal: `Tauri Terminal Template` + version from `get_app_info`
 - Explorer: `Tauri Explorer Template` + version from `get_app_info`
+- Browser: `Tauri Browser Template` + version from `get_app_info`
 
 ## Versions
 

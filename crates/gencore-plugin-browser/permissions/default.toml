@@ -1,0 +1,5 @@
+"$schema" = "schemas/schema.json"
+
+[default]
+description = "No commands are enabled by default for the gencore-browser plugin. Consumers must explicitly allow the create_tab_webview, close_tab_webview, load_bookmarks, save_bookmarks, load_history, save_history, load_downloads, and save_downloads commands they need."
+permissions = []

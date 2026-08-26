@@ -6,8 +6,10 @@ members = [
     "crates/gencore-plugin-fs",
     "crates/gencore-plugin-assistant",
     "crates/gencore-plugin-git",
+    "crates/gencore-plugin-browser",
     "apps/terminal/src-tauri",
     "apps/explorer/src-tauri",
+    "apps/browser/src-tauri",
 ]
 
 [workspace.package]

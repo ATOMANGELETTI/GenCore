@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-create-tab-webview"
+description = "Enables the create_tab_webview command without any pre-configured scope."
+commands.allow = ["create_tab_webview"]
+
+[[permission]]
+identifier = "deny-create-tab-webview"
+description = "Denies the create_tab_webview command without any pre-configured scope."
+commands.deny = ["create_tab_webview"]

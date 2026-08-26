@@ -1,0 +1,19 @@
+[package]
+name = "gencore-browser"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Browser plugin for GenCore. Multiwebview tab management, downloads, and JSON-file-backed bookmarks/history/downloads storage."
+links = "gencore-browser"
+
+[dependencies]
+tauri = { workspace = true, features = ["unstable"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+url = "2"
+
+[build-dependencies]
+tauri-plugin = { workspace = true, features = ["build"] }

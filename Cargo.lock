@@ -1560,6 +1560,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "gencore-browser"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-plugin",
+ "thiserror 2.0.20",
+ "url",
+]
+
+[[package]]
+name = "gencore-browser-app"
+version = "0.1.0"
+dependencies = [
+ "gencore-browser",
+ "gencore-core",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-opener",
+]
+
+[[package]]
 name = "gencore-core"
 version = "0.1.0"
 dependencies = [

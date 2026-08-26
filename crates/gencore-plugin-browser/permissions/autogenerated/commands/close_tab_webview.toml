@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-close-tab-webview"
+description = "Enables the close_tab_webview command without any pre-configured scope."
+commands.allow = ["close_tab_webview"]
+
+[[permission]]
+identifier = "deny-close-tab-webview"
+description = "Denies the close_tab_webview command without any pre-configured scope."
+commands.deny = ["close_tab_webview"]

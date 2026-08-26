@@ -1,0 +1,37 @@
+{
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/tauri-v2.11.1/crates/tauri-schema-generator/schemas/capability.schema.json",
+  "identifier": "main",
+  "description": "Least-privilege capability for the Browser chrome webview only (scoped by webview label, not window label, so tab content webviews created as children of the `main` window inherit none of this): window chrome controls, OS window theme, app-info, the gencore-browser commands the chrome UI calls (tab webview create/close/navigate/eval, the built-in webview size/position/zoom/focus/show/hide commands, bookmarks/history/downloads JSON storage), and scoped open-url for the GenCore GitHub repo only. No shell, http, or filesystem access.",
+  "webviews": ["main"],
+  "permissions": [
+    "core:window:allow-close",
+    "core:window:allow-minimize",
+    "core:window:allow-toggle-maximize",
+    "core:window:allow-start-dragging",
+    "core:window:allow-theme",
+    "gencore-core:allow-get-app-info",
+    "gencore-core:allow-set-theme-icon",
+    "gencore-browser:allow-create-tab-webview",
+    "gencore-browser:allow-close-tab-webview",
+    "gencore-browser:allow-navigate-tab-webview",
+    "gencore-browser:allow-eval-tab-webview",
+    "gencore-browser:allow-load-bookmarks",
+    "gencore-browser:allow-save-bookmarks",
+    "gencore-browser:allow-load-history",
+    "gencore-browser:allow-save-history",
+    "gencore-browser:allow-load-downloads",
+    "gencore-browser:allow-save-downloads",
+    "core:webview:allow-set-webview-size",
+    "core:webview:allow-set-webview-position",
+    "core:webview:allow-set-webview-zoom",
+    "core:webview:allow-set-webview-focus",
+    "core:webview:allow-webview-hide",
+    "core:webview:allow-webview-show",
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [{ "url": "https://github.com/ATOMANGELETTI/GenCore" }]
+    }
+  ]
+}
