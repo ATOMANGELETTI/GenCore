@@ -1,0 +1,19 @@
+.superpowers/docs/reviews/2026-08-25-windows-x64-portable-release.md
+  s_9dc06eae47681c::t_ddf1f1d08e8136 1-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "cb4ed147b4a3abad8cb10f8996f0d433b1f84393",
+  "prompts": {},
+  "sessions": {
+    "s_9dc06eae47681c": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "737fd26c-6234-4a63-918d-50e61b2e828d",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
