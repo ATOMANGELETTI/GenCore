@@ -1,0 +1,19 @@
+scripts/tests/package-win64.test.mjs
+  s_25a0271c63d5d3::t_c950643e06b1e2 1-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "2785f9f823d0c0c27c389cd97bbc0828b7608af1",
+  "prompts": {},
+  "sessions": {
+    "s_25a0271c63d5d3": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "8d30107f-06dd-4b91-8d88-3aac0c729080",
+        "model": "cursor-grok-4.6-xhigh-fast"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
