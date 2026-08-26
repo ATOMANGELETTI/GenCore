@@ -1,2 +1,13 @@
+command -v git-lfs >/dev/null 2>&1 || {
+  echo >&2 "This repository requires Git LFS. Install Git for Windows (includes git-lfs) and run: git lfs install"
+  exit 2
+}
 git lfs pre-push "$@"
-pnpm turbo run lint test typecheck
+# `git lfs pre-push` reads the ref list from stdin. Husky and some GUI clients
+# can invoke this hook with an empty stdin, which uploads nothing and GitHub
+# then rejects the push with GH008. Pushing HEAD is stdin-independent.
+if [ -n "$1" ]; then
+  git lfs push "$1" HEAD
+else
+  git lfs push origin HEAD
+fi

@@ -1,0 +1,5 @@
+command -v git-lfs >/dev/null 2>&1 || {
+  echo >&2 "This repository requires Git LFS. Install Git for Windows (includes git-lfs) and run: git lfs install"
+  exit 2
+}
+git lfs post-checkout "$@"

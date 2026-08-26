@@ -1,6 +1,9 @@
 # Detect text files; do not force eol=lf (avoids a repo-wide CRLF rewrite).
 * text=auto
 
+# Husky hooks run under sh; CRLF breaks them on Git for Windows.
+.husky/** text eol=lf
+
 # Git LFS — case-insensitive globs so Icon.PNG still matches on Linux CI.
 # Do not track text (*.svg, *.gltf, source, lockfiles) or compiled outputs
 # (*.exe, *.dll) that already belong in gitignored artifacts/ / target.
