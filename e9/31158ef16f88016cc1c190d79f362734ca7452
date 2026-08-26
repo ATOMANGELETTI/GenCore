@@ -1,0 +1,22 @@
+crates/gencore-core/tests/theme_icon.rs
+  s_60306863cb6737::t_66a99d14d53563 1-4
+  s_60306863cb6737::t_2e94d5f8c68f10 42-59
+  s_60306863cb6737::t_01089807748519 91-115,120-135
+  s_60306863cb6737::t_56b769a65ea41b 116-119
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "e931158ef16f88016cc1c190d79f362734ca7452",
+  "prompts": {},
+  "sessions": {
+    "s_60306863cb6737": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "a7c91795-4669-442b-97d4-99b408d6f37c",
+        "model": "grok-4.6"
+      },
+      "human_author": "ATOMANGELETTI <DUSTIN@ANGELETTI.SPACE>"
+    }
+  }
+}
