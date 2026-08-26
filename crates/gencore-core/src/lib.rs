@@ -19,8 +19,11 @@ pub use modules::telemetry::{
     classify_gpu, get_system_telemetry, pick_gpus,
 };
 pub use modules::theme_icon::{
-    MAIN_TRAY_ID, SetThemeIconArgs, ThemeIconError, ThemeName, app_theme_icons, set_theme_icon,
+    ICON_BIG_MAX_EDGE, ICON_SMALL_EDGE, MAIN_TRAY_ID, SetThemeIconArgs, ThemeIconError, ThemeName,
+    app_theme_icons, scale_rgba_to_max_edge, set_theme_icon,
 };
+#[cfg(windows)]
+pub use modules::theme_icon::{ThemeIconState, apply_taskbar_icons, create_hicon_from_rgba};
 pub use modules::tray::{
     PxRect, PxSize, TrayAction, TrayActionArgs, TrayError, tray_action, tray_menu_origin,
 };
@@ -44,6 +47,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
         ])
         .setup(|app, _api| {
             app.manage(TelemetryState::new());
+            #[cfg(windows)]
+            app.manage(crate::ThemeIconState::new());
             Ok(())
         })
         .build()

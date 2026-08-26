@@ -412,8 +412,5 @@
   "5319e3aa-4c09-4c8d-82a0-3ca43114c4f6": [
     "crates/gencore-plugin-assistant",
     "apps/terminal"
-  ],
-  "a7c91795-4669-442b-97d4-99b408d6f37c": [
-    "crates/gencore-core"
   ]
 }

@@ -8,4 +8,16 @@ pub enum ThemeIconError {
 
     #[error("failed to decode icon image: {0}")]
     Image(String),
+
+    #[error("failed to apply window icon: {0}")]
+    WindowIcon(String),
+
+    #[error("failed to apply taskbar icon: {0}")]
+    TaskbarIcon(String),
+
+    #[error("failed to apply tray icon: {0}")]
+    TrayIcon(String),
+
+    #[error("invalid icon rgba buffer")]
+    InvalidRgba,
 }

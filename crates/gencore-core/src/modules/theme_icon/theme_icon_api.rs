@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager, Runtime, image::Image};
 
 use super::theme_icon_error::ThemeIconError;
+use super::theme_icon_scale::{ICON_SMALL_EDGE, scale_rgba_to_max_edge};
 use crate::modules::error::CoreError;
 
 pub const MAIN_TRAY_ID: &str = "main-tray";
@@ -80,12 +81,40 @@ pub async fn set_theme_icon<R: Runtime>(
     let tray_image = Image::from_bytes(tray_bytes)
         .map_err(|e| CoreError::ThemeIcon(ThemeIconError::Image(e.to_string())))?;
 
-    if let Some(main) = app.get_webview_window("main") {
-        let _ = main.set_icon(window_image);
+    let main = app
+        .get_webview_window("main")
+        .ok_or(ThemeIconError::WindowMissing)?;
+
+    let (small_rgba, small_w, small_h) = scale_rgba_to_max_edge(
+        window_image.rgba(),
+        window_image.width(),
+        window_image.height(),
+        ICON_SMALL_EDGE,
+    )?;
+    main.set_icon(Image::new(&small_rgba, small_w, small_h))
+        .map_err(|e| ThemeIconError::WindowIcon(e.to_string()))?;
+
+    #[cfg(windows)]
+    {
+        use super::theme_icon_win::{ThemeIconState, apply_taskbar_icons};
+
+        let hwnd_bits = main
+            .hwnd()
+            .map_err(|e| ThemeIconError::TaskbarIcon(e.to_string()))?
+            .0 as isize;
+        let state = app.state::<ThemeIconState>();
+        apply_taskbar_icons(
+            hwnd_bits,
+            window_image.rgba(),
+            window_image.width(),
+            window_image.height(),
+            &state,
+        )?;
     }
 
     if let Some(tray) = app.tray_by_id(MAIN_TRAY_ID) {
-        let _ = tray.set_icon(Some(tray_image));
+        tray.set_icon(Some(tray_image))
+            .map_err(|e| ThemeIconError::TrayIcon(e.to_string()))?;
     }
 
     Ok(())

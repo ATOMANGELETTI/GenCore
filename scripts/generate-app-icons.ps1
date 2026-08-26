@@ -1,10 +1,11 @@
 #Requires -Version 7.2
 <#
 .SYNOPSIS
-  Rasterize Windows PNG/ICO and tray.png from each app's SVG masters.
+  Rasterize Windows PNG/ICO and tray.png from ui-kit favicons and tray.svg.
 
 .DESCRIPTION
-  Runs `tauri icon` for Terminal and Explorer, keeps Windows bundle rasters,
+  Runs `tauri icon` for Terminal and Explorer using the ui-kit snow-storm
+  taskbar favicon (not the old Opus 5 icon.svg), keeps Windows bundle rasters,
   and writes a 32x32 tray.png from tray.svg without overwriting 32x32.png.
 #>
 
@@ -26,18 +27,18 @@ function Remove-IfPresent {
 
 foreach ($Name in $Apps) {
   $icons = Join-Path $RepoRoot "apps/$Name/src-tauri/icons"
-  $IconSvg = Join-Path $icons 'icon.svg'
+  $IconPng = Join-Path $RepoRoot "packages/ui-kit/src/assets/icons/favicon/$Name/favicon_snow-storm.png"
   $TraySvg = Join-Path $icons 'tray.svg'
 
-  if (-not (Test-Path -LiteralPath $IconSvg)) {
-    throw "Missing icon master: $IconSvg"
+  if (-not (Test-Path -LiteralPath $IconPng)) {
+    throw "Missing ui-kit favicon: $IconPng"
   }
   if (-not (Test-Path -LiteralPath $TraySvg)) {
     throw "Missing tray master: $TraySvg"
   }
 
   Write-Host "Rasterizing $Name app icon..."
-  pnpm --filter "@gencore/$Name" exec -- tauri icon $IconSvg -o $icons
+  pnpm --filter "@gencore/$Name" exec -- tauri icon $IconPng -o $icons
   if ($LASTEXITCODE -ne 0) {
     throw "tauri icon failed for $Name app icon (exit $LASTEXITCODE)"
   }

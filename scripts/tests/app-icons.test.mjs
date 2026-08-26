@@ -127,3 +127,12 @@ test("icon.ico files exist and start with ICO magic", () => {
     assert.deepEqual(buf.subarray(0, 4), ICO_MAGIC, `${app} icon.ico`);
   }
 });
+
+test("generate-app-icons.ps1 rasters app icons from ui-kit favicon_snow-storm.png", () => {
+  const script = read("scripts/generate-app-icons.ps1");
+  assert.match(
+    script,
+    /packages\/ui-kit\/src\/assets\/icons\/favicon\/\$Name\/favicon_snow-storm\.png/,
+  );
+  assert.doesNotMatch(script, /tauri icon \$IconSvg/);
+});

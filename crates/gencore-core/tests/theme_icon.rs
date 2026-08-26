@@ -53,7 +53,10 @@ fn theme_icon_error_converts_to_core_error() {
     );
 
     let tray_err: CoreError = ThemeIconError::TrayIcon("missing png".into()).into();
-    assert_eq!(tray_err.to_string(), "failed to apply tray icon: missing png");
+    assert_eq!(
+        tray_err.to_string(),
+        "failed to apply tray icon: missing png"
+    );
 
     let rgba_err: CoreError = ThemeIconError::InvalidRgba.into();
     assert_eq!(rgba_err.to_string(), "invalid icon rgba buffer");
@@ -124,12 +127,8 @@ fn scale_rgba_downscales_to_max_edge_with_nearest_neighbor() {
 #[cfg(windows)]
 #[test]
 fn hicon_from_rgba_creates_a_valid_icon() {
-    use gencore_core::hicon_from_rgba;
-    use windows::Win32::UI::WindowsAndMessaging::DestroyIcon;
+    use gencore_core::create_hicon_from_rgba;
 
     let src = solid_rgba(32, 32, 46, 52, 64, 255);
-    let icon = hicon_from_rgba(&src, 32, 32).expect("CreateIcon");
-    unsafe {
-        DestroyIcon(icon).expect("DestroyIcon");
-    }
+    create_hicon_from_rgba(&src, 32, 32).expect("CreateIcon");
 }
