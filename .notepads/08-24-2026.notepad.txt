@@ -8,3 +8,225 @@
 [x] FIX TASKBAR NEW ICON
 [ ] UPDATE TERMINAL SMALL FUNCTIONALITY
 [ ] UPDATE TERMINAL TRAY MENU
+
+
+my_desktop_app/
+├── .agents/                               # Open Agentic workflows & tool specs
+│   ├── skills/                            # Modular procedural skill definitions
+│   │   ├── build_release/
+│   │   │   └── SKILL.md                   # Multi-platform build & signing procedure
+│   │   └── run_migrations/
+│   │       └── SKILL.md                   # Alembic schema migration workflow
+│   └── workflows.json                     # Shared task automation orchestration
+├── .claude/                               # Claude Code workspace configuration
+│   ├── commands/                          # Custom slash commands
+│   │   ├── compile-qrc.md                 # Slash command to recompile Qt resources
+│   │   └── test-gui.md                    # Slash command for headless Qt test runs
+│   ├── rules/                             # Scoped AI coding constraints
+│   │   ├── db-rules.md                    # Database & transaction boundaries
+│   │   └── gui-rules.md                   # Thread safety & signal-slot rules
+│   ├── mcp.json                           # Model Context Protocol servers (FS, Git, SQLite)
+│   └── settings.json                      # Workspace preferences & context permissions
+├── .cursor/                               # Cursor IDE AI rules & hooks
+│   ├── rules/                             # Glob-scoped rules (.mdc)
+│   │   ├── 00-architecture.mdc            # Global project layering rules
+│   │   ├── 01-qt-threading.mdc            # QThreadPool & worker isolation rules
+│   │   └── 02-pydantic-validation.mdc     # DTO serialization constraints
+│   └── hooks.json                         # Cursor agent lifecycle hooks
+├── .devcontainer/                         # Containerized development & CI environment
+│   ├── devcontainer.json                  # VS Code container specifications & extensions
+│   ├── Dockerfile                         # Linux GUI testing environment (Xvfb/OpenGL support)
+│   └── post_create.sh                     # Dependency lock installation & hook init
+├── .github/                               # GitHub CI/CD, issue templates & repository governance
+│   ├── ISSUE_TEMPLATE/
+│   │   ├── bug_report.yml                 # Structured YAML bug reporting form
+│   │   ├── config.yml                     # Issue template chooser configuration
+│   │   └── feature_request.yml            # Feature proposal template
+│   ├── workflows/
+│   │   ├── ci.yml                         # Multi-OS test matrix (Win, macOS, Ubuntu)
+│   │   ├── lint-typecheck.yml             # Ruff, MyPy, and Bandit security scans
+│   │   ├── release-installers.yml         # Inno Setup (Win), DMG (macOS), AppImage (Linux)
+│   │   └── security-audit.yml             # pip-audit & vulnerability checks
+│   ├── CODEOWNERS                         # Pull request review assignment rules
+│   ├── copilot-instructions.md            # GitHub Copilot agentic guidelines
+│   ├── dependabot.yml                     # Automated dependency updates
+│   └── pull_request_template.md           # PR review checklist and QA verification
+├── .husky/                                # Local Git lifecycle hooks
+│   ├── _/                                 # Husky internal helper scripts
+│   ├── pre-commit                         # Pre-commit hook: Ruff check & format
+│   └── pre-push                           # Pre-push hook: Unit test runner
+├── .vscode/                               # VS Code / Cursor workspace settings
+│   ├── extensions.json                    # Recommended extensions (Pylance, Qt, Ruff)
+│   ├── launch.json                        # Debug profiles (GUI app, Pytest, PyInstaller)
+│   ├── settings.json                      # Formatter overrides, linters, python path
+│   └── tasks.json                         # Build tasks (compile QRC, rebuild translations)
+├── assets/                                # Static media & styling assets
+│   ├── fonts/
+│   │   ├── Inter-Bold.ttf
+│   │   └── Inter-Regular.ttf
+│   ├── icons/
+│   │   ├── app_icon.ico                   # Windows executable icon (multi-resolution)
+│   │   ├── app_icon.icns                  # macOS bundle icon
+│   │   ├── app_icon.png                   # High-resolution raster icon (512x512)
+│   │   ├── app_icon.svg                   # Scalable vector icon
+│   │   └── tray_icon.png                  # System tray / Taskbar icon
+│   ├── images/
+│   │   ├── banner.png                     # About screen graphic
+│   │   └── splash_screen.png              # App launch splash graphic
+│   ├── styles/
+│   │   ├── dark.qss                       # Dark mode Qt Stylesheet
+│   │   ├── light.qss                      # Light mode Qt Stylesheet
+│   │   └── variables.json                 # Design tokens (colors, padding, radiuses)
+│   └── templates/
+│       └── export_pdf.html                # Jinja2 template for PDF report generation
+├── build_scripts/                         # Distribution and packaging automation
+│   ├── clean.py                           # Scrubber for dist/, build/, and cache artifacts
+│   ├── compile_resources.py               # Resource compiler (`pyside6-rcc`)
+│   ├── compile_translations.py            # Translation compiler (`pyside6-lrelease`)
+│   ├── dmg_settings.py                    # macOS DMG visual layout script (`dmgbuild`)
+│   ├── entitlements.mac.plist             # macOS Hardened Runtime code-signing entitlements
+│   ├── inno_setup.iss                     # Windows setup wizard generator (Inno Setup)
+│   └── pyinstaller.spec                   # PyInstaller executable bundling specification
+├── config/                                # Centralized external runtime configurations
+│   ├── app.default.toml                   # Factory default application settings
+│   ├── logging.yaml                       # Log handlers & rotation settings
+│   ├── mcp_servers.json                   # Shared desktop MCP server configuration
+│   └── sentry.toml                        # Crash telemetry reporting settings
+├── docs/                                  # Project documentation
+│   ├── api/
+│   │   └── architecture.md                # System topology & threading documentation
+│   ├── user_guide/
+│   │   ├── installation.md                # End-user setup guide
+│   │   └── shortcuts.md                   # Global hotkeys and keyboard shortcuts
+│   ├── CONTRIBUTING.md                    # Developer guidelines & setup
+│   └── SECURITY.md                        # Vulnerability reporting policy
+├── migrations/                            # Database schema migrations (Alembic)
+│   ├── versions/
+│   │   ├── 0001_initial_schema.py         # Initial database schema definition
+│   │   └── 0002_add_user_settings.py      # Incremental schema evolution
+│   ├── env.py                             # Alembic runtime environment
+│   ├── README                             # Migration documentation
+│   └── script.py.mako                     # Migration file template
+├── plugins/                               # Dynamically loaded runtime extensions
+│   ├── __init__.py
+│   ├── plugin_base.py                     # Abstract Base Class for plugins
+│   └── example_exporter/
+│       ├── __init__.py
+│       └── exporter.py                    # Example concrete plugin implementation
+├── resources/                             # Raw Qt resource files
+│   └── resources.qrc                      # XML index mapping assets to Qt binaries
+├── src/                                   # Application source code
+│   └── my_desktop_app/
+│       ├── __init__.py                    # Exposes __version__ and package metadata
+│       ├── __main__.py                    # Main app entry point (`python -m my_desktop_app`)
+│       ├── core/                          # Low-level systems, app state, & runtime utilities
+│       │   ├── __init__.py
+│       │   ├── app_state.py               # Central reactive application state store
+│       │   ├── config.py                  # Pydantic Settings with platformdirs resolution
+│       │   ├── constants.py               # Global immutable values & defaults
+│       │   ├── event_bus.py               # Decoupled Publish-Subscribe broker
+│       │   ├── exceptions.py              # Application-specific error hierarchy
+│       │   ├── keychain.py                # OS Secure Vault bridge (Win Creds / macOS Keychain)
+│       │   ├── logger.py                  # Loguru rotated file & console handlers
+│       │   ├── single_instance.py         # QLocalServer duplicate execution lock
+│       │   ├── updater.py                 # Delta patch & update installer
+│       │   └── workers.py                 # QRunnable & QThreadPool task execution engine
+│       ├── db/                            # Persistence & Data Access Layer
+│       │   ├── __init__.py
+│       │   ├── connection.py              # SQLite connection pool & transaction manager
+│       │   ├── models.py                  # SQLAlchemy / SQLModel ORM entities
+│       │   └── repositories/              # Repository pattern for data operations
+│       │       ├── __init__.py
+│       │       ├── base_repository.py     # Generic CRUD repository interface
+│       │       └── item_repository.py     # Entity-specific database operations
+│       ├── i18n/                          # Internationalization & translation catalogs
+│       │   ├── __init__.py
+│       │   ├── i18n_manager.py            # Dynamic runtime language switcher
+│       │   └── translations/
+│       │       ├── app_de.qm              # Compiled German binary catalog
+│       │       ├── app_de.ts              # German XML translation source
+│       │       ├── app_en.qm              # Compiled English binary catalog
+│       │       ├── app_en.ts              # English XML translation source
+│       │       ├── app_es.qm              # Compiled Spanish binary catalog
+│       │       └── app_es.ts              # Spanish XML translation source
+│       ├── models/                        # Domain DTOs & validation schemas
+│       │   ├── __init__.py
+│       │   ├── app_settings.py            # Strongly-typed user preferences
+│       │   ├── item.py                    # Core business entities
+│       │   └── telemetry_event.py         # Crash / diagnostic event payloads
+│       ├── services/                      # Business operations & external adapters
+│       │   ├── __init__.py
+│       │   ├── api_client.py              # HTTP client (httpx / requests)
+│       │   ├── backup_service.py          # SQLite database backup & compression
+│       │   ├── file_exporter.py           # PDF, CSV, and XLSX export engines
+│       │   ├── notification_service.py    # Desktop OS-native toast notifications
+│       │   └── telemetry_service.py       # Crash reporter (Sentry bridge)
+│       └── ui/                            # Presentation Layer (Views & Components)
+│           ├── __init__.py
+│           ├── app.py                     # QApplication configuration & styling setup
+│           ├── main_window.py             # Root QMainWindow layout & menu bar
+│           ├── tray_manager.py            # Taskbar minimize & system tray menu
+│           ├── components/                # Reusable custom UI widgets
+│           │   ├── __init__.py
+│           │   ├── async_button.py        # Action button with built-in loading state
+│           │   ├── card_widget.py         # Styled container card widget
+│           │   ├── search_bar.py          # Debounced search input widget
+│           │   └── status_bar.py          # Interactive bottom status strip
+│           ├── dialogs/                   # Modal and utility dialogs
+│           │   ├── __init__.py
+│           │   ├── about_dialog.py        # Version, license, and author modal
+│           │   ├── confirm_dialog.py      # Destructive action confirmation dialog
+│           │   ├── error_dialog.py        # Detailed error traceback inspection window
+│           │   └── settings_dialog.py     # Preferences window (Themes, Paths, Network)
+│           ├── presenters/                # MVP pattern controllers
+│           │   ├── __init__.py
+│           │   ├── base_presenter.py
+│           │   └── dashboard_presenter.py
+│           ├── views/                     # Primary screen layouts
+│           │   ├── __init__.py
+│           │   ├── dashboard_view.py      # Primary application workspace
+│           │   ├── logs_view.py           # Real-time interactive app log console
+│           │   └── splash_screen.py       # Bootloader splash screen with progress bar
+│           └── resources_rc.py            # Compiled Qt binary resource module
+├── tests/                                 # Automated test suite
+│   ├── __init__.py
+│   ├── conftest.py                        # Root fixtures (QApplication, temp DB, mocks)
+│   ├── fixtures/                          # Static mock files and payloads
+│   │   ├── mock_config.json
+│   │   └── sample_export_data.json
+│   ├── gui/                               # PySide6 GUI automation tests (`pytest-qt`)
+│   │   ├── __init__.py
+│   │   ├── test_async_button.py
+│   │   ├── test_dashboard_view.py
+│   │   └── test_main_window.py
+│   ├── integration/                       # Service, database, and migration tests
+│   │   ├── __init__.py
+│   │   ├── test_backup_service.py
+│   │   └── test_db_repository.py
+│   └── unit/                              # Isolated fast business logic tests
+│       ├── __init__.py
+│       ├── test_app_state.py
+│       ├── test_config.py
+│       └── test_event_bus.py
+├── .bandit                                # Bandit security linter scan configuration
+├── .commitlintrc.json                     # Conventional Commit enforcement rules
+├── .coveragerc                            # Code coverage measurement exclusions
+├── .dockerignore                          # Files excluded from container builds
+├── .editorconfig                          # Cross-editor formatting rules (spaces, line endings)
+├── .env.example                           # Template for developer environment variables
+├── .gitattributes                         # Git line-ending normalization (CRLF/LF) & binary flags
+├── .gitignore                             # Git ignore rules (binaries, venv, IDE, cache, dist)
+├── .pre-commit-config.yaml                # Git pre-commit framework configurations
+├── .prettierignore                        # Prettier file exclusions
+├── .prettierrc.json                       # Formatter settings for JSON, YAML, and Markdown
+├── .pylintrc                              # Python static analysis rules
+├── .python-version                        # Declared Python version for pyenv/mise/uv
+├── AGENTS.md                              # Global system instructions for AI agents
+├── alembic.ini                            # Database migration tool configuration
+├── CHANGELOG.md                           # Keep-a-Changelog formatted release history
+├── CLAUDE.md                              # Claude Code system prompts and baseline preferences
+├── LICENSE                                # Project distribution license (MIT / Apache 2.0)
+├── Makefile                               # Developer CLI commands (lint, test, build, clean)
+├── pyproject.toml                         # Unified configuration for Hatch, Ruff, MyPy, and Pytest
+├── README.md                              # Repository overview and onboarding guide
+└── uv.lock                                # Deterministic dependency lockfile
